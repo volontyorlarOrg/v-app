@@ -23,14 +23,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 
-/**
- * Opportunity detail — the page a Telegram link actually opens.
- *
- * Indexable, server-rendered, and readable without JavaScript. Everything a
- * volunteer needs in order to decide is above the fold on a 360px screen:
- * what it is, when, where, by when to apply, and the apply button.
- */
-
 export async function generateMetadata(
   props: PageProps<"/[locale]/opportunities/[slug]">,
 ): Promise<Metadata> {
@@ -38,7 +30,10 @@ export async function generateMetadata(
   const opportunity = await getOpportunity(slug);
 
   if (!opportunity) {
-    const t = await getTranslations({ locale, namespace: "errors.opportunityNotFound" });
+    const t = await getTranslations({
+      locale,
+      namespace: "errors.opportunityNotFound",
+    });
     return { title: t("title"), robots: { index: false, follow: false } };
   }
 
@@ -61,22 +56,6 @@ export async function generateMetadata(
     },
   };
 }
-
-/**
- * Deliberately **no** `generateStaticParams`.
- *
- * This page reads the session to decide its call to action — "Apply",
- * "Sign in to apply", or "You have applied" — and a route that reads cookies
- * cannot be statically prerendered. Exporting `generateStaticParams` here
- * marks the route static and every request then fails with
- * `DYNAMIC_SERVER_USAGE`.
- *
- * Rendering dynamically costs less than it looks: the expensive part is the
- * backend read, and that is cached by `revalidate` + tags inside
- * `getOpportunity`, so a burst of visitors arriving from one Telegram link
- * share a single upstream fetch. The sitemap still enumerates slugs through
- * `listOpportunitySlugs`.
- */
 
 export default async function OpportunityDetailPage(
   props: PageProps<"/[locale]/opportunities/[slug]">,
@@ -101,7 +80,7 @@ export default async function OpportunityDetailPage(
     <article className="flex flex-col gap-6">
       <Link
         href="/opportunities"
-        className="inline-flex w-fit items-center gap-1.5 text-sm font-bold text-muted transition-colors hover:text-ink"
+        className="inline-flex w-fit items-center gap-1.5 text-sm font-bold text-ink-muted transition-colors hover:text-ink"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("detail.backToList")}
@@ -112,7 +91,7 @@ export default async function OpportunityDetailPage(
           <OpportunityStatusBadge opportunity={opportunity} />
           <OpportunityDeadline deadline={opportunity.applicationDeadline} />
           {opportunity.sourcedByYvc ? (
-            <Badge tone="signalQuiet" icon={<BadgeCheck aria-hidden="true" />}>
+            <Badge tone="structure" icon={<BadgeCheck aria-hidden="true" />}>
               {t("detail.sourcedBy")}
             </Badge>
           ) : (
@@ -121,7 +100,7 @@ export default async function OpportunityDetailPage(
         </div>
 
         <h1 className="text-2xl leading-tight sm:text-4xl">{opportunity.title}</h1>
-        <p className="max-w-2xl text-base leading-8 text-muted">
+        <p className="max-w-2xl text-base leading-8 text-ink-muted">
           {opportunity.summary}
         </p>
       </header>
@@ -143,7 +122,7 @@ export default async function OpportunityDetailPage(
                     {opportunity.organization.verified ? (
                       <BadgeCheck
                         aria-label={t("detail.sourcedBy")}
-                        className="size-4 text-teal"
+                        className="size-4 text-blue-deep"
                       />
                     ) : null}
                   </span>
@@ -174,10 +153,7 @@ export default async function OpportunityDetailPage(
                 label={t("detail.deadline")}
                 value={
                   <time dateTime={opportunity.applicationDeadline}>
-                    {format.dateTime(
-                      new Date(opportunity.applicationDeadline),
-                      "long",
-                    )}
+                    {format.dateTime(new Date(opportunity.applicationDeadline), "long")}
                   </time>
                 }
               />
@@ -195,7 +171,7 @@ export default async function OpportunityDetailPage(
             <h2 id="about" className="text-lg">
               {t("detail.description")}
             </h2>
-            <p className="max-w-prose leading-8 text-muted whitespace-pre-line">
+            <p className="max-w-prose leading-8 whitespace-pre-line text-ink-muted">
               {opportunity.description}
             </p>
           </section>
@@ -209,11 +185,11 @@ export default async function OpportunityDetailPage(
                 {opportunity.requirements.map((requirement) => (
                   <li
                     key={requirement}
-                    className="flex items-start gap-2.5 leading-7 text-muted"
+                    className="flex items-start gap-2.5 leading-7 text-ink-muted"
                   >
                     <CircleCheck
                       aria-hidden="true"
-                      className="mt-1.5 size-4 shrink-0 text-teal"
+                      className="mt-1.5 size-4 shrink-0 text-blue-deep"
                     />
                     {requirement}
                   </li>
@@ -227,12 +203,7 @@ export default async function OpportunityDetailPage(
               <h2 id="questions" className="text-lg">
                 {t("detail.questions")}
               </h2>
-              {/*
-                Showing the questions before sign-in is deliberate: a volunteer
-                should know what a 600-word essay commitment looks like before
-                creating an account, not after.
-              */}
-              <ol className="flex list-decimal flex-col gap-2 pl-5 leading-7 text-muted marker:text-teal">
+              <ol className="flex list-decimal flex-col gap-2 pl-5 leading-7 text-ink-muted marker:text-blue-deep">
                 {opportunity.questions.map((question) => (
                   <li key={question.id}>{question.prompt}</li>
                 ))}
@@ -241,14 +212,10 @@ export default async function OpportunityDetailPage(
           ) : null}
         </div>
 
-        {/*
-          Sticky on desktop; in normal flow on mobile, where a fixed bar would
-          collide with the tab bar and eat a third of a small screen.
-        */}
         <Surface as="aside" padding="md" className="lg:sticky lg:top-24">
           <div className="flex flex-col gap-3">
             {opportunity.spotsRemaining !== undefined ? (
-              <p className="text-sm text-muted">
+              <p className="text-sm text-ink-muted">
                 {t("detail.spotsLeft", { count: opportunity.spotsRemaining })}
               </p>
             ) : null}
@@ -272,9 +239,7 @@ export default async function OpportunityDetailPage(
                     {t("cta.signInToApply")}
                   </Link>
                 </Button>
-                <p className="text-xs leading-6 text-muted">
-                  {common("tagline")}
-                </p>
+                <p className="text-xs leading-6 text-ink-muted">{common("tagline")}</p>
               </>
             )}
           </div>
@@ -295,9 +260,9 @@ function Fact({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 text-teal [&_svg]:size-4">{icon}</span>
+      <span className="mt-0.5 text-blue-deep [&_svg]:size-4">{icon}</span>
       <div className="flex flex-col gap-0.5">
-        <dt className="text-xs font-extrabold tracking-[0.14em] text-muted uppercase">
+        <dt className="text-xs font-extrabold tracking-[0.14em] text-ink-muted uppercase">
           {label}
         </dt>
         <dd className="text-sm leading-6 text-ink">{value}</dd>

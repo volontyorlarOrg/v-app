@@ -14,13 +14,6 @@ import { ApiErrorState } from "@/components/shared/api-error-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
 
-/**
- * One application.
- *
- * A draft renders the editable form; anything submitted renders read-only
- * answers. The distinction comes from `isEditable`, not from a status string
- * compared inline, so "which states can still be changed" has one definition.
- */
 export default async function ApplicationDetailPage(
   props: PageProps<"/[locale]/applications/[applicationId]">,
 ) {
@@ -66,13 +59,13 @@ export default async function ApplicationDetailPage(
 
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-extrabold tracking-[0.14em] text-muted uppercase">
+            <dt className="text-xs font-extrabold tracking-[0.14em] text-ink-muted uppercase">
               {t("detail.opportunity")}
             </dt>
             <dd className="mt-1">
               <Link
                 href={`/opportunities/${application.opportunity.slug}`}
-                className="text-teal underline-offset-4 hover:underline"
+                className="text-blue-deep underline-offset-4 hover:underline"
               >
                 {application.opportunity.title}
               </Link>
@@ -81,7 +74,7 @@ export default async function ApplicationDetailPage(
 
           {application.submittedAt ? (
             <div>
-              <dt className="text-xs font-extrabold tracking-[0.14em] text-muted uppercase">
+              <dt className="text-xs font-extrabold tracking-[0.14em] text-ink-muted uppercase">
                 {t("detail.submittedOn")}
               </dt>
               <dd className="mt-1 text-ink">
@@ -111,11 +104,9 @@ export default async function ApplicationDetailPage(
           </h2>
 
           {application.answers.map((answer) => (
-            <Surface key={answer.questionId} padding="md" tone="field">
-              <p className="whitespace-pre-line leading-7 text-muted">
-                {Array.isArray(answer.value)
-                  ? answer.value.join(", ")
-                  : answer.value}
+            <Surface key={answer.questionId} padding="md" tone="muted">
+              <p className="leading-7 whitespace-pre-line text-ink-muted">
+                {Array.isArray(answer.value) ? answer.value.join(", ") : answer.value}
               </p>
             </Surface>
           ))}

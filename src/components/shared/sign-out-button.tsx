@@ -8,13 +8,6 @@ import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/features/auth/actions";
 
-/**
- * Sign out.
- *
- * Navigates to `/login` rather than refreshing in place: after the session
- * cookie is gone, refreshing the current authenticated route would bounce
- * through the proxy redirect anyway, and going straight there is one hop less.
- */
 export function SignOutButton() {
   const t = useTranslations("profile.settings");
   const auth = useTranslations("auth.session");

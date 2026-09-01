@@ -1,17 +1,17 @@
 {
   "list": {
-    "title": "Ko'ngillilik imkoniyatlari",
+    "title": "Koʻngillilik imkoniyatlari",
     "subtitle": "YVC jamoasi topgan va tekshirgan haqiqiy tadbirlar.",
     "resultCount": "{count, plural, =0 {Imkoniyat topilmadi} other {# ta imkoniyat}}",
-    "emptyTitle": "Bu filtrlarga mos imkoniyat yo'q",
-    "emptyBody": "Kengroq hudud tanlang yoki filtrlarni tozalab, ochiq imkoniyatlarning barchasini ko'ring.",
-    "errorTitle": "Imkoniyatlarni yuklab bo'lmadi",
-    "errorBody": "Muammo biz tomonda. Bir daqiqadan so'ng qayta urinib ko'ring."
+    "emptyTitle": "Bu filtrlarga mos imkoniyat yoʻq",
+    "emptyBody": "Kengroq hudud tanlang yoki filtrlarni tozalab, ochiq imkoniyatlarning barchasini koʻring.",
+    "errorTitle": "Imkoniyatlarni yuklab boʻlmadi",
+    "errorBody": "Muammo biz tomonda. Bir daqiqadan soʻng qayta urinib koʻring."
   },
   "filters": {
     "legend": "Imkoniyatlarni filtrlash",
     "search": "Qidiruv",
-    "searchPlaceholder": "Tadbir, tashkilotchi, kalit so'z",
+    "searchPlaceholder": "Tadbir, tashkilotchi, kalit soʻz",
     "region": "Hudud",
     "regionAny": "Barcha hududlar",
     "format": "Format",
@@ -23,7 +23,7 @@
   "sort": {
     "deadline": "Tez yopiladigan",
     "startDate": "Tez boshlanadigan",
-    "newest": "Yangi qo'shilgan"
+    "newest": "Yangi qoʻshilgan"
   },
   "format": {
     "onsite": "Joyida",
@@ -44,9 +44,9 @@
     "deadline": "Arizalar qabuli tugaydi",
     "requirements": "Nima talab qilinadi",
     "description": "Imkoniyat haqida",
-    "capacity": "Kerakli ko'ngillilar",
+    "capacity": "Kerakli koʻngillilar",
     "spotsLeft": "{count, plural, other {# ta joy qoldi}}",
-    "questions": "Sizdan nima so'raladi",
+    "questions": "Sizdan nima soʻraladi",
     "questionCount": "{count, plural, other {# ta savol}}",
     "sourcedBy": "YVC topgan",
     "partnerOpportunity": "Hamkor imkoniyati",
@@ -66,7 +66,7 @@
     "continueDraft": "Qoralamani davom ettirish",
     "alreadyApplied": "Siz ariza topshirgansiz",
     "signInToApply": "Ariza topshirish uchun kiring",
-    "viewApplication": "Arizani ko'rish"
+    "viewApplication": "Arizani koʻrish"
   },
   "save": {
     "add": "Imkoniyatni saqlash",
@@ -76,14 +76,14 @@
   },
   "saved": {
     "title": "Saqlangan imkoniyatlar",
-    "subtitle": "Keyinroq uchun ajratib qo'yganlaringiz.",
+    "subtitle": "Keyinroq uchun ajratib qoʻyganlaringiz.",
     "emptyTitle": "Hali hech narsa saqlamadingiz",
-    "emptyBody": "Ko'rish davomida imkoniyatni saqlang — u shu yerda sizni kutadi."
+    "emptyBody": "Koʻrish davomida imkoniyatni saqlang — u shu yerda sizni kutadi."
   },
   "regions": {
     "andijan": "Andijon viloyati",
     "bukhara": "Buxoro viloyati",
-    "fergana": "Farg'ona viloyati",
+    "fergana": "Fargʻona viloyati",
     "jizzakh": "Jizzax viloyati",
     "kashkadarya": "Qashqadaryo viloyati",
     "khorezm": "Xorazm viloyati",
@@ -94,6 +94,6 @@
     "surkhandarya": "Surxondaryo viloyati",
     "tashkent-region": "Toshkent viloyati",
     "tashkent-city": "Toshkent shahri",
-    "karakalpakstan": "Qoraqalpog'iston Respublikasi"
+    "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
   }
 }

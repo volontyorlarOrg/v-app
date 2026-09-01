@@ -9,16 +9,6 @@ import {
   stripLocale,
 } from "./policy";
 
-/**
- * Route policy.
- *
- * These are the tests that stop a privacy regression from shipping quietly.
- * The product deliberately does *not* copy the reference architecture's
- * blanket noindex, which means "is this route public?" is now a decision with
- * a wrong answer — and the wrong answer puts a volunteer's application history
- * into a search index.
- */
-
 describe("stripLocale", () => {
   it("removes a supported locale prefix", () => {
     expect(stripLocale("/uz/opportunities", locales)).toBe("/opportunities");
@@ -30,7 +20,6 @@ describe("stripLocale", () => {
   });
 
   it("does not mistake a path segment for a locale", () => {
-    // `/entry` starts with `en` as a substring but is not the `en` segment.
     expect(stripLocale("/entry/thing", locales)).toBe("/entry/thing");
   });
 
@@ -67,7 +56,6 @@ describe("isProtectedPath", () => {
   );
 
   it("matches on a full segment, not a prefix string", () => {
-    // `/savedthing` must not be treated as living under `/saved`.
     expect(isProtectedPath("/savedthing")).toBe(false);
   });
 });
@@ -107,8 +95,6 @@ describe("isIndexablePath", () => {
   });
 
   it("is closed by default — an unlisted route is not indexable", () => {
-    // A new route must be added to the allowlist deliberately; forgetting
-    // keeps it private rather than exposing it.
     expect(isIndexablePath("/some-new-feature")).toBe(false);
     expect(isIndexablePath("/")).toBe(false);
   });
@@ -130,9 +116,7 @@ describe("robotsFor", () => {
 
 describe("localeAlternates", () => {
   it("builds an absolute URL per locale", () => {
-    expect(
-      localeAlternates("https://app.example", "/opportunities", locales),
-    ).toEqual({
+    expect(localeAlternates("https://app.example", "/opportunities", locales)).toEqual({
       uz: "https://app.example/uz/opportunities",
       ru: "https://app.example/ru/opportunities",
       en: "https://app.example/en/opportunities",

@@ -12,13 +12,6 @@ function useIsActive(href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/**
- * Navigation link that marks the current section.
- *
- * `aria-current="page"` is what actually communicates "you are here" to a
- * screen reader; the colour change is the sighted equivalent. Both, always —
- * neither one alone is sufficient.
- */
 export function NavLink({
   href,
   children,
@@ -35,8 +28,10 @@ export function NavLink({
       href={href as Href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "rounded-lg px-3 py-2 text-sm font-bold transition-colors",
-        active ? "text-teal" : "text-muted hover:text-ink",
+        "rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
+        active
+          ? "bg-blue-tint text-blue-deep"
+          : "text-ink-muted hover:bg-surface hover:text-ink",
         className,
       )}
     >
@@ -45,7 +40,6 @@ export function NavLink({
   );
 }
 
-/** Bottom-bar variant: icon over label, full-height tap target. */
 export function TabLink({
   href,
   icon,
@@ -63,8 +57,8 @@ export function TabLink({
       aria-current={active ? "page" : undefined}
       className={cn(
         "flex min-h-14 flex-1 flex-col items-center justify-center gap-1",
-        "text-[0.6875rem] font-bold transition-colors [&_svg]:size-5",
-        active ? "text-teal" : "text-muted hover:text-ink",
+        "text-[0.6875rem] font-semibold transition-colors [&_svg]:size-5",
+        active ? "text-blue-deep" : "text-ink-muted hover:text-ink",
       )}
     >
       {icon}

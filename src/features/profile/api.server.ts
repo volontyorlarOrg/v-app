@@ -10,21 +10,6 @@ import {
   type ProfileInput,
 } from "./schemas";
 
-/**
- * Volunteer profile reads and writes.
- *
- * No `userId` parameter anywhere: the profile is always the session's own.
- * Reading someone else's is not a capability this layer offers, so it cannot
- * be reached by passing the wrong id.
- */
-
-/**
- * The signed-in volunteer's profile.
- *
- * A 404 means "not created yet", which is the normal state right after
- * sign-up — it returns an empty profile rather than an error, so onboarding is
- * just the edit form with nothing in it.
- */
 export async function getMyProfile(): Promise<Profile> {
   const session = await requireSession();
 

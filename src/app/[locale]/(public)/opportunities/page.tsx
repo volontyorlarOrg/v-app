@@ -20,16 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { isApiError } from "@/lib/api/errors";
 
-/**
- * Opportunity discovery — the product's front door and its only indexable
- * listing.
- *
- * A Server Component: the list itself needs no client JavaScript. Only the
- * filter bar is interactive, and it pushes to the URL, which re-runs this
- * render. That keeps the first paint from a Telegram link fast and makes every
- * filtered view a shareable address.
- */
-
 export async function generateMetadata(
   props: PageProps<"/[locale]/opportunities">,
 ): Promise<Metadata> {
@@ -41,7 +31,7 @@ export async function generateMetadata(
   return {
     title: t("title"),
     description: t("subtitle"),
-    // The one listing YVC wants indexed.
+
     robots: robotsFor("/opportunities"),
     alternates: {
       canonical: `${origin}/${locale}/opportunities`,
@@ -74,9 +64,6 @@ export default async function OpportunitiesPage(
   try {
     result = await listOpportunities(filters);
   } catch (error) {
-    // A failed listing is a page state, not a crashed route: the header, the
-    // filters, and the language switcher all still work, and the message says
-    // which kind of failure it was.
     const notConfigured = isApiError(error) && error.code === "notConfigured";
     const errors = await getTranslations("errors");
 

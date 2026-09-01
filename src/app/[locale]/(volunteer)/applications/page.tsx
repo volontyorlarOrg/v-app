@@ -10,7 +10,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/states";
 
-/** Every application the volunteer has started, newest first. */
 export default async function ApplicationsPage(
   props: PageProps<"/[locale]/applications">,
 ) {
@@ -57,7 +56,7 @@ export default async function ApplicationsPage(
             <li key={application.id}>
               <Surface
                 padding="none"
-                className="transition-colors focus-within:border-teal hover:border-teal/60"
+                className="transition-colors focus-within:border-blue-deep hover:border-line-control"
               >
                 <Link
                   href={`/applications/${application.id}`}
@@ -65,7 +64,7 @@ export default async function ApplicationsPage(
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <ApplicationStatusBadge status={application.status} />
-                    <span className="text-xs text-muted">
+                    <span className="text-xs text-ink-muted">
                       {application.submittedAt
                         ? t("list.appliedOn", {
                             date: format.dateTime(
@@ -82,11 +81,11 @@ export default async function ApplicationsPage(
                     </span>
                   </div>
 
-                  <h2 className="font-display text-base font-semibold text-ink">
+                  <h2 className="text-base font-semibold text-ink">
                     {application.opportunity.title}
                   </h2>
 
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-ink-muted">
                     {application.opportunity.organization.name}
                   </p>
                 </Link>

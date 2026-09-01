@@ -1,18 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-/**
- * Security and privacy smoke tests.
- *
- * These are the checks the handoff asks for by name, and they are the ones
- * most worth automating: the product deliberately does *not* apply a blanket
- * noindex, which means the public/private split is now a decision that can be
- * got wrong — and getting it wrong puts a volunteer's application history into
- * a search index.
- *
- * All of these run without a backend, because being signed out is exactly the
- * state they test.
- */
-
 const PRIVATE_PATHS = [
   "/uz/dashboard",
   "/uz/profile",
@@ -28,7 +15,7 @@ test.describe("private routes", () => {
       await page.goto(path);
 
       await expect(page).toHaveURL(/\/uz\/login/);
-      // The destination is preserved so sign-in can return them.
+
       await expect(page).toHaveURL(/next=/);
     });
   }
@@ -44,8 +31,6 @@ test.describe("private routes", () => {
   });
 
   test("private routes are not stored by a shared cache", async ({ request }) => {
-    // Without this an intermediary could serve one volunteer's dashboard to
-    // another.
     const response = await request.get("/uz/dashboard", { maxRedirects: 0 });
     expect(response.headers()["cache-control"]).toContain("no-store");
   });
@@ -61,8 +46,7 @@ test.describe("public routes stay indexable", () => {
     const response = await request.get("/uz/opportunities");
 
     expect(response.status()).toBe(200);
-    // The deliberate divergence from the reference architecture's blanket
-    // noindex: discovery is the acquisition funnel and must be findable.
+
     expect(response.headers()["x-robots-tag"]).toContain("index");
     expect(response.headers()["x-robots-tag"]).not.toContain("noindex");
   });
@@ -75,7 +59,6 @@ test.describe("public routes stay indexable", () => {
       /\/uz\/opportunities\/winter-book-drive-tashkent$/,
     );
 
-    // hreflang alternates for all three locales.
     for (const locale of ["uz", "ru", "en"]) {
       await expect(
         page.locator(`link[rel="alternate"][hreflang="${locale}"]`),
@@ -138,7 +121,6 @@ test.describe("response hardening", () => {
       session: JSON.stringify(Object.entries(sessionStorage)),
     }));
 
-    // Session tokens live in an httpOnly cookie and nowhere else.
     expect(leaked.cookie).not.toContain("yvc_session");
     expect(leaked.local).not.toMatch(/token/i);
     expect(leaked.session).not.toMatch(/token/i);
@@ -157,7 +139,6 @@ test.describe("response hardening", () => {
 
     await page.goto("/uz/opportunities", { waitUntil: "networkidle" });
 
-    // Server-only env vars must never be inlined into a browser bundle.
     for (const body of scriptBodies) {
       expect(body).not.toContain("YVC_API_BASE_URL");
       expect(body).not.toContain("YVC_SESSION_SECRET");
@@ -170,7 +151,6 @@ test.describe("response hardening", () => {
 
     await expect(page).toHaveURL(/q=books/);
 
-    // Only the declared filter params may appear — never an id or a contact.
     const params = new URL(page.url()).searchParams;
     for (const key of params.keys()) {
       expect(["q", "region", "format", "open", "sort", "page"]).toContain(key);

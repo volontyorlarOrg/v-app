@@ -13,13 +13,6 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 
-/**
- * Start or resume an application.
- *
- * `startApplication` is idempotent, so arriving here twice resumes the same
- * draft instead of creating a second one — a double-tapped Apply button and a
- * re-opened Telegram link both land here.
- */
 export default async function NewApplicationPage(
   props: PageProps<"/[locale]/applications/new/[slug]">,
 ) {

@@ -5,14 +5,6 @@ import { renderWithIntl } from "@/test/render";
 import type { ApplicationQuestion } from "@/features/opportunities/schemas";
 import { EssayField, SaveIndicator } from "./essay-field";
 
-/**
- * The essay field.
- *
- * Two product rules are asserted here: a character counter appears only when
- * the backend states a limit, and the save state is always stated in words
- * rather than by an icon alone.
- */
-
 function question(overrides: Partial<ApplicationQuestion> = {}): ApplicationQuestion {
   return {
     id: "q1",
@@ -25,17 +17,14 @@ function question(overrides: Partial<ApplicationQuestion> = {}): ApplicationQues
 
 describe("EssayField", () => {
   it("renders the prompt as the field label", () => {
-    renderWithIntl(
-      <EssayField question={question()} value="" onChange={() => {}} />,
-      { locale: "en" },
-    );
+    renderWithIntl(<EssayField question={question()} value="" onChange={() => {}} />, {
+      locale: "en",
+    });
 
     expect(screen.getByLabelText(/Why do you want to join\?/)).toBeInTheDocument();
   });
 
   it("shows no counter when the backend states no limit", () => {
-    // Inventing a limit would make a volunteer trim a good answer to fit a
-    // number nobody set.
     renderWithIntl(
       <EssayField question={question()} value="hello" onChange={() => {}} />,
       { locale: "en" },
@@ -74,10 +63,9 @@ describe("EssayField", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    renderWithIntl(
-      <EssayField question={question()} value="" onChange={onChange} />,
-      { locale: "en" },
-    );
+    renderWithIntl(<EssayField question={question()} value="" onChange={onChange} />, {
+      locale: "en",
+    });
 
     await user.type(screen.getByLabelText(/Why do you want to join\?/), "Hi");
     expect(onChange).toHaveBeenCalled();

@@ -3,15 +3,6 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { locales } from "./routing";
 
-/**
- * Translation catalogue integrity.
- *
- * The failure this prevents is specific and easy to ship: a key added to
- * English and forgotten in Uzbek renders as a raw key path — `list.emptyTitle`
- * — in front of the audience the product is actually for. Reviewing three
- * files by eye does not catch it; this does.
- */
-
 const MESSAGES_DIR = join(process.cwd(), "src/i18n/messages");
 const REFERENCE_LOCALE = "en";
 
@@ -35,15 +26,6 @@ const namespaces = readdirSync(join(MESSAGES_DIR, REFERENCE_LOCALE))
   .filter((file) => file.endsWith(".json"))
   .map((file) => file.replace(/\.json$/, ""));
 
-/**
- * The ICU *argument* names a message uses, at the top level.
- *
- * A naive `/\{(\w+)/` regex is wrong here: in
- * `{count, plural, one {# event} other {# events}}` the inner braces delimit
- * plural branches, not arguments, and a translation is free to word those
- * branches however its language needs. Only depth-0 braces name real
- * arguments, so the scanner tracks nesting and reads identifiers there.
- */
 function icuArguments(message: string): string[] {
   const names = new Set<string>();
   let depth = 0;
@@ -114,8 +96,6 @@ describe("message catalogues", () => {
     it.each(locales.filter((locale) => locale !== REFERENCE_LOCALE))(
       "%s uses the same ICU arguments as the reference",
       (locale) => {
-        // A translation that drops `{count}` renders a sentence with a hole in
-        // it; one that invents an argument throws at render time.
         const args = (catalogue: Catalogue) => {
           const found = new Map<string, string[]>();
 

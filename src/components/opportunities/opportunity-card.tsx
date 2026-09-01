@@ -7,14 +7,6 @@ import type { OpportunitySummary } from "@/features/opportunities/schemas";
 import { OpportunityDeadline } from "./opportunity-deadline";
 import { OpportunityStatusBadge } from "./opportunity-status";
 
-/**
- * The list card. Server-rendered — a list of forty of these should cost no
- * client JavaScript at all.
- *
- * The whole card is one link rather than a card with a link inside it: on a
- * phone the entire block is the tap target, and there is exactly one tab stop
- * per result instead of three.
- */
 export function OpportunityCard({
   opportunity,
   now,
@@ -34,7 +26,7 @@ export function OpportunityCard({
     <Surface
       as="article"
       padding="none"
-      className="transition-colors focus-within:border-teal hover:border-teal/60"
+      className="transition-colors focus-within:border-blue-deep hover:border-line-control"
     >
       <Link
         href={`/opportunities/${opportunity.slug}`}
@@ -42,29 +34,24 @@ export function OpportunityCard({
       >
         <div className="flex flex-wrap items-center gap-2">
           <OpportunityStatusBadge opportunity={opportunity} now={now} />
-          <OpportunityDeadline
-            deadline={opportunity.applicationDeadline}
-            now={now}
-          />
+          <OpportunityDeadline deadline={opportunity.applicationDeadline} now={now} />
         </div>
 
-        <h3 className="font-display text-lg leading-snug font-semibold text-ink">
+        <h3 className="text-lg leading-snug font-semibold text-ink">
           {opportunity.title}
         </h3>
 
-        <p className="line-clamp-3 text-sm leading-6 text-muted">
+        <p className="line-clamp-3 text-sm leading-6 text-ink-muted">
           {opportunity.summary}
         </p>
 
-        <div className="mt-auto flex flex-col gap-2 pt-2 text-xs text-muted">
+        <div className="mt-auto flex flex-col gap-2 pt-2 text-xs text-ink-muted">
           <span className="inline-flex items-center gap-1.5">
             {opportunity.organization.name}
             {opportunity.organization.verified ? (
-              // Title, not just colour: the check means "YVC verified this
-              // organiser", which is not guessable from a teal tick.
               <BadgeCheck
                 aria-label={t("detail.sourcedBy")}
-                className="size-3.5 text-teal"
+                className="size-3.5 text-blue"
               />
             ) : null}
           </span>
@@ -85,7 +72,7 @@ export function OpportunityCard({
 
             {opportunity.spotsRemaining !== undefined &&
             opportunity.spotsRemaining > 0 ? (
-              <Badge tone="signalQuiet">
+              <Badge tone="structure">
                 {t("detail.spotsLeft", { count: opportunity.spotsRemaining })}
               </Badge>
             ) : null}

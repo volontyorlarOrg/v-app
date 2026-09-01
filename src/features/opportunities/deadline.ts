@@ -2,16 +2,6 @@ import { isAfter, parseISO } from "date-fns";
 import { calendarDaysBetween, isValidDate } from "@/lib/datetime";
 import type { OpportunityStatus, OpportunitySummary } from "./schemas";
 
-/**
- * Deadline and status derivation.
- *
- * Pure functions, no React, no formatting — so the rule "when is an
- * opportunity closing soon" has exactly one definition that a unit test can
- * pin down, instead of being re-implemented in each component that shows a
- * badge.
- */
-
-/** Below this many days remaining, a deadline is urgent enough to call out. */
 export const CLOSING_SOON_DAYS = 3;
 
 export type DeadlineState =
@@ -21,12 +11,6 @@ export type DeadlineState =
   | { kind: "soon"; days: number }
   | { kind: "later"; days: number; date: Date };
 
-/**
- * Days are compared as *calendar* days in the event timezone, not as 24-hour
- * spans and not in the server's local zone: a deadline at 23:00 tonight is
- * "today", not "in 0.9 days", and it is "today" regardless of where the
- * process rendering it happens to run. See `lib/datetime.ts`.
- */
 export function deadlineState(
   deadlineIso: string,
   now: Date = new Date(),
@@ -34,8 +18,6 @@ export function deadlineState(
   const deadline = parseISO(deadlineIso);
 
   if (!isValidDate(deadline)) {
-    // An unparseable date must not render as "NaN days left". Treat it as
-    // uninformative and let the caller fall back to the raw status.
     return { kind: "later", days: Number.POSITIVE_INFINITY, date: deadline };
   }
 
@@ -55,14 +37,6 @@ export function isClosingSoon(deadlineIso: string, now: Date = new Date()): bool
   return state.kind === "today" || state.kind === "tomorrow" || state.kind === "soon";
 }
 
-/**
- * The status to display, which can differ from the stored one.
- *
- * The backend's `open` is a fact about the record; whether the deadline has
- * actually passed is a fact about the clock. A listing that says "Open" three
- * days after its deadline is worse than useless — a volunteer writes an essay
- * for nothing — so the clock wins here.
- */
 export type DisplayStatus = OpportunityStatus | "closingSoon";
 
 export function displayStatus(
@@ -74,12 +48,9 @@ export function displayStatus(
   const state = deadlineState(opportunity.applicationDeadline, now);
   if (state.kind === "passed") return "closed";
 
-  return isClosingSoon(opportunity.applicationDeadline, now)
-    ? "closingSoon"
-    : "open";
+  return isClosingSoon(opportunity.applicationDeadline, now) ? "closingSoon" : "open";
 }
 
-/** Whether an apply CTA should be actionable. */
 export function canApply(
   opportunity: Pick<OpportunitySummary, "status" | "applicationDeadline">,
   now: Date = new Date(),

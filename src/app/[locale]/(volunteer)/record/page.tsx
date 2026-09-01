@@ -5,7 +5,6 @@ import { VolunteerRecordCard } from "@/components/volunteers/volunteer-record-ca
 import { ApiErrorState } from "@/components/shared/api-error-state";
 import { PageHeader } from "@/components/ui/page-header";
 
-/** The volunteer's confirmed participation record. */
 export default async function RecordPage(props: PageProps<"/[locale]/record">) {
   const { locale } = await props.params;
   setRequestLocale(locale as Locale);

@@ -4,10 +4,6 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/states";
 
-/**
- * In-locale 404. Renders inside the app shell, so the header, navigation, and
- * language switcher still work — a dead link should not strand someone.
- */
 export default async function NotFound() {
   const t = await getTranslations("errors.notFound");
 

@@ -20,26 +20,12 @@ import {
   REGIONS,
 } from "@/features/opportunities/schemas";
 
-/**
- * Opportunity filters, backed entirely by the URL.
- *
- * There is no local mirror of the filter state. That is deliberate: the moment
- * filters live in `useState`, `/uz/opportunities?region=samarkand` stops being
- * a real address, and the links people paste into Telegram — the product's
- * main distribution channel — stop reproducing what the sender saw.
- *
- * The one exception is the search box, which keeps a local value so typing
- * feels immediate; it is pushed to the URL on a debounce.
- */
-
 const parsers = {
   [FILTER_PARAMS.q]: parseAsString.withDefault(""),
   [FILTER_PARAMS.region]: parseAsStringLiteral(REGIONS),
   [FILTER_PARAMS.format]: parseAsStringLiteral(OPPORTUNITY_FORMATS),
   [FILTER_PARAMS.openOnly]: parseAsBoolean.withDefault(false),
-  [FILTER_PARAMS.sort]: parseAsStringLiteral(OPPORTUNITY_SORTS).withDefault(
-    "deadline",
-  ),
+  [FILTER_PARAMS.sort]: parseAsStringLiteral(OPPORTUNITY_SORTS).withDefault("deadline"),
   [FILTER_PARAMS.page]: parseAsInteger.withDefault(1),
 };
 
@@ -50,11 +36,8 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
   const common = useTranslations("common");
 
   const [filters, setFilters] = useQueryStates(parsers, {
-    // The listing is a Server Component, so a filter change has to re-run the
-    // server render rather than only updating the URL.
     shallow: false,
-    // Filtering replaces the current view rather than stacking history
-    // entries; otherwise Back walks through every keystroke.
+
     history: "replace",
   });
 
@@ -63,15 +46,6 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
   const [search, setSearch] = useState(urlQuery);
   const deferredSearch = useDeferredValue(search);
 
-  /**
-   * Re-sync the box when the URL changes from somewhere else — Back, a pasted
-   * link, "clear filters".
-   *
-   * Adjusted during render rather than in an effect. An effect here would set
-   * state on every URL change and cascade a second render on each keystroke's
-   * round trip; this pattern re-renders once, immediately, before anything is
-   * painted.
-   */
   const [syncedQuery, setSyncedQuery] = useState(urlQuery);
 
   if (urlQuery !== syncedQuery) {
@@ -92,7 +66,6 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
     return () => clearTimeout(timer);
   }, [deferredSearch, urlQuery, setFilters]);
 
-  /** Any filter change resets to page 1 — see `withFilterChange`. */
   function update(next: Partial<Record<string, string | boolean | null>>) {
     void setFilters({ ...next, [FILTER_PARAMS.page]: null });
   }
@@ -115,19 +88,13 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
   }
 
   return (
-    <section
-      // A fieldset would be more semantic, but its legend cannot be styled
-      // reliably across browsers; an explicitly labelled region is equivalent
-      // for assistive technology and does not fight the layout.
-      aria-label={t("filters.legend")}
-      className="flex flex-col gap-4"
-    >
+    <section aria-label={t("filters.legend")} className="flex flex-col gap-4">
       <Field label={t("filters.search")}>
         {(field) => (
           <div className="relative">
             <Search
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted"
             />
             <Input
               {...field}
@@ -186,9 +153,7 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
             <Select
               {...field}
               value={filters[FILTER_PARAMS.sort]}
-              onChange={(event) =>
-                update({ [FILTER_PARAMS.sort]: event.target.value })
-              }
+              onChange={(event) => update({ [FILTER_PARAMS.sort]: event.target.value })}
             >
               {OPPORTUNITY_SORTS.map((sort) => (
                 <option key={sort} value={sort}>
@@ -208,14 +173,14 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
             onChange={(event) =>
               update({ [FILTER_PARAMS.openOnly]: event.target.checked || null })
             }
-            className="size-4 accent-[var(--color-teal)]"
+            className="size-4 accent-[var(--color-blue-deep)]"
           />
           {t("status.anyOpen")}
         </label>
 
         {activeCount > 0 ? (
           <>
-            <Badge tone="signalQuiet" icon={<SlidersHorizontal aria-hidden="true" />}>
+            <Badge tone="structure" icon={<SlidersHorizontal aria-hidden="true" />}>
               {t("filters.applied", { count: activeCount })}
             </Badge>
             <Button variant="ghost" size="sm" onClick={clearAll}>
@@ -225,11 +190,7 @@ export function OpportunityFiltersBar({ resultCount }: { resultCount: number }) 
           </>
         ) : null}
 
-        {/*
-          Announces the new count after a filter change. Without this a screen
-          reader user changes a filter and hears nothing at all.
-        */}
-        <p role="status" aria-live="polite" className="ml-auto text-sm text-muted">
+        <p role="status" aria-live="polite" className="ml-auto text-sm text-ink-muted">
           {t("list.resultCount", { count: resultCount })}
         </p>
       </div>

@@ -5,8 +5,6 @@ import { authedApi } from "@/lib/api/client.server";
 import { requireSession } from "@/lib/auth/session.server";
 import { opportunitySummarySchema } from "@/features/opportunities/schemas";
 
-/** Saved (bookmarked) opportunities for the signed-in volunteer. */
-
 const savedListSchema = z.object({
   items: z.array(opportunitySummarySchema),
 });

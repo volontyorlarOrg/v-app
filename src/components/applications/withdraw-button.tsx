@@ -8,10 +8,6 @@ import { Button } from "@/components/ui/button";
 import { withdrawApplicationAction } from "@/features/applications/actions";
 import { ConfirmDialog } from "./confirm-dialog";
 
-/**
- * Withdrawing is irreversible, so it is styled as destructive and gated behind
- * a confirmation that says what will happen in plain words.
- */
 export function WithdrawButton({ applicationId }: { applicationId: string }) {
   const t = useTranslations("applications.detail");
   const common = useTranslations("common");

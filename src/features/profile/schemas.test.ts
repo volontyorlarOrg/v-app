@@ -6,22 +6,12 @@ import {
   type ProfileInput,
 } from "./schemas";
 
-/**
- * Profile validation and the completion model.
- *
- * The completion percentage is only permitted because its model is explicit;
- * these tests are what keep it explicit rather than drifting into a number
- * nobody can account for.
- */
-
 function profile(overrides: Partial<ProfileInput> = {}): ProfileInput {
   return { ...EMPTY_PROFILE, ...overrides };
 }
 
 describe("profileSchema", () => {
   it("emits keys rather than English sentences for errors", () => {
-    // A hard-coded English message could not be shown to a Russian or Uzbek
-    // speaker; the field component translates these keys instead.
     const result = profileSchema.safeParse(profile({ fullName: "A" }));
 
     expect(result.success).toBe(false);
@@ -60,9 +50,8 @@ describe("profileSchema", () => {
 
   it("rejects a link that is not a full URL", () => {
     expect(
-      profileSchema.safeParse(
-        profile({ fullName: "Aziza", links: ["example.com"] }),
-      ).success,
+      profileSchema.safeParse(profile({ fullName: "Aziza", links: ["example.com"] }))
+        .success,
     ).toBe(false);
   });
 });
@@ -77,8 +66,6 @@ describe("profileCompletion", () => {
   });
 
   it("counts either contact channel, not both", () => {
-    // Requiring both would force a volunteer without Telegram to hand over a
-    // phone number they had no reason to give.
     const withPhone = profileCompletion(profile({ phone: "+998901234567" }));
     const withTelegram = profileCompletion(profile({ telegram: "aziza_v" }));
 
@@ -108,8 +95,6 @@ describe("profileCompletion", () => {
   });
 
   it("does not count a portfolio link toward completion", () => {
-    // "Complete" means an organiser can evaluate and contact you. A link is
-    // welcome but is not part of that bar.
     const withLink = profileCompletion(profile({ links: ["https://example.com"] }));
     expect(withLink.percent).toBe(0);
   });
