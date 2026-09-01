@@ -1,10 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { LoadingRegion, Skeleton } from "@/components/ui/states";
 
-/**
- * Streamed while the listing renders. The skeleton mirrors the real card
- * grid's shape so the page does not jump when the content arrives.
- */
 export default async function OpportunitiesLoading() {
   const t = await getTranslations("common.state");
 

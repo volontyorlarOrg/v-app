@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-label="Volontyorlar">
+  <g transform="translate(10 -6) scale(0.86)">
+    <circle cx="100" cy="76" r="20" fill="#007FC2"/>
+    <path d="M 41.74 81.30 A 59 59 0 0 0 158.26 81.30" fill="none" stroke="#007FC2" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <text x="212" y="96" font-family="Onest, 'Segoe UI', system-ui, sans-serif" font-size="62" font-weight="700" letter-spacing="-1.6" fill="#222B33">volontyorlar</text>
+</svg>

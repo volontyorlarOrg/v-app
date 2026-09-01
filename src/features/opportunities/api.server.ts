@@ -14,23 +14,9 @@ import {
   type OpportunityListResponse,
 } from "./schemas";
 
-/**
- * Opportunity reads.
- *
- * These are the only functions permitted to fetch opportunities. Components
- * call them from Server Components; nothing imports `client.server.ts`
- * directly outside of a `*.server.ts` module like this one.
- *
- * Reads are public, so they use `publicApi` and may be cached — unlike
- * anything authenticated, an opportunity listing is identical for every
- * visitor and is the single hottest path in the product.
- */
-
-/** Opportunity data changes on the order of hours, not seconds. */
 const LIST_REVALIDATE_SECONDS = 120;
 const DETAIL_REVALIDATE_SECONDS = 300;
 
-/** Whether this deployment is serving the built-in sample set. */
 export function isUsingSampleData(): boolean {
   return publicApiBaseUrl() === null && sampleDataEnabled();
 }
@@ -67,15 +53,7 @@ export async function listOpportunities(
   });
 }
 
-/**
- * One opportunity by slug, or `null` when it does not exist.
- *
- * `null` rather than a thrown 404 because "this opportunity was taken down" is
- * an ordinary outcome that deserves its own page, not an error boundary.
- */
-export async function getOpportunity(
-  slug: string,
-): Promise<OpportunityDetail | null> {
+export async function getOpportunity(slug: string): Promise<OpportunityDetail | null> {
   ensureSource();
 
   if (isUsingSampleData()) {
@@ -94,7 +72,6 @@ export async function getOpportunity(
   }
 }
 
-/** Slugs for `generateStaticParams`. Empty when no source can enumerate them. */
 export async function listOpportunitySlugs(): Promise<string[]> {
   if (isUsingSampleData()) {
     return sampleOpportunities().map((item) => item.slug);
@@ -102,15 +79,6 @@ export async function listOpportunitySlugs(): Promise<string[]> {
   return [];
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Sample-data filtering                                                      */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Applies the same filter semantics in-process that the backend will apply
- * server-side. Kept beside the real path so the two cannot drift into
- * behaving differently under test.
- */
 function listFromSample(filters: OpportunityFilters): OpportunityListResponse {
   const now = new Date();
   const needle = filters.q.trim().toLowerCase();
@@ -142,11 +110,6 @@ function listFromSample(filters: OpportunityFilters): OpportunityListResponse {
   }
 
   items = [...items].sort((a, b) => {
-    // Actionable opportunities always outrank unactionable ones, whatever the
-    // chosen sort. Without this, "closing soonest" puts the *already closed*
-    // ones at the very top — the least useful content in the most valuable
-    // position. The backend is expected to order the same way; see
-    // docs/api/API_CONTRACT.md.
     const openA = canApply(a, now) ? 0 : 1;
     const openB = canApply(b, now) ? 0 : 1;
     if (openA !== openB) return openA - openB;
@@ -157,7 +120,6 @@ function listFromSample(filters: OpportunityFilters): OpportunityListResponse {
       case "startDate":
         return a.startsAt.localeCompare(b.startsAt);
       case "newest":
-        // No `createdAt` in the sample set; id order stands in for it.
         return b.id.localeCompare(a.id);
     }
   });

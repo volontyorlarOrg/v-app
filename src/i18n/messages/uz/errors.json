@@ -4,41 +4,41 @@
     "body": "Bu sahifa uchun hisob kerak. Kiring — sizni shu yerga qaytaramiz."
   },
   "forbidden": {
-    "title": "Sizda ruxsat yo'q",
-    "body": "Siz tizimga kirgansiz, lekin bu sahifani ochishga hisobingizning ruxsati yo'q."
+    "title": "Sizda ruxsat yoʻq",
+    "body": "Siz tizimga kirgansiz, lekin bu sahifani ochishga hisobingizning ruxsati yoʻq."
   },
   "notFound": {
     "title": "Bunday sahifa topilmadi",
-    "body": "Havola eskirgan yoki imkoniyat olib tashlangan bo'lishi mumkin.",
-    "browse": "Imkoniyatlarni ko'rish"
+    "body": "Havola eskirgan yoki imkoniyat olib tashlangan boʻlishi mumkin.",
+    "browse": "Imkoniyatlarni koʻrish"
   },
   "opportunityNotFound": {
-    "title": "Bu imkoniyat endi e'lon qilinmagan",
-    "body": "U yopilgan yoki olib tashlangan bo'lishi mumkin. Hozir ochiq bo'lganlari quyida."
+    "title": "Bu imkoniyat endi eʼlon qilinmagan",
+    "body": "U yopilgan yoki olib tashlangan boʻlishi mumkin. Hozir ochiq boʻlganlari quyida."
   },
   "conflict": {
     "title": "Siz allaqachon ariza topshirgansiz",
-    "body": "Bitta imkoniyatga faqat bir marta ariza topshirish mumkin. Holatini ko'rish uchun arizani oching."
+    "body": "Bitta imkoniyatga faqat bir marta ariza topshirish mumkin. Holatini koʻrish uchun arizani oching."
   },
   "validation": {
     "title": "Javoblaringizni tekshiring",
-    "body": "Yuborishdan oldin ba'zi maydonlarni to'g'rilash kerak."
+    "body": "Yuborishdan oldin baʼzi maydonlarni toʻgʻrilash kerak."
   },
   "network": {
-    "title": "Serverga ulanib bo'lmadi",
-    "body": "Internet aloqasini tekshirib, qayta urinib ko'ring. Yozganlaringiz yo'qolmadi."
+    "title": "Serverga ulanib boʻlmadi",
+    "body": "Internet aloqasini tekshirib, qayta urinib koʻring. Yozganlaringiz yoʻqolmadi."
   },
   "server": {
     "title": "Biz tomonda xatolik yuz berdi",
-    "body": "Xatolik qayd etildi. Qayta urinish ko'pincha yordam beradi."
+    "body": "Xatolik qayd etildi. Qayta urinish koʻpincha yordam beradi."
   },
   "notConfigured": {
-    "title": "Bu bo'lim hali ulanmagan",
+    "title": "Bu boʻlim hali ulanmagan",
     "body": "YVC ning bu qismi uchun xizmat joriy muhitda sozlanmagan."
   },
   "boundary": {
-    "title": "Sahifani ko'rsatib bo'lmadi",
-    "body": "Kutilmagan xatolik sahifaning chizilishiga to'sqinlik qildi.",
+    "title": "Sahifani koʻrsatib boʻlmadi",
+    "body": "Kutilmagan xatolik sahifaning chizilishiga toʻsqinlik qildi.",
     "reset": "Qayta urinish",
     "reference": "Kod: {digest}"
   }

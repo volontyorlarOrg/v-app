@@ -26,7 +26,7 @@ Two clients:
   `ctx.session`.
 
 `authedActionClient` is what makes "never trust an identity field from a form"
-enforceable rather than aspirational: an action built on it *cannot* read a
+enforceable rather than aspirational: an action built on it _cannot_ read a
 `userId` from its input, because the only one available is
 `ctx.session.userId`. The backend still authorises independently — a Server
 Action is a POST to the route it lives on and is reachable without the UI.
@@ -36,10 +36,10 @@ Action is a POST to the route it lives on and is reachable without the UI.
 The reference architecture returns `"Invalid email or password."` from the
 server. That string cannot be shown to a Russian or Uzbek speaker.
 
-Here, `handleServerError` returns an **`ApiErrorCode`**. The client renders
-`t(\`errors.${code}.title\`)`. Anything thrown that is not an `ActionFailure`
-is logged server-side and masked as `server`, so backend internals never reach
-a browser.
+Here, `handleServerError` returns an **`ApiErrorCode`**, which is also a key in
+the `errors` translation namespace. The client renders the translated title for
+that code. Anything thrown that is not an `ActionFailure` is logged server-side
+and masked as `server`, so backend internals never reach a browser.
 
 ```ts
 const submit = useAction(submitApplicationAction, {
@@ -56,7 +56,7 @@ A Zod schema is a module and cannot call `useTranslations`, so schemas carry
 **keys** as their messages:
 
 ```ts
-fullName: z.string().trim().min(2, { message: "tooShort" })
+fullName: z.string().trim().min(2, { message: "tooShort" });
 ```
 
 [`useValidationMessage`](../../src/lib/forms/use-validation-message.ts) turns
@@ -72,7 +72,9 @@ A schema with `.default()` has a different **input** type (field optional) from
 its **output** type (field guaranteed). React Hook Form needs both:
 
 ```ts
-useForm<ProfileFormValues, unknown, ProfileInput>({ resolver: zodResolver(profileSchema) })
+useForm<ProfileFormValues, unknown, ProfileInput>({
+  resolver: zodResolver(profileSchema),
+});
 //      ^ z.input           ^ context ^ z.output
 ```
 
@@ -83,7 +85,7 @@ types for this reason.
 ## 5. `Field` is not optional
 
 Every input goes through [`Field`](../../src/components/ui/field.tsx). It is
-where accessibility is *structural* rather than remembered:
+where accessibility is _structural_ rather than remembered:
 
 - label associated by `htmlFor`/`id` (a `useId`, so two fields cannot collide)
 - `aria-describedby` wired to help text and errors, error first
@@ -123,7 +125,7 @@ successful save there is a window where a refresh loses work. Rather than
 widen it silently, `hasUnsavedChanges` drives the browser's own "leave site?"
 prompt.
 
-Implementation note: `"pending"` is *derived* from "dirty and nothing in
+Implementation note: `"pending"` is _derived_ from "dirty and nothing in
 flight" rather than stored. Storing it would mean a `setState` inside the
 debounce effect, cascading a render on every keystroke — the React Compiler
 lint rule flags exactly this.
@@ -132,6 +134,6 @@ lint rule flags exactly this.
 
 Reuse is an explicit per-field action the volunteer takes. Silently submitting
 last month's essay to a different organiser is the failure this rule exists to
-prevent. The submit schema is *generated* from the opportunity's questions, so
+prevent. The submit schema is _generated_ from the opportunity's questions, so
 a question added server-side is validated without a frontend change — and a
 character counter can never disagree with the rule that rejects the answer.

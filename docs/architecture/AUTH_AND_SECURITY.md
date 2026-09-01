@@ -13,14 +13,14 @@ A signed token leaves the backend access token readable by anyone who can see
 the cookie value — a support screenshot, a shared device, a proxy log.
 Encrypting it makes the cookie opaque to everything except this server.
 
-| Property | Value | Why |
-| --- | --- | --- |
-| Name | `yvc_session` | |
-| Encryption | `dir` + `A256GCM`, key = SHA-256 of `YVC_SESSION_SECRET` | Hashing gives exactly 32 bytes whatever the secret's shape |
-| `httpOnly` | always | Puts the session out of reach of `document.cookie`, and therefore of any XSS payload |
-| `secure` | in production | |
-| `sameSite` | `lax` | Still rides the top-level navigation Telegram sends users back on |
-| Lifetime | 30 days | |
+| Property   | Value                                                    | Why                                                                                  |
+| ---------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Name       | `yvc_session`                                            |                                                                                      |
+| Encryption | `dir` + `A256GCM`, key = SHA-256 of `YVC_SESSION_SECRET` | Hashing gives exactly 32 bytes whatever the secret's shape                           |
+| `httpOnly` | always                                                   | Puts the session out of reach of `document.cookie`, and therefore of any XSS payload |
+| `secure`   | in production                                            |                                                                                      |
+| `sameSite` | `lax`                                                    | Still rides the top-level navigation Telegram sends users back on                    |
+| Lifetime   | 30 days                                                  |                                                                                      |
 
 Implementation: [`lib/auth/session.server.ts`](../../src/lib/auth/session.server.ts).
 
@@ -44,8 +44,8 @@ no way to persist, ending the session permanently.
 ## 2. Reading identity
 
 ```ts
-const session = await requireSession();   // throws ApiError("unauthenticated")
-const session = await getSession();       // null when signed out
+const session = await requireSession(); // throws ApiError("unauthenticated")
+const session = await getSession(); // null when signed out
 ```
 
 This is the **only** source of authenticated identity.
@@ -60,11 +60,11 @@ are absent by construction rather than by remembering to strip them.
 
 ## 3. Three layers, one of which is real
 
-| Layer | What it does | Is it security? |
-| --- | --- | --- |
-| `src/proxy.ts` | Redirects signed-out visitors away from private routes | **No.** A redirect for humans. |
-| `(volunteer)/layout.tsx` | Re-checks the session | **No.** Defence in depth against a proxy matcher change. |
-| Backend | Authorises every operation | **Yes.** |
+| Layer                    | What it does                                           | Is it security?                                          |
+| ------------------------ | ------------------------------------------------------ | -------------------------------------------------------- |
+| `src/proxy.ts`           | Redirects signed-out visitors away from private routes | **No.** A redirect for humans.                           |
+| `(volunteer)/layout.tsx` | Re-checks the session                                  | **No.** Defence in depth against a proxy matcher change. |
+| Backend                  | Authorises every operation                             | **Yes.**                                                 |
 
 Hidden buttons are not authorisation. Frontend role checks decide what is worth
 rendering, nothing more.
@@ -89,7 +89,7 @@ The whole contract is marked unverified in
 [`../api/API_CONTRACT.md`](../api/API_CONTRACT.md). The marketing repository
 records that nothing is implemented server-side.
 
-What is implemented here is the *shape*: a start route that asks the backend
+What is implemented here is the _shape_: a start route that asks the backend
 for a single-use ticket and redirects to the bot, and a complete route that
 redeems a login token and writes the session.
 
@@ -121,7 +121,7 @@ regardless.
 `safeReturnPath` accepts only a same-site path. It rejects anything not
 starting with `/`, anything starting with `//` (protocol-relative, so
 `//evil.example` is an absolute URL), and anything containing a backslash. It
-is applied on the way in *and* on the way back.
+is applied on the way in _and_ on the way back.
 
 ## 7. Response headers
 

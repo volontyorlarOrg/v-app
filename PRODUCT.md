@@ -10,12 +10,16 @@ volunteering opportunities. It has grown past listing what other people
 organise: the team now finds opportunities, contacts organisers, sources
 events, builds partnerships, and supplies volunteers.
 
-> **Naming note.** This repository uses "Youth Volunteer Club (YVC)", the name
-> given in the product handoff. The marketing repository's `PRODUCT.md` says
-> "Youth Volunteering Community" and its brand assets are filed under
-> `volontyorlar`. Which of the three is the legal and public name is an
-> **open product decision**; user-facing copy here lives in the translation
-> catalogues, so settling it is a catalogue edit rather than a code change.
+> **Naming.** The **wordmark is `volontyorlar`** — that is what the logo
+> specification and every brand asset carry, and it is what the interface
+> displays. The _descriptive_ name is still open: the product handoff says
+> "Youth Volunteer Club (YVC)" and the marketing repository says "Youth
+> Volunteering Community".
+>
+> The two are separated in the code. `brandWordmark` is a brand constant with
+> the same value in all three catalogues; `appName` and `appShortName` are
+> ordinary translated copy. Settling the descriptive name is a catalogue edit.
+> See [`docs/design/brand.md`](./docs/design/brand.md).
 
 ## Known traction
 
@@ -66,14 +70,14 @@ them. That is why partner self-service does not exist here.
 The canonical thresholds, implemented once in
 [`src/features/record/levels.ts`](./src/features/record/levels.ts):
 
-| Level    | Qualification                                                        |
-| -------- | -------------------------------------------------------------------- |
-| Newcomer | Joined                                                               |
-| Active   | 3 completed events                                                   |
-| Trusted  | 8 completed events with at least 85% reliability                     |
-| Core     | 20 completed events, at least 90% reliability, and standout reviews  |
+| Level    | Qualification                                                       |
+| -------- | ------------------------------------------------------------------- |
+| Newcomer | Joined                                                              |
+| Active   | 3 completed events                                                  |
+| Trusted  | 8 completed events with at least 85% reliability                    |
+| Core     | 20 completed events, at least 90% reliability, and standout reviews |
 
-**Reliability** is the share of *resolved* accepted events the volunteer
+**Reliability** is the share of _resolved_ accepted events the volunteer
 attended. Two rules follow from that word:
 
 1. An event an organiser never confirmed is excluded from the calculation
@@ -100,12 +104,12 @@ See [`docs/architecture/AUTH_AND_SECURITY.md`](./docs/architecture/AUTH_AND_SECU
 
 ## Relationship to the marketing site
 
-| | Marketing (`volontyorlarOrg/v-web`) | Product (this repository) |
-| --- | --- | --- |
-| Purpose | Explain YVC, build trust, convert | Operate the volunteering loop |
-| Audience | Anyone | Volunteers, and later partners and admins |
-| Auth | None | Session-based |
-| Indexing | Public | Per route — opportunities yes, accounts never |
+|          | Marketing (`volontyorlarOrg/v-web`) | Product (this repository)                     |
+| -------- | ----------------------------------- | --------------------------------------------- |
+| Purpose  | Explain YVC, build trust, convert   | Operate the volunteering loop                 |
+| Audience | Anyone                              | Volunteers, and later partners and admins     |
+| Auth     | None                                | Session-based                                 |
+| Indexing | Public                              | Per route — opportunities yes, accounts never |
 
 Brand assets and the design token set are sourced from the marketing
 repository so the two stay recognisably one product. Application functionality

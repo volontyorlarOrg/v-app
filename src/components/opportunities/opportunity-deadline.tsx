@@ -3,20 +3,11 @@ import { useFormatter, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { deadlineState } from "@/features/opportunities/deadline";
 
-/**
- * Renders a deadline as the thing a volunteer actually needs to know: how much
- * time is left, not a raw date they have to subtract in their head.
- *
- * Amber is used here and almost nowhere else — the design system reserves it
- * for deadlines. The icon and the words carry the same information, so the
- * urgency survives greyscale and colour blindness.
- */
 export function OpportunityDeadline({
   deadline,
   now,
 }: {
   deadline: string;
-  /** Injectable for deterministic tests. */
   now?: Date;
 }) {
   const t = useTranslations("opportunities.deadline");
@@ -41,7 +32,7 @@ export function OpportunityDeadline({
 
   return (
     <Badge
-      tone={urgent ? "deadline" : "neutral"}
+      tone={urgent ? "urgent" : "neutral"}
       icon={urgent ? <CalendarClock aria-hidden="true" /> : undefined}
     >
       {label}

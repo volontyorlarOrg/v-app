@@ -3,28 +3,15 @@ import { describe, expect, it } from "vitest";
 import { renderWithIntl } from "@/test/render";
 import { Field, Input } from "./field";
 
-/**
- * The form-field accessibility contract.
- *
- * Every input in the product goes through `Field`, so these assertions cover
- * every form at once: label association, `aria-describedby` wiring, and
- * `aria-invalid`. These are the things that are invisible when broken and that
- * a manual pass through the UI will never catch.
- */
 describe("Field", () => {
   it("associates the label with the control", () => {
-    renderWithIntl(
-      <Field label="Full name">{(props) => <Input {...props} />}</Field>,
-    );
+    renderWithIntl(<Field label="Full name">{(props) => <Input {...props} />}</Field>);
 
-    // `getByLabelText` only succeeds if htmlFor/id actually match.
     expect(screen.getByLabelText("Full name")).toBeInTheDocument();
   });
 
   it("does not mark a healthy field invalid", () => {
-    renderWithIntl(
-      <Field label="Full name">{(props) => <Input {...props} />}</Field>,
-    );
+    renderWithIntl(<Field label="Full name">{(props) => <Input {...props} />}</Field>);
 
     expect(screen.getByLabelText("Full name")).not.toHaveAttribute("aria-invalid");
   });
@@ -73,8 +60,6 @@ describe("Field", () => {
     const description =
       screen.getByLabelText("Phone").getAttribute("aria-describedby") ?? "";
 
-    // Two ids, error first — a screen reader should hear the problem before
-    // the hint that has become less relevant.
     expect(description.split(" ")).toHaveLength(2);
     expect(screen.getByLabelText("Phone")).toHaveAccessibleDescription(
       /Invalid\..*country code/s,

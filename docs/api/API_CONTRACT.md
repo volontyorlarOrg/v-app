@@ -21,12 +21,12 @@ schema before it is returned.
 
 ## Configuration
 
-| Variable | Scope | Purpose |
-| --- | --- | --- |
-| `YVC_API_BASE_URL` | server only | Origin for all backend traffic. No trailing slash. |
-| `YVC_SESSION_SECRET` | server only | ≥32 chars; encrypts the session cookie. |
-| `YVC_ENABLE_SAMPLE_DATA` | server only | `true` serves the built-in sample opportunities when no API origin is set. |
-| `NEXT_PUBLIC_SITE_ORIGIN` | public | Canonical origin for metadata and the sitemap. |
+| Variable                  | Scope       | Purpose                                                                    |
+| ------------------------- | ----------- | -------------------------------------------------------------------------- |
+| `YVC_API_BASE_URL`        | server only | Origin for all backend traffic. No trailing slash.                         |
+| `YVC_SESSION_SECRET`      | server only | ≥32 chars; encrypts the session cookie.                                    |
+| `YVC_ENABLE_SAMPLE_DATA`  | server only | `true` serves the built-in sample opportunities when no API origin is set. |
+| `NEXT_PUBLIC_SITE_ORIGIN` | public      | Canonical origin for metadata and the sitemap.                             |
 
 Neither the API origin nor any token is ever exposed to the browser; an
 end-to-end test asserts their absence from the client bundle.
@@ -52,10 +52,10 @@ error taxonomy in [`src/lib/api/errors.ts`](../../src/lib/api/errors.ts).
 
 ### Public — opportunities
 
-| Method | Path | Response schema |
-| --- | --- | --- |
-| GET | `/opportunities` | `opportunityListResponseSchema` |
-| GET | `/opportunities/{slug}` | `opportunityDetailSchema` |
+| Method | Path                    | Response schema                 |
+| ------ | ----------------------- | ------------------------------- |
+| GET    | `/opportunities`        | `opportunityListResponseSchema` |
+| GET    | `/opportunities/{slug}` | `opportunityDetailSchema`       |
 
 Query parameters: `q`, `region`, `format`, `status`, `sort`, `page`, `pageSize`.
 
@@ -69,11 +69,11 @@ Schemas: [`src/features/opportunities/schemas.ts`](../../src/features/opportunit
 
 ### Auth — Telegram (**assumed; see the caveat below**)
 
-| Method | Path | Response |
-| --- | --- | --- |
-| POST | `/auth/telegram/ticket` | `{ ticket, botUsername }` |
-| POST | `/auth/telegram/complete` | `{ userId, accessToken, refreshToken?, accessTokenExpiresAt?, displayName?, roles? }` |
-| POST | `/auth/logout` | any |
+| Method | Path                      | Response                                                                              |
+| ------ | ------------------------- | ------------------------------------------------------------------------------------- |
+| POST   | `/auth/telegram/ticket`   | `{ ticket, botUsername }`                                                             |
+| POST   | `/auth/telegram/complete` | `{ userId, accessToken, refreshToken?, accessTokenExpiresAt?, displayName?, roles? }` |
+| POST   | `/auth/logout`            | any                                                                                   |
 
 The flow assumed is a bot deep link: the app asks for a single-use ticket,
 sends the user to `t.me/<bot>?start=<ticket>`, the bot verifies the Telegram
@@ -95,22 +95,22 @@ Schemas: [`src/features/auth/telegram.ts`](../../src/features/auth/telegram.ts).
 
 ### Authenticated — profile
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| GET | `/profile` | 404 means "not created yet" and is handled as an empty profile, not an error. |
-| PUT | `/profile` | Body is `profileSchema`. |
+| Method | Path       | Notes                                                                         |
+| ------ | ---------- | ----------------------------------------------------------------------------- |
+| GET    | `/profile` | 404 means "not created yet" and is handled as an empty profile, not an error. |
+| PUT    | `/profile` | Body is `profileSchema`.                                                      |
 
 ### Authenticated — applications
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| GET | `/applications` | Optional `status` filter. |
-| GET | `/applications/{id}` | 404 and 403 are deliberately indistinguishable to the client, so the UI cannot be used to probe which ids exist. |
-| GET | `/applications/by-opportunity?opportunityId=` | The volunteer's application to one opportunity. |
-| POST | `/applications` | **Must be idempotent per (user, opportunity).** A double-tapped Apply button or a re-opened Telegram link must resume the existing draft, not create a second one. |
-| PATCH | `/applications/{id}/draft` | Autosave. Called every few seconds while typing. |
-| POST | `/applications/{id}/submit` | Answers become immutable. |
-| POST | `/applications/{id}/withdraw` | |
+| Method | Path                                          | Notes                                                                                                                                                              |
+| ------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GET    | `/applications`                               | Optional `status` filter.                                                                                                                                          |
+| GET    | `/applications/{id}`                          | 404 and 403 are deliberately indistinguishable to the client, so the UI cannot be used to probe which ids exist.                                                   |
+| GET    | `/applications/by-opportunity?opportunityId=` | The volunteer's application to one opportunity.                                                                                                                    |
+| POST   | `/applications`                               | **Must be idempotent per (user, opportunity).** A double-tapped Apply button or a re-opened Telegram link must resume the existing draft, not create a second one. |
+| PATCH  | `/applications/{id}/draft`                    | Autosave. Called every few seconds while typing.                                                                                                                   |
+| POST   | `/applications/{id}/submit`                   | Answers become immutable.                                                                                                                                          |
+| POST   | `/applications/{id}/withdraw`                 |                                                                                                                                                                    |
 
 **Application status enum — unconfirmed.** The frontend uses
 `draft | submitted | under_review | accepted | rejected | withdrawn | closed`.
@@ -120,23 +120,23 @@ reconciling it is a single edit there plus the three translation catalogues.
 
 ### Authenticated — saved
 
-| Method | Path |
-| --- | --- |
-| GET | `/saved` |
-| POST | `/saved` |
+| Method | Path                     |
+| ------ | ------------------------ |
+| GET    | `/saved`                 |
+| POST   | `/saved`                 |
 | DELETE | `/saved/{opportunityId}` |
 
 ### Authenticated — record
 
-| Method | Path | Notes |
-| --- | --- | --- |
-| GET | `/record` | Raw counts only. The **level is derived on the frontend** so one formula exists; the backend must not send a computed level. |
-| GET | `/record/history` | Participation entries with an attendance outcome. |
+| Method | Path              | Notes                                                                                                                        |
+| ------ | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/record`         | Raw counts only. The **level is derived on the frontend** so one formula exists; the backend must not send a computed level. |
+| GET    | `/record/history` | Participation entries with an attendance outcome.                                                                            |
 
 `recordCounts` must distinguish three things:
 
 - `attended` — confirmed present.
-- `acceptedResolved` — accepted *and* resolved by the organiser either way.
+- `acceptedResolved` — accepted _and_ resolved by the organiser either way.
 - `acceptedUnconfirmed` — accepted, event passed, organiser never said.
 
 The third is excluded from reliability entirely. Collapsing it into

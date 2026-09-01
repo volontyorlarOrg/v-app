@@ -15,10 +15,12 @@ Use the architecture patterns from the supplied Dwelve repositories as reference
 # 1. Repositories to study first
 
 ## Reference marketing repository
+
 - `DwelveOrg/dwelve`
 - Purpose: understand how public marketing content is kept separate from authenticated product workflows.
 
 ## Reference application repository
+
 - `DwelveOrg/app`
 - Purpose: study:
   - Next.js App Router organization;
@@ -32,6 +34,7 @@ Use the architecture patterns from the supplied Dwelve repositories as reference
   - auth/session boundary patterns.
 
 ## Current YVC marketing repository
+
 - `volontyorlarOrg/v-web`
 - Purpose:
   - read the YVC product/brand context;
@@ -56,15 +59,18 @@ Official name:
 **Youth Volunteer Club (YVC)**
 
 Founded:
+
 - June 4, 2025
 
 Founders:
+
 - Arslon Rajabov
 - Parizoda Abdurakhimova
 
 YVC helps young people discover and apply to meaningful volunteering opportunities.
 
 YVC has evolved from listing opportunities into:
+
 - actively finding opportunities;
 - contacting organizers;
 - sourcing events;
@@ -72,6 +78,7 @@ YVC has evolved from listing opportunities into:
 - supplying volunteers.
 
 Known current traction:
+
 - 3,600+ Telegram followers;
 - 220+ Instagram followers;
 - volunteer work for 50+ events;
@@ -83,6 +90,7 @@ Known current traction:
 - 500+ applications for regional project manager/coordinator roles.
 
 Current content category:
+
 - volunteering opportunities.
 
 Do not prematurely turn this into a generic job board, grant marketplace, internship marketplace, or social network.
@@ -150,11 +158,13 @@ Do not let the architecture devolve into “a prettier list of Telegram posts.�
 Model roles carefully.
 
 Initial logical roles:
+
 - volunteer;
 - YVC administrator;
 - partner/organization member.
 
 Potential later role:
+
 - regional coordinator/project manager.
 
 Do not implement coordinator authorization merely because regional expansion exists operationally. Implement it only when an actual product workflow/backend contract exists.
@@ -176,10 +186,13 @@ A user's identity and organization membership must come from the trusted session
 Do not finalize backend schemas from this document alone, but use these concepts to organize frontend ownership.
 
 ## User
+
 Global account identity.
 
 ## VolunteerProfile
+
 Reusable volunteer information, for example:
+
 - name;
 - school/education information;
 - grade/year if required;
@@ -194,7 +207,9 @@ Reusable volunteer information, for example:
 Collect only data that has a real product use.
 
 ## Opportunity
+
 Core marketplace object:
+
 - title;
 - organization;
 - description;
@@ -211,7 +226,9 @@ Core marketplace object:
 - slug/id.
 
 ## Application
+
 A volunteer's application to one opportunity:
+
 - draft/submitted state;
 - answers;
 - reusable profile snapshot/reference;
@@ -220,15 +237,19 @@ A volunteer's application to one opportunity:
 - reviewer outcome.
 
 ## ApplicationAnswer / Essay
+
 Opportunity-specific answers.
 
 Support reuse where the product intentionally allows it, but never silently submit an old essay to a new opportunity.
 
 ## SavedOpportunity
+
 Bookmark/favorite relation.
 
 ## VolunteerRecord
+
 Derived view of verified participation:
+
 - completed events;
 - attendance;
 - reliability;
@@ -239,7 +260,9 @@ Derived view of verified participation:
 Do not display an authoritative “rating” until its formula and source are defined.
 
 ## AttendanceRecord
+
 Must distinguish:
+
 - accepted;
 - attended;
 - excused/cancelled where applicable;
@@ -248,9 +271,11 @@ Must distinguish:
 Never reduce reliability because the organizer failed to confirm attendance.
 
 ## Organization / Partner
+
 Public and private organization identity.
 
 ## Review / Rating
+
 Future-facing unless a real backend contract exists.
 
 Do not invent scoring algorithms.
@@ -266,13 +291,16 @@ YVC is different because opportunities are inherently public/discoverable conten
 Use route-level indexing rules.
 
 ## Potentially public/indexable
+
 Only after canonical-host/product decision is verified:
+
 - opportunity discovery;
 - opportunity detail pages;
 - public organization pages;
 - public volunteer share profile, if product explicitly supports it and privacy has been designed.
 
 ## Always private/noindex
+
 - login/signup;
 - onboarding;
 - personal profile editor;
@@ -295,6 +323,7 @@ Do not expose personal application data to search engines.
 # 7. Recommended frontend stack
 
 ## Core
+
 - Next.js 16 App Router
 - React 19
 - strict TypeScript
@@ -302,6 +331,7 @@ Do not expose personal application data to search engines.
 - Tailwind CSS 4
 
 ## UI
+
 - shadcn-compatible primitives
 - Lucide React
 - class-variance-authority
@@ -312,10 +342,13 @@ Do not expose personal application data to search engines.
 Do not add a second component system.
 
 ## Localization
+
 Use:
+
 - `next-intl`
 
 Target:
+
 - Uzbek (`uz`);
 - Russian (`ru`);
 - English (`en`).
@@ -323,12 +356,15 @@ Target:
 Use URL-aware localization where practical and keep server rendering compatible.
 
 ## Forms
+
 Use:
+
 - `react-hook-form`;
 - `zod`;
 - `@hookform/resolvers`.
 
 For server mutation boundaries, prefer either:
+
 - plain typed Server Actions with a standardized result envelope; or
 - `next-safe-action` if the repository adopts it consistently.
 
@@ -337,7 +373,9 @@ Do not mix several competing action abstractions.
 If `next-safe-action` is adopted, document it as the one approved client-triggered mutation boundary.
 
 ## Server/client data
+
 Use:
+
 - Next.js Server Components for initial server data;
 - TanStack Query for dynamic client server-state;
 - centralized query keys;
@@ -348,10 +386,13 @@ Do not use React Query for every initial page read.
 Do not duplicate server data in Zustand.
 
 ## URL state
+
 Use:
+
 - `nuqs`
 
 for:
+
 - opportunity filters;
 - search;
 - sorting;
@@ -359,21 +400,27 @@ for:
 - tab state only when it should be shareable/bookmarkable.
 
 ## Client UI state
+
 Do **not** install/use Zustand by default.
 
 Add Zustand only when a genuine cross-component/cross-route client-only state problem appears that is not:
+
 - server state;
 - URL state;
 - form state;
 - local component state.
 
 ## Dates
+
 Use:
+
 - native `Intl`;
 - `date-fns` where actual date manipulation makes it worthwhile.
 
 ## Tables
+
 Use:
+
 - `@tanstack/react-table`
 
 only for real data-heavy admin/partner tables.
@@ -381,10 +428,13 @@ only for real data-heavy admin/partner tables.
 Do not use it for ordinary card lists.
 
 ## Motion
+
 Use:
+
 - `motion`
 
 sparingly for:
+
 - page/step transitions;
 - application progress;
 - meaningful dialog/list feedback.
@@ -392,12 +442,15 @@ sparingly for:
 Respect reduced-motion preferences.
 
 ## API typing
+
 Preferred:
+
 - backend publishes OpenAPI;
 - generate TypeScript API types;
 - use `openapi-fetch` or an equivalent small typed client inside the server-only API layer.
 
 If no OpenAPI contract exists:
+
 - use a centralized native-fetch wrapper;
 - validate UI-critical backend JSON with Zod schemas;
 - document the temporary contract.
@@ -405,19 +458,24 @@ If no OpenAPI contract exists:
 Do not maintain both a full handwritten API type system and a generated one without a reason.
 
 ## Error monitoring
+
 Production:
+
 - `@sentry/nextjs`
 
 only once a real project/config exists.
 
 ## Product analytics
+
 If deployed on Vercel:
+
 - `@vercel/analytics`;
 - `@vercel/speed-insights`.
 
 Do not send volunteer PII, essays, phone numbers, or application text to analytics.
 
 ## Testing
+
 - Vitest;
 - React Testing Library;
 - `@testing-library/jest-dom`;
@@ -431,6 +489,7 @@ Automated tests are part of the target architecture, not an optional someday-cle
 # 8. Suggested dependency policy
 
 ## Install/approve now when the feature requires it
+
 - `next`
 - `react`
 - `react-dom`
@@ -447,6 +506,7 @@ Automated tests are part of the target architecture, not an optional someday-cle
 - shadcn-related primitive dependencies
 
 ## Add only when justified
+
 - `@tanstack/react-table`
 - `openapi-fetch`
 - generated OpenAPI tooling
@@ -461,6 +521,7 @@ Automated tests are part of the target architecture, not an optional someday-cle
 - PDF tooling
 
 ## Do not add by default
+
 - Redux;
 - Axios;
 - Formik;
@@ -563,6 +624,7 @@ Do not promote a component to `shared/` because it is used twice by accident.
 ### UI primitives
 
 Prefer:
+
 - Button;
 - Input;
 - Textarea;
@@ -584,6 +646,7 @@ Prefer:
 - Progress.
 
 Build product components on top:
+
 - `OpportunityCard`;
 - `OpportunityFilters`;
 - `OpportunityDeadline`;
@@ -612,6 +675,7 @@ shared primitives
 ```
 
 Use `"use client"` only for:
+
 - React state/effects;
 - event handlers;
 - browser APIs;
@@ -650,6 +714,7 @@ src/features/profile/api.server.ts
 or route-local equivalents.
 
 Rules:
+
 1. API origin lives in a server-only environment variable.
 2. No private bearer token in client JavaScript.
 3. No API origin duplicated throughout components.
@@ -672,6 +737,7 @@ Telegram is a planned/high-priority authentication path.
 Do not invent its backend protocol.
 
 Requirements:
+
 - browser receives only data needed for the client auth interaction;
 - Telegram-provided identity/auth payload must be verified server-side/backend-side;
 - never trust Telegram user fields simply because JavaScript received them;
@@ -694,6 +760,7 @@ Do not install Clerk/Auth0/etc. unless the maintainers deliberately select them.
 The app should treat the server session as the source of authenticated identity.
 
 Frontend must never send trusted identity fields such as:
+
 - `userId`;
 - `volunteerId`;
 - organization membership role
@@ -710,18 +777,18 @@ Authorization must be validated by the backend for every protected operation.
 
 Use this ownership table.
 
-| State | Owner |
-|---|---|
-| Initial page data | Server Component |
-| User-triggered dynamic reads | TanStack Query |
-| Mutations | Server action/API boundary + TanStack mutation when client cache is involved |
-| Search/filter/sort/page | URL via nuqs |
-| Form | React Hook Form |
-| Theme | next-themes only if product ships theme switching |
-| Locale | URL / next-intl |
-| Tiny component state | local React state |
-| Genuine shared client-only state | Zustand only if justified |
-| Auth/session | server |
+| State                            | Owner                                                                        |
+| -------------------------------- | ---------------------------------------------------------------------------- |
+| Initial page data                | Server Component                                                             |
+| User-triggered dynamic reads     | TanStack Query                                                               |
+| Mutations                        | Server action/API boundary + TanStack mutation when client cache is involved |
+| Search/filter/sort/page          | URL via nuqs                                                                 |
+| Form                             | React Hook Form                                                              |
+| Theme                            | next-themes only if product ships theme switching                            |
+| Locale                           | URL / next-intl                                                              |
+| Tiny component state             | local React state                                                            |
+| Genuine shared client-only state | Zustand only if justified                                                    |
+| Auth/session                     | server                                                                       |
 
 Never mirror server records into local state merely to make them editable. Create an explicit form/draft model.
 
@@ -751,6 +818,7 @@ Do not implement real-time systems for human workflows that tolerate 30–60 sec
 Opportunity browsing is a primary product surface.
 
 Requirements:
+
 - mobile-first;
 - fast from Telegram/social deep links;
 - search;
@@ -775,6 +843,7 @@ Example:
 Do not hide the state entirely inside React.
 
 Opportunity detail should clearly show:
+
 - organizer;
 - date;
 - location;
@@ -791,6 +860,7 @@ Opportunity detail should clearly show:
 Goal: complete information once, reuse it.
 
 Profile must distinguish:
+
 - reusable personal/profile data;
 - opportunity-specific application answers.
 
@@ -809,6 +879,7 @@ Never lose unsaved data silently.
 Application states should come from backend truth.
 
 Potential states:
+
 - draft;
 - submitted;
 - under_review;
@@ -840,6 +911,7 @@ status feedback
 ```
 
 Form requirements:
+
 - complete default values;
 - inline field errors;
 - root submission error;
@@ -850,6 +922,7 @@ Form requirements:
 - explicit submit confirmation when submission becomes immutable.
 
 Essay UX:
+
 - character/word limit only if backend/product defines one;
 - autosave after idle;
 - save state visible;
@@ -864,6 +937,7 @@ Treat reputation as high-trust product data.
 Do not display arbitrary stars.
 
 If the backend formally defines:
+
 - events completed;
 - verified hours;
 - attendance;
@@ -874,6 +948,7 @@ If the backend formally defines:
 render them transparently.
 
 Any derived score should have:
+
 - documented formula;
 - understandable meaning;
 - source/verification rules;
@@ -890,6 +965,7 @@ Do not duplicate formulas across JSX.
 When implemented:
 
 Partner users need:
+
 - opportunity management or access to assigned opportunities;
 - applicant list;
 - filters;
@@ -912,6 +988,7 @@ Do not expose private volunteer information beyond what the partner is authorize
 Admin is an operational tool, not a prettier copy of the volunteer UI.
 
 Potential responsibilities:
+
 - opportunity creation/editing;
 - partner/source management;
 - applications;
@@ -923,6 +1000,7 @@ Potential responsibilities:
 Every admin mutation must be backend-authorized.
 
 For dangerous actions:
+
 - confirmation;
 - clear destructive styling;
 - auditability if backend supports it.
@@ -932,11 +1010,13 @@ For dangerous actions:
 # 23. Localization
 
 Support from the beginning:
+
 - Uzbek;
 - Russian;
 - English.
 
 Requirements:
+
 - all user-facing strings localized;
 - no hard-coded English buried in validation/toasts;
 - localized date/time using `Intl`;
@@ -954,6 +1034,7 @@ Validation errors should use stable error codes/keys where possible instead of t
 Most volunteer acquisition may come from Telegram/social links.
 
 Optimize:
+
 - small-screen opportunity cards;
 - fast detail page;
 - thumb-friendly apply CTA;
@@ -966,6 +1047,7 @@ Optimize:
 - fast return from Telegram webview/browser.
 
 Test at:
+
 - ~360px;
 - ~390px;
 - tablet;
@@ -976,6 +1058,7 @@ Test at:
 # 25. Accessibility
 
 Required:
+
 - semantic headings;
 - associated labels;
 - keyboard navigation;
@@ -998,6 +1081,7 @@ Required:
 YVC serves young people, potentially including minors.
 
 Frontend rules:
+
 - collect minimum necessary personal information;
 - no PII in URLs;
 - no application essays in analytics;
@@ -1019,6 +1103,7 @@ Document unresolved privacy-policy requirements.
 Analytics should answer product questions, not collect everything.
 
 Examples:
+
 - opportunity viewed;
 - apply started;
 - signup started;
@@ -1030,6 +1115,7 @@ Examples:
 - filter applied.
 
 Never send:
+
 - essays;
 - names;
 - phone numbers;
@@ -1044,6 +1130,7 @@ Use centralized typed event definitions.
 # 28. Error handling
 
 Establish:
+
 - route `error.tsx`;
 - `loading.tsx`;
 - empty states;
@@ -1053,6 +1140,7 @@ Establish:
 - network/backend failure state.
 
 Distinguish:
+
 - 401 unauthenticated;
 - 403 forbidden;
 - 404 missing;
@@ -1071,7 +1159,9 @@ Do not leak backend stack traces or internal messages.
 This is a mandatory improvement over the current Dwelve baseline.
 
 ## Unit
+
 Vitest:
+
 - schema helpers;
 - query-key factories;
 - reputation display helpers;
@@ -1080,7 +1170,9 @@ Vitest:
 - localization helpers.
 
 ## Component
+
 React Testing Library:
+
 - application fields;
 - opportunity filters;
 - status components;
@@ -1089,9 +1181,11 @@ React Testing Library:
 - profile completion UI.
 
 ## E2E
+
 Playwright critical paths:
 
 ### Public
+
 1. open opportunity list;
 2. filter by region;
 3. open opportunity;
@@ -1099,6 +1193,7 @@ Playwright critical paths:
 5. deep link still works.
 
 ### Volunteer
+
 1. sign in through available test auth;
 2. complete profile;
 3. start application;
@@ -1110,6 +1205,7 @@ Playwright critical paths:
 9. see application status/history.
 
 ### Partner
+
 1. sign in as partner;
 2. open applicants;
 3. inspect applicant;
@@ -1117,6 +1213,7 @@ Playwright critical paths:
 5. UI refreshes correctly.
 
 ### Security/privacy smoke
+
 - private route redirects when logged out;
 - private route is noindex;
 - volunteer cannot reach partner/admin route by UI or direct URL;
@@ -1181,6 +1278,7 @@ Do not create empty documentation merely to satisfy this tree.
 `docs/README.md` must act as a context router.
 
 `.agent-memory/` should record:
+
 - non-obvious decisions;
 - costly discoveries;
 - recurring bugs;
@@ -1194,6 +1292,7 @@ It should not contain daily progress logs.
 # 31. Suggested implementation phases
 
 ## Phase 0 — Repository audit
+
 - inspect target repo;
 - inspect all three reference repos;
 - inventory packages;
@@ -1202,6 +1301,7 @@ It should not contain daily progress logs.
 - identify unknowns.
 
 ## Phase 1 — Foundation
+
 - Next.js/React/TS/Tailwind;
 - lint/format;
 - locale architecture;
@@ -1213,6 +1313,7 @@ It should not contain daily progress logs.
 - docs router.
 
 ## Phase 2 — API/auth boundary
+
 - server-only backend client;
 - normalized errors;
 - OpenAPI integration if available;
@@ -1221,6 +1322,7 @@ It should not contain daily progress logs.
 - protected route policy.
 
 ## Phase 3 — Opportunities
+
 - public list;
 - detail;
 - URL filters;
@@ -1229,6 +1331,7 @@ It should not contain daily progress logs.
 - application CTA.
 
 ## Phase 4 — Volunteer identity
+
 - signup/onboarding;
 - profile;
 - saved opportunities;
@@ -1236,6 +1339,7 @@ It should not contain daily progress logs.
 - settings.
 
 ## Phase 5 — Applications
+
 - application schema;
 - draft;
 - essay UX;
@@ -1245,19 +1349,23 @@ It should not contain daily progress logs.
 - invalidation/freshness.
 
 ## Phase 6 — Volunteer record
+
 - verified participation data;
 - reliability;
 - history;
 - rating/level only when backend rules are defined.
 
 ## Phase 7 — Partner/admin
+
 Only after real backend permissions/contracts exist:
+
 - partner applicant review;
 - attendance confirmation;
 - opportunity management;
 - admin operations.
 
 ## Phase 8 — Production hardening
+
 - Playwright;
 - Sentry;
 - analytics;
@@ -1272,6 +1380,7 @@ Only after real backend permissions/contracts exist:
 # 32. Branch and change discipline
 
 Unless repository policy says otherwise:
+
 - do not do architectural migration directly on `main`;
 - work on a focused branch;
 - keep commits coherent;
@@ -1286,6 +1395,7 @@ If this task is only a handoff inside an existing agent branch, continue that br
 # 33. Non-negotiable forbidden patterns
 
 Do not:
+
 - build the authenticated app inside `volontyorlarOrg/v-web`;
 - copy Dwelve branding/domain/env values;
 - expose backend tokens to the browser;

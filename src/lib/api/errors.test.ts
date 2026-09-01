@@ -7,15 +7,6 @@ import {
   isApiError,
 } from "./errors";
 
-/**
- * Error classification.
- *
- * The handoff's rule is that a 401, a 403, a 404, a conflict, a validation
- * failure, and a network drop must not all become "Something went wrong".
- * These tests hold that line at the one place where a raw failure becomes a
- * user-visible category.
- */
-
 describe("codeForStatus", () => {
   it.each([
     [401, "unauthenticated"],
@@ -39,17 +30,16 @@ describe("classifyApiError", () => {
   });
 
   it("treats a fetch TypeError as a network failure", () => {
-    // `fetch` rejects with a bare TypeError when offline or on a DNS failure.
     expect(classifyApiError(new TypeError("Failed to fetch")).code).toBe("network");
   });
 
   it("distinguishes a timeout from a generic abort", () => {
-    expect(
-      classifyApiError(new DOMException("timed out", "TimeoutError")).code,
-    ).toBe("timeout");
-    expect(
-      classifyApiError(new DOMException("aborted", "AbortError")).code,
-    ).toBe("network");
+    expect(classifyApiError(new DOMException("timed out", "TimeoutError")).code).toBe(
+      "timeout",
+    );
+    expect(classifyApiError(new DOMException("aborted", "AbortError")).code).toBe(
+      "network",
+    );
   });
 
   it("falls back to server for anything unrecognised, including non-Errors", () => {
@@ -61,7 +51,6 @@ describe("classifyApiError", () => {
 
 describe("ApiError", () => {
   it("hides internal codes from the user-facing surface", () => {
-    // These name our infrastructure, not the user's action.
     expect(new ApiError("server").isUserFacing).toBe(false);
     expect(new ApiError("invalidResponse").isUserFacing).toBe(false);
     expect(new ApiError("notConfigured").isUserFacing).toBe(false);
@@ -77,7 +66,6 @@ describe("ApiError", () => {
     expect(new ApiError("timeout").isRetryable).toBe(true);
     expect(new ApiError("rateLimited").isRetryable).toBe(true);
 
-    // Retrying a decided answer just repeats it.
     expect(new ApiError("forbidden").isRetryable).toBe(false);
     expect(new ApiError("notFound").isRetryable).toBe(false);
     expect(new ApiError("conflict").isRetryable).toBe(false);

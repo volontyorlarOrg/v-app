@@ -20,7 +20,7 @@ every domain concept is marked "Implemented here: No", and its Telegram section
 reads "Implemented: Nothing."
 
 So every `*.api.server.ts` module codes against a contract this repository
-*proposes*, collected and labelled in
+_proposes_, collected and labelled in
 [`docs/api/API_CONTRACT.md`](./docs/api/API_CONTRACT.md). Consequences that are
 deliberate and must not be quietly removed:
 
@@ -35,7 +35,7 @@ verified because a page looks finished.
 ## Stack
 
 Next.js 16 App Router · React 19 · strict TypeScript · Node 22+ · Tailwind 4
-with repository-owned tokens · Radix + CVA · `next-intl` (uz/ru/en,
+with repository-owned tokens · Onest · Radix + CVA · `next-intl` (uz/ru/en,
 server-first) · React Hook Form + Zod · `next-safe-action` · `nuqs` · TanStack
 Query · Sonner · `jose` · Vitest + Testing Library + Playwright.
 
@@ -99,6 +99,15 @@ Keep route-specific implementation beside its route in `_components`, `_lib`,
   communicated by colour alone.
 - **Minimum personal data.** No PII in URLs, analytics, logs, or browser
   storage. The audience includes minors.
+- **Source files carry no comments.** Reasoning goes in `/docs` or
+  `.agent-memory/`; `npm run check:comments` strips any that reappear. Only
+  functional directives (`eslint-disable`, `@ts-`) may stay. See
+  [`docs/architecture/CODE_STYLE.md`](./docs/architecture/CODE_STYLE.md).
+- **Brand colour has rules that are checked.** Blue is structure, orange is a
+  volunteer's own achievement, and `blue`/`orange` are graphics colours while
+  `blue-deep`/`orange-deep` are the text and button fills. `npm run check:contrast`
+  fails the build if any of it drifts. See
+  [`docs/design/design-system.md`](./docs/design/design-system.md).
 - Do not add a dependency without checking the existing stack first.
 
 ## Default loop
@@ -112,12 +121,12 @@ Keep route-specific implementation beside its route in `_components`, `_lib`,
 Before declaring completion:
 
 ```bash
-npm run lint
-npm run typecheck
-npm run test
+npm run check        # format, lint, types, contrast, unit and component tests
 npm run build
 npm run test:e2e     # when routes, policy, or public behaviour changed
 ```
+
+`npm run verify` runs `check` and `build` together.
 
 Also exercise the flow at 360px and with the keyboard, and review `git diff`.
 **Never claim a behaviour works because the code was written.** If a check did

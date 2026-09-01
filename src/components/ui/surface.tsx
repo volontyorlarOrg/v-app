@@ -2,20 +2,15 @@ import type { ComponentProps, ElementType } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-/**
- * The raised panel that most content sits on. One component so every card in
- * the product shares a radius, a border, and a background, rather than each
- * page inventing its own.
- */
 const surfaceVariants = cva("rounded-card border", {
   variants: {
     tone: {
-      panel: "border-signal-line bg-panel",
-      field: "border-signal-line bg-field",
-      // For a single decisive callout only. The design system's "signal
-      // rarity" rule: teal marks action, it does not wash a whole section.
-      accent: "border-teal/55 bg-panel-strong",
-      quiet: "border-signal-line/60 bg-transparent",
+      raised: "border-line bg-canvas",
+      muted: "border-line bg-surface",
+      structure: "border-blue-deep/20 bg-blue-tint",
+      achievement: "border-orange-deep/25 bg-orange-tint",
+      alert: "border-danger/25 bg-danger-tint",
+      quiet: "border-line bg-transparent",
     },
     padding: {
       none: "",
@@ -24,7 +19,7 @@ const surfaceVariants = cva("rounded-card border", {
       lg: "p-6 sm:p-8",
     },
   },
-  defaultVariants: { tone: "panel", padding: "md" },
+  defaultVariants: { tone: "raised", padding: "md" },
 });
 
 export type SurfaceProps<T extends ElementType = "div"> = {

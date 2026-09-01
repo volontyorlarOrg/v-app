@@ -8,14 +8,6 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { localeLabels, locales, type Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
-/**
- * Language switcher.
- *
- * Route-preserving: it replaces the locale segment and keeps the rest of the
- * path *and the query string*. Sending the user to the home page on a language
- * change would throw away a filtered opportunity list — the thing they were
- * most likely reading when they realised they wanted another language.
- */
 export function LanguageSwitcher({ className }: { className?: string }) {
   const t = useTranslations("common.language");
   const router = useRouter();
@@ -30,9 +22,6 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     if (next === current) return;
 
     startTransition(() => {
-      // `pathname` is already locale-stripped by next-intl's hook. The query
-      // string is carried across deliberately: switching language on a
-      // filtered opportunity list must not silently discard the filters.
       const query = searchParams.toString();
       router.replace(`${pathname}${query ? `?${query}` : ""}`, { locale: next });
     });
@@ -42,7 +31,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     <div className={cn("relative inline-flex items-center", className)}>
       <Languages
         aria-hidden="true"
-        className="pointer-events-none absolute left-2.5 size-4 text-muted"
+        className="pointer-events-none absolute left-2.5 size-4 text-ink-muted"
       />
       <select
         aria-label={t("change")}
@@ -50,13 +39,13 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         disabled={isPending}
         onChange={(event) => change(event.target.value)}
         className={cn(
-          "h-9 cursor-pointer appearance-none rounded-lg border border-signal-line",
-          "bg-transparent pl-8 pr-3 text-sm font-bold text-ink",
-          "transition-colors hover:border-teal disabled:opacity-60",
+          "h-9 cursor-pointer appearance-none rounded-lg border border-line",
+          "bg-transparent pr-3 pl-8 text-sm font-semibold text-ink",
+          "transition-colors hover:border-blue-deep disabled:opacity-60",
         )}
       >
         {locales.map((locale) => (
-          <option key={locale} value={locale} className="bg-panel text-ink">
+          <option key={locale} value={locale} className="bg-surface text-ink">
             {localeLabels[locale]}
           </option>
         ))}

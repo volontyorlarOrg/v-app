@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/states";
 
-/** Bookmarked opportunities. */
 export default async function SavedPage(props: PageProps<"/[locale]/saved">) {
   const { locale } = await props.params;
   setRequestLocale(locale as Locale);

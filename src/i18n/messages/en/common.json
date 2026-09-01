@@ -34,5 +34,6 @@
     "change": "Change language"
   },
   "skipToContent": "Skip to content",
-  "sampleDataNotice": "Sample data. These are illustrative example opportunities, not real events — this deployment has no opportunity service connected."
+  "sampleDataNotice": "Sample data. These are illustrative example opportunities, not real events — this deployment has no opportunity service connected.",
+  "brandWordmark": "volontyorlar"
 }

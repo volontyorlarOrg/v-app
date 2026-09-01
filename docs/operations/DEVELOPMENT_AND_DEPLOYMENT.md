@@ -23,12 +23,12 @@ labels itself whenever it is active.
 
 ## Environment
 
-| Variable | Scope | Required | Purpose |
-| --- | --- | --- | --- |
-| `YVC_API_BASE_URL` | server | production | Backend origin, no trailing slash |
-| `YVC_SESSION_SECRET` | server | for any auth | ≥32 chars, random. Rotating it signs everyone out. |
-| `YVC_ENABLE_SAMPLE_DATA` | server | dev/test | `true` serves sample opportunities |
-| `NEXT_PUBLIC_SITE_ORIGIN` | public | production | Canonical origin for metadata and sitemap |
+| Variable                  | Scope  | Required     | Purpose                                            |
+| ------------------------- | ------ | ------------ | -------------------------------------------------- |
+| `YVC_API_BASE_URL`        | server | production   | Backend origin, no trailing slash                  |
+| `YVC_SESSION_SECRET`      | server | for any auth | ≥32 chars, random. Rotating it signs everyone out. |
+| `YVC_ENABLE_SAMPLE_DATA`  | server | dev/test     | `true` serves sample opportunities                 |
+| `NEXT_PUBLIC_SITE_ORIGIN` | public | production   | Canonical origin for metadata and sitemap          |
 
 Never prefix a secret with `NEXT_PUBLIC_` — Next.js inlines those into the
 browser bundle. An E2E test asserts the server-only names are absent from it.
@@ -38,27 +38,50 @@ Generate a secret: `openssl rand -base64 48`.
 ## Checks
 
 ```bash
-npm run lint       # ESLint + React Compiler rules
-npm run typecheck  # next typegen && tsc --noEmit
-npm run test       # Vitest — unit + component
+npm run check      # format, lint, types, contrast, unit + component tests
 npm run build      # production build
-npm run check      # the first three
+npm run verify     # check + build
 
 npm run test:e2e   # Playwright — builds and starts its own server on :3100
 ```
 
+Individually:
+
+| Command                  | What it gates                                   |
+| ------------------------ | ----------------------------------------------- |
+| `npm run format:check`   | Prettier, including Tailwind class order        |
+| `npm run lint`           | ESLint and the React Compiler rules             |
+| `npm run typecheck`      | `next typegen && tsc --noEmit`                  |
+| `npm run check:contrast` | 35 WCAG checks against the design tokens        |
+| `npm run check:comments` | Strips any comment that reappeared in source    |
+| `npm run test`           | Vitest — unit and component                     |
+| `npm run test:e2e`       | Playwright — public journeys, privacy, indexing |
+
 First E2E run needs `npm run test:e2e:install`.
 
-All four gates must pass before a change is called done. Exercise the affected
-flow as well; code compiling is not evidence that it works.
+`npm run format` and `npm run lint:fix` write rather than gate.
+
+All of it runs in CI on every push and pull request
+([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)), split into three
+jobs so a formatting failure does not hide a test failure.
+
+Exercise the affected flow as well; code compiling is not evidence that it
+works.
+
+## Editor
+
+`.vscode/` ships workspace settings and extension recommendations: format on
+save with Prettier, ESLint fixes on save, the workspace TypeScript version,
+Tailwind IntelliSense configured for `cn()` and `cva()`, and i18n-ally wired to
+the three catalogues. `.editorconfig` covers editors that do not read it.
 
 ## Test layout
 
-| Kind | Where | Runner |
-| --- | --- | --- |
-| Unit | `src/**/*.test.ts` | Vitest |
+| Kind      | Where               | Runner                   |
+| --------- | ------------------- | ------------------------ |
+| Unit      | `src/**/*.test.ts`  | Vitest                   |
 | Component | `src/**/*.test.tsx` | Vitest + Testing Library |
-| E2E | `e2e/*.spec.ts` | Playwright |
+| E2E       | `e2e/*.spec.ts`     | Playwright               |
 
 Component tests render with the **real** message catalogues
 ([`src/test/render.tsx`](../../src/test/render.tsx)), not a stub `t`. Half of
@@ -83,7 +106,7 @@ Before a first production deploy:
 
 ## Troubleshooting
 
-**`DYNAMIC_SERVER_USAGE` on a page.** It reads `cookies()` *and* exports
+**`DYNAMIC_SERVER_USAGE` on a page.** It reads `cookies()` _and_ exports
 `generateStaticParams`. Remove the latter — see `.agent-memory/gotchas/`.
 
 **Route types missing.** `npx next typegen`. `PageProps` and `LayoutProps` are

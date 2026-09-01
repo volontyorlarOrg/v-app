@@ -6,14 +6,14 @@ The deliberate divergence from the Dwelve reference architecture.
 
 ## 1. Two repositories, one product
 
-| | `volontyorlarOrg/v-web` | `volontyorlarOrg/v-app` (here) |
-| --- | --- | --- |
-| Role | Marketing site | The product |
-| Auth | None | Session-based |
-| Indexing | Fully public | **Per route** |
-| Owns | Brand narrative, design system source, brand assets | Discovery, profiles, applications, records |
+|          | `volontyorlarOrg/v-web`                             | `volontyorlarOrg/v-app` (here)             |
+| -------- | --------------------------------------------------- | ------------------------------------------ |
+| Role     | Marketing site                                      | The product                                |
+| Auth     | None                                                | Session-based                              |
+| Indexing | Fully public                                        | **Per route**                              |
+| Owns     | Brand narrative, design system source, brand assets | Discovery, profiles, applications, records |
 
-Brand assets and the token palette come *from* the marketing repository so the
+Brand assets and the token palette come _from_ the marketing repository so the
 two look like one product. Application functionality never goes back into it.
 
 ## 2. Why not a blanket noindex
@@ -35,19 +35,19 @@ So indexing is a per-route decision, with two rules that never bend:
 Defined once in [`lib/routes/policy.ts`](../../src/lib/routes/policy.ts) and
 enforced in three places that all read from it.
 
-| Route | Public? | Indexable? |
-| --- | --- | --- |
-| `/[locale]/opportunities` | yes | **yes** |
-| `/[locale]/opportunities/[slug]` | yes | **yes** |
-| `/[locale]/login` | yes | no |
-| `/[locale]/dashboard` | no | no |
-| `/[locale]/profile` | no | no |
-| `/[locale]/saved` | no | no |
-| `/[locale]/applications`, `/applications/*` | no | no |
-| `/[locale]/record` | no | no |
-| `/[locale]/settings` | no | no |
-| `/[locale]/partner/*` *(reserved)* | no | no |
-| `/[locale]/admin/*` *(reserved)* | no | no |
+| Route                                       | Public? | Indexable? |
+| ------------------------------------------- | ------- | ---------- |
+| `/[locale]/opportunities`                   | yes     | **yes**    |
+| `/[locale]/opportunities/[slug]`            | yes     | **yes**    |
+| `/[locale]/login`                           | yes     | no         |
+| `/[locale]/dashboard`                       | no      | no         |
+| `/[locale]/profile`                         | no      | no         |
+| `/[locale]/saved`                           | no      | no         |
+| `/[locale]/applications`, `/applications/*` | no      | no         |
+| `/[locale]/record`                          | no      | no         |
+| `/[locale]/settings`                        | no      | no         |
+| `/[locale]/partner/*` _(reserved)_          | no      | no         |
+| `/[locale]/admin/*` _(reserved)_            | no      | no         |
 
 **Closed by default.** `isIndexablePath` works from an allowlist, so a route
 added without thinking about indexing stays private. A test asserts this for an
@@ -55,12 +55,12 @@ invented path.
 
 ## 4. Enforcement
 
-| Mechanism | File | Covers |
-| --- | --- | --- |
-| `X-Robots-Tag` + `Cache-Control` per route | `src/proxy.ts` | Every response |
-| `robots` metadata per route | each `page.tsx` / `layout.tsx` | The rendered `<head>` |
-| `robots.txt` | `src/app/robots.ts` | Crawler instruction |
-| `sitemap.xml` | `src/app/sitemap.ts` | Only public routes, by construction |
+| Mechanism                                  | File                           | Covers                              |
+| ------------------------------------------ | ------------------------------ | ----------------------------------- |
+| `X-Robots-Tag` + `Cache-Control` per route | `src/proxy.ts`                 | Every response                      |
+| `robots` metadata per route                | each `page.tsx` / `layout.tsx` | The rendered `<head>`               |
+| `robots.txt`                               | `src/app/robots.ts`            | Crawler instruction                 |
+| `sitemap.xml`                              | `src/app/sitemap.ts`           | Only public routes, by construction |
 
 The root layout defaults to `robots: { index: false }`; public routes opt **in**
 via their own metadata. Both layers exist because `robots.txt` alone still

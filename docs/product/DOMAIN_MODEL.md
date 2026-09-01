@@ -30,7 +30,7 @@ audience includes minors.
 
 **Completion** is defined explicitly, because a percentage with no stated rule
 is exactly the unexplained number the product avoids. Six fields count:
-`fullName`, `bio`, `region`, `school`, `languages`, and *either* contact
+`fullName`, `bio`, `region`, `school`, `languages`, and _either_ contact
 channel. "Complete" means an organiser can evaluate and contact you — which is
 why a portfolio link, welcome as it is, does not count.
 
@@ -81,7 +81,7 @@ An answer to one opportunity-specific question.
 Silently submitting last month's essay to a different organiser is the failure
 this rule exists to prevent.
 
-The validation schema is *generated* from the opportunity's question list, so a
+The validation schema is _generated_ from the opportunity's question list, so a
 question added server-side is validated without a frontend change, and a
 character counter can never disagree with the rule that rejects the answer. A
 counter appears only when the backend states a `maxLength` — inventing a limit

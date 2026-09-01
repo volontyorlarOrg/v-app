@@ -14,10 +14,12 @@ and guaranteed on its **output** type. `useForm<T>` with a single generic uses
 **Fix.** Use the three-generic form:
 
 ```ts
-useForm<ProfileFormValues, unknown, ProfileInput>({ resolver: zodResolver(profileSchema) })
+useForm<ProfileFormValues, unknown, ProfileInput>({
+  resolver: zodResolver(profileSchema),
+});
 //      ^ z.input          ^ ctx    ^ z.output
 ```
 
 `features/profile/schemas.ts` exports both types for exactly this reason. A
-`Controller`'s `field.value` is then the *input* type, so an array field can be
+`Controller`'s `field.value` is then the _input_ type, so an array field can be
 `undefined` and needs a `?? []` at the call site.

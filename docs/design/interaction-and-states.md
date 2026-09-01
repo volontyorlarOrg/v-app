@@ -6,12 +6,12 @@ Every asynchronous surface needs four answers, not one.
 
 ## The four states
 
-| State | Component | Rule |
-| --- | --- | --- |
-| Loading | `loading.tsx` + `Skeleton` in a `LoadingRegion` | Mirror the real layout so nothing jumps |
-| Empty | `EmptyState` | Say why it is empty and offer the next action |
-| Error | `ErrorState` / `ApiErrorState` | Name the *kind* of failure |
-| Content | — | |
+| State   | Component                                       | Rule                                          |
+| ------- | ----------------------------------------------- | --------------------------------------------- |
+| Loading | `loading.tsx` + `Skeleton` in a `LoadingRegion` | Mirror the real layout so nothing jumps       |
+| Empty   | `EmptyState`                                    | Say why it is empty and offer the next action |
+| Error   | `ErrorState` / `ApiErrorState`                  | Name the _kind_ of failure                    |
+| Content | —                                               |                                               |
 
 ## Errors are never one message
 
@@ -19,16 +19,16 @@ Every asynchronous surface needs four answers, not one.
 [`lib/api/errors.ts`](../../src/lib/api/errors.ts) has a distinct translated
 title and body for each:
 
-| Code | What the user is told |
-| --- | --- |
-| `unauthenticated` | Sign in, and we will bring you back |
-| `forbidden` | You are signed in but not allowed here |
-| `notFound` | The link may be old |
-| `conflict` | You have already applied |
-| `validation` | Some fields need attention |
+| Code                  | What the user is told                                 |
+| --------------------- | ----------------------------------------------------- |
+| `unauthenticated`     | Sign in, and we will bring you back                   |
+| `forbidden`           | You are signed in but not allowed here                |
+| `notFound`            | The link may be old                                   |
+| `conflict`            | You have already applied                              |
+| `validation`          | Some fields need attention                            |
 | `network` / `timeout` | Check your connection — **nothing you typed is lost** |
-| `server` | On our side; it has been logged |
-| `notConfigured` | This part is not connected in this deployment |
+| `server`              | On our side; it has been logged                       |
+| `notConfigured`       | This part is not connected in this deployment         |
 
 Server components `catch` and render `<ApiErrorState error={error} />`. Client
 components read the code from `error.serverError` and translate it.

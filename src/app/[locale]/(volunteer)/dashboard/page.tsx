@@ -11,17 +11,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Surface } from "@/components/ui/surface";
 import { Button } from "@/components/ui/button";
 
-/**
- * Volunteer home.
- *
- * Reads two independent resources concurrently and degrades one at a time:
- * if the profile loads and applications do not, the profile card still
- * renders. `Promise.allSettled`, not `Promise.all`, is what makes that true —
- * one failing endpoint should not blank the whole dashboard.
- */
-export default async function DashboardPage(
-  props: PageProps<"/[locale]/dashboard">,
-) {
+export default async function DashboardPage(props: PageProps<"/[locale]/dashboard">) {
   const { locale } = await props.params;
   setRequestLocale(locale as Locale);
 
@@ -36,8 +26,7 @@ export default async function DashboardPage(
     listMyApplications(null),
   ]);
 
-  const profile =
-    profileResult.status === "fulfilled" ? profileResult.value : null;
+  const profile = profileResult.status === "fulfilled" ? profileResult.value : null;
   const applications =
     applicationsResult.status === "fulfilled"
       ? applicationsResult.value.items.slice(0, 3)
@@ -71,16 +60,19 @@ export default async function DashboardPage(
 
         {applications.length === 0 ? (
           <Surface tone="quiet" padding="md">
-            <p className="text-sm text-muted">{applicationsT("list.emptyBody")}</p>
+            <p className="text-sm text-ink-muted">{applicationsT("list.emptyBody")}</p>
           </Surface>
         ) : (
           <ul className="flex flex-col gap-2">
             {applications.map((application) => (
               <li key={application.id}>
-                <Surface padding="sm" className="flex items-center justify-between gap-3">
+                <Surface
+                  padding="sm"
+                  className="flex items-center justify-between gap-3"
+                >
                   <Link
                     href={`/applications/${application.id}`}
-                    className="text-sm font-bold text-ink hover:text-teal"
+                    className="text-sm font-bold text-ink hover:text-blue-deep"
                   >
                     {application.opportunity.title}
                   </Link>

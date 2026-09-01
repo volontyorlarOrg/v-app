@@ -10,8 +10,8 @@ digest: 'DYNAMIC_SERVER_USAGE'
 The build itself succeeded and marked the route `● (SSG)`. Ten E2E tests failed
 at once; the listing page was fine.
 
-**Cause.** Exporting `generateStaticParams` marks a route static — *even when it
-returns an empty array*. The page also called `getSession()`, which reads
+**Cause.** Exporting `generateStaticParams` marks a route static — _even when it
+returns an empty array_. The page also called `getSession()`, which reads
 `cookies()`. Reading a request-scoped API in a route Next is trying to
 prerender throws `DYNAMIC_SERVER_USAGE`.
 
@@ -28,7 +28,7 @@ fetch. The sitemap enumerates slugs separately.
 
 **The general rule.** A route that reads `cookies()`, `headers()`, or
 `draftMode()` cannot export `generateStaticParams`. If you want a static shell
-*and* personalised content, that needs Cache Components / PPR, which this
+_and_ personalised content, that needs Cache Components / PPR, which this
 project does not enable.
 
 See [[why-no-cache-components]].

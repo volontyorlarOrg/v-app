@@ -1,26 +1,5 @@
 import type { OpportunityDetail } from "./schemas";
 
-/**
- * SAMPLE DATA — NOT REAL OPPORTUNITIES.
- *
- * There is no YVC backend yet. Rather than ship an application that renders an
- * empty page and cannot be tested, this module provides a small illustrative
- * set behind the `YVC_ENABLE_SAMPLE_DATA` flag (off by default).
- *
- * Rules that keep this honest:
- *   - Every organisation name below is fictional. Real YVC partners
- *     (O'ZLIDEP, the Youth Affairs Agency, the Uzbekistan Volunteer
- *     Association, the Republican Children's Library) are deliberately NOT
- *     used, because presenting a fabricated event as theirs would misrepresent
- *     a real organisation.
- *   - The UI renders a visible sample-data notice whenever this source is
- *     active. See `SampleDataNotice`.
- *   - Dates are generated relative to now, so the deadline states stay
- *     exercisable without anyone editing fixtures.
- *
- * When a real API exists, delete this file and the flag with it.
- */
-
 function daysFromNow(days: number, hour = 18): string {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + days);
@@ -149,7 +128,7 @@ export function sampleOpportunities(): OpportunityDetail[] {
         {
           id: "q-sample",
           prompt:
-            "Translate this sentence into your strongest second language: \"Volunteers should arrive fifteen minutes early.\"",
+            'Translate this sentence into your strongest second language: "Volunteers should arrive fifteen minutes early."',
           helpText: "This is a short check, not a test with a right answer.",
           type: "long_text",
           required: true,

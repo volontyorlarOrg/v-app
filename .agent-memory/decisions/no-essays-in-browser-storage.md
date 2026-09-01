@@ -20,7 +20,7 @@ that gets injected.
    never claims "Saved" when it is not.
 
 **If this is ever revisited,** the thing to change is the failure path — a
-local buffer used *only* when the server save fails, cleared on success, and
+local buffer used _only_ when the server save fails, cleared on success, and
 documented. Not a permanent mirror.
 
 See [[error-codes-not-messages]] for the related "never show a backend

@@ -8,16 +8,6 @@ import {
   type RecordCounts,
 } from "./levels";
 
-/**
- * The level and reliability rules.
- *
- * This is the highest-stakes pure logic in the product: it decides what a
- * volunteer's record says about them. The cases below pin the thresholds from
- * PRODUCT.md and, more importantly, the two rules that protect volunteers —
- * unconfirmed attendance never counts against them, and `core` is unreachable
- * without an explicit recognition rather than being computed.
- */
-
 function counts(overrides: Partial<RecordCounts> = {}): RecordCounts {
   return {
     attended: 0,
@@ -30,8 +20,6 @@ function counts(overrides: Partial<RecordCounts> = {}): RecordCounts {
 
 describe("reliability", () => {
   it("is null when nothing has been resolved, not zero", () => {
-    // Zero would read on screen as "never shows up", which is a false
-    // accusation against someone who simply has no confirmed events yet.
     expect(reliability(counts())).toBeNull();
     expect(reliability(counts({ acceptedUnconfirmed: 4 }))).toBeNull();
   });
@@ -43,7 +31,6 @@ describe("reliability", () => {
       acceptedUnconfirmed: 10,
     });
 
-    // Ten events the organiser never confirmed leave reliability at 100%.
     expect(reliability(record)).toBe(1);
     expect(reliabilityPercent(record)).toBe(100);
   });
@@ -52,9 +39,7 @@ describe("reliability", () => {
     expect(reliability(counts({ attended: 17, acceptedResolved: 20 }))).toBeCloseTo(
       0.85,
     );
-    expect(
-      reliabilityPercent(counts({ attended: 17, acceptedResolved: 20 })),
-    ).toBe(85);
+    expect(reliabilityPercent(counts({ attended: 17, acceptedResolved: 20 }))).toBe(85);
   });
 
   it("never exceeds 1 even if the backend sends inconsistent counts", () => {
@@ -80,15 +65,12 @@ describe("levelFor", () => {
   it("requires eight events and 85% reliability for trusted", () => {
     expect(levelFor(counts({ attended: 8, acceptedResolved: 8 }))).toBe("trusted");
 
-    // Eight attended but eleven resolved is 72% — below the bar.
     expect(levelFor(counts({ attended: 8, acceptedResolved: 11 }))).toBe("active");
   });
 
   it("does not award core without an explicit standout-review recognition", () => {
     const qualified = counts({ attended: 25, acceptedResolved: 26 });
 
-    // 96% reliability and 25 events still is not core: "standout reviews" is
-    // not computable, so it must be granted, never inferred.
     expect(levelFor(qualified)).toBe("trusted");
     expect(levelFor({ ...qualified, standoutReviews: true })).toBe("core");
   });
@@ -105,7 +87,6 @@ describe("levelProgress", () => {
   });
 
   it("distinguishes a reliability block from an event-count block", () => {
-    // Enough events for trusted, but 8/11 is 72%.
     const progress = levelProgress(counts({ attended: 8, acceptedResolved: 11 }));
 
     expect(progress.current).toBe("active");

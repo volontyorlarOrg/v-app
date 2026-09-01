@@ -4,7 +4,7 @@ The product's front door, and the only indexable surface.
 
 **Code:** [`features/opportunities/`](../../src/features/opportunities/) ·
 [`components/opportunities/`](../../src/components/opportunities/) ·
-[`app/[locale]/(public)/opportunities/`](../../src/app/%5Blocale%5D/(public)/opportunities/)
+[`app/[locale]/(public)/opportunities/`](<../../src/app/%5Blocale%5D/(public)/opportunities/>)
 
 ---
 

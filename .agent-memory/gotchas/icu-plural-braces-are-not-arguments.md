@@ -3,7 +3,7 @@
 A naive check that two locales use the same placeholders:
 
 ```ts
-[...message.matchAll(/\{(\w+)/g)]
+[...message.matchAll(/\{(\w+)/g)];
 ```
 
 reports a false mismatch on every plural message. In

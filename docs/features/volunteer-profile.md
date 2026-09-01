@@ -21,7 +21,7 @@ contact, gender, photo.
 ## Completion
 
 Six fields count: `fullName`, `bio`, `region`, `school`, `languages`, and
-*either* contact channel. Either — not both — because requiring both would
+_either_ contact channel. Either — not both — because requiring both would
 force a volunteer without Telegram to hand over a phone number they had no
 reason to give.
 

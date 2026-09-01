@@ -29,8 +29,8 @@ Every state has an icon as well as a colour: `accepted` and `rejected` must be
 distinguishable without colour vision, and this badge is often the only thing
 scanned down a list.
 
-Each state also has a one-line explanation of what it means *for the
-volunteer*. `rejected` says "Not this time. Your record is unaffected." — which
+Each state also has a one-line explanation of what it means _for the
+volunteer_. `rejected` says "Not this time. Your record is unaffected." — which
 is true, and worth saying.
 
 ## Validation

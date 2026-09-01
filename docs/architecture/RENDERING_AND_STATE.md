@@ -2,7 +2,7 @@
 
 Where the `"use client"` boundary goes, and who owns each piece of state.
 
-`ARCHITECTURE.md` owns the request *plumbing*. This file owns the **ownership
+`ARCHITECTURE.md` owns the request _plumbing_. This file owns the **ownership
 decision** — which layer is responsible for a piece of state at all. Most
 freshness bugs are ownership bugs: a panel fed by server props that no
 invalidation can ever refresh, or a filter kept in `useState` that makes its own
@@ -54,18 +54,18 @@ namespace into a shared component makes it usable from exactly one place.
 
 ## 2. Ownership table
 
-| State | Owner | Where |
-| --- | --- | --- |
-| Initial page data | Server Component | `page.tsx` calls `*.api.server.ts` |
-| Search / filter / sort / page | **URL** via `nuqs` | `OpportunityFiltersBar` |
-| Locale | URL segment via next-intl | `src/i18n/` |
-| Form values and validation | React Hook Form + Zod | see `FORMS.md` |
-| Mutations | `next-safe-action` | `features/*/actions.ts` |
-| Client-dynamic server reads | TanStack Query | `lib/query/` |
-| Draft autosave status | local hook state | `use-autosave.ts` |
-| Auth / session | server, HTTP-only cookie | `lib/auth/` |
-| Tiny UI state (a dialog being open) | local `useState` | in the component |
-| Shared client-only state | **Zustand — not installed** | — |
+| State                               | Owner                       | Where                              |
+| ----------------------------------- | --------------------------- | ---------------------------------- |
+| Initial page data                   | Server Component            | `page.tsx` calls `*.api.server.ts` |
+| Search / filter / sort / page       | **URL** via `nuqs`          | `OpportunityFiltersBar`            |
+| Locale                              | URL segment via next-intl   | `src/i18n/`                        |
+| Form values and validation          | React Hook Form + Zod       | see `FORMS.md`                     |
+| Mutations                           | `next-safe-action`          | `features/*/actions.ts`            |
+| Client-dynamic server reads         | TanStack Query              | `lib/query/`                       |
+| Draft autosave status               | local hook state            | `use-autosave.ts`                  |
+| Auth / session                      | server, HTTP-only cookie    | `lib/auth/`                        |
+| Tiny UI state (a dialog being open) | local `useState`            | in the component                   |
+| Shared client-only state            | **Zustand — not installed** | —                                  |
 
 ### Why Zustand is absent
 
@@ -77,14 +77,14 @@ cross-route client-only problem appears that is none of the above.
 
 ### Never mirror a server record into state to make it editable
 
-`ProfileForm` takes `defaultValues` and owns a *draft*; the server owns the
+`ProfileForm` takes `defaultValues` and owns a _draft_; the server owns the
 record. That is why saving calls `form.reset(form.getValues())` rather than
 writing the response back into a mirrored object.
 
 ## 3. Filters live in the URL
 
 `/uz/opportunities?region=tashkent-city&sort=deadline&page=2` is a real
-address. That matters more here than in most products: distribution *is* people
+address. That matters more here than in most products: distribution _is_ people
 pasting links into Telegram channels, and a filter kept in component state
 makes every filtered view unlinkable.
 
@@ -124,10 +124,10 @@ staleness comfortably, and `revalidatePath` after a mutation covers the rest.
 
 ## 5. Freshness after a mutation
 
-| Mutation | What refreshes |
-| --- | --- |
-| Save draft | Nothing. Called every few seconds; re-rendering the route would fight the editor for focus. |
-| Submit application | `revalidatePath("/applications")` and the detail path, then `router.refresh()` |
-| Withdraw | Same |
-| Save profile | `revalidatePath("/", "layout")` — the completion meter appears on the dashboard too |
-| Toggle saved | `revalidatePath("/saved")` |
+| Mutation           | What refreshes                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| Save draft         | Nothing. Called every few seconds; re-rendering the route would fight the editor for focus. |
+| Submit application | `revalidatePath("/applications")` and the detail path, then `router.refresh()`              |
+| Withdraw           | Same                                                                                        |
+| Save profile       | `revalidatePath("/", "layout")` — the completion meter appears on the dashboard too         |
+| Toggle saved       | `revalidatePath("/saved")`                                                                  |

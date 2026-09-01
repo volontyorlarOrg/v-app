@@ -1,24 +1,24 @@
 {
   "title": "Sizning profilingiz",
-  "subtitle": "Bir marta to'ldiring — har bir arizada ishlatiladi.",
+  "subtitle": "Bir marta toʻldiring — har bir arizada ishlatiladi.",
   "sections": {
     "identity": "Siz haqingizda",
-    "education": "Ta'lim",
+    "education": "Taʼlim",
     "location": "Qayerdasiz",
-    "skills": "Tillar va ko'nikmalar",
-    "contact": "Tashkilotchilar siz bilan qanday bog'lanadi",
+    "skills": "Tillar va koʻnikmalar",
+    "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
     "links": "Havolalar"
   },
   "fields": {
-    "fullName": "To'liq ism",
+    "fullName": "Toʻliq ism",
     "bio": "Qisqacha tanishtiruv",
-    "bioHelp": "Tashkilotchi birinchi bo'lib o'qiydigan bir necha gap. Insho emas.",
+    "bioHelp": "Tashkilotchi birinchi boʻlib oʻqiydigan bir necha gap. Insho emas.",
     "school": "Maktab, kollej yoki universitet",
     "gradeYear": "Sinf yoki kurs",
     "region": "Hudud",
     "city": "Shahar yoki tuman",
     "languages": "Bilgan tillaringiz",
-    "skills": "Ko'nikma va qiziqishlar",
+    "skills": "Koʻnikma va qiziqishlar",
     "phone": "Telefon raqami",
     "phoneHelp": "Tashkilotchiga faqat ariza topshirganingizdan keyin beriladi.",
     "telegram": "Telegramdagi foydalanuvchi nomi",
@@ -26,16 +26,16 @@
     "links": "Portfolio, rezyume yoki ijtimoiy tarmoq havolasi"
   },
   "completion": {
-    "label": "Profil to'ldirilganligi",
-    "value": "{percent}% to'ldirilgan",
-    "complete": "Profilingiz to'liq to'ldirilgan.",
+    "label": "Profil toʻldirilganligi",
+    "value": "{percent}% toʻldirilgan",
+    "complete": "Profilingiz toʻliq toʻldirilgan.",
     "missing": "Yetishmayapti: {fields}",
-    "why": "To'liq profil bilan ariza topshirish bir daqiqadan kam vaqt oladi."
+    "why": "Toʻliq profil bilan ariza topshirish bir daqiqadan kam vaqt oladi."
   },
   "save": {
     "success": "Profil saqlandi.",
     "autosaved": "Qoralama shu qurilmada saqlandi",
-    "restorePrompt": "Avvalgi saqlanmagan profil o'zgarishlari bor. Tiklansinmi?",
+    "restorePrompt": "Avvalgi saqlanmagan profil oʻzgarishlari bor. Tiklansinmi?",
     "restore": "Tiklash",
     "discard": "Tiklanmasin"
   },
@@ -43,7 +43,7 @@
     "title": "Sozlamalar",
     "subtitle": "Til, bildirishnomalar va hisobingiz.",
     "language": "Interfeys tili",
-    "languageHelp": "Bu faqat siz ko'radigan tilni o'zgartiradi. Tashkilotchilar ko'radigan ma'lumotga ta'sir qilmaydi.",
+    "languageHelp": "Bu faqat siz koʻradigan tilni oʻzgartiradi. Tashkilotchilar koʻradigan maʼlumotga taʼsir qilmaydi.",
     "account": "Hisob",
     "signOutEverywhere": "Chiqish"
   }

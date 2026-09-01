@@ -7,14 +7,6 @@ import {
 } from "./filters";
 import { DEFAULT_FILTERS } from "./schemas";
 
-/**
- * URL filter round-tripping.
- *
- * These tests exist because opportunity links get pasted into Telegram
- * channels. A URL that does not survive the round trip means the sender and
- * the reader see different listings.
- */
-
 describe("parseFilters", () => {
   it("returns defaults for an empty query", () => {
     expect(parseFilters(new URLSearchParams())).toEqual(DEFAULT_FILTERS);
@@ -31,7 +23,6 @@ describe("parseFilters", () => {
   });
 
   it("discards an unknown region rather than failing the page", () => {
-    // A truncated or hand-edited link from a chat app is normal input.
     expect(parseFilters(new URLSearchParams("region=atlantis")).region).toBeNull();
   });
 
@@ -46,9 +37,7 @@ describe("parseFilters", () => {
   });
 
   it("caps an oversized search term instead of forwarding it", () => {
-    const filters = parseFilters(
-      new URLSearchParams(`q=${"x".repeat(500)}`),
-    );
+    const filters = parseFilters(new URLSearchParams(`q=${"x".repeat(500)}`));
     expect(filters.q).toHaveLength(120);
   });
 
@@ -71,7 +60,6 @@ describe("parseFilters", () => {
 
 describe("serializeFilters", () => {
   it("omits defaults so an unfiltered listing has one canonical URL", () => {
-    // Two URLs for the same listing would split cache entries and SEO signals.
     expect(serializeFilters(DEFAULT_FILTERS)).toBe("");
   });
 
@@ -109,8 +97,6 @@ describe("filtersHref", () => {
 
 describe("withFilterChange", () => {
   it("resets to page 1 when a filter changes", () => {
-    // Narrowing a search while on page 4 would otherwise land on an empty
-    // page and look like "no results".
     const next = withFilterChange(
       { ...DEFAULT_FILTERS, page: 4 },
       { region: "khorezm" },

@@ -9,12 +9,6 @@ import { isTelegramStatus } from "@/features/auth/telegram";
 import { Surface } from "@/components/ui/surface";
 import { TelegramPanel } from "./_components/telegram-panel";
 
-/**
- * Sign-in.
- *
- * Never indexable and never cached — the proxy stamps both, and the metadata
- * below repeats it so the rule survives a proxy matcher change.
- */
 export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
@@ -30,9 +24,7 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
   ]);
 
   const rawNext = searchParams.next;
-  const next = safeReturnPath(
-    Array.isArray(rawNext) ? rawNext[0] : rawNext,
-  );
+  const next = safeReturnPath(Array.isArray(rawNext) ? rawNext[0] : rawNext);
 
   const rawStatus = searchParams.telegram;
   const status = Array.isArray(rawStatus) ? rawStatus[0] : rawStatus;
@@ -42,7 +34,7 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
     <div className="mx-auto flex w-full max-w-md flex-col gap-6 py-6">
       <header className="flex flex-col items-center gap-4 text-center">
         <Image
-          src="/logo/volontyorlar-mark.svg"
+          src="/brand/mark-blue.svg"
           alt=""
           width={56}
           height={56}
@@ -50,7 +42,7 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
           className="size-14"
         />
         <h1 className="text-2xl">{t("signIn.title")}</h1>
-        <p className="text-sm leading-6 text-muted">{t("signIn.subtitle")}</p>
+        <p className="text-sm leading-6 text-ink-muted">{t("signIn.subtitle")}</p>
       </header>
 
       {telegramStatus ? (
@@ -68,7 +60,7 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
             <p className="text-sm font-bold text-ink">
               {t(`telegram.${telegramStatus}Title`)}
             </p>
-            <p className="text-xs leading-6 text-muted">
+            <p className="text-xs leading-6 text-ink-muted">
               {t(`telegram.${telegramStatus}Body`)}
             </p>
           </div>
@@ -76,18 +68,14 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
       ) : null}
 
       {!configured ? (
-        // Honest about the deployment's state rather than showing a button
-        // that cannot work. Disappears once YVC_SESSION_SECRET is set.
         <Surface
           tone="quiet"
           padding="sm"
           role="note"
-          className="flex flex-col gap-1 border-amber/40"
+          className="flex flex-col gap-1 border-blue-deep/25"
         >
-          <p className="text-sm font-bold text-amber">
-            {t("notConfigured.title")}
-          </p>
-          <p className="text-xs leading-6 text-muted">{t("notConfigured.body")}</p>
+          <p className="text-sm font-bold text-blue-deep">{t("notConfigured.title")}</p>
+          <p className="text-xs leading-6 text-ink-muted">{t("notConfigured.body")}</p>
         </Surface>
       ) : null}
 
@@ -97,7 +85,7 @@ export default async function LoginPage(props: PageProps<"/[locale]/login">) {
         disabled={!configured}
       />
 
-      <p className="text-center text-xs leading-6 text-muted">
+      <p className="text-center text-xs leading-6 text-ink-muted">
         {t("signIn.createsAccount")}
       </p>
     </div>

@@ -6,21 +6,21 @@ Where things live and why.
 
 ## 1. Stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | Next.js 16 App Router (Turbopack), React 19, Node 22+ |
-| Language | TypeScript, `strict` + `noUncheckedIndexedAccess` |
-| Styling | Tailwind CSS 4, repository-owned semantic tokens |
-| Primitives | Radix + `class-variance-authority`, Lucide icons |
-| i18n | `next-intl`, three locales, server-first |
-| Forms | React Hook Form + Zod + `@hookform/resolvers` |
-| Mutations | `next-safe-action` — the one approved boundary |
-| URL state | `nuqs` |
-| Client server-state | TanStack Query |
-| Toasts | Sonner |
-| Dates | `Intl` via next-intl, `date-fns` for arithmetic |
-| Session | `jose`, encrypted JWE cookie |
-| Tests | Vitest + Testing Library, Playwright |
+| Layer               | Choice                                                |
+| ------------------- | ----------------------------------------------------- |
+| Framework           | Next.js 16 App Router (Turbopack), React 19, Node 22+ |
+| Language            | TypeScript, `strict` + `noUncheckedIndexedAccess`     |
+| Styling             | Tailwind CSS 4, repository-owned semantic tokens      |
+| Primitives          | Radix + `class-variance-authority`, Lucide icons      |
+| i18n                | `next-intl`, three locales, server-first              |
+| Forms               | React Hook Form + Zod + `@hookform/resolvers`         |
+| Mutations           | `next-safe-action` — the one approved boundary        |
+| URL state           | `nuqs`                                                |
+| Client server-state | TanStack Query                                        |
+| Toasts              | Sonner                                                |
+| Dates               | `Intl` via next-intl, `date-fns` for arithmetic       |
+| Session             | `jose`, encrypted JWE cookie                          |
+| Tests               | Vitest + Testing Library, Playwright                  |
 
 ### Deliberately absent
 
@@ -33,14 +33,14 @@ Where things live and why.
 
 ### Where this differs from the Dwelve reference, and why
 
-| Dwelve | Here | Reason |
-| --- | --- | --- |
-| `i18next` + `react-i18next` (client-only) | `next-intl` | Server components can translate. Dwelve's own docs note "i18n is client-only in this app" as a constraint that shapes its component API; this removes it. |
-| `react-toastify` | `sonner` | One toast system; the handoff names Sonner. |
-| Filters in component state | `nuqs` | Shareable URLs — the product's distribution channel. |
-| Blanket `noindex` | Per-route policy | Opportunity pages are the funnel. |
-| No automated tests | Vitest + Playwright | The handoff calls this a mandatory improvement. |
-| English strings from server actions | Error **codes** | A backend sentence cannot be translated. |
+| Dwelve                                    | Here                | Reason                                                                                                                                                    |
+| ----------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `i18next` + `react-i18next` (client-only) | `next-intl`         | Server components can translate. Dwelve's own docs note "i18n is client-only in this app" as a constraint that shapes its component API; this removes it. |
+| `react-toastify`                          | `sonner`            | One toast system; the handoff names Sonner.                                                                                                               |
+| Filters in component state                | `nuqs`              | Shareable URLs — the product's distribution channel.                                                                                                      |
+| Blanket `noindex`                         | Per-route policy    | Opportunity pages are the funnel.                                                                                                                         |
+| No automated tests                        | Vitest + Playwright | The handoff calls this a mandatory improvement.                                                                                                           |
+| English strings from server actions       | Error **codes**     | A backend sentence cannot be translated.                                                                                                                  |
 
 ## 2. Directory layout
 
@@ -107,7 +107,7 @@ the ones that bit during this build.
 1. **`middleware.ts` is deprecated and renamed to `proxy.ts`.** The old
    filename silently does nothing.
 2. **The root layout can live under a dynamic segment.** It is at
-   `app/[locale]/layout.tsx`, which makes `locale` a *root parameter*.
+   `app/[locale]/layout.tsx`, which makes `locale` a _root parameter_.
 3. **No `app/layout.tsx` means `app/not-found.tsx` is its own root** and must
    render its own `<html>` and `<body>`.
 4. **`PageProps<'/route'>` and `LayoutProps<'/route'>` are global** after type

@@ -8,11 +8,11 @@ Three locales, from day one, with server rendering.
 
 ## Locales
 
-| Code | Tag | Label |
-| --- | --- | --- |
+| Code | Tag     | Label                   |
+| ---- | ------- | ----------------------- |
 | `uz` | `uz-UZ` | O'zbekcha — **default** |
-| `ru` | `ru-RU` | Русский |
-| `en` | `en-US` | English |
+| `ru` | `ru-RU` | Русский                 |
+| `en` | `en-US` | English                 |
 
 `uz` is the default because YVC's volunteers are in Uzbekistan and the
 handoff's own canonical example URL is `/uz/opportunities?...`. It is a product

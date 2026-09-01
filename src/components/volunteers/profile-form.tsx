@@ -17,17 +17,6 @@ import {
 import { REGIONS } from "@/features/opportunities/schemas";
 import { useValidationMessage } from "@/lib/forms/use-validation-message";
 
-/**
- * The reusable profile.
- *
- * Filled once and reused by every application, which is the whole reason the
- * product has a profile rather than asking for a school name eight times.
- *
- * Comma-separated text is used for languages and skills rather than a tag
- * widget: a custom chip input is a keyboard-accessibility liability, and a
- * plain text field with a clear hint is understood by everyone including a
- * screen-reader user on a phone.
- */
 export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValues }) {
   const t = useTranslations("profile");
   const common = useTranslations("common");
@@ -35,9 +24,6 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValue
   const opportunities = useTranslations("opportunities");
   const messageFor = useValidationMessage();
 
-  // Three generics, not one: the form holds the schema's *input* type while
-  // the submit handler receives its *output* type, which `.default()` makes
-  // different. Collapsing them makes the resolver type mismatch.
   const form = useForm<ProfileFormValues, unknown, ProfileInput>({
     resolver: zodResolver(profileSchema),
     mode: "onBlur",
@@ -47,7 +33,7 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValue
   const save = useAction(saveProfileAction, {
     onSuccess() {
       toast.success(t("save.success"));
-      // Resets the dirty state so the unsaved-changes affordance clears.
+
       form.reset(form.getValues());
     },
     onError({ error }) {
@@ -166,9 +152,7 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValue
               optionalLabel={common("meta.optional")}
               error={messageFor(fieldState.error?.message, 80)}
             >
-              {(props) => (
-                <Input {...props} {...field} autoComplete="address-level2" />
-              )}
+              {(props) => <Input {...props} {...field} autoComplete="address-level2" />}
             </Field>
           )}
         />
@@ -256,8 +240,8 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValue
         />
       </Section>
 
-      <div className="flex items-center justify-between gap-4 border-t border-signal-line pt-6">
-        <p aria-live="polite" className="text-xs text-muted">
+      <div className="flex items-center justify-between gap-4 border-t border-line pt-6">
+        <p aria-live="polite" className="text-xs text-ink-muted">
           {form.formState.isDirty ? common("state.unsaved") : ""}
         </p>
 
@@ -272,7 +256,7 @@ export function ProfileForm({ defaultValues }: { defaultValues: ProfileFormValue
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Surface as="section" padding="md" className="flex flex-col gap-4">
-      <h2 className="font-display text-base font-semibold text-ink">{title}</h2>
+      <h2 className="text-base font-semibold text-ink">{title}</h2>
       {children}
     </Surface>
   );

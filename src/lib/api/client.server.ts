@@ -1,30 +1,8 @@
 import "server-only";
 
 import type { z } from "zod";
-import {
-  ApiError,
-  classifyApiError,
-  codeForStatus,
-  type ApiErrorCode,
-} from "./errors";
+import { ApiError, classifyApiError, codeForStatus, type ApiErrorCode } from "./errors";
 import { privateApiBaseUrl, publicApiBaseUrl } from "./env.server";
-
-/**
- * The only place in this application that talks to the YVC backend.
- *
- * Nothing outside `*.server.ts` modules may import it, and no component may
- * call the API origin directly. The rules it enforces (handoff §12):
- *
- *   1. The origin comes from a server-only environment variable.
- *   2. Credentials are attached here and nowhere else.
- *   3. Timeouts are explicit; a hung backend cannot hang a render forever.
- *   4. A non-JSON or malformed body is a typed failure, not a crash.
- *   5. Every response that the UI depends on is parsed by a Zod schema before
- *      it is handed upwards — backend JSON is untrusted input.
- *   6. Errors leave here as `ApiError` with a code from the closed set.
- *
- * @see docs/architecture/ARCHITECTURE.md
- */
 
 const DEFAULT_TIMEOUT_MS = 12_000;
 
@@ -35,16 +13,13 @@ export type ApiRequest<TSchema extends z.ZodType | undefined = undefined> = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   query?: QueryParams;
   body?: unknown;
-  /** Schema the successful response body must satisfy. */
+
   schema?: TSchema;
   timeoutMs?: number;
   signal?: AbortSignal;
-  /** Bearer credential. Supplied only by `authedApi`, never by a caller. */
+
   accessToken?: string;
-  /**
-   * Next.js fetch caching. Defaults to `no-store`: authenticated reads must
-   * never be shared between users. Public reads override this deliberately.
-   */
+
   cache?: RequestCache;
   revalidate?: number;
   tags?: readonly string[];
@@ -67,7 +42,6 @@ function buildUrl(baseUrl: string, path: string, query?: QueryParams): string {
   return url.toString();
 }
 
-/** Combines a caller's abort signal with our own timeout. */
 function requestSignal(
   signal: AbortSignal | undefined,
   timeoutMs: number,
@@ -85,20 +59,10 @@ async function readBody(response: Response): Promise<unknown> {
   try {
     return JSON.parse(text) as unknown;
   } catch {
-    // A proxy error page or an HTML 502 lands here. The body is useless to
-    // both the user and the parser, so it is discarded rather than surfaced.
     return null;
   }
 }
 
-/**
- * Pulls field-level messages out of an error body.
- *
- * Shapes accepted, because the backend contract is not fixed yet (see
- * docs/api/API_CONTRACT.md): `{ errors: { field: "msg" } }`,
- * `{ errors: { field: ["msg"] } }`, and NestJS's `{ message: ["msg", ...] }`
- * — the last of which has no field names, so it produces none.
- */
 function extractFieldErrors(body: unknown): Record<string, string> {
   if (typeof body !== "object" || body === null) return {};
 
@@ -120,8 +84,6 @@ function baseUrlOrThrow(scope: "public" | "private"): string {
   const baseUrl = scope === "public" ? publicApiBaseUrl() : privateApiBaseUrl();
 
   if (!baseUrl) {
-    // Deliberately not a fallback to localhost. A production deployment with a
-    // missing origin should fail loudly rather than quietly fetch nothing.
     throw new ApiError("notConfigured", {
       message: "YVC_API_BASE_URL is not set.",
     });
@@ -171,8 +133,7 @@ async function request<TSchema extends z.ZodType | undefined>(
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: requestSignal(signal, timeoutMs),
-      // Authenticated reads default to no-store so one volunteer's data can
-      // never be served from another's cached render.
+
       cache: cache ?? (accessToken ? "no-store" : undefined),
       next:
         revalidate !== undefined || tags
@@ -203,9 +164,6 @@ async function request<TSchema extends z.ZodType | undefined>(
   const parsed = schema.safeParse(payload);
 
   if (!parsed.success) {
-    // The backend answered 200 with a body we cannot trust. Treating it as a
-    // success would push `undefined` into the UI at a random depth; this
-    // fails at the boundary instead, where the cause is still visible.
     const error = new ApiError("invalidResponse", {
       status: response.status,
       message: `Response from ${method} ${path} did not match its schema.`,
@@ -219,13 +177,6 @@ async function request<TSchema extends z.ZodType | undefined>(
   return parsed.data as ApiResult<TSchema>;
 }
 
-/**
- * Server-side logging for a failed request.
- *
- * Logs the code, status, path, and correlation id — never the request body,
- * never a response body. Application answers and profile fields are exactly
- * the kind of content that must not end up in logs (handoff §26).
- */
 function logFailure(
   method: string,
   path: string,
@@ -239,7 +190,6 @@ function logFailure(
   );
 }
 
-/** Unauthenticated read against the public API surface. */
 export function publicApi<TSchema extends z.ZodType | undefined = undefined>(
   path: string,
   init?: ApiRequest<TSchema>,
@@ -247,12 +197,6 @@ export function publicApi<TSchema extends z.ZodType | undefined = undefined>(
   return request("public", path, init);
 }
 
-/**
- * Authenticated request. The token is supplied by the session layer, never by
- * a caller and never from a form field.
- *
- * @see src/lib/auth/session.server.ts
- */
 export function authedApi<TSchema extends z.ZodType | undefined = undefined>(
   path: string,
   accessToken: string,

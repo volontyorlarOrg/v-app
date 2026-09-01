@@ -19,7 +19,7 @@ The repeatable path. Follow it in order; each step depends on the one before.
 `src/features/<domain>/schemas.ts` — the shape, the enums, and the derivations.
 
 - Validation messages are **keys**, not sentences.
-- Export `z.input` *and* `z.output` types if the schema uses `.default()`.
+- Export `z.input` _and_ `z.output` types if the schema uses `.default()`.
 - Put derived rules here, not in JSX. "What counts as closing soon" has one
   definition.
 

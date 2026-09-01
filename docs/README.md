@@ -7,25 +7,25 @@ index exists to prevent.
 
 ## Start by task
 
-| Task | Read first |
-| --- | --- |
-| Product scope, roles, the volunteer loop | [`../PRODUCT.md`](../PRODUCT.md), [`product/PRD.md`](./product/PRD.md) |
-| Domain concepts and their ownership | [`product/DOMAIN_MODEL.md`](./product/DOMAIN_MODEL.md) |
-| Where a thing lives; route and folder structure | [`architecture/SYSTEM_DESIGN.md`](./architecture/SYSTEM_DESIGN.md) |
-| Calling the backend; schemas; error handling | [`architecture/ARCHITECTURE.md`](./architecture/ARCHITECTURE.md) |
-| Server vs client; who owns which state; invalidation | [`architecture/RENDERING_AND_STATE.md`](./architecture/RENDERING_AND_STATE.md) |
-| Forms, validation, mutations | [`architecture/FORMS.md`](./architecture/FORMS.md) |
-| Sessions, Telegram, authorisation, privacy | [`architecture/AUTH_AND_SECURITY.md`](./architecture/AUTH_AND_SECURITY.md) |
-| Which routes are public; robots; canonical URLs | [`architecture/DOMAINS_AND_INDEXING.md`](./architecture/DOMAINS_AND_INDEXING.md) |
-| What the backend must provide | [`api/API_CONTRACT.md`](./api/API_CONTRACT.md) |
-| Colour, type, spacing, motion | [`design/design-system.md`](./design/design-system.md) |
-| Which component to reuse | [`design/component-library.md`](./design/component-library.md) |
-| Loading, empty, error, destructive states | [`design/interaction-and-states.md`](./design/interaction-and-states.md) |
-| Accessibility requirements | [`design/accessibility.md`](./design/accessibility.md) |
-| Copy, translation keys, three locales | [`design/content-and-i18n.md`](./design/content-and-i18n.md) |
-| A specific workflow | [`features/`](./features/) |
-| Local setup, environment, deployment, checks | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](./operations/DEVELOPMENT_AND_DEPLOYMENT.md) |
-| Adding a feature end to end | [`guides/building-a-feature.md`](./guides/building-a-feature.md) |
+| Task                                                 | Read first                                                                               |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Product scope, roles, the volunteer loop             | [`../PRODUCT.md`](../PRODUCT.md), [`product/PRD.md`](./product/PRD.md)                   |
+| Domain concepts and their ownership                  | [`product/DOMAIN_MODEL.md`](./product/DOMAIN_MODEL.md)                                   |
+| Where a thing lives; route and folder structure      | [`architecture/SYSTEM_DESIGN.md`](./architecture/SYSTEM_DESIGN.md)                       |
+| Calling the backend; schemas; error handling         | [`architecture/ARCHITECTURE.md`](./architecture/ARCHITECTURE.md)                         |
+| Server vs client; who owns which state; invalidation | [`architecture/RENDERING_AND_STATE.md`](./architecture/RENDERING_AND_STATE.md)           |
+| Forms, validation, mutations                         | [`architecture/FORMS.md`](./architecture/FORMS.md)                                       |
+| Sessions, Telegram, authorisation, privacy           | [`architecture/AUTH_AND_SECURITY.md`](./architecture/AUTH_AND_SECURITY.md)               |
+| Which routes are public; robots; canonical URLs      | [`architecture/DOMAINS_AND_INDEXING.md`](./architecture/DOMAINS_AND_INDEXING.md)         |
+| What the backend must provide                        | [`api/API_CONTRACT.md`](./api/API_CONTRACT.md)                                           |
+| Colour, type, spacing, motion                        | [`design/design-system.md`](./design/design-system.md)                                   |
+| Which component to reuse                             | [`design/component-library.md`](./design/component-library.md)                           |
+| Loading, empty, error, destructive states            | [`design/interaction-and-states.md`](./design/interaction-and-states.md)                 |
+| Accessibility requirements                           | [`design/accessibility.md`](./design/accessibility.md)                                   |
+| Copy, translation keys, three locales                | [`design/content-and-i18n.md`](./design/content-and-i18n.md)                             |
+| A specific workflow                                  | [`features/`](./features/)                                                               |
+| Local setup, environment, deployment, checks         | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](./operations/DEVELOPMENT_AND_DEPLOYMENT.md) |
+| Adding a feature end to end                          | [`guides/building-a-feature.md`](./guides/building-a-feature.md)                         |
 
 After picking a domain, search [`../.agent-memory/`](../.agent-memory/) for it.
 Memory records expensive discoveries and the reasoning behind non-obvious
@@ -47,7 +47,7 @@ docs/
 ## The one thing to know before reading anything else
 
 **There is no YVC backend yet.** Every request module in `src/features/*/api.server.ts`
-codes against a contract this repository *proposes* rather than one it has
+codes against a contract this repository _proposes_ rather than one it has
 verified. Those proposals are collected in
 [`api/API_CONTRACT.md`](./api/API_CONTRACT.md), and each is labelled.
 

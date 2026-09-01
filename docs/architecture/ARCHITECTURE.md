@@ -2,7 +2,7 @@
 
 How data gets from the backend into a page, and what happens when it does not.
 
-**Related:** [`RENDERING_AND_STATE.md`](./RENDERING_AND_STATE.md) (who *owns*
+**Related:** [`RENDERING_AND_STATE.md`](./RENDERING_AND_STATE.md) (who _owns_
 which state) · [`../api/API_CONTRACT.md`](../api/API_CONTRACT.md) (what the
 backend must provide) · [`FORMS.md`](./FORMS.md) (writes)
 
@@ -37,16 +37,16 @@ Three rules make this hold:
 on purpose — it exists so that these are true everywhere rather than
 per-call-site:
 
-| Concern | How |
-| --- | --- |
-| Origin | `YVC_API_BASE_URL`, server only. Missing in production throws `notConfigured` rather than silently falling back to localhost. |
-| Credentials | Attached in one place, by `authedApi`, from the session. Never by a caller. |
-| Timeouts | 12s default via `AbortSignal.timeout`, composed with any caller signal. |
-| Malformed bodies | A non-JSON body (an HTML 502, a proxy error page) becomes `null`, never a parse crash. |
-| Response trust | Every UI-critical response is `safeParse`d. A 200 with the wrong shape is `invalidResponse`, not a silent `undefined`. |
-| Errors | One `ApiError` with a code from a closed set. |
-| Caching | Authenticated requests default to `no-store`. Public reads opt into `revalidate` + tags. |
-| Logging | Code, status, path, request id. **Never a request or response body** — those contain essays and profile fields. |
+| Concern          | How                                                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Origin           | `YVC_API_BASE_URL`, server only. Missing in production throws `notConfigured` rather than silently falling back to localhost. |
+| Credentials      | Attached in one place, by `authedApi`, from the session. Never by a caller.                                                   |
+| Timeouts         | 12s default via `AbortSignal.timeout`, composed with any caller signal.                                                       |
+| Malformed bodies | A non-JSON body (an HTML 502, a proxy error page) becomes `null`, never a parse crash.                                        |
+| Response trust   | Every UI-critical response is `safeParse`d. A 200 with the wrong shape is `invalidResponse`, not a silent `undefined`.        |
+| Errors           | One `ApiError` with a code from a closed set.                                                                                 |
+| Caching          | Authenticated requests default to `no-store`. Public reads opt into `revalidate` + tags.                                      |
+| Logging          | Code, status, path, request id. **Never a request or response body** — those contain essays and profile fields.               |
 
 ## 3. The error taxonomy
 
@@ -59,7 +59,7 @@ rateLimited      network    timeout   server    notConfigured  invalidResponse
 
 These are also translation keys under the `errors` namespace. That is the whole
 point: a backend's English sentence cannot be shown to an Uzbek speaker, so the
-server returns a *code* and the UI renders the translated message for it.
+server returns a _code_ and the UI renders the translated message for it.
 
 Two properties are derived rather than decided per call site:
 
@@ -108,16 +108,16 @@ Conventions inside them:
 
 ## 5. Caching
 
-| Data | Policy | Why |
-| --- | --- | --- |
-| Opportunity list | `revalidate: 120`, tag `opportunities` | Identical for everyone; the hottest path in the product. |
-| Opportunity detail | `revalidate: 300`, tags `opportunities`, `opportunity:<slug>` | A burst arriving from one Telegram link shares a single upstream fetch. |
-| Anything authenticated | `no-store` | One volunteer's data must never be served from another's cached render. |
+| Data                   | Policy                                                        | Why                                                                     |
+| ---------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Opportunity list       | `revalidate: 120`, tag `opportunities`                        | Identical for everyone; the hottest path in the product.                |
+| Opportunity detail     | `revalidate: 300`, tags `opportunities`, `opportunity:<slug>` | A burst arriving from one Telegram link shares a single upstream fetch. |
+| Anything authenticated | `no-store`                                                    | One volunteer's data must never be served from another's cached render. |
 
-Opportunity *pages* render dynamically even though their *data* is cached,
+Opportunity _pages_ render dynamically even though their _data_ is cached,
 because the detail page reads the session to choose its call to action. See the
 note in
-[`src/app/[locale]/(public)/opportunities/[slug]/page.tsx`](../../src/app/%5Blocale%5D/(public)/opportunities/%5Bslug%5D/page.tsx)
+[`src/app/[locale]/(public)/opportunities/[slug]/page.tsx`](<../../src/app/%5Blocale%5D/(public)/opportunities/%5Bslug%5D/page.tsx>)
 — adding `generateStaticParams` there makes every request fail with
 `DYNAMIC_SERVER_USAGE`.
 

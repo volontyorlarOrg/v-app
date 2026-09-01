@@ -4,14 +4,6 @@ import { renderWithIntl } from "@/test/render";
 import { OpportunityDeadline } from "./opportunity-deadline";
 import { OpportunityStatusBadge } from "./opportunity-status";
 
-/**
- * Status and deadline rendering.
- *
- * The assertions are on *words*, not on classes, because the accessibility
- * requirement is that status survives without colour. If a badge ever
- * communicates "closed" by turning grey and nothing else, these fail.
- */
-
 const NOW = new Date("2026-06-15T12:00:00.000Z");
 
 function at(days: number, hour = 18): string {
@@ -68,7 +60,6 @@ describe("OpportunityStatusBadge", () => {
       { locale: "uz" },
     );
 
-    // Proves the catalogue is wired up, not just that a key exists.
     expect(screen.getByText("Joy qolmagan")).toBeInTheDocument();
   });
 });
@@ -103,8 +94,6 @@ describe("OpportunityDeadline", () => {
       locale: "en",
     });
 
-    // "Closes 25 Jul 2026" — the exact date matters less than that it is a
-    // date rather than an unhelpful "in 40 days".
     expect(screen.getByText(/^Closes /)).toBeInTheDocument();
   });
 
@@ -113,7 +102,6 @@ describe("OpportunityDeadline", () => {
       locale: "ru",
     });
 
-    // Russian has a distinct few-form; getting this wrong reads as broken.
     expect(screen.getByText("Закрывается через 2 дня")).toBeInTheDocument();
   });
 });

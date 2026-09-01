@@ -11,16 +11,6 @@ import {
   withdrawApplication,
 } from "./api.server";
 
-/**
- * Application mutations.
- *
- * Every one of these runs through `authedActionClient`, so the session is
- * resolved server-side before the body executes and is available as
- * `ctx.session`. Note what none of them accept: a `userId`. Ownership comes
- * from the token, and the backend re-checks it — a Server Action is reachable
- * by direct POST, so nothing here may assume the UI was the caller.
- */
-
 const applicationIdSchema = z.object({ applicationId: z.string().min(1) });
 
 export const startApplicationAction = authedActionClient
@@ -31,13 +21,6 @@ export const startApplicationAction = authedActionClient
     return { applicationId: application.id, status: application.status };
   });
 
-/**
- * Autosave. Returns the save time so the field can show "Saved 14:32" rather
- * than a spinner that never resolves into anything the user can trust.
- *
- * No `revalidatePath` — a draft save happens every few seconds while typing,
- * and re-rendering the route each time would fight the editor for focus.
- */
 export const saveDraftAction = authedActionClient
   .inputSchema(
     z.object({
@@ -63,7 +46,6 @@ export const submitApplicationAction = authedActionClient
       parsedInput.answers,
     );
 
-    // Submission changes both the list and this application's own page.
     revalidatePath("/applications");
     revalidatePath(`/applications/${application.id}`);
 

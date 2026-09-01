@@ -1,14 +1,14 @@
 {
   "appName": "Youth Volunteer Club",
   "appShortName": "YVC",
-  "tagline": "Vaqtingizga arziydigan ko'ngillilikni toping. O'zingiz haqingizda gapiradigan tajriba to'plang.",
+  "tagline": "Vaqtingizga arziydigan koʻngillilikni toping. Oʻzingiz haqingizda gapiradigan tajriba toʻplang.",
   "action": {
     "apply": "Ariza topshirish",
     "back": "Orqaga",
     "cancel": "Bekor qilish",
     "close": "Yopish",
     "continue": "Davom etish",
-    "loadMore": "Yana ko'rsatish",
+    "loadMore": "Yana koʻrsatish",
     "retry": "Qayta urinish",
     "save": "Saqlash",
     "saveDraft": "Qoralamani saqlash",
@@ -22,8 +22,8 @@
     "loading": "Yuklanmoqda",
     "saving": "Saqlanmoqda…",
     "saved": "Saqlandi",
-    "unsaved": "Saqlanmagan o'zgarishlar bor",
-    "empty": "Hozircha bo'sh"
+    "unsaved": "Saqlanmagan oʻzgarishlar bor",
+    "empty": "Hozircha boʻsh"
   },
   "meta": {
     "required": "Majburiy",
@@ -31,8 +31,9 @@
   },
   "language": {
     "label": "Til",
-    "change": "Tilni o'zgartirish"
+    "change": "Tilni oʻzgartirish"
   },
-  "skipToContent": "Asosiy qismga o'tish",
-  "sampleDataNotice": "Namuna ma'lumotlari. Bular haqiqiy tadbirlar emas, balki misol uchun keltirilgan imkoniyatlar — bu muhitga imkoniyatlar xizmati ulanmagan."
+  "skipToContent": "Asosiy qismga oʻtish",
+  "sampleDataNotice": "Namuna maʼlumotlari. Bular haqiqiy tadbirlar emas, balki misol uchun keltirilgan imkoniyatlar — bu muhitga imkoniyatlar xizmati ulanmagan.",
+  "brandWordmark": "volontyorlar"
 }

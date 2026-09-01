@@ -24,12 +24,12 @@ because one absence out of two is noise, not a 50% rating.
 
 ## Levels
 
-| Level | Requires |
-| --- | --- |
-| Newcomer | — |
-| Active | 3 completed events |
-| Trusted | 8 completed events, ≥85% reliability |
-| Core | 20 completed events, ≥90% reliability, **and** standout reviews |
+| Level    | Requires                                                        |
+| -------- | --------------------------------------------------------------- |
+| Newcomer | —                                                               |
+| Active   | 3 completed events                                              |
+| Trusted  | 8 completed events, ≥85% reliability                            |
+| Core     | 20 completed events, ≥90% reliability, **and** standout reviews |
 
 "Standout reviews" is not computable and there is no review system, so `core`
 is gated on a backend-granted boolean the frontend never infers. **`core` is
@@ -42,7 +42,7 @@ The backend sends counts; the level is computed here. One formula, one place, a
 threshold change is one edit — and a server-computed label can never disagree
 with a client-computed one.
 
-`levelProgress` distinguishes *why* the next level is out of reach: more events
+`levelProgress` distinguishes _why_ the next level is out of reach: more events
 needed, reliability below the bar, or a recognition that cannot be computed.
 "Attend two more events" is an instruction; "your reliability is below 85%" is
 not something more attendance alone fixes quickly.

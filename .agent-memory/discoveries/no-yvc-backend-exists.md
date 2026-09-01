@@ -15,13 +15,13 @@ frontend looks.
 - `docs/web/SEO_AND_ROUTES.md` — the only routes are `/`, `/v1`, `/v2`, `/v3`,
   which are design explorations.
 
-The marketing repository *is* real and useful: `DESIGN.md` carries the full
+The marketing repository _is_ real and useful: `DESIGN.md` carries the full
 token set, `public/logo/` the brand assets, and `PRODUCT.md` the volunteer
 level thresholds. Those were taken. The API was not, because there is none.
 
 **What follows from this:**
 
-- Every `*.api.server.ts` codes against a contract labelled *proposed* in
+- Every `*.api.server.ts` codes against a contract labelled _proposed_ in
   `docs/api/API_CONTRACT.md`.
 - The Telegram flow in `features/auth/telegram.ts` is marked
   UNVERIFIED ASSUMED CONTRACT in its own header.
