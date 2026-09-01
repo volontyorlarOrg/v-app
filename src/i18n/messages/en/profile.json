@@ -1,0 +1,50 @@
+{
+  "title": "Your profile",
+  "subtitle": "Fill this in once. Every application reuses it.",
+  "sections": {
+    "identity": "About you",
+    "education": "Education",
+    "location": "Where you are",
+    "skills": "Languages and skills",
+    "contact": "How organisers reach you",
+    "links": "Links"
+  },
+  "fields": {
+    "fullName": "Full name",
+    "bio": "Short introduction",
+    "bioHelp": "A few sentences an organiser will read first. Not an essay.",
+    "school": "School, college, or university",
+    "gradeYear": "Year or grade",
+    "region": "Region",
+    "city": "City or district",
+    "languages": "Languages you speak",
+    "skills": "Skills and interests",
+    "phone": "Phone number",
+    "phoneHelp": "Shared with an organiser only after you apply.",
+    "telegram": "Telegram username",
+    "email": "Email",
+    "links": "Portfolio, CV, or social link"
+  },
+  "completion": {
+    "label": "Profile completeness",
+    "value": "{percent}% complete",
+    "complete": "Your profile is complete.",
+    "missing": "Still missing: {fields}",
+    "why": "A complete profile makes an application take under a minute."
+  },
+  "save": {
+    "success": "Profile saved.",
+    "autosaved": "Draft kept on this device",
+    "restorePrompt": "You have unsaved profile changes from earlier. Restore them?",
+    "restore": "Restore",
+    "discard": "Discard"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Language, notifications, and your account.",
+    "language": "Interface language",
+    "languageHelp": "Changes what you see here. It does not change what organisers see.",
+    "account": "Account",
+    "signOutEverywhere": "Sign out"
+  }
+}

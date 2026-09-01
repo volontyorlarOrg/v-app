@@ -1,0 +1,41 @@
+{
+  "title": "Your volunteer record",
+  "subtitle": "What you have actually done, confirmed by organisers.",
+  "level": {
+    "label": "Level",
+    "newcomer": "Newcomer",
+    "active": "Active",
+    "trusted": "Trusted",
+    "core": "Core",
+    "explain": "Levels come from confirmed participation. Nothing here is an opinion about you.",
+    "nextLevel": "Next: {level}",
+    "nextLevelNeeds": "Needs {events} more confirmed {events, plural, one {event} other {events}}"
+  },
+  "stats": {
+    "eventsCompleted": "Events completed",
+    "hours": "Hours",
+    "hoursUnverified": "Hours are recorded but not yet verified",
+    "reliability": "Reliability",
+    "reliabilityHelp": "The share of events you were accepted to and attended.",
+    "reliabilityPending": "Not enough confirmed events yet",
+    "accepted": "Accepted",
+    "attended": "Attended"
+  },
+  "attendance": {
+    "accepted": "Accepted",
+    "attended": "Attended",
+    "excused": "Excused",
+    "cancelled": "Cancelled",
+    "awaitingConfirmation": "Awaiting organiser confirmation",
+    "awaitingHelp": "This does not count against you. Reliability only counts events an organiser has confirmed either way."
+  },
+  "history": {
+    "title": "Participation history",
+    "emptyTitle": "Your record starts with your first confirmed event",
+    "emptyBody": "Apply, attend, and the organiser's confirmation appears here."
+  },
+  "notAvailable": {
+    "title": "Records are not available yet",
+    "body": "Participation confirmation is not connected in this deployment, so no record can be shown. We would rather show nothing than invent a number."
+  }
+}

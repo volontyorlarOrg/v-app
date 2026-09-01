@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Volontyorlar</title>
+  <desc id="desc">Youth Volunteering Community in Uzbekistan.</desc>
+  <rect width="1200" height="630" rx="48" fill="#071719"/>
+  <circle cx="600" cy="180" r="52" fill="#45C1C4"/>
+  <path d="M474 248C500 356 700 356 726 248" fill="none" stroke="#45C1C4" stroke-width="46" stroke-linecap="round"/>
+  <text x="600" y="440" fill="#F4FBFB" text-anchor="middle" font-family="Avenir Next, Manrope, sans-serif" font-size="92" font-weight="600" letter-spacing="-3">volontyorlar</text>
+  <text x="600" y="506" fill="#A8C0C2" text-anchor="middle" font-family="Manrope, sans-serif" font-size="25" font-weight="600" letter-spacing="2">YOUTH VOLUNTEERING COMMUNITY · UZBEKISTAN</text>
+</svg>

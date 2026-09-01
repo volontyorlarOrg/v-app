@@ -1,0 +1,68 @@
+{
+  "status": {
+    "draft": "Draft",
+    "submitted": "Submitted",
+    "under_review": "Under review",
+    "accepted": "Accepted",
+    "rejected": "Not selected",
+    "withdrawn": "Withdrawn",
+    "closed": "Closed"
+  },
+  "statusHelp": {
+    "draft": "Not sent yet. Only you can see this.",
+    "submitted": "The organiser has your application.",
+    "under_review": "Someone is reading your application now.",
+    "accepted": "You are in. Details will follow from the organiser.",
+    "rejected": "Not this time. Your record is unaffected.",
+    "withdrawn": "You withdrew this application.",
+    "closed": "This opportunity closed before a decision was made."
+  },
+  "list": {
+    "title": "Your applications",
+    "subtitle": "Every application you have started, in one place.",
+    "emptyTitle": "No applications yet",
+    "emptyBody": "When you apply to an opportunity it will appear here with its status.",
+    "appliedOn": "Applied {date}",
+    "startedOn": "Started {date}"
+  },
+  "form": {
+    "title": "Apply to {opportunity}",
+    "fromProfile": "From your profile",
+    "fromProfileHelp": "These come from your profile. Editing them here updates this application only.",
+    "questions": "Questions from the organiser",
+    "questionsHelp": "These are specific to this opportunity. They are not reused from an earlier application.",
+    "submitTitle": "Submit this application?",
+    "submitBody": "Once submitted you cannot edit your answers. You can still withdraw the application.",
+    "submitConfirm": "Yes, submit",
+    "submitted": "Application submitted.",
+    "draftSaved": "Draft saved.",
+    "draftSaveFailed": "Draft could not be saved. Your answers are still on this page.",
+    "leaveWarning": "You have unsaved answers. Leave this page?"
+  },
+  "essay": {
+    "charactersUsed": "{count} of {max} characters",
+    "charactersOver": "{count} characters over the limit",
+    "autosaveIdle": "Saves automatically",
+    "autosaveSaving": "Saving…",
+    "autosaveSaved": "Saved {time}",
+    "autosaveFailed": "Not saved"
+  },
+  "reuse": {
+    "label": "Reuse an earlier answer",
+    "help": "Pick an answer you wrote before, then edit it for this opportunity. Nothing is submitted until you say so.",
+    "none": "You have no saved answers yet.",
+    "insert": "Insert"
+  },
+  "detail": {
+    "title": "Your application",
+    "opportunity": "Opportunity",
+    "submittedOn": "Submitted",
+    "lastUpdated": "Last updated",
+    "yourAnswers": "Your answers",
+    "withdraw": "Withdraw application",
+    "withdrawTitle": "Withdraw this application?",
+    "withdrawBody": "The organiser will no longer consider you for this opportunity. You cannot undo this.",
+    "withdrawConfirm": "Yes, withdraw",
+    "withdrawn": "Application withdrawn."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "status": {
+    "draft": "Qoralama",
+    "submitted": "Yuborilgan",
+    "under_review": "Ko'rib chiqilmoqda",
+    "accepted": "Qabul qilingan",
+    "rejected": "Tanlanmadi",
+    "withdrawn": "Qaytarib olingan",
+    "closed": "Yopilgan"
+  },
+  "statusHelp": {
+    "draft": "Hali yuborilmagan. Buni faqat siz ko'rasiz.",
+    "submitted": "Tashkilotchi arizangizni oldi.",
+    "under_review": "Arizangiz hozir o'qilmoqda.",
+    "accepted": "Siz qabul qilindingiz. Tafsilotlarni tashkilotchi yuboradi.",
+    "rejected": "Bu safar bo'lmadi. Bu sizning tajribangizga ta'sir qilmaydi.",
+    "withdrawn": "Siz bu arizani qaytarib oldingiz.",
+    "closed": "Qaror qabul qilinishidan oldin imkoniyat yopildi."
+  },
+  "list": {
+    "title": "Sizning arizalaringiz",
+    "subtitle": "Boshlagan barcha arizalaringiz bir joyda.",
+    "emptyTitle": "Hozircha ariza yo'q",
+    "emptyBody": "Ariza topshirganingizda u holati bilan shu yerda ko'rinadi.",
+    "appliedOn": "{date} da topshirilgan",
+    "startedOn": "{date} da boshlangan"
+  },
+  "form": {
+    "title": "Ariza: {opportunity}",
+    "fromProfile": "Profilingizdan",
+    "fromProfileHelp": "Bu ma'lumotlar profilingizdan olingan. Bu yerdagi tahrir faqat shu arizaga ta'sir qiladi.",
+    "questions": "Tashkilotchining savollari",
+    "questionsHelp": "Bu savollar faqat shu imkoniyatga tegishli va oldingi arizalardan ko'chirilmaydi.",
+    "submitTitle": "Ariza yuborilsinmi?",
+    "submitBody": "Yuborilgandan so'ng javoblarni tahrirlab bo'lmaydi. Arizani qaytarib olish esa mumkin.",
+    "submitConfirm": "Ha, yuborilsin",
+    "submitted": "Ariza yuborildi.",
+    "draftSaved": "Qoralama saqlandi.",
+    "draftSaveFailed": "Qoralamani saqlab bo'lmadi. Javoblaringiz sahifada turibdi.",
+    "leaveWarning": "Saqlanmagan javoblaringiz bor. Sahifadan chiqasizmi?"
+  },
+  "essay": {
+    "charactersUsed": "{max} belgidan {count} tasi",
+    "charactersOver": "{count} belgiga oshib ketdi",
+    "autosaveIdle": "Avtomatik saqlanadi",
+    "autosaveSaving": "Saqlanmoqda…",
+    "autosaveSaved": "{time} da saqlandi",
+    "autosaveFailed": "Saqlanmadi"
+  },
+  "reuse": {
+    "label": "Oldingi javobdan foydalanish",
+    "help": "Ilgari yozgan javobingizni tanlang va shu imkoniyatga moslab tahrirlang. Siz aytmaguningizcha hech narsa yuborilmaydi.",
+    "none": "Hali saqlangan javoblaringiz yo'q.",
+    "insert": "Qo'yish"
+  },
+  "detail": {
+    "title": "Sizning arizangiz",
+    "opportunity": "Imkoniyat",
+    "submittedOn": "Yuborilgan",
+    "lastUpdated": "Yangilangan",
+    "yourAnswers": "Sizning javoblaringiz",
+    "withdraw": "Arizani qaytarib olish",
+    "withdrawTitle": "Ariza qaytarib olinsinmi?",
+    "withdrawBody": "Tashkilotchi endi sizning nomzodingizni ko'rib chiqmaydi. Buni ortga qaytarib bo'lmaydi.",
+    "withdrawConfirm": "Ha, qaytarib olinsin",
+    "withdrawn": "Ariza qaytarib olindi."
+  }
+}

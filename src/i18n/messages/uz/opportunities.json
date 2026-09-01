@@ -1,0 +1,99 @@
+{
+  "list": {
+    "title": "Ko'ngillilik imkoniyatlari",
+    "subtitle": "YVC jamoasi topgan va tekshirgan haqiqiy tadbirlar.",
+    "resultCount": "{count, plural, =0 {Imkoniyat topilmadi} other {# ta imkoniyat}}",
+    "emptyTitle": "Bu filtrlarga mos imkoniyat yo'q",
+    "emptyBody": "Kengroq hudud tanlang yoki filtrlarni tozalab, ochiq imkoniyatlarning barchasini ko'ring.",
+    "errorTitle": "Imkoniyatlarni yuklab bo'lmadi",
+    "errorBody": "Muammo biz tomonda. Bir daqiqadan so'ng qayta urinib ko'ring."
+  },
+  "filters": {
+    "legend": "Imkoniyatlarni filtrlash",
+    "search": "Qidiruv",
+    "searchPlaceholder": "Tadbir, tashkilotchi, kalit so'z",
+    "region": "Hudud",
+    "regionAny": "Barcha hududlar",
+    "format": "Format",
+    "formatAny": "Istalgan format",
+    "status": "Holat",
+    "sort": "Saralash",
+    "applied": "{count, plural, other {# ta filtr}}"
+  },
+  "sort": {
+    "deadline": "Tez yopiladigan",
+    "startDate": "Tez boshlanadigan",
+    "newest": "Yangi qo'shilgan"
+  },
+  "format": {
+    "onsite": "Joyida",
+    "remote": "Masofadan",
+    "hybrid": "Aralash"
+  },
+  "status": {
+    "open": "Ochiq",
+    "closingSoon": "Tez yopiladi",
+    "closed": "Yopiq",
+    "full": "Joy qolmagan",
+    "anyOpen": "Hozir ochiq"
+  },
+  "detail": {
+    "organiser": "Tashkilotchi",
+    "date": "Sana",
+    "location": "Manzil",
+    "deadline": "Arizalar qabuli tugaydi",
+    "requirements": "Nima talab qilinadi",
+    "description": "Imkoniyat haqida",
+    "capacity": "Kerakli ko'ngillilar",
+    "spotsLeft": "{count, plural, other {# ta joy qoldi}}",
+    "questions": "Sizdan nima so'raladi",
+    "questionCount": "{count, plural, other {# ta savol}}",
+    "sourcedBy": "YVC topgan",
+    "partnerOpportunity": "Hamkor imkoniyati",
+    "backToList": "Barcha imkoniyatlar"
+  },
+  "deadline": {
+    "today": "Bugun yopiladi",
+    "tomorrow": "Ertaga yopiladi",
+    "inDays": "{days, plural, other {# kundan keyin yopiladi}}",
+    "passed": "Arizalar qabuli yopilgan",
+    "on": "{date} da yopiladi"
+  },
+  "cta": {
+    "apply": "Ariza topshirish",
+    "applyClosed": "Arizalar qabuli yopilgan",
+    "applyFull": "Joy qolmagan",
+    "continueDraft": "Qoralamani davom ettirish",
+    "alreadyApplied": "Siz ariza topshirgansiz",
+    "signInToApply": "Ariza topshirish uchun kiring",
+    "viewApplication": "Arizani ko'rish"
+  },
+  "save": {
+    "add": "Imkoniyatni saqlash",
+    "remove": "Saqlanganlardan olib tashlash",
+    "added": "Saqlandi",
+    "removed": "Saqlanganlardan olib tashlandi"
+  },
+  "saved": {
+    "title": "Saqlangan imkoniyatlar",
+    "subtitle": "Keyinroq uchun ajratib qo'yganlaringiz.",
+    "emptyTitle": "Hali hech narsa saqlamadingiz",
+    "emptyBody": "Ko'rish davomida imkoniyatni saqlang — u shu yerda sizni kutadi."
+  },
+  "regions": {
+    "andijan": "Andijon viloyati",
+    "bukhara": "Buxoro viloyati",
+    "fergana": "Farg'ona viloyati",
+    "jizzakh": "Jizzax viloyati",
+    "kashkadarya": "Qashqadaryo viloyati",
+    "khorezm": "Xorazm viloyati",
+    "namangan": "Namangan viloyati",
+    "navoiy": "Navoiy viloyati",
+    "samarkand": "Samarqand viloyati",
+    "sirdaryo": "Sirdaryo viloyati",
+    "surkhandarya": "Surxondaryo viloyati",
+    "tashkent-region": "Toshkent viloyati",
+    "tashkent-city": "Toshkent shahri",
+    "karakalpakstan": "Qoraqalpog'iston Respublikasi"
+  }
+}

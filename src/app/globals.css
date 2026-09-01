@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+ * YVC product design tokens — "Night Signal Board".
+ *
+ * The palette, type scale, and radii are lifted from the marketing repository's
+ * DESIGN.md frontmatter (volontyorlarOrg/v-web) so the product and the public
+ * site stay recognisably one brand. Values that DESIGN.md does not define —
+ * danger, success, and the focus ring — are product extensions and are marked
+ * as such below.
+ *
+ * Rules that travel with these tokens:
+ *   - Teal marks action, progress, confirmation, and identity. Never wash a
+ *     whole surface in it except for a single decisive callout.
+ *   - Amber is reserved for deadlines and explicitly labelled illustrative or
+ *     target information. It is not a generic accent.
+ *   - Status is never communicated by colour alone; pair it with an icon or a
+ *     word (see docs/design/accessibility.md).
+ */
+
+@theme {
+  /* Surfaces — deepest to most raised */
+  --color-night: #071719;
+  --color-field: #0d2529;
+  --color-panel: #123438;
+  --color-panel-strong: #174147;
+  --color-signal-line: #285158;
+
+  /* Ink */
+  --color-ink: #f4fbfb;
+  --color-muted: #a8c0c2;
+
+  /* Signals */
+  --color-teal: #45c1c4;
+  --color-teal-hover: #62d1d3;
+  --color-teal-ink: #082326;
+  --color-amber: #f3a94a;
+
+  /* Product extensions — not in DESIGN.md. Chosen to sit inside the night
+     field at >= 4.5:1 against --color-night, and never used as the only
+     carrier of meaning. */
+  --color-danger: #f2777a;
+  --color-danger-ink: #2a0d0e;
+  --color-success: #6fd3a2;
+
+  /* Type */
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", system-ui, sans-serif;
+  --font-sans: var(--font-manrope), "Manrope", system-ui, sans-serif;
+
+  /* Radii */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-card: 24px;
+  --radius-feature: 28px;
+  --radius-callout: 32px;
+
+  /* Section rhythm */
+  --spacing-section-mobile: 96px;
+  --spacing-section-wide: 128px;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-night);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.75;
+  }
+
+  /* One visible focus treatment for the whole product. Removing it is a
+     regression, not a style choice. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+  }
+
+  /* Headings use the display face; body copy stays on Manrope. */
+  :where(h1, h2, h3, h4) {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  :where(p) {
+    text-wrap: pretty;
+  }
+
+  /* Native form controls inherit the dark field rather than the UA default. */
+  :where(input, textarea, select) {
+    color-scheme: dark;
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+}
+
+@layer components {
+  /* Skip link: visually hidden until focused. Present in the app shell so
+     keyboard users can jump past the header on every page. */
+  .skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    z-index: 100;
+    transform: translateY(-200%);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-teal);
+    color: var(--color-teal-ink);
+    padding: 0.625rem 1rem;
+    font-weight: 700;
+    transition: transform 150ms ease;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+}
+
+/* Respect the OS preference. Motion in this product is feedback, never the
+   only way a state change is communicated, so removing it costs nothing. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

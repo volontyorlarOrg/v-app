@@ -1,0 +1,41 @@
+{
+  "title": "Sizning ko'ngillilik tajribangiz",
+  "subtitle": "Tashkilotchilar tasdiqlagan, siz haqiqatan qilgan ishlar.",
+  "level": {
+    "label": "Daraja",
+    "newcomer": "Yangi kelgan",
+    "active": "Faol",
+    "trusted": "Ishonchli",
+    "core": "Asosiy jamoa",
+    "explain": "Daraja tasdiqlangan ishtirokdan hisoblanadi. Bu kimningdir siz haqingizdagi fikri emas.",
+    "nextLevel": "Keyingisi: {level}",
+    "nextLevelNeeds": "Yana {events, plural, other {# ta tasdiqlangan tadbir}} kerak"
+  },
+  "stats": {
+    "eventsCompleted": "Yakunlangan tadbirlar",
+    "hours": "Soatlar",
+    "hoursUnverified": "Soatlar yozilgan, lekin hali tasdiqlanmagan",
+    "reliability": "Ishonchlilik",
+    "reliabilityHelp": "Siz qabul qilingan va qatnashgan tadbirlar ulushi.",
+    "reliabilityPending": "Tasdiqlangan tadbirlar hali yetarli emas",
+    "accepted": "Qabul qilingan",
+    "attended": "Qatnashgan"
+  },
+  "attendance": {
+    "accepted": "Qabul qilingan",
+    "attended": "Qatnashgan",
+    "excused": "Uzrli sabab",
+    "cancelled": "Bekor qilingan",
+    "awaitingConfirmation": "Tashkilotchi tasdig'i kutilmoqda",
+    "awaitingHelp": "Bu sizga qarshi hisoblanmaydi. Ishonchlilik faqat tashkilotchi javob bergan tadbirlarni hisobga oladi."
+  },
+  "history": {
+    "title": "Ishtirok tarixi",
+    "emptyTitle": "Tajribangiz birinchi tasdiqlangan tadbirdan boshlanadi",
+    "emptyBody": "Ariza topshiring, qatnashing — tashkilotchining tasdig'i shu yerda paydo bo'ladi."
+  },
+  "notAvailable": {
+    "title": "Tajriba ma'lumotlari hali mavjud emas",
+    "body": "Bu muhitda ishtirokni tasdiqlash ulanmagan, shuning uchun tajribani ko'rsatib bo'lmaydi. Raqamni o'ylab topgandan ko'ra hech narsa ko'rsatmagan ma'qul."
+  }
+}

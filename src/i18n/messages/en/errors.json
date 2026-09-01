@@ -1,0 +1,45 @@
+{
+  "unauthenticated": {
+    "title": "Please sign in",
+    "body": "This page needs an account. Sign in and we will bring you straight back."
+  },
+  "forbidden": {
+    "title": "You do not have access to this",
+    "body": "Your account is signed in, but it is not allowed to open this page."
+  },
+  "notFound": {
+    "title": "We could not find that page",
+    "body": "The link may be old, or the opportunity may have been taken down.",
+    "browse": "Browse opportunities"
+  },
+  "opportunityNotFound": {
+    "title": "This opportunity is no longer listed",
+    "body": "It may have closed or been removed. Here is what is open right now."
+  },
+  "conflict": {
+    "title": "You have already applied",
+    "body": "You can only apply once to an opportunity. Open your application to see its status."
+  },
+  "validation": {
+    "title": "Check your answers",
+    "body": "Some fields need attention before this can be sent."
+  },
+  "network": {
+    "title": "We could not reach the server",
+    "body": "Check your connection and try again. Nothing you typed has been lost."
+  },
+  "server": {
+    "title": "Something went wrong on our side",
+    "body": "This has been logged. Trying again often works."
+  },
+  "notConfigured": {
+    "title": "This feature is not connected yet",
+    "body": "The backend service for this part of YVC is not configured in this deployment."
+  },
+  "boundary": {
+    "title": "This page could not be displayed",
+    "body": "An unexpected error stopped this page from rendering.",
+    "reset": "Try again",
+    "reference": "Reference: {digest}"
+  }
+}
