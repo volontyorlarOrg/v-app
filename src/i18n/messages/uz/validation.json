@@ -1,0 +1,12 @@
+{
+  "required": "Bu maydon majburiy.",
+  "tooShort": "Kamida {min} ta belgi kiriting.",
+  "tooLong": "Ko'pi bilan {max} ta belgi kiriting.",
+  "invalidEmail": "To'g'ri elektron pochta manzilini kiriting.",
+  "invalidPhone": "Raqamni davlat kodi bilan kiriting, masalan +998901234567.",
+  "invalidUrl": "https:// bilan boshlanadigan to'liq havola kiriting.",
+  "invalidTelegram": "Telegram foydalanuvchi nomini @ belgisisiz kiriting.",
+  "selectOne": "Bitta variantni tanlang.",
+  "selectAtLeastOne": "Kamida bittasini tanlang.",
+  "unknown": "Bu qiymat qabul qilinmaydi."
+}

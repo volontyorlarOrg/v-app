@@ -1,0 +1,38 @@
+{
+  "appName": "Youth Volunteer Club",
+  "appShortName": "YVC",
+  "tagline": "Vaqtingizga arziydigan ko'ngillilikni toping. O'zingiz haqingizda gapiradigan tajriba to'plang.",
+  "action": {
+    "apply": "Ariza topshirish",
+    "back": "Orqaga",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "continue": "Davom etish",
+    "loadMore": "Yana ko'rsatish",
+    "retry": "Qayta urinish",
+    "save": "Saqlash",
+    "saveDraft": "Qoralamani saqlash",
+    "search": "Qidiruv",
+    "submit": "Yuborish",
+    "signIn": "Kirish",
+    "signOut": "Chiqish",
+    "clearFilters": "Filtrlarni tozalash"
+  },
+  "state": {
+    "loading": "Yuklanmoqda",
+    "saving": "Saqlanmoqda…",
+    "saved": "Saqlandi",
+    "unsaved": "Saqlanmagan o'zgarishlar bor",
+    "empty": "Hozircha bo'sh"
+  },
+  "meta": {
+    "required": "Majburiy",
+    "optional": "Ixtiyoriy"
+  },
+  "language": {
+    "label": "Til",
+    "change": "Tilni o'zgartirish"
+  },
+  "skipToContent": "Asosiy qismga o'tish",
+  "sampleDataNotice": "Namuna ma'lumotlari. Bular haqiqiy tadbirlar emas, balki misol uchun keltirilgan imkoniyatlar — bu muhitga imkoniyatlar xizmati ulanmagan."
+}

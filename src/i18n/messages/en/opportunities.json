@@ -1,0 +1,99 @@
+{
+  "list": {
+    "title": "Volunteering opportunities",
+    "subtitle": "Real events, sourced and checked by the YVC team.",
+    "resultCount": "{count, plural, =0 {No opportunities} one {# opportunity} other {# opportunities}}",
+    "emptyTitle": "No opportunities match these filters",
+    "emptyBody": "Try a wider region or clear the filters to see everything that is open.",
+    "errorTitle": "Opportunities could not be loaded",
+    "errorBody": "This is on our side, not yours. Try again in a moment."
+  },
+  "filters": {
+    "legend": "Filter opportunities",
+    "search": "Search",
+    "searchPlaceholder": "Event, organiser, keyword",
+    "region": "Region",
+    "regionAny": "All regions",
+    "format": "Format",
+    "formatAny": "Any format",
+    "status": "Status",
+    "sort": "Sort by",
+    "applied": "{count, plural, one {# filter applied} other {# filters applied}}"
+  },
+  "sort": {
+    "deadline": "Closing soonest",
+    "startDate": "Starting soonest",
+    "newest": "Recently added"
+  },
+  "format": {
+    "onsite": "In person",
+    "remote": "Remote",
+    "hybrid": "Hybrid"
+  },
+  "status": {
+    "open": "Open",
+    "closingSoon": "Closing soon",
+    "closed": "Closed",
+    "full": "Full",
+    "anyOpen": "Open now"
+  },
+  "detail": {
+    "organiser": "Organiser",
+    "date": "Date",
+    "location": "Location",
+    "deadline": "Applications close",
+    "requirements": "What you need",
+    "description": "About this opportunity",
+    "capacity": "Volunteers needed",
+    "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
+    "questions": "What you will be asked",
+    "questionCount": "{count, plural, one {# question} other {# questions}}",
+    "sourcedBy": "Sourced by YVC",
+    "partnerOpportunity": "Partner opportunity",
+    "backToList": "All opportunities"
+  },
+  "deadline": {
+    "today": "Closes today",
+    "tomorrow": "Closes tomorrow",
+    "inDays": "{days, plural, one {Closes in # day} other {Closes in # days}}",
+    "passed": "Applications closed",
+    "on": "Closes {date}"
+  },
+  "cta": {
+    "apply": "Apply",
+    "applyClosed": "Applications are closed",
+    "applyFull": "This opportunity is full",
+    "continueDraft": "Continue your draft",
+    "alreadyApplied": "You have applied",
+    "signInToApply": "Sign in to apply",
+    "viewApplication": "View your application"
+  },
+  "save": {
+    "add": "Save this opportunity",
+    "remove": "Remove from saved",
+    "added": "Saved",
+    "removed": "Removed from saved"
+  },
+  "saved": {
+    "title": "Saved opportunities",
+    "subtitle": "Opportunities you kept for later.",
+    "emptyTitle": "You have not saved anything yet",
+    "emptyBody": "Save an opportunity while browsing and it will wait for you here."
+  },
+  "regions": {
+    "andijan": "Andijan",
+    "bukhara": "Bukhara",
+    "fergana": "Fergana",
+    "jizzakh": "Jizzakh",
+    "kashkadarya": "Kashkadarya",
+    "khorezm": "Khorezm",
+    "namangan": "Namangan",
+    "navoiy": "Navoiy",
+    "samarkand": "Samarkand",
+    "sirdaryo": "Sirdaryo",
+    "surkhandarya": "Surkhandarya",
+    "tashkent-region": "Tashkent Region",
+    "tashkent-city": "Tashkent City",
+    "karakalpakstan": "Karakalpakstan"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "required": "This is required.",
+  "tooShort": "Use at least {min} characters.",
+  "tooLong": "Use at most {max} characters.",
+  "invalidEmail": "Enter a valid email address.",
+  "invalidPhone": "Enter a phone number with its country code, for example +998901234567.",
+  "invalidUrl": "Enter a full link starting with https://",
+  "invalidTelegram": "Enter your Telegram username without the @.",
+  "selectOne": "Choose one option.",
+  "selectAtLeastOne": "Choose at least one.",
+  "unknown": "This value is not accepted."
+}

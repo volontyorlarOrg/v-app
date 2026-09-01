@@ -1,0 +1,38 @@
+{
+  "appName": "Youth Volunteer Club",
+  "appShortName": "YVC",
+  "tagline": "Find volunteering worth your time. Build a record that speaks for you.",
+  "action": {
+    "apply": "Apply",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "continue": "Continue",
+    "loadMore": "Load more",
+    "retry": "Try again",
+    "save": "Save",
+    "saveDraft": "Save draft",
+    "search": "Search",
+    "submit": "Submit",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "clearFilters": "Clear filters"
+  },
+  "state": {
+    "loading": "Loading",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "unsaved": "Unsaved changes",
+    "empty": "Nothing here yet"
+  },
+  "meta": {
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "language": {
+    "label": "Language",
+    "change": "Change language"
+  },
+  "skipToContent": "Skip to content",
+  "sampleDataNotice": "Sample data. These are illustrative example opportunities, not real events — this deployment has no opportunity service connected."
+}
