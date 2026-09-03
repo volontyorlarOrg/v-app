@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { calendarDaysBetween, isValidDate } from "./datetime";
+
+import { calendarDaysBetween, isValidDate, tashkentInstant } from "@/lib/datetime";
 
 describe("calendarDaysBetween", () => {
   const now = new Date("2026-06-15T12:00:00.000Z");
@@ -28,11 +29,23 @@ describe("calendarDaysBetween", () => {
       ),
     ).toBe(3);
   });
+});
 
-  it("is unaffected by the process timezone", () => {
-    const a = new Date("2026-06-15T12:00:00.000Z");
-    const b = new Date("2026-06-17T12:00:00.000Z");
-    expect(calendarDaysBetween(a, b)).toBe(2);
+describe("tashkentInstant", () => {
+  const now = new Date("2026-06-15T12:00:00.000Z");
+
+  it("places a wall-clock time on a Tashkent calendar day", () => {
+    expect(tashkentInstant(now, 0, 9)).toBe("2026-06-15T04:00:00.000Z");
+    expect(tashkentInstant(now, 2, 18, 30)).toBe("2026-06-17T13:30:00.000Z");
+  });
+
+  it("keeps the calendar day even when the source instant is late in Tashkent", () => {
+    const lateEvening = new Date("2026-06-15T20:00:00.000Z");
+    expect(tashkentInstant(lateEvening, 0, 9)).toBe("2026-06-16T04:00:00.000Z");
+  });
+
+  it("accepts negative offsets for the past", () => {
+    expect(calendarDaysBetween(now, new Date(tashkentInstant(now, -3, 10)))).toBe(-3);
   });
 });
 

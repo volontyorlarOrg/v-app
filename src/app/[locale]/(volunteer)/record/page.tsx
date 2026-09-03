@@ -1,37 +1,92 @@
+import { useFormatter, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { Locale } from "@/i18n/routing";
-import { getMyRecord } from "@/features/record/api.server";
-import { VolunteerRecordCard } from "@/components/volunteers/volunteer-record-card";
-import { ApiErrorState } from "@/components/shared/api-error-state";
-import { PageHeader } from "@/components/ui/page-header";
+import type { Metadata } from "next";
 
-export default async function RecordPage(props: PageProps<"/[locale]/record">) {
-  const { locale } = await props.params;
-  setRequestLocale(locale as Locale);
+import { Panel } from "@/components/app/panel";
+import { PageHeader } from "@/components/app/page-header";
+import { StatTiles, type Stat } from "@/components/app/stat-tile";
+import { RecordProgress } from "@/components/dashboard/record-progress";
+import { HistoryTable } from "@/components/record/history-table";
+import { isReliabilityMeaningful, reliabilityPercent } from "@/lib/record/levels";
+import { sampleVolunteer } from "@/lib/sample/volunteer";
 
-  const t = await getTranslations("record");
+export const dynamic = "force-dynamic";
 
-  let record;
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/record">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "record" });
+  return { title: t("metaTitle") };
+}
 
-  try {
-    record = await getMyRecord();
-  } catch (error) {
-    return (
-      <div className="flex flex-col gap-6">
-        <PageHeader title={t("title")} description={t("subtitle")} />
-        <ApiErrorState error={error} />
-      </div>
-    );
-  }
+export default async function RecordPage({ params }: PageProps<"/[locale]/record">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  return <Record />;
+}
+
+function Record() {
+  const t = useTranslations("record");
+  const common = useTranslations("common");
+  const format = useFormatter();
+  const now = new Date();
+  const volunteer = sampleVolunteer(now);
+  const { record } = volunteer;
+  const percent = reliabilityPercent(record.counts);
+  const meaningful = isReliabilityMeaningful(record.counts);
+
+  const stats: Stat[] = [
+    {
+      id: "events",
+      label: t("figures.events"),
+      value: format.number(record.counts.attended),
+      achievement: true,
+    },
+    {
+      id: "reliability",
+      label: t("figures.reliability"),
+      value: meaningful && percent !== null ? `${percent}%` : "—",
+      note: meaningful ? t("figures.reliabilityHelp") : t("figures.reliabilityPending"),
+      achievement: true,
+    },
+    {
+      id: "hours",
+      label: t("figures.hours"),
+      value: record.hours === undefined ? "—" : format.number(record.hours),
+      note: record.hoursVerified ? undefined : t("figures.hoursUnverified"),
+      achievement: true,
+    },
+    {
+      id: "awaiting",
+      label: t("figures.awaiting"),
+      value: format.number(record.counts.acceptedUnconfirmed),
+      note: t("figures.awaitingHelp"),
+    },
+  ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title={t("title")} description={t("subtitle")} />
-      <VolunteerRecordCard
-        counts={record.counts}
-        hours={record.hours}
-        hoursVerified={record.hoursVerified}
+    <>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        chip={common("sample.chip")}
       />
-    </div>
+      <StatTiles stats={stats} className="mt-6" />
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+        <Panel id="level" title={t("level.label")} className="xl:self-start">
+          <RecordProgress record={record} />
+        </Panel>
+        <Panel
+          id="history"
+          title={t("history.title")}
+          description={t("history.description")}
+          padding="none"
+        >
+          <HistoryTable entries={volunteer.history} />
+        </Panel>
+      </div>
+    </>
   );
 }

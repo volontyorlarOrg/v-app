@@ -1,7 +1,7 @@
 .next
 node_modules
 package-lock.json
-public/brand
-coverage
-playwright-report
+public
+docs/reference
 test-results
+playwright-report

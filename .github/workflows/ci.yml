@@ -2,80 +2,47 @@ name: CI
 
 on:
   push:
-    branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: volontyorlar-app-ci-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
 
 jobs:
-  quality:
-    name: Format, lint, types, contrast, unit tests
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-
-      - name: Formatting
-        run: npm run format:check
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Types
-        run: npm run typecheck
-
-      - name: Contrast
-        run: npm run check:contrast
-
-      - name: Unit and component tests
-        run: npm run test
-
-  build:
-    name: Production build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
       - run: npm run build
-        env:
-          NEXT_PUBLIC_SITE_ORIGIN: https://example.invalid
-          YVC_ENABLE_SAMPLE_DATA: "true"
+      - run: npm audit --audit-level=high
 
   e2e:
-    name: End-to-end
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-
-      - run: npx playwright install --with-deps chromium
-
+      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
-
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

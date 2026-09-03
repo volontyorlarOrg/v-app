@@ -1,87 +1,72 @@
-import type { Metadata, Viewport } from "next";
-import { Onest } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Onest, Source_Serif_4 } from "next/font/google";
 import { notFound } from "next/navigation";
-import { Toaster } from "sonner";
-import { isLocale, locales, localeTags, type Locale } from "@/i18n/routing";
-import { QueryProvider } from "@/lib/query/QueryProvider";
-import { siteOrigin } from "@/lib/api/env.server";
-import { getSession } from "@/lib/auth/session.server";
-import { toPublicSession } from "@/lib/auth/session";
-import { PALETTE } from "@/lib/design/palette";
-import { AppShell } from "@/components/shared/app-shell";
+import type { Metadata } from "next";
+
+import { ThemeScript } from "@/components/app/theme-script";
+import { routing } from "@/i18n/routing";
+import { siteOrigin } from "@/lib/seo/origin";
 import "../globals.css";
 
 const onest = Onest({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-onest",
   display: "swap",
 });
 
-export const viewport: Viewport = {
-  themeColor: PALETTE.blue,
-  maximumScale: 5,
-};
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-source-serif",
+  display: "swap",
+});
 
-export async function generateMetadata(
-  props: LayoutProps<"/[locale]">,
-): Promise<Metadata> {
-  const { locale } = await props.params;
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+
   const t = await getTranslations({ locale, namespace: "common" });
 
   return {
     metadataBase: new URL(siteOrigin()),
     title: {
-      default: t("appName"),
-      template: `%s · ${t("appShortName")}`,
+      default: t("organizationName"),
+      template: `%s · ${t("organizationShortName")}`,
     },
-    description: t("tagline"),
-    applicationName: t("appName"),
+    applicationName: t("organizationName"),
     robots: { index: false, follow: false },
   };
 }
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
+export default async function LocaleLayout({
+  children,
+  params,
+}: LayoutProps<"/[locale]">) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
 
-export default async function LocaleLayout(props: LayoutProps<"/[locale]">) {
-  const { locale } = await props.params;
-
-  if (!isLocale(locale)) notFound();
-
-  const typedLocale: Locale = locale;
-  setRequestLocale(typedLocale);
-
-  const session = await getSession();
-  const publicSession = session ? toPublicSession(session) : null;
+  setRequestLocale(locale);
 
   return (
     <html
-      lang={localeTags[typedLocale]}
-      className={onest.variable}
+      lang={locale}
+      data-theme="light"
       suppressHydrationWarning
+      className={`${onest.variable} ${sourceSerif.variable} h-full`}
     >
-      <body className="min-h-dvh">
-        <NextIntlClientProvider>
-          <NuqsAdapter>
-            <QueryProvider>
-              <AppShell session={publicSession}>{props.children}</AppShell>
-              <Toaster
-                position="top-center"
-                toastOptions={{
-                  classNames: {
-                    toast: "!bg-canvas !border-line !text-ink !rounded-lg !shadow-lg",
-                    description: "!text-ink-muted",
-                    actionButton: "!bg-blue-deep !text-knockout",
-                  },
-                }}
-              />
-            </QueryProvider>
-          </NuqsAdapter>
-        </NextIntlClientProvider>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="flex min-h-full flex-col">
+        <NextIntlClientProvider messages={null}>{children}</NextIntlClientProvider>
       </body>
     </html>
   );

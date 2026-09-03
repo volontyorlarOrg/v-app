@@ -1,0 +1,481 @@
+{
+  "common": {
+    "organizationName": "Volontyorlar",
+    "organizationShortName": "Volontyorlar",
+    "tagline": "Volunteering for young people in Uzbekistan",
+    "location": "Uzbekistan",
+    "sample": {
+      "chip": "Sample data",
+      "body": "This panel shows an illustrative volunteer. Nothing on it is connected to a real account yet."
+    },
+    "preview": {
+      "chip": "Preview",
+      "notSaved": "Changes on this page are not saved anywhere yet. Saving arrives with the backend."
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "opportunities": "Opportunities",
+    "applications": "Applications",
+    "saved": "Saved",
+    "record": "My record",
+    "profile": "Profile",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "primaryLabel": "Main navigation",
+    "secondaryLabel": "Account",
+    "tabBarLabel": "App sections",
+    "languageLabel": "Language",
+    "themeLabel": "Dark theme",
+    "skipToContent": "Skip to content",
+    "marketingSite": "About Volontyorlar",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "search": {
+      "label": "Search opportunities",
+      "placeholder": "Search opportunities…"
+    },
+    "notifications": {
+      "label": "Notifications",
+      "title": "Notifications",
+      "empty": "Nothing new.",
+      "markAllRead": "Mark all as read"
+    },
+    "userMenu": {
+      "label": "Account menu"
+    }
+  },
+  "notifications": {
+    "kinds": {
+      "attendanceConfirmed": "The organiser confirmed you attended {title}.",
+      "applicationAccepted": "You were accepted to {title}.",
+      "applicationUnderReview": "Your application to {title} is under review.",
+      "deadlineSoon": "{title} closes tomorrow.",
+      "newOpportunity": "New in your region: {title}."
+    }
+  },
+  "auth": {
+    "preview": {
+      "chip": "Preview",
+      "body": "Sign-in is not connected yet. Every option below opens the sample panel."
+    },
+    "providers": {
+      "google": "Continue with Google",
+      "telegram": "Continue with Telegram",
+      "or": "or with email"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "passwordHelp": "At least 8 characters.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "login": {
+      "metaTitle": "Log in",
+      "title": "Welcome back.",
+      "lead": "Log in to see your applications, your record and what is coming up.",
+      "submit": "Log in",
+      "forgot": "Forgot password?",
+      "noAccount": "New to Volontyorlar?",
+      "createAccount": "Create an account",
+      "resetSent": "If that email belongs to an account, a reset link is on its way."
+    },
+    "signup": {
+      "metaTitle": "Create an account",
+      "title": "Create your account.",
+      "lead": "One profile, reused for every application. Fill it in once.",
+      "submit": "Create account",
+      "legal": "By continuing you agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+      "legalPlain": "By continuing you agree to the Terms and the Privacy Policy.",
+      "haveAccount": "Already have an account?",
+      "logIn": "Log in"
+    },
+    "forgot": {
+      "metaTitle": "Reset password",
+      "title": "Reset your password.",
+      "lead": "Enter the email you signed up with and we will send you a link.",
+      "submit": "Send reset link",
+      "back": "Back to log in"
+    }
+  },
+  "dashboard": {
+    "metaTitle": "Dashboard",
+    "greeting": "Hi, {name}.",
+    "browse": "Browse opportunities",
+    "levelLead": {
+      "events": "You are {level}. {events, plural, one {# more confirmed event} other {# more confirmed events}} and you are {next}.",
+      "reliability": "You are {level}. {next} needs reliability of {percent}% or more.",
+      "review": "You are {level}. {next} is granted by the team for standout reviews.",
+      "top": "You are {level}, the highest level."
+    },
+    "tiles": {
+      "level": "Level",
+      "events": "Events completed",
+      "reliability": "Reliability",
+      "reliabilityPending": "Shown after 3 confirmed events",
+      "hours": "Hours",
+      "hoursUnverified": "Recorded, not yet verified"
+    },
+    "nextUp": {
+      "title": "Next up",
+      "description": "Accepted applications with the event still ahead.",
+      "empty": "Nothing scheduled yet. An accepted application appears here with its date and place.",
+      "cta": "Browse opportunities"
+    },
+    "applications": {
+      "title": "Your applications",
+      "viewAll": "All applications"
+    },
+    "progress": {
+      "title": "Your progress",
+      "description": "Your confirmed record and profile readiness in one place."
+    },
+    "record": {
+      "title": "Your record",
+      "viewAll": "Full record"
+    },
+    "profile": {
+      "title": "Your profile",
+      "cta": "Complete profile",
+      "edit": "Edit profile"
+    },
+    "closingSoon": {
+      "title": "Closing soon near you",
+      "viewAll": "All opportunities",
+      "empty": "Nothing is closing soon in your region."
+    },
+    "saved": {
+      "title": "Saved for later",
+      "viewAll": "All saved",
+      "empty": "Save an opportunity while browsing and it waits for you here."
+    },
+    "activity": {
+      "title": "Recently",
+      "kinds": {
+        "attendanceConfirmed": "The organiser confirmed you attended {title}",
+        "applicationAccepted": "You were accepted to {title}",
+        "applicationSubmitted": "You applied to {title}",
+        "opportunitySaved": "You saved {title}",
+        "levelReached": "You reached the {title} level"
+      }
+    }
+  },
+  "record": {
+    "metaTitle": "My record",
+    "title": "Your record",
+    "description": "What you have actually done, confirmed by organisers.",
+    "level": {
+      "label": "Level",
+      "newcomer": "Newcomer",
+      "active": "Active",
+      "trusted": "Trusted",
+      "core": "Core",
+      "railLabel": "Level progress",
+      "current": "current level",
+      "explain": "Levels come from confirmed participation. Nothing here is anyone’s opinion of you."
+    },
+    "next": {
+      "label": "Next: {level}",
+      "progress": "{done} of {needed} confirmed events.",
+      "reliability": "Needs reliability of {percent}% or more.",
+      "review": "Granted by the team for standout reviews.",
+      "top": "You are at the highest level."
+    },
+    "figures": {
+      "events": "Events completed",
+      "reliability": "Reliability",
+      "reliabilityHelp": "Share of accepted events you attended",
+      "reliabilityPending": "Shown after 3 confirmed events",
+      "hours": "Hours",
+      "hoursUnverified": "Recorded, not yet verified",
+      "awaiting": "Awaiting confirmation",
+      "awaitingHelp": "Events the organiser has not confirmed yet. They never count against you."
+    },
+    "history": {
+      "title": "Participation history",
+      "description": "Every event you were accepted to, and what the organiser said.",
+      "date": "Date",
+      "event": "Event",
+      "outcome": "Outcome",
+      "hours": "Hours",
+      "empty": "Your record starts with your first confirmed event."
+    },
+    "outcomes": {
+      "attended": "Attended",
+      "excused": "Excused",
+      "cancelled": "Cancelled",
+      "awaiting_confirmation": "Awaiting confirmation"
+    }
+  },
+  "applications": {
+    "metaTitle": "Applications",
+    "title": "Your applications",
+    "description": "Every application you have started, in one place.",
+    "groups": {
+      "label": "Filter applications by state",
+      "all": "All",
+      "drafts": "Drafts",
+      "active": "In progress",
+      "decided": "Decided"
+    },
+    "empty": {
+      "title": "No applications here",
+      "body": "When you apply to an opportunity it appears here with its status."
+    },
+    "status": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "under_review": "Under review",
+      "accepted": "Accepted",
+      "rejected": "Not selected",
+      "withdrawn": "Withdrawn",
+      "closed": "Closed"
+    },
+    "appliedOn": "Applied {date}",
+    "startedOn": "Started {date}",
+    "continueDraft": "Continue draft",
+    "detail": {
+      "eyebrow": "Application",
+      "back": "All applications",
+      "timeline": "Progress",
+      "steps": {
+        "submitted": "Submitted",
+        "under_review": "Under review",
+        "decided": "Decision"
+      },
+      "inProgress": "In progress",
+      "pending": "Not yet",
+      "answers": "Your answers",
+      "answersEmpty": "Nothing written yet. The draft is empty.",
+      "noQuestions": "This opportunity asked no questions.",
+      "fromProfile": "From your profile",
+      "fromProfileHelp": "What the organiser sees alongside your answers.",
+      "withdraw": "Withdraw application",
+      "withdrawPreview": "Withdrawing opens with the backend.",
+      "continuePreview": "Editing a draft opens with the backend.",
+      "viewOpportunity": "View opportunity"
+    }
+  },
+  "opportunities": {
+    "metaTitle": "Opportunities",
+    "title": "Opportunities",
+    "description": "Real events, checked with the organiser before they reach you.",
+    "count": "{count, plural, =0 {No opportunities} one {# opportunity} other {# opportunities}}",
+    "views": {
+      "label": "Choose which opportunities to show",
+      "all": "All opportunities",
+      "saved": "Saved"
+    },
+    "empty": {
+      "title": "Nothing matches these filters",
+      "body": "Try a wider region or clear the filters to see everything that is open."
+    },
+    "filters": {
+      "legend": "Filter opportunities",
+      "search": "Search",
+      "searchPlaceholder": "Event, organiser, keyword",
+      "region": "Region",
+      "regionAny": "All regions",
+      "format": "Format",
+      "formatAny": "Any format",
+      "sort": "Sort by",
+      "sortBy": {
+        "deadline": "Closing soonest",
+        "start": "Starting soonest"
+      },
+      "openOnly": "Open only",
+      "apply": "Search",
+      "clear": "Clear filters"
+    },
+    "card": {
+      "view": "View",
+      "save": "Save",
+      "saved": "Saved",
+      "sourced": "Sourced by Volontyorlar"
+    },
+    "detail": {
+      "back": "All opportunities",
+      "facts": "At a glance",
+      "organiser": "Organiser",
+      "date": "Date",
+      "location": "Location",
+      "deadline": "Applications close",
+      "format": "Format",
+      "capacity": "Volunteers needed",
+      "spotsOf": "{spots} of {capacity} spots left",
+      "requirements": "What you need",
+      "description": "About this opportunity",
+      "questions": "What you will be asked",
+      "questionCount": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
+      "noQuestions": "This opportunity asks no questions. Your profile is the application.",
+      "required": "Required",
+      "optional": "Optional",
+      "maxLength": "up to {count} characters",
+      "apply": "Apply",
+      "applyClosed": "Applications are closed",
+      "applyPreview": "Applying opens with the backend. Until then the button is a preview."
+    },
+    "status": {
+      "open": "Open",
+      "closingSoon": "Closing soon",
+      "closed": "Closed",
+      "full": "Full"
+    },
+    "format": {
+      "onsite": "In person",
+      "remote": "Remote",
+      "hybrid": "Hybrid"
+    },
+    "verified": "Verified organiser",
+    "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
+    "deadline": {
+      "today": "Closes today",
+      "tomorrow": "Closes tomorrow",
+      "inDays": "{days, plural, one {Closes in # day} other {Closes in # days}}",
+      "passed": "Applications closed",
+      "on": "Closes {date}"
+    },
+    "regions": {
+      "andijan": "Andijan",
+      "bukhara": "Bukhara",
+      "fergana": "Fergana",
+      "jizzakh": "Jizzakh",
+      "kashkadarya": "Kashkadarya",
+      "khorezm": "Khorezm",
+      "namangan": "Namangan",
+      "navoiy": "Navoiy",
+      "samarkand": "Samarkand",
+      "sirdaryo": "Sirdaryo",
+      "surkhandarya": "Surkhandarya",
+      "tashkent-region": "Tashkent Region",
+      "tashkent-city": "Tashkent City",
+      "karakalpakstan": "Karakalpakstan"
+    }
+  },
+  "saved": {
+    "metaTitle": "Saved",
+    "title": "Saved for later",
+    "description": "Opportunities you kept to decide on later.",
+    "empty": {
+      "title": "You have not saved anything yet",
+      "body": "Save an opportunity while browsing and it waits for you here.",
+      "cta": "Browse opportunities"
+    }
+  },
+  "profile": {
+    "metaTitle": "Profile",
+    "title": "Your profile",
+    "description": "Fill this in once. Every application reuses it.",
+    "sections": {
+      "identity": "About you",
+      "education": "Education",
+      "location": "Where you are",
+      "skills": "Languages and skills",
+      "contact": "How organisers reach you",
+      "links": "Links"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "bio": "Short introduction",
+      "bioHelp": "A few sentences an organiser reads first. Not an essay.",
+      "school": "School, college, or university",
+      "gradeYear": "Year or grade",
+      "region": "Region",
+      "regionAny": "Choose a region",
+      "city": "City or district",
+      "languages": "Languages you speak",
+      "languagesHelp": "Separate with commas.",
+      "skills": "Skills and interests",
+      "skillsHelp": "Separate with commas.",
+      "phone": "Phone number",
+      "phoneHelp": "Shared with an organiser only after you apply.",
+      "telegram": "Telegram username",
+      "telegramHelp": "Without the @.",
+      "links": "Portfolio, CV, or social link",
+      "linksHelp": "Optional. Does not count toward completeness.",
+      "contact": "A way to reach you"
+    },
+    "save": "Save profile",
+    "saved": "Saved in this preview only.",
+    "completion": {
+      "label": "Profile completeness",
+      "value": "{percent}% complete",
+      "complete": "Your profile is complete. Applications take under a minute.",
+      "missing": "Still missing: {fields}",
+      "why": "A complete profile means an organiser can evaluate and contact you."
+    }
+  },
+  "settings": {
+    "metaTitle": "Settings",
+    "title": "Settings",
+    "description": "Notifications, privacy, appearance, and your account.",
+    "preview": "Switches on this page change what you see, and nothing is stored yet. Saving preferences arrives with the backend.",
+    "preferences": {
+      "title": "Privacy and appearance",
+      "description": "What others can see and how this app looks to you."
+    },
+    "accountGroup": {
+      "title": "Account and access",
+      "description": "Sign-in methods, active sessions, and account controls."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Where and when Volontyorlar reaches you.",
+      "telegram": "Telegram messages",
+      "telegramHelp": "Decisions and reminders from the Volontyorlar bot.",
+      "email": "Email digest",
+      "emailHelp": "A weekly summary of new opportunities near you.",
+      "deadlines": "Deadline reminders",
+      "deadlinesHelp": "A day before a saved or drafted opportunity closes.",
+      "decisions": "Application decisions",
+      "decisionsHelp": "The moment an organiser accepts or declines."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "What organisers and other volunteers can see.",
+      "profileToOrganisers": "Share my profile with organisers I apply to",
+      "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
+      "levelPublic": "Show my level on the community list",
+      "levelPublicHelp": "Off by default. Your record stays private either way."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Kept on this device only.",
+      "darkTheme": "Dark theme",
+      "darkThemeHelp": "Follows your system setting until you choose.",
+      "language": "Interface language",
+      "languageHelp": "Changes what you see here. It does not change what organisers see."
+    },
+    "account": {
+      "title": "Ways to sign in",
+      "description": "Every method opens the same account.",
+      "telegram": "Telegram",
+      "google": "Google",
+      "email": "Email and password",
+      "connected": "Connected",
+      "notConnected": "Not connected",
+      "verified": "Verified",
+      "connect": "Connect",
+      "disconnect": "Disconnect"
+    },
+    "session": {
+      "title": "Session",
+      "description": "Sign out on this device, or everywhere at once.",
+      "signOut": "Sign out",
+      "signOutEverywhere": "Sign out everywhere"
+    },
+    "danger": {
+      "title": "Delete account",
+      "description": "Removes your profile, applications and record. Not reversible.",
+      "delete": "Delete my account"
+    }
+  },
+  "notFound": {
+    "metaTitle": "Page not found",
+    "title": "Page not found",
+    "description": "This page does not exist, or it has moved.",
+    "action": "Go to the dashboard"
+  }
+}

@@ -1,88 +1,187 @@
+import { useFormatter, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight } from "lucide-react";
-import type { Locale } from "@/i18n/routing";
+import type { Metadata } from "next";
+
+import { Panel } from "@/components/app/panel";
+import { PageHeader } from "@/components/app/page-header";
+import { StatTiles, type Stat } from "@/components/app/stat-tile";
+import { ApplicationRows } from "@/components/dashboard/application-rows";
+import { ImpactOrbit } from "@/components/dashboard/impact-orbit";
+import { NextUp } from "@/components/dashboard/next-up";
+import { ProfileMeter } from "@/components/dashboard/profile-meter";
+import { RecordProgress } from "@/components/dashboard/record-progress";
+import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { getMyProfile } from "@/features/profile/api.server";
-import { profileCompletion } from "@/features/profile/schemas";
-import { listMyApplications } from "@/features/applications/api.server";
-import { ApplicationStatusBadge } from "@/components/applications/application-status";
-import { ProfileCompletionCard } from "@/components/volunteers/profile-completion";
-import { PageHeader } from "@/components/ui/page-header";
-import { Surface } from "@/components/ui/surface";
-import { Button } from "@/components/ui/button";
+import { isUpcomingCommitment } from "@/lib/applications/status";
+import { profileCompletion } from "@/lib/profile/completion";
+import {
+  LEVEL_THRESHOLDS,
+  isReliabilityMeaningful,
+  levelProgress,
+  reliabilityPercent,
+  type Level,
+} from "@/lib/record/levels";
+import { navHref } from "@/lib/routing/routes";
+import { sampleVolunteer } from "@/lib/sample/volunteer";
 
-export default async function DashboardPage(props: PageProps<"/[locale]/dashboard">) {
-  const { locale } = await props.params;
-  setRequestLocale(locale as Locale);
+export const dynamic = "force-dynamic";
 
-  const [t, nav, applicationsT] = await Promise.all([
-    getTranslations("profile"),
-    getTranslations("nav"),
-    getTranslations("applications"),
-  ]);
+const APPLICATIONS_SHOWN = 3;
 
-  const [profileResult, applicationsResult] = await Promise.allSettled([
-    getMyProfile(),
-    listMyApplications(null),
-  ]);
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/dashboard">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "dashboard" });
+  return { title: t("metaTitle") };
+}
 
-  const profile = profileResult.status === "fulfilled" ? profileResult.value : null;
-  const applications =
-    applicationsResult.status === "fulfilled"
-      ? applicationsResult.value.items.slice(0, 3)
-      : [];
+export default async function DashboardPage({
+  params,
+}: PageProps<"/[locale]/dashboard">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  return <Dashboard />;
+}
+
+function Dashboard() {
+  const t = useTranslations("dashboard");
+  const record = useTranslations("record");
+  const common = useTranslations("common");
+  const applicationsT = useTranslations("applications");
+  const format = useFormatter();
+
+  const now = new Date();
+  const volunteer = sampleVolunteer(now);
+  const progress = levelProgress(volunteer.record.counts);
+  const percent = reliabilityPercent(volunteer.record.counts);
+  const meaningful = isReliabilityMeaningful(volunteer.record.counts);
+  const completion = profileCompletion(volunteer.profile);
+  const levelName = (level: Level) => record(`level.${level}`);
+
+  const lead = progress.next
+    ? progress.eventsNeeded !== null
+      ? t("levelLead.events", {
+          level: levelName(progress.current),
+          next: levelName(progress.next),
+          events: progress.eventsNeeded,
+        })
+      : progress.blockedByReview
+        ? t("levelLead.review", {
+            level: levelName(progress.current),
+            next: levelName(progress.next),
+          })
+        : t("levelLead.reliability", {
+            level: levelName(progress.current),
+            next: levelName(progress.next),
+            percent: Math.round(LEVEL_THRESHOLDS[progress.next].reliability * 100),
+          })
+    : t("levelLead.top", { level: levelName(progress.current) });
+
+  const stats: Stat[] = [
+    {
+      id: "events",
+      label: t("tiles.events"),
+      value: format.number(volunteer.record.counts.attended),
+      achievement: true,
+    },
+    {
+      id: "reliability",
+      label: t("tiles.reliability"),
+      value: meaningful && percent !== null ? `${percent}%` : "—",
+      note: meaningful ? undefined : t("tiles.reliabilityPending"),
+    },
+    {
+      id: "hours",
+      label: t("tiles.hours"),
+      value:
+        volunteer.record.hours === undefined
+          ? "—"
+          : format.number(volunteer.record.hours),
+      note: volunteer.record.hoursVerified ? undefined : t("tiles.hoursUnverified"),
+    },
+  ];
+
+  const commitments = volunteer.applications
+    .filter((application) => isUpcomingCommitment(application, now))
+    .sort(
+      (a, b) =>
+        new Date(a.opportunity.startsAt).getTime() -
+        new Date(b.opportunity.startsAt).getTime(),
+    );
+
+  const applications = [...volunteer.applications]
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, APPLICATIONS_SHOWN);
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title={nav("dashboard")} />
+    <>
+      <section className="dashboard-hero">
+        <div className="min-w-0 py-1">
+          <PageHeader
+            chip={common("sample.chip")}
+            title={t("greeting", { name: volunteer.firstName })}
+            description={lead}
+            actions={
+              <Link
+                href={navHref("opportunities")}
+                className={buttonClass({ size: "sm" })}
+              >
+                {t("browse")}
+              </Link>
+            }
+          />
+          <p className="enter-rise mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted [--enter-delay:90ms]">
+            {common("sample.body")}
+          </p>
+        </div>
+        <ImpactOrbit />
+      </section>
 
-      {profile ? (
-        <ProfileCompletionCard
-          completion={profileCompletion(profile)}
-          fieldLabels={profileCompletion(profile).missing.map((field) =>
-            field === "contact" ? t("sections.contact") : t(`fields.${field}`),
-          )}
-        />
-      ) : null}
+      <StatTiles stats={stats} className="mt-6" />
 
-      <section aria-labelledby="recent" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-4">
-          <h2 id="recent" className="text-lg">
-            {applicationsT("list.title")}
-          </h2>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/applications">
-              {nav("applications")}
-              <ArrowRight aria-hidden="true" className="size-4" />
-            </Link>
-          </Button>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <Panel
+            id="next-up"
+            title={t("nextUp.title")}
+            description={t("nextUp.description")}
+            padding="none"
+          >
+            <NextUp commitments={commitments} />
+          </Panel>
+
+          <Panel
+            id="applications"
+            title={t("applications.title")}
+            action={{ href: navHref("applications"), label: t("applications.viewAll") }}
+            padding="none"
+          >
+            <ApplicationRows
+              applications={applications}
+              now={now}
+              empty={{
+                title: applicationsT("empty.title"),
+                body: applicationsT("empty.body"),
+              }}
+            />
+          </Panel>
         </div>
 
-        {applications.length === 0 ? (
-          <Surface tone="quiet" padding="md">
-            <p className="text-sm text-ink-muted">{applicationsT("list.emptyBody")}</p>
-          </Surface>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {applications.map((application) => (
-              <li key={application.id}>
-                <Surface
-                  padding="sm"
-                  className="flex items-center justify-between gap-3"
-                >
-                  <Link
-                    href={`/applications/${application.id}`}
-                    className="text-sm font-bold text-ink hover:text-blue-deep"
-                  >
-                    {application.opportunity.title}
-                  </Link>
-                  <ApplicationStatusBadge status={application.status} />
-                </Surface>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+        <div className="min-w-0">
+          <Panel
+            id="progress"
+            title={t("progress.title")}
+            description={t("progress.description")}
+            action={{ href: navHref("record"), label: t("record.viewAll") }}
+          >
+            <RecordProgress record={volunteer.record} />
+            <div className="mt-5 border-t border-border pt-5">
+              <ProfileMeter completion={completion} />
+            </div>
+          </Panel>
+        </div>
+      </div>
+    </>
   );
 }

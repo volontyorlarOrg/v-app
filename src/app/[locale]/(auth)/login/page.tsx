@@ -1,93 +1,87 @@
-import type { Metadata } from "next";
-import Image from "next/image";
+import { CircleCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { TriangleAlert } from "lucide-react";
-import type { Locale } from "@/i18n/routing";
-import { isAuthConfigured } from "@/lib/auth/session.server";
-import { safeReturnPath } from "@/lib/auth/session";
-import { isTelegramStatus } from "@/features/auth/telegram";
-import { Surface } from "@/components/ui/surface";
-import { TelegramPanel } from "./_components/telegram-panel";
+import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false, nocache: true },
-};
+import { AuthForm } from "@/components/auth/auth-form";
+import { AuthIntro } from "@/components/auth/auth-intro";
+import { AuthDivider, AuthPanel } from "@/components/auth/auth-panel";
+import { PreviewNotice } from "@/components/auth/preview-notice";
+import { ProviderButtons } from "@/components/auth/provider-buttons";
+import { Link } from "@/i18n/navigation";
+import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
 
-export default async function LoginPage(props: PageProps<"/[locale]/login">) {
-  const { locale } = await props.params;
-  setRequestLocale(locale as Locale);
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/login">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth.login" });
+  return { title: t("metaTitle") };
+}
 
-  const searchParams = await props.searchParams;
-  const [t, configured] = await Promise.all([
-    getTranslations("auth"),
-    isAuthConfigured(),
-  ]);
+export default async function LoginPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/login">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-  const rawNext = searchParams.next;
-  const next = safeReturnPath(Array.isArray(rawNext) ? rawNext[0] : rawNext);
+  const { reset } = await searchParams;
+  return <Login resetSent={reset === "sent"} />;
+}
 
-  const rawStatus = searchParams.telegram;
-  const status = Array.isArray(rawStatus) ? rawStatus[0] : rawStatus;
-  const telegramStatus = isTelegramStatus(status) ? status : null;
+function Login({ resetSent }: { resetSent: boolean }) {
+  const t = useTranslations("auth");
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-6 py-6">
-      <header className="flex flex-col items-center gap-4 text-center">
-        <Image
-          src="/brand/mark-blue.svg"
-          alt=""
-          width={56}
-          height={56}
-          priority
-          className="size-14"
+    <>
+      <AuthIntro title={t("login.title")} lead={t("login.lead")} />
+      <PreviewNotice chip={t("preview.chip")} body={t("preview.body")} />
+
+      {resetSent ? (
+        <p
+          role="status"
+          className="enter-rise mt-6 flex items-start gap-3 rounded-lg bg-surface-soft px-4 py-3 text-sm leading-relaxed text-primary-ink [--enter-delay:650ms]"
+        >
+          <CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          {t("login.resetSent")}
+        </p>
+      ) : null}
+
+      <AuthPanel>
+        <ProviderButtons
+          href={navHref(HOME_ROUTE)}
+          google={t("providers.google")}
+          telegram={t("providers.telegram")}
         />
-        <h1 className="text-2xl">{t("signIn.title")}</h1>
-        <p className="text-sm leading-6 text-ink-muted">{t("signIn.subtitle")}</p>
-      </header>
+        <AuthDivider label={t("providers.or")} />
+        <AuthForm
+          destination={navHref(HOME_ROUTE)}
+          submitLabel={t("login.submit")}
+          passwordLabels={{
+            show: t("fields.showPassword"),
+            hide: t("fields.hidePassword"),
+          }}
+          fields={[
+            { name: "email", label: t("fields.email") },
+            {
+              name: "password",
+              label: t("fields.password"),
+              trailing: { href: navHref("forgotPassword"), label: t("login.forgot") },
+            },
+          ]}
+        />
+      </AuthPanel>
 
-      {telegramStatus ? (
-        <Surface
-          tone="quiet"
-          padding="sm"
-          role="alert"
-          className="flex items-start gap-3 border-danger/40"
+      <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">
+        {t("login.noAccount")}{" "}
+        <Link
+          href={navHref("signup")}
+          className="font-semibold text-primary-ink underline-offset-4 hover:underline"
         >
-          <TriangleAlert
-            aria-hidden="true"
-            className="mt-0.5 size-4 shrink-0 text-danger"
-          />
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-bold text-ink">
-              {t(`telegram.${telegramStatus}Title`)}
-            </p>
-            <p className="text-xs leading-6 text-ink-muted">
-              {t(`telegram.${telegramStatus}Body`)}
-            </p>
-          </div>
-        </Surface>
-      ) : null}
-
-      {!configured ? (
-        <Surface
-          tone="quiet"
-          padding="sm"
-          role="note"
-          className="flex flex-col gap-1 border-blue-deep/25"
-        >
-          <p className="text-sm font-bold text-blue-deep">{t("notConfigured.title")}</p>
-          <p className="text-xs leading-6 text-ink-muted">{t("notConfigured.body")}</p>
-        </Surface>
-      ) : null}
-
-      <TelegramPanel
-        locale={locale as Locale}
-        next={next ?? undefined}
-        disabled={!configured}
-      />
-
-      <p className="text-center text-xs leading-6 text-ink-muted">
-        {t("signIn.createsAccount")}
+          {t("login.createAccount")}
+        </Link>
       </p>
-    </div>
+    </>
   );
 }

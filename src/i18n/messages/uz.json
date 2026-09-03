@@ -1,0 +1,481 @@
+{
+  "common": {
+    "organizationName": "Volontyorlar",
+    "organizationShortName": "Volontyorlar",
+    "tagline": "Oʻzbekistondagi yoshlar uchun volontyorlik",
+    "location": "Oʻzbekiston",
+    "sample": {
+      "chip": "Namuna maʼlumot",
+      "body": "Bu panelda namunaviy volontyor koʻrsatilgan. Hozircha undagi hech narsa haqiqiy hisobga ulanmagan."
+    },
+    "preview": {
+      "chip": "Koʻrib chiqish",
+      "notSaved": "Bu sahifadagi oʻzgarishlar hali hech qayerda saqlanmaydi. Saqlash backend bilan birga keladi."
+    }
+  },
+  "nav": {
+    "dashboard": "Bosh panel",
+    "opportunities": "Imkoniyatlar",
+    "applications": "Arizalar",
+    "saved": "Saqlanganlar",
+    "record": "Mening tarixim",
+    "profile": "Profil",
+    "settings": "Sozlamalar",
+    "signOut": "Chiqish",
+    "primaryLabel": "Asosiy navigatsiya",
+    "secondaryLabel": "Hisob",
+    "tabBarLabel": "Ilova boʻlimlari",
+    "languageLabel": "Til",
+    "themeLabel": "Tungi rejim",
+    "skipToContent": "Asosiy qismga oʻtish",
+    "marketingSite": "Volontyorlar haqida",
+    "privacy": "Maxfiylik",
+    "terms": "Shartlar",
+    "search": {
+      "label": "Imkoniyatlarni qidirish",
+      "placeholder": "Imkoniyatlarni qidirish…"
+    },
+    "notifications": {
+      "label": "Bildirishnomalar",
+      "title": "Bildirishnomalar",
+      "empty": "Yangilik yoʻq.",
+      "markAllRead": "Hammasini oʻqilgan deb belgilash"
+    },
+    "userMenu": {
+      "label": "Hisob menyusi"
+    }
+  },
+  "notifications": {
+    "kinds": {
+      "attendanceConfirmed": "Tashkilotchi {title} tadbirida qatnashganingizni tasdiqladi.",
+      "applicationAccepted": "Siz {title} tadbiriga qabul qilindingiz.",
+      "applicationUnderReview": "{title} uchun arizangiz koʻrib chiqilmoqda.",
+      "deadlineSoon": "{title} ertaga yopiladi.",
+      "newOpportunity": "Hududingizda yangi imkoniyat: {title}."
+    }
+  },
+  "auth": {
+    "preview": {
+      "chip": "Koʻrib chiqish",
+      "body": "Kirish hali ulanmagan. Quyidagi har bir variant namunaviy panelni ochadi."
+    },
+    "providers": {
+      "google": "Google orqali davom etish",
+      "telegram": "Telegram orqali davom etish",
+      "or": "yoki email bilan"
+    },
+    "fields": {
+      "fullName": "Toʻliq ism",
+      "email": "Email",
+      "password": "Parol",
+      "passwordHelp": "Kamida 8 ta belgi.",
+      "showPassword": "Parolni koʻrsatish",
+      "hidePassword": "Parolni yashirish"
+    },
+    "login": {
+      "metaTitle": "Kirish",
+      "title": "Xush kelibsiz.",
+      "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻrish uchun kiring.",
+      "submit": "Kirish",
+      "forgot": "Parolni unutdingizmi?",
+      "noAccount": "Volontyorlarda yangimisiz?",
+      "createAccount": "Hisob yaratish",
+      "resetSent": "Agar bu email hisobga tegishli boʻlsa, tiklash havolasi yuborildi."
+    },
+    "signup": {
+      "metaTitle": "Hisob yaratish",
+      "title": "Hisobingizni yarating.",
+      "lead": "Bitta profil — har bir ariza uchun. Uni bir marta toʻldirasiz.",
+      "submit": "Hisob yaratish",
+      "legal": "Davom etish orqali siz <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozilik bildirasiz.",
+      "legalPlain": "Davom etish orqali siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
+      "haveAccount": "Hisobingiz bormi?",
+      "logIn": "Kirish"
+    },
+    "forgot": {
+      "metaTitle": "Parolni tiklash",
+      "title": "Parolingizni tiklang.",
+      "lead": "Roʻyxatdan oʻtgan emailingizni kiriting, sizga havola yuboramiz.",
+      "submit": "Tiklash havolasini yuborish",
+      "back": "Kirishga qaytish"
+    }
+  },
+  "dashboard": {
+    "metaTitle": "Bosh panel",
+    "greeting": "Salom, {name}.",
+    "browse": "Imkoniyatlarni koʻrish",
+    "levelLead": {
+      "events": "Siz {level} darajadasiz. Yana {events, plural, other {# ta tasdiqlangan tadbir}} — va siz {next} boʻlasiz.",
+      "reliability": "Siz {level} darajadasiz. {next} uchun ishonchlilik kamida {percent}% boʻlishi kerak.",
+      "review": "Siz {level} darajadasiz. {next} darajasini jamoa alohida eʼtirof uchun beradi.",
+      "top": "Siz {level} darajadasiz — bu eng yuqori daraja."
+    },
+    "tiles": {
+      "level": "Daraja",
+      "events": "Yakunlangan tadbirlar",
+      "reliability": "Ishonchlilik",
+      "reliabilityPending": "3 ta tasdiqlangan tadbirdan soʻng koʻrsatiladi",
+      "hours": "Soatlar",
+      "hoursUnverified": "Yozilgan, hali tasdiqlanmagan"
+    },
+    "nextUp": {
+      "title": "Navbatdagi",
+      "description": "Tadbiri hali oldinda boʻlgan qabul qilingan arizalar.",
+      "empty": "Hali rejalashtirilgan tadbir yoʻq. Qabul qilingan ariza bu yerda sanasi va joyi bilan koʻrinadi.",
+      "cta": "Imkoniyatlarni koʻrish"
+    },
+    "applications": {
+      "title": "Arizalaringiz",
+      "viewAll": "Barcha arizalar"
+    },
+    "progress": {
+      "title": "Oʻsishingiz",
+      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda."
+    },
+    "record": {
+      "title": "Tarixingiz",
+      "viewAll": "Toʻliq tarix"
+    },
+    "profile": {
+      "title": "Profilingiz",
+      "cta": "Profilni toʻldirish",
+      "edit": "Profilni tahrirlash"
+    },
+    "closingSoon": {
+      "title": "Hududingizda tez yopiladi",
+      "viewAll": "Barcha imkoniyatlar",
+      "empty": "Hududingizda tez orada yopiladigan imkoniyat yoʻq."
+    },
+    "saved": {
+      "title": "Keyinga saqlangan",
+      "viewAll": "Barcha saqlanganlar",
+      "empty": "Koʻrib chiqayotganda imkoniyatni saqlang — u sizni shu yerda kutadi."
+    },
+    "activity": {
+      "title": "Yaqinda",
+      "kinds": {
+        "attendanceConfirmed": "Tashkilotchi {title} tadbirida qatnashganingizni tasdiqladi",
+        "applicationAccepted": "Siz {title} tadbiriga qabul qilindingiz",
+        "applicationSubmitted": "Siz {title} tadbiriga ariza berdingiz",
+        "opportunitySaved": "Siz {title} imkoniyatini saqladingiz",
+        "levelReached": "Siz {title} darajasiga yetdingiz"
+      }
+    }
+  },
+  "record": {
+    "metaTitle": "Mening tarixim",
+    "title": "Tarixingiz",
+    "description": "Haqiqatan qilganlaringiz — tashkilotchilar tasdigʻi bilan.",
+    "level": {
+      "label": "Daraja",
+      "newcomer": "Yangi kelgan",
+      "active": "Faol",
+      "trusted": "Ishonchli",
+      "core": "Asosiy jamoa",
+      "railLabel": "Daraja boʻyicha oʻsish",
+      "current": "joriy daraja",
+      "explain": "Daraja tasdiqlangan ishtirokdan hisoblanadi. Bu yerda hech narsa kimningdir siz haqingizdagi fikri emas."
+    },
+    "next": {
+      "label": "Keyingisi: {level}",
+      "progress": "{needed} ta tasdiqlangan tadbirdan {done} tasi.",
+      "reliability": "Ishonchlilik kamida {percent}% boʻlishi kerak.",
+      "review": "Jamoa alohida eʼtirof uchun beradi.",
+      "top": "Siz eng yuqori darajadasiz."
+    },
+    "figures": {
+      "events": "Yakunlangan tadbirlar",
+      "reliability": "Ishonchlilik",
+      "reliabilityHelp": "Qabul qilingan tadbirlardan qatnashganlaringiz ulushi",
+      "reliabilityPending": "3 ta tasdiqlangan tadbirdan soʻng koʻrsatiladi",
+      "hours": "Soatlar",
+      "hoursUnverified": "Yozilgan, hali tasdiqlanmagan",
+      "awaiting": "Tasdiq kutilmoqda",
+      "awaitingHelp": "Tashkilotchi hali tasdiqlamagan tadbirlar. Ular hech qachon sizga qarshi hisoblanmaydi."
+    },
+    "history": {
+      "title": "Ishtirok tarixi",
+      "description": "Siz qabul qilingan har bir tadbir va tashkilotchining javobi.",
+      "date": "Sana",
+      "event": "Tadbir",
+      "outcome": "Natija",
+      "hours": "Soat",
+      "empty": "Tarixingiz birinchi tasdiqlangan tadbirdan boshlanadi."
+    },
+    "outcomes": {
+      "attended": "Qatnashgan",
+      "excused": "Uzrli sabab",
+      "cancelled": "Bekor qilingan",
+      "awaiting_confirmation": "Tasdiq kutilmoqda"
+    }
+  },
+  "applications": {
+    "metaTitle": "Arizalar",
+    "title": "Arizalaringiz",
+    "description": "Boshlagan barcha arizalaringiz — bir joyda.",
+    "groups": {
+      "label": "Arizalarni holati boʻyicha saralash",
+      "all": "Hammasi",
+      "drafts": "Qoralamalar",
+      "active": "Jarayonda",
+      "decided": "Hal qilingan"
+    },
+    "empty": {
+      "title": "Bu yerda arizalar yoʻq",
+      "body": "Imkoniyatga ariza berganingizda u shu yerda holati bilan koʻrinadi."
+    },
+    "status": {
+      "draft": "Qoralama",
+      "submitted": "Yuborilgan",
+      "under_review": "Koʻrib chiqilmoqda",
+      "accepted": "Qabul qilingan",
+      "rejected": "Tanlanmadi",
+      "withdrawn": "Qaytarib olingan",
+      "closed": "Yopilgan"
+    },
+    "appliedOn": "Yuborilgan: {date}",
+    "startedOn": "Boshlangan: {date}",
+    "continueDraft": "Qoralamani davom ettirish",
+    "detail": {
+      "eyebrow": "Ariza",
+      "back": "Barcha arizalar",
+      "timeline": "Jarayon",
+      "steps": {
+        "submitted": "Yuborildi",
+        "under_review": "Koʻrib chiqilmoqda",
+        "decided": "Qaror"
+      },
+      "inProgress": "Jarayonda",
+      "pending": "Hali emas",
+      "answers": "Javoblaringiz",
+      "answersEmpty": "Hali hech narsa yozilmagan. Qoralama boʻsh.",
+      "noQuestions": "Bu imkoniyat savol bermagan.",
+      "fromProfile": "Profilingizdan",
+      "fromProfileHelp": "Tashkilotchi javoblaringiz bilan birga koʻradigan maʼlumot.",
+      "withdraw": "Arizani qaytarib olish",
+      "withdrawPreview": "Qaytarib olish backend bilan birga ochiladi.",
+      "continuePreview": "Qoralamani tahrirlash backend bilan birga ochiladi.",
+      "viewOpportunity": "Imkoniyatni koʻrish"
+    }
+  },
+  "opportunities": {
+    "metaTitle": "Imkoniyatlar",
+    "title": "Imkoniyatlar",
+    "description": "Sizga yetib kelishidan oldin tashkilotchi bilan tekshirilgan haqiqiy tadbirlar.",
+    "count": "{count, plural, =0 {Imkoniyat yoʻq} other {# ta imkoniyat}}",
+    "views": {
+      "label": "Koʻrsatiladigan imkoniyatlarni tanlash",
+      "all": "Barcha imkoniyatlar",
+      "saved": "Saqlanganlar"
+    },
+    "empty": {
+      "title": "Bu filtrlarga mos imkoniyat yoʻq",
+      "body": "Kengroq hudud tanlang yoki filtrlarni tozalab, barcha ochiq imkoniyatlarni koʻring."
+    },
+    "filters": {
+      "legend": "Imkoniyatlarni filtrlash",
+      "search": "Qidirish",
+      "searchPlaceholder": "Tadbir, tashkilotchi, kalit soʻz",
+      "region": "Hudud",
+      "regionAny": "Barcha hududlar",
+      "format": "Shakl",
+      "formatAny": "Istalgan shakl",
+      "sort": "Saralash",
+      "sortBy": {
+        "deadline": "Tez yopiladiganlar",
+        "start": "Tez boshlanadiganlar"
+      },
+      "openOnly": "Faqat ochiqlar",
+      "apply": "Qidirish",
+      "clear": "Filtrlarni tozalash"
+    },
+    "card": {
+      "view": "Koʻrish",
+      "save": "Saqlash",
+      "saved": "Saqlangan",
+      "sourced": "Volontyorlar topgan"
+    },
+    "detail": {
+      "back": "Barcha imkoniyatlar",
+      "facts": "Qisqacha",
+      "organiser": "Tashkilotchi",
+      "date": "Sana",
+      "location": "Joy",
+      "deadline": "Arizalar yopiladi",
+      "format": "Shakl",
+      "capacity": "Kerakli volontyorlar",
+      "spotsOf": "{capacity} ta joydan {spots} tasi qoldi",
+      "requirements": "Nima kerak",
+      "description": "Bu imkoniyat haqida",
+      "questions": "Sizdan nima soʻraladi",
+      "questionCount": "{count, plural, =0 {Savol yoʻq} other {# ta savol}}",
+      "noQuestions": "Bu imkoniyat savol bermaydi. Profilingiz — arizangiz.",
+      "required": "Majburiy",
+      "optional": "Ixtiyoriy",
+      "maxLength": "{count} tagacha belgi",
+      "apply": "Ariza berish",
+      "applyClosed": "Arizalar yopilgan",
+      "applyPreview": "Ariza berish backend bilan birga ochiladi. Hozircha tugma — koʻrib chiqish."
+    },
+    "status": {
+      "open": "Ochiq",
+      "closingSoon": "Tez yopiladi",
+      "closed": "Yopiq",
+      "full": "Joy qolmagan"
+    },
+    "format": {
+      "onsite": "Joyida",
+      "remote": "Masofadan",
+      "hybrid": "Aralash"
+    },
+    "verified": "Tasdiqlangan tashkilotchi",
+    "spotsLeft": "{count, plural, other {# ta joy qoldi}}",
+    "deadline": {
+      "today": "Bugun yopiladi",
+      "tomorrow": "Ertaga yopiladi",
+      "inDays": "{days, plural, other {# kundan soʻng yopiladi}}",
+      "passed": "Arizalar yopilgan",
+      "on": "{date} kuni yopiladi"
+    },
+    "regions": {
+      "andijan": "Andijon viloyati",
+      "bukhara": "Buxoro viloyati",
+      "fergana": "Fargʻona viloyati",
+      "jizzakh": "Jizzax viloyati",
+      "kashkadarya": "Qashqadaryo viloyati",
+      "khorezm": "Xorazm viloyati",
+      "namangan": "Namangan viloyati",
+      "navoiy": "Navoiy viloyati",
+      "samarkand": "Samarqand viloyati",
+      "sirdaryo": "Sirdaryo viloyati",
+      "surkhandarya": "Surxondaryo viloyati",
+      "tashkent-region": "Toshkent viloyati",
+      "tashkent-city": "Toshkent shahri",
+      "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
+    }
+  },
+  "saved": {
+    "metaTitle": "Saqlanganlar",
+    "title": "Keyinga saqlangan",
+    "description": "Keyinroq qaror qilish uchun saqlab qoʻygan imkoniyatlaringiz.",
+    "empty": {
+      "title": "Hali hech narsa saqlamagansiz",
+      "body": "Koʻrib chiqayotganda imkoniyatni saqlang — u sizni shu yerda kutadi.",
+      "cta": "Imkoniyatlarni koʻrish"
+    }
+  },
+  "profile": {
+    "metaTitle": "Profil",
+    "title": "Profilingiz",
+    "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi.",
+    "sections": {
+      "identity": "Siz haqingizda",
+      "education": "Taʼlim",
+      "location": "Qayerdasiz",
+      "skills": "Tillar va koʻnikmalar",
+      "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
+      "links": "Havolalar"
+    },
+    "fields": {
+      "fullName": "Toʻliq ism",
+      "bio": "Qisqacha tanishuv",
+      "bioHelp": "Tashkilotchi birinchi oʻqiydigan bir necha jumla. Insho emas.",
+      "school": "Maktab, kollej yoki universitet",
+      "gradeYear": "Sinf yoki kurs",
+      "region": "Hudud",
+      "regionAny": "Hududni tanlang",
+      "city": "Shahar yoki tuman",
+      "languages": "Biladigan tillaringiz",
+      "languagesHelp": "Vergul bilan ajrating.",
+      "skills": "Koʻnikma va qiziqishlar",
+      "skillsHelp": "Vergul bilan ajrating.",
+      "phone": "Telefon raqami",
+      "phoneHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
+      "telegram": "Telegram foydalanuvchi nomi",
+      "telegramHelp": "@ belgisisiz.",
+      "links": "Portfolio, CV yoki ijtimoiy tarmoq havolasi",
+      "linksHelp": "Ixtiyoriy. Toʻliqlikka hisoblanmaydi.",
+      "contact": "Siz bilan bogʻlanish usuli"
+    },
+    "save": "Profilni saqlash",
+    "saved": "Faqat shu koʻrib chiqishda saqlandi.",
+    "completion": {
+      "label": "Profil toʻliqligi",
+      "value": "{percent}% toʻldirilgan",
+      "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
+      "missing": "Hali yetishmayapti: {fields}",
+      "why": "Toʻliq profil — tashkilotchi sizni baholay oladi va siz bilan bogʻlana oladi."
+    }
+  },
+  "settings": {
+    "metaTitle": "Sozlamalar",
+    "title": "Sozlamalar",
+    "description": "Bildirishnomalar, maxfiylik, koʻrinish va hisobingiz.",
+    "preview": "Bu sahifadagi tugmachalar koʻrinishni oʻzgartiradi, lekin hali hech narsa saqlanmaydi. Sozlamalarni saqlash backend bilan birga keladi.",
+    "preferences": {
+      "title": "Maxfiylik va koʻrinish",
+      "description": "Boshqalar nimani koʻrishi va ilova sizga qanday koʻrinishi."
+    },
+    "accountGroup": {
+      "title": "Hisob va kirish",
+      "description": "Kirish usullari, seanslar va hisob boshqaruvi."
+    },
+    "notifications": {
+      "title": "Bildirishnomalar",
+      "description": "Volontyorlar siz bilan qayerda va qachon bogʻlanadi.",
+      "telegram": "Telegram xabarlari",
+      "telegramHelp": "Volontyorlar botidan qarorlar va eslatmalar.",
+      "email": "Email dayjesti",
+      "emailHelp": "Hududingizdagi yangi imkoniyatlar haqida haftalik xulosa.",
+      "deadlines": "Muddat eslatmalari",
+      "deadlinesHelp": "Saqlangan yoki qoralama holidagi imkoniyat yopilishidan bir kun oldin.",
+      "decisions": "Ariza boʻyicha qarorlar",
+      "decisionsHelp": "Tashkilotchi qabul qilgan yoki rad etgan zahoti."
+    },
+    "privacy": {
+      "title": "Maxfiylik",
+      "description": "Tashkilotchilar va boshqa volontyorlar nimani koʻra oladi.",
+      "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
+      "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
+      "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
+      "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi."
+    },
+    "appearance": {
+      "title": "Koʻrinish",
+      "description": "Faqat shu qurilmada saqlanadi.",
+      "darkTheme": "Tungi rejim",
+      "darkThemeHelp": "Siz tanlaguningizcha tizim sozlamasiga ergashadi.",
+      "language": "Interfeys tili",
+      "languageHelp": "Bu yerda koʻradiganingizni oʻzgartiradi. Tashkilotchilar koʻradiganini oʻzgartirmaydi."
+    },
+    "account": {
+      "title": "Kirish usullari",
+      "description": "Har bir usul bitta hisobni ochadi.",
+      "telegram": "Telegram",
+      "google": "Google",
+      "email": "Email va parol",
+      "connected": "Ulangan",
+      "notConnected": "Ulanmagan",
+      "verified": "Tasdiqlangan",
+      "connect": "Ulash",
+      "disconnect": "Uzish"
+    },
+    "session": {
+      "title": "Seans",
+      "description": "Shu qurilmada yoki barcha qurilmalarda birdan chiqish.",
+      "signOut": "Chiqish",
+      "signOutEverywhere": "Hamma joydan chiqish"
+    },
+    "danger": {
+      "title": "Hisobni oʻchirish",
+      "description": "Profilingiz, arizalaringiz va tarixingizni oʻchiradi. Qaytarib boʻlmaydi.",
+      "delete": "Hisobimni oʻchirish"
+    }
+  },
+  "notFound": {
+    "metaTitle": "Sahifa topilmadi",
+    "title": "Sahifa topilmadi",
+    "description": "Bu sahifa mavjud emas yoki koʻchirilgan.",
+    "action": "Bosh panelga oʻtish"
+  }
+}
