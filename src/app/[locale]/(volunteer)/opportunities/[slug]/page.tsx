@@ -1,0 +1,181 @@
+import { ArrowLeft } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+import { Panel } from "@/components/app/panel";
+import { PageHeader } from "@/components/app/page-header";
+import { PreviewNote } from "@/components/app/preview-note";
+import { StatusChip } from "@/components/app/section";
+import { OpportunityStatusChip } from "@/components/dashboard/opportunity-status";
+import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
+import { SaveButton } from "@/components/opportunities/save-button";
+import { buttonClass } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { canApply } from "@/lib/opportunities/deadline";
+import { localized, type OpportunityDetail } from "@/lib/opportunities/types";
+import { navHref } from "@/lib/routing/routes";
+import { sampleOpportunity } from "@/lib/sample/opportunities";
+import { sampleVolunteer } from "@/lib/sample/volunteer";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/opportunities/[slug]">): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const opportunity = sampleOpportunity(slug);
+  return opportunity ? { title: localized(opportunity.title, locale as Locale) } : {};
+}
+
+export default async function OpportunityPage({
+  params,
+}: PageProps<"/[locale]/opportunities/[slug]">) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const now = new Date();
+  const opportunity = sampleOpportunity(slug, now);
+  if (!opportunity) notFound();
+
+  return <Opportunity opportunity={opportunity} now={now} />;
+}
+
+function Opportunity({
+  opportunity,
+  now,
+}: {
+  opportunity: OpportunityDetail;
+  now: Date;
+}) {
+  const t = useTranslations("opportunities");
+  const common = useTranslations("common");
+  const locale = useLocale() as Locale;
+  const volunteer = sampleVolunteer(now);
+  const applicable = canApply(opportunity, now);
+
+  return (
+    <>
+      <Link
+        href={navHref("opportunities")}
+        className="enter-rise inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+      >
+        <ArrowLeft aria-hidden="true" className="size-4" />
+        {t("detail.back")}
+      </Link>
+
+      <PageHeader
+        className="mt-3"
+        eyebrow={localized(opportunity.organization.name, locale)}
+        chip={common("sample.chip")}
+        title={localized(opportunity.title, locale)}
+        actions={
+          <>
+            <OpportunityStatusChip opportunity={opportunity} now={now} />
+            {opportunity.sourcedByTeam ? (
+              <StatusChip>{t("card.sourced")}</StatusChip>
+            ) : null}
+          </>
+        }
+      />
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <Panel id="about" title={t("detail.description")}>
+            <p className="max-w-prose leading-relaxed text-ink">
+              {localized(opportunity.description, locale)}
+            </p>
+          </Panel>
+
+          {opportunity.requirements.length > 0 ? (
+            <Panel id="requirements" title={t("detail.requirements")}>
+              <ul className="flex flex-col gap-2">
+                {opportunity.requirements.map((requirement) => (
+                  <li key={requirement.en} className="flex gap-3 text-ink">
+                    <span
+                      aria-hidden="true"
+                      className="mt-2.5 size-1.5 shrink-0 rounded-full bg-primary"
+                    />
+                    {localized(requirement, locale)}
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          ) : null}
+
+          <Panel
+            id="questions"
+            title={t("detail.questions")}
+            description={t("detail.questionCount", {
+              count: opportunity.questions.length,
+            })}
+          >
+            {opportunity.questions.length === 0 ? (
+              <p className="text-sm text-ink-muted">{t("detail.noQuestions")}</p>
+            ) : (
+              <ol className="flex flex-col gap-5">
+                {opportunity.questions.map((question, index) => (
+                  <li key={question.id} className="grid grid-cols-[2rem_1fr] gap-x-3">
+                    <span className="tabular pt-0.5 text-xs font-semibold tracking-[0.14em] text-primary-ink uppercase">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-ink">
+                        {localized(question.prompt, locale)}
+                      </p>
+                      {question.help ? (
+                        <p className="mt-1 text-sm text-ink-muted">
+                          {localized(question.help, locale)}
+                        </p>
+                      ) : null}
+                      <p className="mt-1.5 text-xs text-ink-muted">
+                        {question.required
+                          ? t("detail.required")
+                          : t("detail.optional")}
+                        {question.maxLength
+                          ? ` · ${t("detail.maxLength", { count: question.maxLength })}`
+                          : null}
+                        {question.options
+                          ? ` · ${question.options.map((option) => localized(option.label, locale)).join(" / ")}`
+                          : null}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Panel>
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-6">
+          <Panel id="facts" title={t("detail.facts")}>
+            <OpportunityFacts opportunity={opportunity} now={now} />
+          </Panel>
+
+          <Panel id="apply">
+            <button
+              type="button"
+              disabled
+              className={buttonClass({ className: "w-full" })}
+            >
+              {applicable ? t("detail.apply") : t("detail.applyClosed")}
+            </button>
+            <PreviewNote
+              chip={common("preview.chip")}
+              body={t("detail.applyPreview")}
+              className="mt-4"
+            />
+            <SaveButton
+              saved={volunteer.savedSlugs.includes(opportunity.slug)}
+              saveLabel={t("card.save")}
+              savedLabel={t("card.saved")}
+              className="mt-3 -ml-4"
+            />
+          </Panel>
+        </div>
+      </div>
+    </>
+  );
+}

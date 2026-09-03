@@ -1,38 +1,32 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const PORT = 3211;
+const baseURL = `http://127.0.0.1:${PORT}`;
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  forbidOnly: Boolean(process.env.CI),
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
-
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL,
     trace: "on-first-retry",
-    screenshot: "only-on-failure",
   },
-
   projects: [
-    {
-      name: "mobile",
-      use: { ...devices["Pixel 7"] },
-    },
-    {
-      name: "desktop",
-      use: { ...devices["Desktop Chrome"] },
-    },
+    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium-mobile", use: { ...devices["Pixel 7"] } },
+    { name: "firefox-desktop", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit-mobile", use: { ...devices["iPhone 15"] } },
   ],
-
   webServer: {
-    command: "npm run build && npm run start -- --port 3100",
-    url: "http://127.0.0.1:3100/uz/opportunities",
+    command: `npm run build && npx next start -p ${PORT}`,
+    url: `${baseURL}/uz/login`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
     env: {
-      YVC_ENABLE_SAMPLE_DATA: "true",
-      NEXT_PUBLIC_SITE_ORIGIN: "http://127.0.0.1:3100",
+      NEXT_PUBLIC_SITE_URL: "",
+      NEXT_PUBLIC_MARKETING_URL: "",
     },
   },
 });

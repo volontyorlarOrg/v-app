@@ -1,22 +1,41 @@
-# Agent Memory
+# Project Memory
 
-Non-obvious decisions, costly discoveries, and gotchas worth outliving the task
-that produced them.
+Store durable project knowledge here when it would otherwise be expensive to
+rediscover.
 
-**This is not a progress log.** Nothing dated, nothing narrating what was done.
-If a fact belongs in `/docs` because it is stable product or architecture
-truth, put it there instead and link to it from here.
+- `decisions/` — choices and the reasoning behind them
+- `discoveries/` — verified facts about the project or its integrations
+- `gotchas/` — recurring failure modes and constraints
 
-Write a note when:
+Keep temporary plans, command logs, and ordinary status updates out of this
+folder. Never store secrets or unverified external claims.
 
-- a decision has a reason that is not visible from the code
-- something cost real debugging time and would cost it again
-- an obvious-looking approach is wrong for a reason worth recording
+## Current entries
 
-```text
-decisions/    why a road was taken, and which ones were rejected
-discoveries/  facts about the framework or an upstream library
-gotchas/      traps that will be walked into again
-```
-
-Link related notes with `[[name]]`.
+- `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
+  `v-web`'s tokens, motion, catalogs and registry, and what happened to the
+  previous foundation
+- `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo says
+  it is a sample, why organisers are fictional, and why dates are relative
+- `decisions/planned-sections-render-instead-of-404.md` — why the app became
+  a real panel with every section on mock data, and what stayed from `v-web`
+- `decisions/error-codes-not-messages.md` — errors are codes the catalog
+  translates, never sentences from a server
+- `decisions/no-comments-in-source.md` — where the explanations went
+- `decisions/no-essays-in-browser-storage.md` — why long answers never touch
+  `localStorage`
+- `decisions/why-no-cache-components.md` — why PPR is not enabled
+- `discoveries/backend-has-a-schema-but-no-endpoints.md` — what `v-backend`
+  provides today and what it does not
+- `discoveries/onest-covers-all-three-locales.md` — the typeface and the Uzbek
+  apostrophes
+- `gotchas/calendar-days-are-timezone-dependent.md` — why deadlines count
+  Tashkent days
+- `gotchas/generate-static-params-and-cookies.md` — why a route reading cookies
+  cannot be static
+- `gotchas/icu-plural-braces-are-not-arguments.md` — how the catalog test reads
+  ICU arguments
+- `gotchas/nextjs-16-renamed-middleware.md` — `proxy.ts`, not `middleware.ts`
+- `gotchas/next-typegen-before-typecheck.md` — why `typecheck` runs typegen
+- `gotchas/the-password-toggle-shares-its-label.md` — why Playwright must match
+  the password field exactly

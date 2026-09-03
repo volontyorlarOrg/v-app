@@ -6,14 +6,8 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "uz";
 
-export const localeTags: Record<Locale, string> = {
-  uz: "uz-UZ",
-  ru: "ru-RU",
-  en: "en-US",
-};
-
-export const localeLabels: Record<Locale, string> = {
-  uz: "Oʻzbekcha",
+export const localeNames: Record<Locale, string> = {
+  uz: "O‘zbekcha",
   ru: "Русский",
   en: "English",
 };
@@ -25,6 +19,7 @@ export function isLocale(value: unknown): value is Locale {
 export const routing = defineRouting({
   locales,
   defaultLocale,
-
   localePrefix: "always",
+  localeCookie: false,
+  alternateLinks: false,
 });

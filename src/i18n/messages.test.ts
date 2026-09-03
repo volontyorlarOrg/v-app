@@ -1,30 +1,32 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { locales } from "./routing";
+
+import { locales } from "@/i18n/routing";
 
 const MESSAGES_DIR = join(process.cwd(), "src/i18n/messages");
-const REFERENCE_LOCALE = "en";
 
-type Catalogue = Record<string, unknown>;
+type Messages = { [key: string]: string | Messages };
 
-function flatten(value: Catalogue, prefix = ""): string[] {
-  return Object.entries(value).flatMap(([key, child]) =>
-    child !== null && typeof child === "object" && !Array.isArray(child)
-      ? flatten(child as Catalogue, `${prefix}${key}.`)
-      : [`${prefix}${key}`],
+function load(locale: string): Messages {
+  return JSON.parse(readFileSync(join(MESSAGES_DIR, `${locale}.json`), "utf8"));
+}
+
+function flatten(messages: Messages, prefix = ""): string[] {
+  return Object.entries(messages).flatMap(([key, value]) =>
+    typeof value === "string"
+      ? [`${prefix}${key}`]
+      : flatten(value, `${prefix}${key}.`),
   );
 }
 
-function load(locale: string, namespace: string): Catalogue {
-  return JSON.parse(
-    readFileSync(join(MESSAGES_DIR, locale, `${namespace}.json`), "utf8"),
-  ) as Catalogue;
+function values(messages: Messages, prefix = ""): Array<[string, string]> {
+  return Object.entries(messages).flatMap(([key, value]) =>
+    typeof value === "string"
+      ? [[`${prefix}${key}`, value] as [string, string]]
+      : values(value, `${prefix}${key}.`),
+  );
 }
-
-const namespaces = readdirSync(join(MESSAGES_DIR, REFERENCE_LOCALE))
-  .filter((file) => file.endsWith(".json"))
-  .map((file) => file.replace(/\.json$/, ""));
 
 function icuArguments(message: string): string[] {
   const names = new Set<string>();
@@ -42,7 +44,7 @@ function icuArguments(message: string): string[] {
 
     if (depth === 0) {
       const identifier = /^\{\s*(\w+)\s*[,}]/.exec(message.slice(index));
-      if (identifier) names.add(identifier[1]!);
+      if (identifier?.[1]) names.add(identifier[1]);
     }
 
     depth += 1;
@@ -51,75 +53,54 @@ function icuArguments(message: string): string[] {
   return [...names].sort();
 }
 
-describe("message catalogues", () => {
-  it("defines at least one namespace to check", () => {
-    expect(namespaces.length).toBeGreaterThan(0);
+describe("message catalogs", () => {
+  it("has exactly one catalog per supported locale", () => {
+    const files = readdirSync(MESSAGES_DIR).filter((name) => name.endsWith(".json"));
+    expect(files.sort()).toEqual(locales.map((locale) => `${locale}.json`).sort());
   });
 
-  it.each(locales)("locale %s has every namespace file", (locale) => {
-    const present = readdirSync(join(MESSAGES_DIR, locale))
-      .filter((file) => file.endsWith(".json"))
-      .map((file) => file.replace(/\.json$/, ""))
-      .sort();
+  it("defines the same keys in every locale, so no locale falls back to English", () => {
+    const reference = flatten(load("en")).sort();
+    expect(reference.length).toBeGreaterThan(100);
 
-    expect(present).toEqual([...namespaces].sort());
+    for (const locale of locales) {
+      expect(flatten(load(locale)).sort(), `locale: ${locale}`).toEqual(reference);
+    }
   });
 
-  describe.each(namespaces)("namespace %s", (namespace) => {
-    const reference = flatten(load(REFERENCE_LOCALE, namespace)).sort();
+  it("has no empty or placeholder string", () => {
+    for (const locale of locales) {
+      for (const [key, value] of values(load(locale))) {
+        expect(value.trim(), `${locale}: ${key}`).not.toBe("");
+        expect(value, `${locale}: ${key}`).not.toMatch(/TODO|FIXME|\{\{|lorem/i);
+      }
+    }
+  });
 
-    it.each(locales.filter((locale) => locale !== REFERENCE_LOCALE))(
-      "%s has exactly the same keys as the reference locale",
-      (locale) => {
-        expect(flatten(load(locale, namespace)).sort()).toEqual(reference);
-      },
+  it("uses the same ICU arguments in every locale", () => {
+    const reference = new Map(
+      values(load("en")).map(([key, value]) => [key, icuArguments(value)]),
     );
 
-    it.each(locales)("%s has no empty strings", (locale) => {
-      const catalogue = load(locale, namespace);
-      const empty: string[] = [];
+    for (const locale of locales) {
+      for (const [key, value] of values(load(locale))) {
+        expect({ key, names: icuArguments(value) }, `${locale}: ${key}`).toEqual({
+          key,
+          names: reference.get(key),
+        });
+      }
+    }
+  });
 
-      const walk = (value: Catalogue, prefix = "") => {
-        for (const [key, child] of Object.entries(value)) {
-          if (typeof child === "string" && child.trim() === "") {
-            empty.push(`${prefix}${key}`);
-          } else if (child !== null && typeof child === "object") {
-            walk(child as Catalogue, `${prefix}${key}.`);
-          }
-        }
-      };
+  it("writes Uzbek with the turned comma, not a straight apostrophe", () => {
+    for (const [key, value] of values(load("uz"))) {
+      expect(value, `uz: ${key} uses ' instead of ʻ`).not.toMatch(/[a-z]'[a-z]/i);
+    }
+  });
 
-      walk(catalogue);
-      expect(empty).toEqual([]);
-    });
-
-    it.each(locales.filter((locale) => locale !== REFERENCE_LOCALE))(
-      "%s uses the same ICU arguments as the reference",
-      (locale) => {
-        const args = (catalogue: Catalogue) => {
-          const found = new Map<string, string[]>();
-
-          const walk = (value: Catalogue, prefix = "") => {
-            for (const [key, child] of Object.entries(value)) {
-              if (typeof child === "string") {
-                found.set(`${prefix}${key}`, icuArguments(child));
-              } else if (child !== null && typeof child === "object") {
-                walk(child as Catalogue, `${prefix}${key}.`);
-              }
-            }
-          };
-
-          walk(catalogue);
-          return found;
-        };
-
-        const expected = args(load(REFERENCE_LOCALE, namespace));
-        const actual = args(load(locale, namespace));
-
-        for (const [key, names] of expected) {
-          expect({ key, names: actual.get(key) }).toEqual({ key, names });
-        }
-      },
-    );
+  it("writes Russian in Cyrillic rather than leaving English copy behind", () => {
+    const ru = values(load("ru"));
+    const cyrillic = ru.filter(([, value]) => /[Ѐ-ӿ]/.test(value));
+    expect(cyrillic.length / ru.length).toBeGreaterThan(0.8);
   });
 });

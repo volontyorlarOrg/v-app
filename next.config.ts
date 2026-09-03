@@ -1,31 +1,32 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+import {
+  configuredTransportIsSecure,
+  securityHeaders,
+} from "./src/lib/security/headers";
 
-const securityHeaders = [
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
-  },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
-];
+const development = process.env.NODE_ENV === "development";
+const secureTransport = configuredTransportIsSecure(process.env.NEXT_PUBLIC_SITE_URL);
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
   poweredByHeader: false,
-
-  typedRoutes: true,
-
+  images: {
+    remotePatterns: [],
+  },
+  experimental: {
+    globalNotFound: true,
+  },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders({ development, secureTransport }),
+      },
+    ];
   },
 };
+
+const withNextIntl = createNextIntlPlugin();
 
 export default withNextIntl(nextConfig);

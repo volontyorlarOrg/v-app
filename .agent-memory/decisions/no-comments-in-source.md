@@ -1,34 +1,19 @@
-# Source files carry no comments
+# Source files carry no comments; explanations live in /docs
 
-A project convention, applied across the whole codebase in one pass and enforced
-by `npm run check:comments`.
+The same rule as the marketing site, applied across `src/`, `e2e/`, and the
+root configs. There is no stripping script here any more; the rule is kept by
+review and by the docs being the place a reader looks.
 
-Reasoning lives in `/docs` and `.agent-memory/` instead. The argument is in
-[`docs/architecture/CODE_STYLE.md`](../../docs/architecture/CODE_STYLE.md);
-the short version is that a comment's audience is whoever opens that file, while
-the same paragraph in a document reaches whoever is making the same decision
-again — and comments drift silently while documents sit under a heading someone
-rereads.
+Where things go:
 
-## The stripper is not a regex
+- Component and token rationale → `docs/ui/UI_SYSTEM.md` and `DESIGN.md`
+- Rendering, client boundary, and configuration → `docs/architecture/ARCHITECTURE.md`
+- Why a block exists → `docs/product/VOLUNTEER_DASHBOARD.md`
+- What a rule means → `docs/product/DOMAIN_MODEL.md` and `PRODUCT.md`
+- Everything a contributor needs before touching the code → `docs/operations/EXTENDING.md`
+- Why a road was taken → this folder
 
-`scripts/strip-comments.mjs` uses `ts.getLeadingCommentRanges` and
-`ts.getTrailingCommentRanges` over the parsed AST. That matters: a regex over
-`//` mangles `https://` inside string literals and JSX text, and a naive
-`/\*[\s\S]*?\*/` eats regex literals.
-
-It also parses the result before writing and refuses any file where the
-diagnostic count went up.
-
-**A first attempt used `ts.createScanner` with `skipTrivia: false` and silently
-found zero comments** — the scanner reached the end of the file and reported no
-trivia tokens. The comment-range helpers are the API that actually works for
-this.
-
-## What stays
-
-Functional directives only: `eslint-disable`, `@ts-*`, `prettier-*`, shebangs.
-The preference is to restructure so even those are unnecessary — the one
-`eslint-disable` for `no-location-assign-relative-destination` was removed by
-replacing a `window.location.href` assignment with a real anchor, which was
-better UX anyway.
+Compiler and linter directives — `@ts-expect-error`, `eslint-disable` — are
+not comments and stay. A test name is the right place for "this must never
+happen": `volunteer.test.ts` says "never names a real partner or source as an
+organiser" rather than a comment above the data.

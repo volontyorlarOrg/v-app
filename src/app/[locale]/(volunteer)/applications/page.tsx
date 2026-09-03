@@ -1,99 +1,86 @@
-import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
-import { FileText } from "lucide-react";
-import type { Locale } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
-import { listMyApplications } from "@/features/applications/api.server";
-import { ApplicationStatusBadge } from "@/components/applications/application-status";
-import { ApiErrorState } from "@/components/shared/api-error-state";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
-import { Surface } from "@/components/ui/surface";
-import { EmptyState } from "@/components/ui/states";
+import { useTranslations } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
 
-export default async function ApplicationsPage(
-  props: PageProps<"/[locale]/applications">,
-) {
-  const { locale } = await props.params;
-  setRequestLocale(locale as Locale);
+import { Panel } from "@/components/app/panel";
+import { PageHeader } from "@/components/app/page-header";
+import { Segmented, type SegmentedItem } from "@/components/app/segmented";
+import { ApplicationRows } from "@/components/dashboard/application-rows";
+import {
+  APPLICATION_GROUPS,
+  inApplicationGroup,
+  isApplicationGroup,
+  type ApplicationGroup,
+} from "@/lib/applications/status";
+import { navHref } from "@/lib/routing/routes";
+import { sampleVolunteer } from "@/lib/sample/volunteer";
 
-  const [t, common, format] = await Promise.all([
-    getTranslations("applications"),
-    getTranslations("common"),
-    getFormatter(),
-  ]);
+export const dynamic = "force-dynamic";
 
-  let applications;
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/applications">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "applications" });
+  return { title: t("metaTitle") };
+}
 
-  try {
-    applications = await listMyApplications(null);
-  } catch (error) {
-    return (
-      <div className="flex flex-col gap-6">
-        <PageHeader title={t("list.title")} description={t("list.subtitle")} />
-        <ApiErrorState error={error} />
-      </div>
-    );
-  }
+export default async function ApplicationsPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/applications">) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { group } = await searchParams;
+  const selected = isApplicationGroup(group) ? group : "all";
+  return <Applications group={selected} />;
+}
+
+function Applications({ group }: { group: ApplicationGroup }) {
+  const t = useTranslations("applications");
+  const common = useTranslations("common");
+
+  const now = new Date();
+  const volunteer = sampleVolunteer(now);
+  const sorted = [...volunteer.applications].sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
+  const shown = sorted.filter((application) =>
+    inApplicationGroup(application.status, group),
+  );
+
+  const items: SegmentedItem[] = APPLICATION_GROUPS.map((key) => ({
+    key,
+    href:
+      key === "all"
+        ? navHref("applications")
+        : `${navHref("applications")}?group=${key}`,
+    label: t(`groups.${key}`),
+    active: key === group,
+    count: sorted.filter((application) => inApplicationGroup(application.status, key))
+      .length,
+  }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title={t("list.title")} description={t("list.subtitle")} />
-
-      {applications.items.length === 0 ? (
-        <EmptyState
-          icon={<FileText />}
-          title={t("list.emptyTitle")}
-          body={t("list.emptyBody")}
-          action={
-            <Button asChild>
-              <Link href="/opportunities">{common("action.search")}</Link>
-            </Button>
-          }
+    <>
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        chip={common("sample.chip")}
+      />
+      <Segmented
+        label={t("groups.label")}
+        items={items}
+        className="enter-rise mt-6 [--enter-delay:90ms]"
+      />
+      <Panel className="mt-4" padding="none">
+        <ApplicationRows
+          applications={shown}
+          now={now}
+          empty={{ title: t("empty.title"), body: t("empty.body") }}
         />
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {applications.items.map((application) => (
-            <li key={application.id}>
-              <Surface
-                padding="none"
-                className="transition-colors focus-within:border-blue-deep hover:border-line-control"
-              >
-                <Link
-                  href={`/applications/${application.id}`}
-                  className="flex flex-col gap-2 p-5 focus-visible:outline-none"
-                >
-                  <div className="flex flex-wrap items-center gap-2">
-                    <ApplicationStatusBadge status={application.status} />
-                    <span className="text-xs text-ink-muted">
-                      {application.submittedAt
-                        ? t("list.appliedOn", {
-                            date: format.dateTime(
-                              new Date(application.submittedAt),
-                              "short",
-                            ),
-                          })
-                        : t("list.startedOn", {
-                            date: format.dateTime(
-                              new Date(application.createdAt),
-                              "short",
-                            ),
-                          })}
-                    </span>
-                  </div>
-
-                  <h2 className="text-base font-semibold text-ink">
-                    {application.opportunity.title}
-                  </h2>
-
-                  <p className="text-xs text-ink-muted">
-                    {application.opportunity.organization.name}
-                  </p>
-                </Link>
-              </Surface>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      </Panel>
+    </>
   );
 }

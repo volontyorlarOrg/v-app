@@ -1,85 +1,58 @@
-"use client";
-
+import { ChevronDown } from "lucide-react";
 import { useId, type ComponentProps, type ReactNode } from "react";
+
 import { cn } from "@/lib/utils";
 
-export type FieldProps = {
-  label: string;
-  children: (props: {
-    id: string;
-    "aria-describedby": string | undefined;
-    "aria-invalid": boolean | undefined;
-  }) => ReactNode;
-  error?: string | undefined;
-  help?: string | undefined;
-  required?: boolean;
-  optionalLabel?: string | undefined;
-  className?: string;
+export type FieldControlProps = {
+  id: string;
+  "aria-describedby": string | undefined;
 };
+
+export const controlClass =
+  "min-h-12 w-full rounded-lg border border-border-control bg-surface px-4 text-base text-ink transition-colors hover:border-primary-ink disabled:opacity-60";
 
 export function Field({
   label,
-  children,
-  error,
   help,
-  required = false,
-  optionalLabel,
+  trailing,
   className,
-}: FieldProps) {
+  children,
+}: {
+  label: string;
+  help?: string;
+  trailing?: ReactNode;
+  className?: string;
+  children: (control: FieldControlProps) => ReactNode;
+}) {
   const id = useId();
-  const errorId = `${id}-error`;
   const helpId = `${id}-help`;
 
-  const describedBy =
-    [error ? errorId : null, help ? helpId : null].filter(Boolean).join(" ") ||
-    undefined;
-
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-sm font-semibold text-ink">
-        {label}
-        {!required && optionalLabel ? (
-          <span className="ml-2 font-normal text-ink-muted">({optionalLabel})</span>
-        ) : null}
-      </label>
-
-      {children({
-        id,
-        "aria-describedby": describedBy,
-        "aria-invalid": error ? true : undefined,
-      })}
-
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="flex items-baseline justify-between gap-4">
+        <label htmlFor={id} className="text-sm font-semibold text-ink">
+          {label}
+        </label>
+        {trailing}
+      </div>
+      {children({ id, "aria-describedby": help ? helpId : undefined })}
       {help ? (
         <p id={helpId} className="text-xs leading-5 text-ink-muted">
           {help}
-        </p>
-      ) : null}
-
-      {error ? (
-        <p id={errorId} role="alert" className="text-xs font-semibold text-danger">
-          {error}
         </p>
       ) : null}
     </div>
   );
 }
 
-const controlClasses = [
-  "w-full rounded-lg border bg-canvas px-3 text-ink",
-  "border-line-control placeholder:text-ink-muted",
-  "transition-colors hover:border-blue-deep",
-  "aria-[invalid=true]:border-danger",
-  "disabled:cursor-not-allowed disabled:bg-surface disabled:opacity-70",
-].join(" ");
-
 export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={cn(controlClasses, "h-11", className)} {...props} />;
+  return <input className={cn(controlClass, className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return (
     <textarea
-      className={cn(controlClasses, "min-h-32 resize-y py-2.5 leading-7", className)}
+      className={cn(controlClass, "min-h-32 resize-y py-3 leading-relaxed", className)}
       {...props}
     />
   );
@@ -87,8 +60,17 @@ export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
 
 export function Select({ className, children, ...props }: ComponentProps<"select">) {
   return (
-    <select className={cn(controlClasses, "h-11", className)} {...props}>
-      {children}
-    </select>
+    <span className="relative block">
+      <select
+        className={cn(controlClass, "appearance-none pr-11", className)}
+        {...props}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-ink-muted"
+      />
+    </span>
   );
 }

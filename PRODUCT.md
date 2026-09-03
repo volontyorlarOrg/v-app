@@ -1,42 +1,20 @@
-# YVC Product Context
+# Volontyorlar Product Context
 
-## Identity
+## What Volontyorlar is
 
-**Youth Volunteer Club (YVC)** — founded 4 June 2025 by Arslon Rajabov and
-Parizoda Abdurakhimova.
+Volontyorlar helps high school students in Uzbekistan discover and apply to
+meaningful volunteering. It was founded on **4 June 2025** by **Arslon
+Rajabov** and **Parizoda Abdurakhimova**. It finds volunteer opportunities,
+contacts organisers, sources events, builds partnerships, supplies volunteers,
+and builds regional operations toward all 14 regions.
 
-YVC helps young people in Uzbekistan discover and apply to meaningful
-volunteering opportunities. It has grown past listing what other people
-organise: the team now finds opportunities, contacts organisers, sources
-events, builds partnerships, and supplies volunteers.
+The verified facts — traction figures, the one partnership, the supporters and
+the opportunity sources — are owned by the marketing repository
+(`../v-web/PRODUCT.md`, encoded in its `src/lib/content/org.ts`). This
+application presents none of them as content of its own, and its sample data
+never uses a real partner or source as an organiser.
 
-> **Naming.** The **wordmark is `volontyorlar`** — that is what the logo
-> specification and every brand asset carry, and it is what the interface
-> displays. The _descriptive_ name is still open: the product handoff says
-> "Youth Volunteer Club (YVC)" and the marketing repository says "Youth
-> Volunteering Community".
->
-> The two are separated in the code. `brandWordmark` is a brand constant with
-> the same value in all three catalogues; `appName` and `appShortName` are
-> ordinary translated copy. Settling the descriptive name is a catalogue edit.
-> See [`docs/design/brand.md`](./docs/design/brand.md).
-
-## Known traction
-
-Reported at handoff, not verified by this repository:
-
-- 3,600+ Telegram followers; 220+ Instagram followers
-- Volunteers supplied to 50+ events
-- Partnership with the O'ZLIDEP Party
-- Recognition from the Youth Affairs Agency, the Uzbekistan Volunteer
-  Association, and the Republican Children's Library
-- Regional expansion toward all 14 regions
-- 500+ applications for regional project manager / coordinator roles
-
-None of these organisations appear in the application's sample data. Fabricating
-an event under a real partner's name would misrepresent them.
-
-## The loop this product exists to serve
+## The loop this application exists to serve
 
 ```text
 Discover → understand → sign in → complete a reusable profile → apply using it
@@ -45,30 +23,14 @@ Discover → understand → sign in → complete a reusable profile → apply us
   is easier and more credible
 ```
 
-The participation record is the moat. A directory of opportunities can be
-copied in a weekend; a community with a verified attendance history cannot.
-
-Every architectural decision in `docs/architecture/` should be readable as
-serving some step of that loop. If a change does not, it probably belongs in
-the marketing site instead.
-
-## Scope
-
-**In scope now:** volunteering opportunities — discovery, detail, application,
-the reusable profile, and the participation record.
-
-**Deliberately not yet:** partner dashboards, coordinator dashboards, courses,
-a generic job board, a grant marketplace, or a social network. The architecture
-leaves extension points; the product model stays centred on volunteering until
-a real workflow says otherwise.
-
-Organisations currently send opportunity details to the core team, who post
-them. That is why partner self-service does not exist here.
+The participation record is the product's moat. A directory of opportunities
+can be copied in a weekend; a community with a verified attendance history
+cannot. The dashboard is the screen where a volunteer sees that loop from their
+own side — see [`docs/product/VOLUNTEER_DASHBOARD.md`](docs/product/VOLUNTEER_DASHBOARD.md).
 
 ## Volunteer levels
 
-The canonical thresholds, implemented once in
-[`src/features/record/levels.ts`](./src/features/record/levels.ts):
+Implemented once, in `src/lib/record/levels.ts`, and tested there:
 
 | Level    | Qualification                                                       |
 | -------- | ------------------------------------------------------------------- |
@@ -82,35 +44,45 @@ attended. Two rules follow from that word:
 
 1. An event an organiser never confirmed is excluded from the calculation
    entirely. A volunteer is never penalised for someone else's inaction.
-2. Reliability is not shown at all below three resolved events, because one
-   absence out of two would read as a 50% score.
+2. Reliability is not shown below three resolved events, because one absence
+   out of two would read as a 50% score.
 
-"Standout reviews" is not computable and there is no review system. `core` is
-therefore reachable only when the backend grants an explicit recognition flag —
-never by formula. See [`docs/features/volunteer-record.md`](./docs/features/volunteer-record.md).
+"Standout reviews" is not computable and there is no review system, so `core`
+is reachable only when the backend grants an explicit recognition flag.
 
 ## Audience and its consequences
 
-Volunteers are young people, potentially including minors. This drives real
-engineering constraints, not just a policy page:
+Volunteers are young people, potentially including minors:
 
-- Collect the minimum. No date of birth, address, or document number — none has
-  a stated product use.
+- Collect the minimum. No date of birth, address, or document number.
 - No personal data in URLs, analytics, or logs.
 - No session tokens in browser storage.
-- Private pages are never indexable or shared-cacheable.
+- Every screen of this application is private and never indexable.
 
-See [`docs/architecture/AUTH_AND_SECURITY.md`](./docs/architecture/AUTH_AND_SECURITY.md).
+## System boundary
 
-## Relationship to the marketing site
+| `../v-web` (marketing)           | `../v-app` (this repository)                   | `../v-backend` (API)                       |
+| -------------------------------- | ---------------------------------------------- | ------------------------------------------ |
+| Brand, positioning, public pages | Sign-in surfaces, dashboard, volunteer screens | Identity, sessions, data, authorisation    |
+| SEO, structured data, legal      | Reusable profile, applications, record views   | Telegram bot, Google exchange, email flows |
+| Links into the application       | Presentation of backend truth                  | Every rule that must hold server-side      |
 
-|          | Marketing (`volontyorlarOrg/v-web`) | Product (this repository)                     |
-| -------- | ----------------------------------- | --------------------------------------------- |
-| Purpose  | Explain YVC, build trust, convert   | Operate the volunteering loop                 |
-| Audience | Anyone                              | Volunteers, and later partners and admins     |
-| Auth     | None                                | Session-based                                 |
-| Indexing | Public                              | Per route — opportunities yes, accounts never |
+## Languages
 
-Brand assets and the design token set are sourced from the marketing
-repository so the two stay recognisably one product. Application functionality
-never goes back into it.
+Uzbek (default), Russian, and English. Every user-facing string exists in all
+three, and the language is carried by the URL, never by browser storage.
+
+## Presented, not implemented
+
+Sign-in with Google, Telegram, or email; the reusable profile; applications;
+saved opportunities; the record and its confirmations; settings. All of it is
+presented in this repository as interface and sample data, none of it is
+connected, and this document is not evidence that any of it is live.
+
+## Needs verification
+
+- Production origin of this application and of the marketing site
+- Google Cloud project and OAuth client ownership
+- Telegram bot username and ownership
+- Email delivery provider for verification and password reset
+- Legal basis and consent handling for minors
