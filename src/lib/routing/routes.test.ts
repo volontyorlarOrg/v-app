@@ -11,6 +11,7 @@ import {
   applicationHref,
   authRoutes,
   getRoute,
+  guardFor,
   isActivePath,
   localePath,
   navHref,
@@ -105,5 +106,29 @@ describe("locale-aware paths", () => {
     expect(isActivePath("/applications/app-1", "/applications")).toBe(true);
     expect(isActivePath("/applications-archive", "/applications")).toBe(false);
     expect(isActivePath("/dashboard", "/applications")).toBe(false);
+  });
+});
+
+describe("route guards", () => {
+  it("guards every volunteer route with a session and every auth route as guest-only", () => {
+    for (const route of volunteerRoutes) expect(route.guard).toBe("session");
+    for (const route of authRoutes) expect(route.guard).toBe("guest");
+  });
+
+  it("reads the guard through the locale prefix", () => {
+    for (const locale of locales) {
+      expect(guardFor(`/${locale}/dashboard`)).toBe("session");
+      expect(guardFor(`/${locale}/login`)).toBe("guest");
+    }
+  });
+
+  it("reads the guard for a detail page from its section", () => {
+    expect(guardFor("/en/applications/abc123")).toBe("session");
+    expect(guardFor("/en/opportunities/community-library-day")).toBe("session");
+  });
+
+  it("leaves an unregistered path unguarded rather than guessing", () => {
+    expect(guardFor("/en")).toBeNull();
+    expect(guardFor("/en/unknown")).toBeNull();
   });
 });

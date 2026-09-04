@@ -6,12 +6,12 @@ order that keeps every intermediate state honest. Read
 
 ## 0. Where we are
 
-| Layer          | State today                                                                                                                                                                                                                                                                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `v-app` (this) | Login, sign-up and reset pages exist as interface only; every option opens the dashboard. The dashboard renders `src/lib/sample/volunteer.ts`, labelled as a sample. Six sections render a "not built yet" page.                                                                                                                                                                                       |
-| `v-backend`    | Prisma schema with `User`, `TelegramIdentity`, `RefreshSession`, `AuthTicket`, `VolunteerProfile`, `Opportunity`, `Application`, `AttendanceRecord`, `SavedOpportunity`, `SavedEssay`, `AuditLog`. Environment validation, Fastify hardening, health routes, OpenAPI setup. **No product endpoints.** Auth is designed around a Telegram deep-link ticket and JWT access plus rotating refresh tokens. |
-| `v-web`        | Links to the app through `NEXT_PUBLIC_APP_ORIGIN`; hides the sign-in action while it is unset.                                                                                                                                                                                                                                                                                                         |
-| Archive        | `docs/reference/foundation-v1/legacy/` holds a previous, dependency-heavy implementation of the session cookie, the server-only API client, the Telegram route handlers, a profile form, an application form with essay autosave, and their tests. Port ideas from it; do not restore it wholesale.                                                                                                    |
+| Layer          | State today                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `v-app` (this) | **Phases A and D are done.** Telegram sign-in, the encrypted session cookie, the route guards in `src/proxy.ts`, proxy-side token refresh and the sign-out Server Action all work, and switch on only when `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` are both set. Google and the three email forms are still interface only and still open the sample dashboard. The dashboard renders `src/lib/sample/volunteer.ts`, labelled as a sample, with the signed-in display name as the one real value. Six sections render a "not built yet" page. |
+| `v-backend`    | Product endpoints exist. The Telegram ticket, webhook, completion, refresh and logout routes are implemented and now consumed by this app; `AuthTicket` also carries the volunteer's locale. Bot setup is `../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`.                                                                                                                                                                                                                                                                                                |
+| `v-web`        | Links to the app through `NEXT_PUBLIC_APP_ORIGIN`; hides the sign-in action while it is unset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Archive        | `docs/reference/foundation-v1/legacy/` holds a previous, dependency-heavy implementation of the session cookie, the server-only API client, the Telegram route handlers, a profile form, an application form with essay autosave, and their tests. Port ideas from it; do not restore it wholesale.                                                                                                                                                                                                                                                            |
 
 Three principles shape every phase:
 
@@ -221,10 +221,16 @@ Each phase ends with the default verification (`lint`, `typecheck`, `test`,
 `build`, and `test:e2e` when routes change), the docs updated, and the labels
 it earned removed.
 
-### Phase A — The session boundary
+### Phase A — The session boundary — **done**
 
-Goal: a real signed-in state, still with no way to reach it except a
-test-only path.
+Built as described below, with two deviations worth knowing:
+
+- the session helpers live in `src/lib/auth/`, and the encryption itself is in
+  `session.ts` rather than `session.server.ts`, because `src/proxy.ts` needs it
+  and cannot import `next/headers`;
+- everything is gated on `isAuthConfigured()`. With the two server-only
+  variables unset the proxy guards nothing and the app keeps its preview
+  behaviour, so an intermediate state stays honest.
 
 1. Add `zod` and `jose` (the only two dependencies this phase needs).
 2. `src/lib/auth/session.ts` and `session.server.ts`: an encrypted JWE cookie
@@ -296,18 +302,23 @@ Labels earned: none yet — the dashboard is still the sample.
 5. Tests: state mismatch is rejected, a callback without a cookie is rejected,
    `next` is preserved through the round trip.
 
-### Phase D — Telegram
+### Phase D — Telegram — **done**
 
 1. Route handlers `src/app/api/auth/telegram/start/route.ts` and
-   `complete/route.ts`, ported from the archive, calling the two backend
-   endpoints.
-2. The login page gains the "check Telegram" state the archive designed: the
-   button opens the bot, the page explains that sign-in finishes in the tab
-   Telegram opens, and never polls.
-3. `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` points at this app's complete
-   route with the locale in the path.
-4. Tests: an expired or reused token shows a translated status, not a stack
-   trace; the starting tab never receives a session.
+   `complete/route.ts` call the two backend endpoints.
+2. The login and sign-up pages explain the handoff (`auth.telegram.handoff`)
+   and never poll.
+3. `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` points at
+   `/api/auth/telegram/complete` **without** a locale in the path. The locale
+   travels with the ticket instead: `POST /auth/telegram/ticket` takes it, the
+   backend stores it on the ticket and echoes it back as `?locale=` on the
+   completion link. The plan's original path-based idea does not survive the
+   Telegram in-app browser, which does not share the cookies of the tab that
+   started the flow. A short-lived cookie is still set as a second source, and
+   the default locale is the last fallback.
+4. An expired or reused token redirects to `/{locale}/login?telegram=expired`
+   with translated copy. The starting tab never receives a session; only the
+   browser that opens the one-time link does.
 
 ### Phase E — Account linking and settings
 

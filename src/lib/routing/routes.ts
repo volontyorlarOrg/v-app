@@ -14,10 +14,13 @@ export type RouteKey =
 
 export type RouteArea = "auth" | "volunteer";
 
+export type RouteGuard = "guest" | "session";
+
 export type AppRoute = {
   key: RouteKey;
   path: string;
   area: RouteArea;
+  guard: RouteGuard;
   inNav: boolean;
   inTabBar: boolean;
   inAccountMenu: boolean;
@@ -28,6 +31,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "login",
     path: "/login",
     area: "auth",
+    guard: "guest",
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
@@ -36,6 +40,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "signup",
     path: "/signup",
     area: "auth",
+    guard: "guest",
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
@@ -44,6 +49,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "forgotPassword",
     path: "/forgot-password",
     area: "auth",
+    guard: "guest",
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
@@ -52,6 +58,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "dashboard",
     path: "/dashboard",
     area: "volunteer",
+    guard: "session",
     inNav: true,
     inTabBar: true,
     inAccountMenu: false,
@@ -60,6 +67,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "opportunities",
     path: "/opportunities",
     area: "volunteer",
+    guard: "session",
     inNav: true,
     inTabBar: true,
     inAccountMenu: false,
@@ -68,6 +76,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "applications",
     path: "/applications",
     area: "volunteer",
+    guard: "session",
     inNav: true,
     inTabBar: true,
     inAccountMenu: false,
@@ -76,6 +85,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "saved",
     path: "/saved",
     area: "volunteer",
+    guard: "session",
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
@@ -84,6 +94,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "record",
     path: "/record",
     area: "volunteer",
+    guard: "session",
     inNav: true,
     inTabBar: false,
     inAccountMenu: false,
@@ -92,6 +103,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "profile",
     path: "/profile",
     area: "volunteer",
+    guard: "session",
     inNav: false,
     inTabBar: true,
     inAccountMenu: true,
@@ -100,6 +112,7 @@ export const appRoutes: readonly AppRoute[] = [
     key: "settings",
     path: "/settings",
     area: "volunteer",
+    guard: "session",
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
@@ -139,4 +152,11 @@ export function localePath(locale: Locale, key: RouteKey): string {
 
 export function isActivePath(pathname: string, path: string): boolean {
   return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+export function guardFor(pathname: string): RouteGuard | null {
+  const withoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  const path = withoutLocale === "" ? "/" : withoutLocale;
+  const match = appRoutes.find((route) => isActivePath(path, route.path));
+  return match?.guard ?? null;
 }

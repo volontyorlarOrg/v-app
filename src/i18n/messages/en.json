@@ -57,12 +57,18 @@
   "auth": {
     "preview": {
       "chip": "Preview",
-      "body": "Sign-in is not connected yet. Every option below opens the sample panel."
+      "body": "Sign-in is not connected yet. Every option below opens the sample panel.",
+      "bodyTelegram": "Telegram sign-in works. Google and email are not connected yet and still open the sample panel."
     },
     "providers": {
       "google": "Continue with Google",
       "telegram": "Continue with Telegram",
       "or": "or with email"
+    },
+    "telegram": {
+      "handoff": "Telegram opens next. Finish signing in from the link the bot sends you in that chat.",
+      "expired": "That sign-in link had expired or was already used. Start again with Telegram.",
+      "unavailable": "Telegram sign-in is unavailable right now. Try again in a moment."
     },
     "fields": {
       "fullName": "Full name",

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/app/avatar";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
+import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -11,8 +12,20 @@ import { accountRoutes, navHref, navRoutes } from "@/lib/routing/routes";
 
 export type ShellUser = { name: string; initials: string; level: string };
 
-export function Sidebar({ user }: { user: ShellUser }) {
+export function Sidebar({
+  user,
+  signOutLocale,
+}: {
+  user: ShellUser;
+  signOutLocale: string | null;
+}) {
   const t = useTranslations("nav");
+
+  const signOutClass = buttonClass({
+    variant: "outline",
+    size: "sm",
+    className: "mt-4 w-full",
+  });
 
   const toItem = (route: { key: SidebarItem["key"] }): SidebarItem => ({
     key: route.key,
@@ -49,17 +62,18 @@ export function Sidebar({ user }: { user: ShellUser }) {
             <p className="text-xs font-semibold text-accent-ink">{user.level}</p>
           </div>
         </div>
-        <Link
-          href={navHref("login")}
-          className={buttonClass({
-            variant: "outline",
-            size: "sm",
-            className: "mt-4 w-full",
-          })}
-        >
-          <LogOut aria-hidden="true" className="size-4" />
-          {t("signOut")}
-        </Link>
+        {signOutLocale ? (
+          <SignOutForm
+            locale={signOutLocale}
+            label={t("signOut")}
+            className={signOutClass}
+          />
+        ) : (
+          <Link href={navHref("login")} className={signOutClass}>
+            <LogOut aria-hidden="true" className="size-4" />
+            {t("signOut")}
+          </Link>
+        )}
       </div>
     </aside>
   );

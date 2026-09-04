@@ -38,18 +38,33 @@ again.
 ## Environment
 
 The application installs, lints, typechecks, tests, and builds with no
-environment variables at all. Both supported variables are optional and blank
-in `.env.example`; see [`../architecture/DOMAINS.md`](../architecture/DOMAINS.md)
-for what each one changes. Add another only when executable code consumes it,
-document it there, and add a value-free placeholder.
+environment variables at all. All four supported variables are optional and
+blank in `.env.example`; see
+[`../architecture/DOMAINS.md`](../architecture/DOMAINS.md) for what each one
+changes. Add another only when executable code consumes it, document it there,
+and add a value-free placeholder.
 
-`npm run test:e2e` pins both variables to empty, so the smoke suite keeps
-testing the unconfigured baseline no matter what a machine has locally.
+`npm run test:e2e` pins all four variables to empty, so the smoke suite keeps
+testing the unconfigured, unguarded baseline no matter what a machine has in
+`.env.local`.
+
+To work on sign-in locally, set the two server-only variables in `.env.local`:
+
+```bash
+VOLONTYORLAR_API_URL=http://localhost:4000
+VOLONTYORLAR_SESSION_SECRET=$(openssl rand -base64 48)
+```
+
+with `v-backend` running on 4000 with `AUTH_ENABLED=true` and its bot
+registered. The full procedure, including how the bot token is obtained from
+BotFather, is in
+[`../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
+Leave both blank to work on anything else: the app then keeps its unguarded
+preview behaviour.
 
 Never place a session secret, an API origin, a bot token, or a Google client
 secret in a `NEXT_PUBLIC_*` variable. Next.js embeds those values in browser
-bundles. The implementation plan names the server-only variables that will
-exist.
+bundles.
 
 ## Testing
 
@@ -90,6 +105,12 @@ Before a public launch:
 2. Set `NEXT_PUBLIC_MARKETING_URL` so the about, privacy and terms links
    render.
 3. Confirm the host does not strip or override the response headers in
-   `next.config.ts`, and that it supports the proxy (Next.js middleware).
-4. Do not deploy the sample dashboard as a product. Every screen says it is a
-   preview; the implementation plan is what removes those labels.
+   `next.config.ts`, and that it supports the proxy (Next.js middleware). The
+   route guards live in the proxy, so a host that does not run it leaves the
+   `(volunteer)` layout check as the only gate.
+4. Set `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` as server-only
+   values, and point `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` at
+   `https://<this origin>/api/auth/telegram/complete`. Verify the completion
+   link opens correctly inside Telegram's in-app browser on the real origin.
+5. Do not deploy the sample dashboard as a product. Every screen behind sign-in
+   says it is a preview; the implementation plan is what removes those labels.

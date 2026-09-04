@@ -1,7 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { Avatar } from "@/components/app/avatar";
 import { Link } from "@/i18n/navigation";
@@ -19,7 +18,7 @@ export function UserMenu({
   name: string;
   initials: string;
   items: readonly UserMenuItem[];
-  signOut: UserMenuItem;
+  signOut: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
@@ -78,14 +77,7 @@ export function UserMenu({
             {item.label}
           </Link>
         ))}
-        <Link
-          href={signOut.href}
-          onClick={() => setOpen(false)}
-          className="flex min-h-11 items-center gap-2 rounded-md border-t border-border px-3 text-sm font-semibold text-ink transition-colors hover:bg-surface-sunk hover:text-primary-ink"
-        >
-          <LogOut aria-hidden="true" className="size-4" />
-          {signOut.label}
-        </Link>
+        {signOut}
       </nav>
     </div>
   );

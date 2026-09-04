@@ -28,7 +28,10 @@ flowchart LR
 
 | Location                                                          | Responsibility                                                                                                                                                                                                                                                                |
 | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/proxy.ts`                                                    | Sends a prefix-less URL to a locale using `Accept-Language`; the only code path outside a page                                                                                                                                                                                |
+| `src/proxy.ts`                                                    | Sends a prefix-less URL to a locale using `Accept-Language`; once sign-in is configured, also reads the session cookie, enforces each route's `guard`, rotates an expiring access token on a navigation, and marks signed-in responses `private, no-store`                    |
+| `src/app/api/auth/telegram/{start,complete}/route.ts`             | The two hops of Telegram sign-in: mint a ticket and redirect into the bot; redeem the one-time login token and write the session cookie                                                                                                                                       |
+| `src/lib/auth/`                                                   | `config.ts` reads the two server-only variables; `session.ts` holds the cookie schema, its JWE encryption and `safeReturnPath`; `session.server.ts` reads and writes it through `cookies()`; `refresh.ts` rotates a refresh token; `actions.ts` is the sign-out Server Action |
+| `src/lib/api/`                                                    | `client.server.ts`, the one server-only fetch wrapper: timeout, request id, Zod response parsing, normalised `ApiError` codes                                                                                                                                                 |
 | `src/app/[locale]/layout.tsx`                                     | Root document, `lang`, the two typefaces, the theme boot script, `noindex`, the client provider with `messages={null}`                                                                                                                                                        |
 | `src/app/[locale]/page.tsx`                                       | Redirects to the entry route (`login`)                                                                                                                                                                                                                                        |
 | `src/app/[locale]/(auth)/layout.tsx`                              | The sign-in frame: lockup, language and theme controls, centred column, footer, on the dot-grid ground                                                                                                                                                                        |
@@ -171,8 +174,10 @@ its own `Scene` and rises once as it scrolls in.
 ## Dependency boundary
 
 Runtime dependencies are `next`, `react`, `react-dom`, `next-intl`,
-`class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, and
-`three`. The Three.js module is dynamically imported for the dashboard orbit.
+`class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `three`,
+and — added by Telegram sign-in — `jose` for the encrypted session cookie,
+`zod` for parsing every backend response, and `server-only` to keep the API
+client and the cookie reader out of any client bundle. The Three.js module is dynamically imported for the dashboard orbit.
 Filters use native
 GET forms rather than `nuqs`; menus and switches are disclosure buttons rather
 than Radix; the profile form is an uncontrolled form rather than React Hook
