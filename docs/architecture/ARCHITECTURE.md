@@ -18,7 +18,7 @@ flowchart LR
   AuthPages -- every option --> Panel
   Locale --> Panel["(volunteer) layout: AppShell = sidebar + top bar + tab bar"]
   Panel --> Dashboard["dashboard"]
-  Panel --> Sections["opportunities[/slug] · applications[/id] · saved · record · profile · settings"]
+  Panel --> Sections["opportunities[/slug] · applications[/id] · saved · record · profile · settings redirect"]
   Dashboard --> Sample["lib/sample: opportunities.ts · volunteer.ts"]
   Sections --> Sample
   Sample --> Rules["lib/record · lib/opportunities · lib/applications · lib/profile"]
@@ -111,14 +111,14 @@ itself relative to the request.
 height from the large breakpoint and absent below it; the column holds the top
 bar, the workspace and the footer. On a phone the top bar carries the lockup and
 the tab bar carries four essential destinations. Both navigations read the registry:
-`navRoutes` for the main list, `accountRoutes` for profile and settings,
+`navRoutes` for the main list, `accountRoutes` for profile,
 `tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. Saved remains
 a registered compatibility route but is intentionally absent from navigation.
 
 Opportunity search is a plain GET form on the opportunities route, so a search
 is a URL. The notifications menu receives its items already
 translated and relative-timed from the volunteer layout; "mark all read" is
-local state. The user menu links to profile, settings and sign out.
+local state. The user menu links to the consolidated profile and sign out.
 
 ## Filters live in the URL
 

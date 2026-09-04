@@ -46,7 +46,8 @@ The primary destinations are:
 3. Applications — drafts, active applications, and decisions.
 4. Record — confirmed participation and level rules.
 
-Profile and Settings remain account destinations. Mobile keeps Dashboard,
+Profile is the single account destination and includes essential settings;
+the old Settings route redirects there. Mobile keeps Dashboard,
 Opportunities, Applications, and Profile as four thumb-sized tabs. The Record
 is linked from the dashboard progress summary and desktop navigation. The old
 Saved route redirects to the saved Opportunities view so bookmarks and older
@@ -76,8 +77,9 @@ links do not fail.
 
 - Consolidate the profile from six panels to three: About you, Languages and
   skills, and Contact, with education, location, and links as subsections.
-- Consolidate Settings from six panels to three: Notifications, Privacy and
-  appearance, and Account and access.
+- Consolidate essential settings into Profile: Telegram and deadline
+  notifications, organiser profile visibility, theme, language, connected
+  identities, and sign out. Hide future controls until their contracts exist.
 
 ## Motion and Three.js budget
 

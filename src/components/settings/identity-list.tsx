@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 
 import { StateChip } from "@/components/dashboard/state-chip";
 import { GoogleMark, TelegramMark } from "@/components/brand/provider-marks";
-import { buttonClass } from "@/components/ui/button";
 import type { LinkedIdentities } from "@/lib/account/types";
 
 export function IdentityList({ identities }: { identities: LinkedIdentities }) {
@@ -44,9 +43,15 @@ export function IdentityList({ identities }: { identities: LinkedIdentities }) {
     },
   ];
 
+  const connectedRows = rows.filter((row) => row.connected);
+
+  if (connectedRows.length === 0) {
+    return <p className="text-sm text-ink-muted">{t("notConnected")}</p>;
+  }
+
   return (
     <ul className="divide-y divide-border">
-      {rows.map((row) => (
+      {connectedRows.map((row) => (
         <li
           key={row.key}
           className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0"
@@ -65,13 +70,6 @@ export function IdentityList({ identities }: { identities: LinkedIdentities }) {
             </p>
             <p className="truncate text-sm text-ink-muted">{row.detail}</p>
           </div>
-          <button
-            type="button"
-            disabled
-            className={buttonClass({ variant: "outline", size: "sm" })}
-          >
-            {row.connected ? t("disconnect") : t("connect")}
-          </button>
         </li>
       ))}
     </ul>

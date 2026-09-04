@@ -12,6 +12,7 @@ Use this file to route project questions to the smallest relevant source.
 | What a volunteer needs on the dashboard, and why each block exists            | [`product/VOLUNTEER_DASHBOARD.md`](product/VOLUNTEER_DASHBOARD.md)                                                     |
 | **How to make sign-in and the dashboard real** — phases, contracts, decisions | [`plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md)                   |
 | Dashboard information, motion, scroll stability, and verification plan        | [`plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md`](plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md) |
+| Full frontend audit and resolved information-architecture findings            | [`reviews/FRONTEND_DIAGNOSIS.md`](reviews/FRONTEND_DIAGNOSIS.md)                                                       |
 | Applied UI system, localization behaviour, accessibility rules                | [`ui/UI_SYSTEM.md`](ui/UI_SYSTEM.md)                                                                                   |
 | Security headers, CSP, secrets, trust boundaries                              | [`security/SECURITY.md`](security/SECURITY.md)                                                                         |
 | Setup, commands, environment, CI, deployment                                  | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](operations/DEVELOPMENT_AND_DEPLOYMENT.md)                                 |
