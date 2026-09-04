@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 
+import { SignOutForm } from "@/components/auth/sign-out-form";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
@@ -9,7 +10,7 @@ import { marketingHref } from "@/lib/seo/origin";
 const linkClass =
   "inline-flex min-h-9 items-center font-semibold text-ink hover:text-primary-ink";
 
-export function AppFooter() {
+export function AppFooter({ signOutLocale }: { signOutLocale: string | null }) {
   const t = useTranslations("nav");
   const locale = useLocale() as Locale;
 
@@ -33,9 +34,18 @@ export function AppFooter() {
             </li>
           ))}
           <li className="lg:hidden">
-            <Link href={navHref("login")} className={linkClass}>
-              {t("signOut")}
-            </Link>
+            {signOutLocale ? (
+              <SignOutForm
+                locale={signOutLocale}
+                label={t("signOut")}
+                className={linkClass}
+                showIcon={false}
+              />
+            ) : (
+              <Link href={navHref("login")} className={linkClass}>
+                {t("signOut")}
+              </Link>
+            )}
           </li>
         </ul>
       </div>

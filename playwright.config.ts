@@ -27,6 +27,8 @@ export default defineConfig({
     env: {
       NEXT_PUBLIC_SITE_URL: "",
       NEXT_PUBLIC_MARKETING_URL: "",
+      VOLONTYORLAR_API_URL: "",
+      VOLONTYORLAR_SESSION_SECRET: "",
     },
   },
 });

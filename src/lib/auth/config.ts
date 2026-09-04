@@ -1,0 +1,27 @@
+const MINIMUM_SESSION_SECRET_LENGTH = 32;
+
+export function apiBaseUrl(): string | null {
+  const raw = process.env.VOLONTYORLAR_API_URL?.trim();
+  if (!raw) return null;
+
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    return `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
+  } catch {
+    return null;
+  }
+}
+
+export function sessionSecret(): string | null {
+  const value = process.env.VOLONTYORLAR_SESSION_SECRET?.trim();
+  return value && value.length >= MINIMUM_SESSION_SECRET_LENGTH ? value : null;
+}
+
+export function isAuthConfigured(): boolean {
+  return apiBaseUrl() !== null && sessionSecret() !== null;
+}
+
+export function isProduction(): boolean {
+  return process.env.NODE_ENV === "production";
+}

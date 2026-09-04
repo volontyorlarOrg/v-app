@@ -1,4 +1,3 @@
-import { CircleCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
@@ -6,9 +5,13 @@ import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth/auth-form";
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthDivider, AuthPanel } from "@/components/auth/auth-panel";
+import { AuthStatus } from "@/components/auth/auth-status";
 import { PreviewNotice } from "@/components/auth/preview-notice";
-import { ProviderButtons } from "@/components/auth/provider-buttons";
+import { ProviderButtons, telegramStartHref } from "@/components/auth/provider-buttons";
 import { Link } from "@/i18n/navigation";
+import { isAuthConfigured } from "@/lib/auth/config";
+import { safeReturnPath } from "@/lib/auth/session";
+import { isTelegramStatus, type TelegramStatus } from "@/lib/auth/telegram";
 import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
 
 export async function generateMetadata({
@@ -26,34 +29,61 @@ export default async function LoginPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { reset } = await searchParams;
-  return <Login resetSent={reset === "sent"} />;
+  const { reset, telegram, next } = await searchParams;
+  const telegramEnabled = isAuthConfigured();
+
+  return (
+    <Login
+      resetSent={reset === "sent"}
+      telegramStatus={isTelegramStatus(telegram) ? telegram : null}
+      telegramHref={
+        telegramEnabled
+          ? telegramStartHref(
+              locale,
+              safeReturnPath(typeof next === "string" ? next : null),
+            )
+          : null
+      }
+    />
+  );
 }
 
-function Login({ resetSent }: { resetSent: boolean }) {
+function Login({
+  resetSent,
+  telegramStatus,
+  telegramHref,
+}: {
+  resetSent: boolean;
+  telegramStatus: TelegramStatus | null;
+  telegramHref: string | null;
+}) {
   const t = useTranslations("auth");
 
   return (
     <>
       <AuthIntro title={t("login.title")} lead={t("login.lead")} />
-      <PreviewNotice chip={t("preview.chip")} body={t("preview.body")} />
+      <PreviewNotice
+        chip={t("preview.chip")}
+        body={telegramHref ? t("preview.bodyTelegram") : t("preview.body")}
+      />
 
-      {resetSent ? (
-        <p
-          role="status"
-          className="enter-rise mt-6 flex items-start gap-3 rounded-lg bg-surface-soft px-4 py-3 text-sm leading-relaxed text-primary-ink [--enter-delay:650ms]"
-        >
-          <CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          {t("login.resetSent")}
-        </p>
+      {telegramStatus ? (
+        <AuthStatus>{t(`telegram.${telegramStatus}`)}</AuthStatus>
       ) : null}
+      {resetSent ? <AuthStatus tone="done">{t("login.resetSent")}</AuthStatus> : null}
 
       <AuthPanel>
         <ProviderButtons
           href={navHref(HOME_ROUTE)}
+          telegramHref={telegramHref}
           google={t("providers.google")}
           telegram={t("providers.telegram")}
         />
+        {telegramHref ? (
+          <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+            {t("telegram.handoff")}
+          </p>
+        ) : null}
         <AuthDivider label={t("providers.or")} />
         <AuthForm
           destination={navHref(HOME_ROUTE)}

@@ -57,12 +57,18 @@
   "auth": {
     "preview": {
       "chip": "Koʻrib chiqish",
-      "body": "Kirish hali ulanmagan. Quyidagi har bir variant namunaviy panelni ochadi."
+      "body": "Kirish hali ulanmagan. Quyidagi har bir variant namunaviy panelni ochadi.",
+      "bodyTelegram": "Telegram orqali kirish ishlaydi. Google va email hali ulanmagan va namunaviy panelni ochadi."
     },
     "providers": {
       "google": "Google orqali davom etish",
       "telegram": "Telegram orqali davom etish",
       "or": "yoki email bilan"
+    },
+    "telegram": {
+      "handoff": "Keyingi qadamda Telegram ochiladi. Bot oʻsha chatga yuboradigan havola orqali kirishni yakunlang.",
+      "expired": "Bu kirish havolasining muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
+      "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring."
     },
     "fields": {
       "fullName": "Toʻliq ism",

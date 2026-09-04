@@ -41,20 +41,29 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 
 ## The one thing to know first
 
-**There is no sign-in and no product API yet.** `../v-backend` has a Prisma
-schema, configuration, and health routes; product endpoints do not exist. So:
+**Telegram sign-in is real; everything behind it is still the sample.** So:
 
-- every screen renders the illustrative volunteer in `src/lib/sample/` — the
-  dashboard, opportunities and their detail pages, applications and their
+- **sign-in works only when configured.** `VOLONTYORLAR_API_URL` and
+  `VOLONTYORLAR_SESSION_SECRET` are both server-only and both blank by
+  default. While either is blank, `isAuthConfigured()` is false and the app
+  behaves as it did before: no guarded route, no cookie, and the Telegram
+  button is a labelled preview. Set both and Telegram sign-in, the route
+  guards and sign-out all become real. Preserve that fallback in any change;
+- **Google and email/password are still interface only.** Both open the sample
+  dashboard and the preview label on the auth pages still says so;
+- every screen still renders the illustrative volunteer in `src/lib/sample/` —
+  the dashboard, opportunities and their detail pages, applications and their
   detail pages, saved items, the record, the profile editor and settings — and
-  the interface says so on screen through the `common.sample` chip;
-- the login, sign-up and password-reset pages are interface only: every option
-  opens the sample dashboard, and nothing is sent anywhere;
+  the interface says so on screen through the `common.sample` chip. A signed-in
+  volunteer's display name is the only real value on those screens;
 - every control that would write — apply, withdraw, save the profile, a
   settings switch, save an opportunity — either changes local state only or is
-  disabled, and a `PreviewNote` beside it says so;
+  disabled, and a `PreviewNote` beside it says so. Sign-out is the exception:
+  it is a real Server Action;
 - the way from here to a working product is written down in
-  [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md).
+  [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
+  the keys and the bot are set up from
+  [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
 
 Do not delete a label, invent a contract, or claim a behaviour works because
 the code was written.
@@ -84,10 +93,14 @@ set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
 CSS, and `three` is isolated to the lazy dashboard progress object. Panels and
 task content never depend on JavaScript for visibility or scrolling.
 
-Not installed, on purpose, until the implementation plan reaches the phase
-that needs them: React Hook Form, Zod, `next-safe-action`, `nuqs`, TanStack
-Query, Sonner, `jose`, Radix, `motion`, `date-fns`, and any auth SDK. The
-previous foundation used all of them; it is archived under
+Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every
+backend response) and `server-only` (keeping the API client and the cookie
+reader out of client bundles).
+
+Still not installed, on purpose, until the implementation plan reaches the
+phase that needs them: React Hook Form, `next-safe-action`, `nuqs`, TanStack
+Query, Sonner, Radix, `motion`, `date-fns`, and any auth SDK. The previous
+foundation used all of them; it is archived under
 `docs/reference/foundation-v1/legacy/` as reference material, not live code.
 
 For framework behaviour, read `node_modules/next/dist/docs/` before relying on
@@ -97,7 +110,10 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 ## Repository map
 
 ```text
-src/app/[locale]/(auth)/        -> login, signup, forgot-password: interface only
+src/app/[locale]/(auth)/        -> login, signup, forgot-password; Telegram is live, the rest is interface
+src/app/api/auth/telegram/      -> start and complete: the two hops of Telegram sign-in
+src/lib/auth/                   -> config, session cookie, refresh, sign-out action
+src/lib/api/                    -> the server-only backend client and its error codes
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
                                    applications[/id], saved, record, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
@@ -126,12 +142,16 @@ docs/                           -> stable project documentation and the plan
   instead of guessing: an unconfigured marketing origin hides the about,
   privacy and terms links rather than pointing anywhere.
 - Keep secrets out of source control. `NEXT_PUBLIC_*` values reach every
-  browser. There is no server-only secret yet; the plan introduces them.
+  browser. `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` are
+  server-only and must never gain that prefix or be read from a Client
+  Component. The Telegram bot token belongs to `v-backend` and never enters
+  this repository.
 - Every user-facing string exists in `uz`, `ru`, and `en`. Uzbek uses the turned
   comma `ʻ` (U+02BB), Russian uses Cyrillic, and a test enforces key and ICU
   argument parity.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
-  the tab bar, the account menu and the tests all read from it. Detail pages
+  the tab bar, the account menu, the proxy's `guard` and the tests all read
+  from it. Detail pages
   hang off a section through `opportunityHref` and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
   structure, chips for a system state, primary actions, the mark. **Orange is
@@ -144,8 +164,10 @@ docs/                           -> stable project documentation and the plan
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.
-- No personal data in URLs (the reset flow carries only `?reset=sent`), no
-  tokens in browser storage; the theme choice is the only stored value.
+- No personal data in URLs (the reset flow carries only `?reset=sent`, sign-in
+  only `?telegram=expired|unavailable`), no tokens in browser storage; the
+  theme choice is the only stored value. Session tokens live only in the
+  encrypted `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in
   `src/lib/record/levels.ts`. Never duplicate a formula into JSX, never invent
   one, never count unconfirmed attendance against a volunteer, and never show
