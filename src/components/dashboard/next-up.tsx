@@ -61,7 +61,7 @@ export function NextUp({
               >
                 {format.dateTime(starts, { day: "numeric" })}
               </time>
-              <span className="mt-1 block text-[0.6875rem] font-semibold tracking-[0.1em] text-primary-ink uppercase">
+              <span className="mt-1 block text-xs font-semibold tracking-[0.1em] text-primary-ink uppercase">
                 {format.dateTime(starts, { month: "short" })}
               </span>
             </div>

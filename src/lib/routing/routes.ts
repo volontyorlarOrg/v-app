@@ -102,7 +102,7 @@ export const appRoutes: readonly AppRoute[] = [
     area: "volunteer",
     inNav: false,
     inTabBar: false,
-    inAccountMenu: true,
+    inAccountMenu: false,
   },
 ] as const;
 

@@ -145,11 +145,12 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the account menu links to profile, settings and sign out", async ({ page }) => {
+  test("the account menu keeps one profile destination and sign out", async ({ page }) => {
     await page.goto("/en/dashboard");
     await page.getByRole("button", { name: /Account menu/ }).click();
     const menu = page.getByRole("navigation", { name: "Account menu" });
-    await expect(menu.getByRole("link", { name: "Settings" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Settings" })).toHaveCount(0);
     await menu.getByRole("link", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/en\/login$/);
   });
@@ -299,12 +300,18 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("status")).toContainText(/preview/i);
   });
 
-  test("settings switches toggle and the theme switch is real", async ({ page }) => {
+  test("legacy settings redirects to profile where preferences still work", async ({
+    page,
+  }) => {
     await page.goto("/en/settings");
-    const email = page.getByRole("switch", { name: "Email digest" });
-    await expect(email).toHaveAttribute("aria-checked", "false");
-    await email.click();
-    await expect(email).toHaveAttribute("aria-checked", "true");
+    await expect(page).toHaveURL(/\/en\/profile$/);
+    const telegram = page.getByRole("switch", { name: "Telegram messages" });
+    const telegramBefore = await telegram.getAttribute("aria-checked");
+    await telegram.click();
+    await expect(telegram).not.toHaveAttribute(
+      "aria-checked",
+      telegramBefore ?? "false",
+    );
 
     const dark = page.getByRole("switch", { name: "Dark theme" }).last();
     const before = await page.locator("html").getAttribute("data-theme");

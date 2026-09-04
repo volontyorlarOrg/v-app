@@ -47,10 +47,7 @@ export function TopBar({
             label={t("userMenu.label")}
             name={user.name}
             initials={user.initials}
-            items={[
-              { href: navHref("profile"), label: t("profile") },
-              { href: navHref("settings"), label: t("settings") },
-            ]}
+            items={[{ href: navHref("profile"), label: t("profile") }]}
             signOut={{ href: navHref("login"), label: t("signOut") }}
           />
         </div>

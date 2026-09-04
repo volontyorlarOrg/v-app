@@ -43,7 +43,7 @@ describe("app route registry", () => {
   });
 
   it("keeps utility routes out of primary and account navigation", () => {
-    expect(accountRoutes.map((route) => route.key)).toEqual(["profile", "settings"]);
+    expect(accountRoutes.map((route) => route.key)).toEqual(["profile"]);
     expect([...navRoutes, ...accountRoutes].map((route) => route.key)).not.toContain(
       "saved",
     );
@@ -61,6 +61,11 @@ describe("app route registry", () => {
   it("enters through sign-in and lands on the dashboard", () => {
     expect(getRoute(ENTRY_ROUTE).area).toBe("auth");
     expect(getRoute(HOME_ROUTE).area).toBe("volunteer");
+  });
+
+  it("keeps legacy settings registered without exposing another account layer", () => {
+    expect(getRoute("settings").inAccountMenu).toBe(false);
+    expect(navHref("settings")).toBe("/settings");
   });
 
   it("labels every volunteer route in every catalog", () => {
