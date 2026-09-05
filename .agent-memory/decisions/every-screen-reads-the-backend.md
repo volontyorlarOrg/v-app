@@ -24,3 +24,10 @@ panel needs and Telegram sign-in was live on both sides.
   proxy keeps the cookie. Two tabs refreshing at once would otherwise sign the
   loser out; instead the winner's cookie reaches the browser and the next
   request uses it.
+- `authed()` never asks the backend to rotate a refresh token unless the
+  cookie can be written (a Server Action or route handler): the backend
+  revokes the old token on rotation, so a rotation during a Server Component
+  render would burn the session. The proxy rotates on navigations; a render
+  that meets a 401 ends the session instead. `e2e/stub-backend.mjs` issues
+  45-second access tokens — inside the 60-second refresh skew — so every
+  Playwright request exercises those paths.

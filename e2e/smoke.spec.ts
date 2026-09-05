@@ -284,6 +284,7 @@ test.describe("opportunities", () => {
     await expect(save).toHaveAttribute("aria-pressed", "false");
     await save.click();
     await expect(save).toHaveAttribute("aria-pressed", "true");
+    await expect(save).toBeEnabled();
 
     await page.reload();
     await expect(
@@ -410,6 +411,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(telegram).toHaveAttribute("aria-checked", "true");
     await telegram.click();
     await expect(telegram).toHaveAttribute("aria-checked", "false");
+    await expect(telegram).toBeEnabled();
 
     await page.reload();
     await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveAttribute(

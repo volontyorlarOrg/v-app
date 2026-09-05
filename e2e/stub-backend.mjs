@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.STUB_PORT ?? 3212);
+const ACCESS_TOKEN_TTL_SECONDS = 45;
 const DAY = 86_400_000;
 const START = Date.now();
 
@@ -286,7 +287,7 @@ function issueSession(state) {
     userId: state.user.id,
     accessToken,
     refreshToken,
-    accessTokenExpiresAt: Math.floor(Date.now() / 1000) + 900,
+    accessTokenExpiresAt: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_TTL_SECONDS,
     displayName: state.user.displayName,
     roles: state.user.roles,
   };
