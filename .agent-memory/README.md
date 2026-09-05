@@ -15,8 +15,11 @@ folder. Never store secrets or unverified external claims.
 - `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
   `v-web`'s tokens, motion, catalogs and registry, and what happened to the
   previous foundation
-- `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo says
-  it is a sample, why organisers are fictional, and why dates are relative
+- `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo said
+  it was a sample while it existed (historical; the sample is gone)
+- `decisions/every-screen-reads-the-backend.md` — why the sample and the
+  email forms were removed, why the proxy guards unconditionally, and the
+  cookie and refresh rules that came with real data
 - `decisions/planned-sections-render-instead-of-404.md` — why the app became
   a real panel with every section on mock data, and what stayed from `v-web`
 - `decisions/error-codes-not-messages.md` — errors are codes the catalog
@@ -25,8 +28,8 @@ folder. Never store secrets or unverified external claims.
 - `decisions/no-essays-in-browser-storage.md` — why long answers never touch
   `localStorage`
 - `decisions/why-no-cache-components.md` — why PPR is not enabled
-- `discoveries/backend-has-a-schema-but-no-endpoints.md` — what `v-backend`
-  provides today and what it does not
+- `discoveries/backend-has-a-schema-but-no-endpoints.md` — the endpoints
+  `v-backend` serves and the error bodies they return
 - `discoveries/onest-covers-all-three-locales.md` — the typeface and the Uzbek
   apostrophes
 - `gotchas/calendar-days-are-timezone-dependent.md` — why deadlines count

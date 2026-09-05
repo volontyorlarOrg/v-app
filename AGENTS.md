@@ -41,32 +41,36 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 
 ## The one thing to know first
 
-**Telegram sign-in is real; everything behind it is still the sample.** So:
+**Every screen behind sign-in reads `v-backend`; nothing is a sample.** So:
 
-- **sign-in works only when configured.** `VOLONTYORLAR_API_URL` and
-  `VOLONTYORLAR_SESSION_SECRET` are both server-only and both blank by
-  default. While either is blank, `isAuthConfigured()` is false and the app
-  behaves as it did before: no guarded route, no cookie, and the Telegram
-  button is a labelled preview. Set both and Telegram sign-in, the route
-  guards and sign-out all become real. Preserve that fallback in any change;
-- **Google and email/password are still interface only.** Both open the sample
-  dashboard and the preview label on the auth pages still says so;
-- every screen still renders the illustrative volunteer in `src/lib/sample/` —
-  the dashboard, opportunities and their detail pages, applications and their
-  detail pages, saved items, the record, the profile editor and settings — and
-  the interface says so on screen through the `common.sample` chip. A signed-in
-  volunteer's display name is the only real value on those screens;
-- every control that would write — apply, withdraw, save the profile, a
-  settings switch, save an opportunity — either changes local state only or is
-  disabled, and a `PreviewNote` beside it says so. Sign-out is the exception:
-  it is a real Server Action;
-- the way from here to a working product is written down in
+- **Telegram is the only way in.** `/login` and `/signup` both offer "Continue
+  with Telegram"; the backend creates the account on the first sign-in. The
+  Google button renders `disabled` with a note that it is not available yet.
+  There is no email or password anywhere — the backend has none, so the app
+  shows none, and `/forgot-password` is a 404;
+- **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
+  Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
+  or not they are set; unset, no session can exist and the Telegram handoff
+  returns to `/login?telegram=unavailable`. There is no preview mode;
+- every read is a function in `src/lib/api/<domain>.server.ts`, parsed by a
+  schema in `src/lib/api/schemas.ts`. A response the schema rejects is an
+  error, never a guess. The frontend type is the schema's output;
+- every write — apply, save or submit a draft, withdraw, save an opportunity,
+  save the profile, a preference switch, mark notifications read, sign out —
+  is a Server Action in `src/lib/<domain>/actions.ts` returning the
+  `ActionResult` envelope from `src/lib/api/action-result.ts`. Errors are
+  backend codes the catalog translates, never sentences from a server;
+- a section that fails to load renders `LoadErrorPanel` with a retry inside
+  `PanelErrorBoundary`. The palette still defines no red: error states use
+  the sunk surface and ink;
+- the plan that got here, and the two phases still open (Google, email and
+  password), is
   [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
   the keys and the bot are set up from
   [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
 
-Do not delete a label, invent a contract, or claim a behaviour works because
-the code was written.
+Do not invent a contract or claim a behaviour works because the code was
+written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 
 ## Repository boundary
 
@@ -110,19 +114,19 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 ## Repository map
 
 ```text
-src/app/[locale]/(auth)/        -> login, signup, forgot-password; Telegram is live, the rest is interface
+src/app/[locale]/(auth)/        -> login and signup; both are the Telegram handoff
 src/app/api/auth/telegram/      -> start and complete: the two hops of Telegram sign-in
+src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
-src/lib/api/                    -> the server-only backend client and its error codes
+src/lib/api/                    -> the server-only client, per-domain reads, the Zod schemas, error codes, ActionResult
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
                                    applications[/id], saved, record, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
-src/lib/{record,opportunities,applications,profile,activity,notifications,account}/
-                                -> domain rules and vocabulary, no JSX
-src/lib/sample/                 -> the illustrative catalogue and volunteer every screen renders
+src/lib/{record,opportunities,applications,profile,notifications,account}/
+                                -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
@@ -164,20 +168,19 @@ docs/                           -> stable project documentation and the plan
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.
-- No personal data in URLs (the reset flow carries only `?reset=sent`, sign-in
-  only `?telegram=expired|unavailable`), no tokens in browser storage; the
-  theme choice is the only stored value. Session tokens live only in the
+- No personal data in URLs (sign-in carries only `?telegram=expired|unavailable`,
+  `?session=expired` and a same-origin `?next=`), no tokens in browser storage;
+  the theme choice is the only stored value. Session tokens live only in the
   encrypted `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in
   `src/lib/record/levels.ts`. Never duplicate a formula into JSX, never invent
   one, never count unconfirmed attendance against a volunteer, and never show
   reliability below three resolved events.
-- Sample data is labelled on screen wherever it renders, it never names a real
-  partner or opportunity source as an organiser, and its record counts agree
-  with its participation history; tests enforce all three.
-- A control that cannot do its job yet is either local state only or
-  `disabled`, with a `PreviewNote` beside it. Never a button that looks live
-  and does nothing.
+- Backend data is never re-shaped in JSX. A response is parsed once by a schema
+  in `src/lib/api/schemas.ts`; a page renders the schema's output or the
+  load-error panel, never a fallback value it made up.
+- A control that cannot do its job is `disabled` with a visible note, as the
+  Google button is. Never a button that looks live and does nothing.
 - Preserve reduced-motion behaviour, keyboard access, visible focus states, one
   logical `h1` per page, and responsive behaviour.
 - Update `/docs` when stable environment or architecture behaviour changes.

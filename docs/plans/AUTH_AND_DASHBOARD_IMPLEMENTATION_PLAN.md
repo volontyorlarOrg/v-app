@@ -8,7 +8,7 @@ order that keeps every intermediate state honest. Read
 
 | Layer          | State today                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `v-app` (this) | **Phases A and D are done.** Telegram sign-in, the encrypted session cookie, the route guards in `src/proxy.ts`, proxy-side token refresh and the sign-out Server Action all work, and switch on only when `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` are both set. Google and the three email forms are still interface only and still open the sample dashboard. The dashboard renders `src/lib/sample/volunteer.ts`, labelled as a sample, with the signed-in display name as the one real value. Six sections render a "not built yet" page. |
+| `v-app` (this) | **Phases A, D and F are done.** Telegram sign-in, the encrypted session cookie, the route guards, proxy-side refresh, sign-out, and every section on backend data: `src/lib/api/*.server.ts` reads parsed by Zod schemas, and a Server Action for every write. The sample is deleted. Google renders disabled with a note; email and password (Phase B) and Google (Phase C) remain unbuilt on both sides. |
 | `v-backend`    | Product endpoints exist. The Telegram ticket, webhook, completion, refresh and logout routes are implemented and now consumed by this app; `AuthTicket` also carries the volunteer's locale. Bot setup is `../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`.                                                                                                                                                                                                                                                                                                |
 | `v-web`        | Links to the app through `NEXT_PUBLIC_APP_ORIGIN`; hides the sign-in action while it is unset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | Archive        | `docs/reference/foundation-v1/legacy/` holds a previous, dependency-heavy implementation of the session cookie, the server-only API client, the Telegram route handlers, a profile form, an application form with essay autosave, and their tests. Port ideas from it; do not restore it wholesale.                                                                                                                                                                                                                                                            |
@@ -228,9 +228,9 @@ Built as described below, with two deviations worth knowing:
 - the session helpers live in `src/lib/auth/`, and the encryption itself is in
   `session.ts` rather than `session.server.ts`, because `src/proxy.ts` needs it
   and cannot import `next/headers`;
-- everything is gated on `isAuthConfigured()`. With the two server-only
-  variables unset the proxy guards nothing and the app keeps its preview
-  behaviour, so an intermediate state stays honest.
+- the proxy guards every `(volunteer)` route whether or not the two server-only
+  variables are set; unset, no session can exist and the app is closed, not
+  previewed. `isAuthConfigured()` survives only in the two Telegram handlers.
 
 1. Add `zod` and `jose` (the only two dependencies this phase needs).
 2. `src/lib/auth/session.ts` and `session.server.ts`: an encrypted JWE cookie
@@ -258,7 +258,7 @@ Built as described below, with two deviations worth knowing:
    `safeReturnPath` rejects `//evil` and backslashes, the proxy redirects
    with `next`, the guarded layout redirects.
 
-Labels earned: none yet — the dashboard is still the sample.
+Labels earned: all of them, once Phase F landed.
 
 ### Phase B — Email and password
 
@@ -329,7 +329,17 @@ Labels earned: none yet — the dashboard is still the sample.
 3. Deletion and data export wait for the retention policy the backend lists
    as an open decision.
 
-### Phase F — The dashboard on real data
+### Phase F — The dashboard on real data — **done**
+
+Built as described, with four deviations: the reads live in one module per
+domain under `src/lib/api/`; a page reads with `Promise.all` and one
+`PanelErrorBoundary` per section rather than `allSettled` per block; the
+backend serves single-language text, so `LocalizedText` did not survive; and
+no read is tag-revalidated, because the backend already caches public reads
+for a minute and everything signed-in is `no-store`. Every write became a
+Server Action returning the `ActionResult` envelope (plain actions, not
+`next-safe-action`), and the error colour decision was "none": error states
+use the sunk surface and ink.
 
 1. `src/lib/dashboard/api.server.ts` (or one module per domain under
    `src/lib/<domain>/api.server.ts`): one server-only read per block, each

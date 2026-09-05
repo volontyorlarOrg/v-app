@@ -3,10 +3,10 @@
 ## Implemented
 
 A single Next.js 16 App Router application: React 19, strict TypeScript,
-Tailwind CSS 4, and `next-intl`. Every screen is a Server Component. There is
-no API route, database client, authentication provider, or backend transport:
-every signed-in screen renders an illustrative catalogue and volunteer from
-`src/lib/sample/`, and the sign-in surfaces navigate to it.
+Tailwind CSS 4, and `next-intl`. Every screen is a Server Component. Sign-in
+is Telegram, completed by two route handlers that write an encrypted session
+cookie; every signed-in screen reads `v-backend` through the server-only client
+in `src/lib/api/`, and every write is a Server Action.
 
 ```mermaid
 flowchart LR
@@ -14,14 +14,16 @@ flowchart LR
   Proxy --> Locale["/[locale] root layout"]
   Locale --> Root["/[locale] → redirect to /login"]
   Locale --> Auth["(auth) layout: lockup, language, theme, dot grid"]
-  Auth --> AuthPages["login · signup · forgot-password"]
-  AuthPages -- every option --> Panel
+  Auth --> AuthPages["login · signup"]
+  AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,complete}"]
+  Handlers -- session cookie --> Panel
   Locale --> Panel["(volunteer) layout: AppShell = sidebar + top bar + tab bar"]
   Panel --> Dashboard["dashboard"]
   Panel --> Sections["opportunities[/slug] · applications[/id] · saved · record · profile · settings redirect"]
-  Dashboard --> Sample["lib/sample: opportunities.ts · volunteer.ts"]
-  Sections --> Sample
-  Sample --> Rules["lib/record · lib/opportunities · lib/applications · lib/profile"]
+  Dashboard --> Api["lib/api: *.server.ts reads · schemas.ts · actions"]
+  Sections --> Api
+  Api --> Backend[("v-backend")]
+  Api --> Rules["lib/record · lib/opportunities · lib/applications · lib/profile"]
 ```
 
 ## Module ownership
@@ -35,9 +37,9 @@ flowchart LR
 | `src/app/[locale]/layout.tsx`                                     | Root document, `lang`, the two typefaces, the theme boot script, `noindex`, the client provider with `messages={null}`                                                                                                                                                        |
 | `src/app/[locale]/page.tsx`                                       | Redirects to the entry route (`login`)                                                                                                                                                                                                                                        |
 | `src/app/[locale]/(auth)/layout.tsx`                              | The sign-in frame: lockup, language and theme controls, centred column, footer, on the dot-grid ground                                                                                                                                                                        |
-| `src/app/[locale]/(auth)/*/page.tsx`                              | Log in, create account, reset password                                                                                                                                                                                                                                        |
-| `src/app/[locale]/(volunteer)/layout.tsx`                         | Builds the shell's user card and notification list from the sample and wraps every signed-in screen in `AppShell`; `force-dynamic`                                                                                                                                            |
-| `src/app/[locale]/(volunteer)/*/page.tsx`                         | The volunteer sections and two detail pages, each `force-dynamic` so sample dates are relative to the request; `/saved` preserves old links by redirecting into Opportunities                                                                                                 |
+| `src/app/[locale]/(auth)/*/page.tsx`                              | Log in and create an account, both the Telegram handoff                                                                                                                                                                                                                                        |
+| `src/app/[locale]/(volunteer)/layout.tsx`                         | Re-checks the session, reads `/me`, `/record` and `/notifications` for the shell, wraps every section in `PanelErrorBoundary`, and renders `LoadErrorPanel` when those reads fail; `force-dynamic` |
+| `src/app/[locale]/(volunteer)/*/page.tsx`                         | The volunteer sections and two detail pages, each `force-dynamic` and reading the backend per request; `/saved` preserves old links by redirecting to `/opportunities?view=saved`, `/settings` to `/profile` |
 | `src/app/[locale]/(volunteer)/not-found.tsx`                      | The 404 inside the panel, reached through `notFound()` from a detail page                                                                                                                                                                                                     |
 | `src/app/global-not-found.tsx`                                    | 404 for unmatched URLs outside the locale tree                                                                                                                                                                                                                                |
 | `src/app/robots.ts`                                               | Disallows every crawler; the application is private                                                                                                                                                                                                                           |
@@ -47,19 +49,19 @@ flowchart LR
 | `src/lib/seo/origin.ts`                                           | This origin and the marketing origin, both read from configuration and never guessed                                                                                                                                                                                          |
 | `src/lib/security/headers.ts`                                     | The CSP and security headers `next.config.ts` sends                                                                                                                                                                                                                           |
 | `src/lib/theme.ts`                                                | Theme preference, the inline boot script, the `data-motion` flag                                                                                                                                                                                                              |
-| `src/lib/datetime.ts`                                             | Tashkent calendar-day arithmetic and the relative-instant helper the sample uses                                                                                                                                                                                              |
+| `src/lib/datetime.ts`                                             | Tashkent calendar-day arithmetic and a relative-instant helper used by tests                                                                                                                                                                                              |
 | `src/lib/record/levels.ts`                                        | Level thresholds, the reliability rule, attendance outcomes, participation entries                                                                                                                                                                                            |
 | `src/lib/opportunities/`                                          | Region, format, status and question vocabulary; deadline state; URL filter parsing and the filter itself                                                                                                                                                                      |
 | `src/lib/applications/status.ts`                                  | Application statuses, predicates, the status groups, the timeline derivation                                                                                                                                                                                                  |
 | `src/lib/profile/completion.ts`                                   | The six-field completion rule and the full profile shape                                                                                                                                                                                                                      |
-| `src/lib/activity/`, `src/lib/notifications/`, `src/lib/account/` | Activity kinds, notification kinds, linked identities and preference keys                                                                                                                                                                                                     |
-| `src/lib/sample/opportunities.ts`                                 | The ten-opportunity catalogue with descriptions, requirements and questions in three languages                                                                                                                                                                                |
-| `src/lib/sample/volunteer.ts`                                     | The illustrative volunteer: profile, record, applications with answers, saved items, history, notifications, preferences, identities                                                                                                                                          |
+| `src/lib/notifications/`, `src/lib/account/`                       | The notification shape, linked identities and preference keys |
+| `src/lib/api/`                                                    | The server-only client (`client.server.ts`), the authenticated call with refresh-and-retry (`session.server.ts`), one read module per domain (`*.server.ts`), the Zod schemas every response passes through (`schemas.ts`), error codes and the `ActionResult` envelope |
+| `src/lib/<domain>/actions.ts`                                     | The Server Actions that write: apply, save and submit a draft, withdraw, save an opportunity, save the profile, a preference, mark notifications read, sign out |
 | `src/components/ui/`                                              | `buttonClass`, `Field`, `Input`, `Textarea`, `Select`, `Switch`                                                                                                                                                                                                               |
 | `src/components/brand/`                                           | The mark, the arc, the lockup, and the two provider marks                                                                                                                                                                                                                     |
 | `src/components/motion/`                                          | `Scene`, `SplitWords`, the one observer, and `SmoothScroll`                                                                                                                                                                                                                   |
-| `src/components/app/`                                             | The shell (`AppShell`, `Sidebar`, `SidebarNav`, `TopBar`, `TabBar`, `AppFooter`), its menus (`NotificationsMenu`, `UserMenu`), the language and theme controls, and the composition primitives (`Panel`, `StatTiles`, `PageHeader`, `Segmented`, `PreviewNote`, `StatusChip`) |
-| `src/components/auth/`                                            | Intro, preview notice, panel, provider buttons, the form                                                                                                                                                                                                                      |
+| `src/components/app/`                                             | The shell (`AppShell`, `Sidebar`, `SidebarNav`, `TopBar`, `TabBar`, `AppFooter`), its menus (`NotificationsMenu`, `UserMenu`), the language and theme controls, and the composition primitives (`Panel`, `StatTiles`, `PageHeader`, `Segmented`, `StatusChip`, `ActionStatus`, `LoadErrorPanel`) |
+| `src/components/auth/`                                            | Intro, panel, status line, provider buttons, sign-out form |
 | `src/components/dashboard/`                                       | Next up, application rows, record progress, profile meter, activity feed, the status chips                                                                                                                                                                                    |
 | `src/components/opportunities/`                                   | Filters, card, rows, facts, save button                                                                                                                                                                                                                                       |
 | `src/components/applications/`                                    | The timeline                                                                                                                                                                                                                                                                  |
@@ -72,8 +74,8 @@ flowchart LR
 The route registry owns only route identity, area, navigation flags, href
 helpers and the active-path rule. Pages compose components and domain rules.
 Components may depend on `lib` and `i18n`; neither `lib` nor `i18n` may import
-a page or a component. `lib/sample` may import every domain type and nothing
-from `components`; it is the only module that knows the volunteer's name.
+a page or a component. `lib/api` may import every domain type and nothing
+from `components`; `lib/api` is the only module that talks to the backend.
 
 `src/lib/seo/origin.ts` is the one policy join between configured external
 destinations and the interface. The marketing links return `null` while the
@@ -94,19 +96,22 @@ props so no page-level translation reaches the browser:
   hidden input when it has a `name`.
 - `OpportunityFilters` submits its own GET form when a select or the switch
   changes.
-- `SaveButton` toggles its pressed state.
-- `AuthForm` owns the submit handler, the password reveal, and the navigation.
-- `ProfileForm` owns its "saved in preview" status.
+- `SaveButton`, `PreferenceSwitches` and `NotificationsMenu` call a Server
+  Action inside a transition and hold an optimistic value until it settles.
+- `ApplyForm`, `AnswersForm`, `WithdrawForm` and `ProfileForm` post to a
+  Server Action through `useActionState` and render its `ActionResult`.
+- `PanelErrorBoundary` catches a section that failed to render and refreshes
+  the router on retry.
 - `SceneObserver` and `SmoothScroll` render nothing and own one browser API
   each.
 
 The root layout gives `NextIntlClientProvider` `messages={null}`, as the
 marketing site does: locale context reaches the client, no catalog does.
 
-Every page calls `setRequestLocale` before reading translations. The sign-up
-and reset pages are statically generated per locale; the login page reads
-`?reset=sent`, and every signed-in screen is dynamic because the sample dates
-itself relative to the request.
+Every page calls `setRequestLocale` before reading translations. The sign-in
+pages are dynamic because they read `?telegram=`, `?session=` and `?next=`,
+and every signed-in screen is dynamic because it reads the backend on each
+request.
 
 ## The panel shell
 
@@ -134,24 +139,19 @@ retains the selected All or Saved view. A filtered screen can therefore be share
 reloaded and switched between languages without losing its state, and the
 application status groups work the same way through `?group=`.
 
-## Sample data
+## Backend data
 
-Two modules. `sampleOpportunities(now)` is a catalogue of ten opportunities
-across seven regions and three formats, in every state the chips know (open,
-closing tomorrow, closing soon, full, closed), each with a description,
-requirements and organiser questions in three languages. `sampleVolunteer(now)`
-composes one volunteer from it: a profile missing one field, a record of five
-confirmed events and one awaiting confirmation, five applications from draft
-to rejected with answers, two saved items, a seven-row participation history
-whose counts and hours agree with the record, five notifications, preferences
-and linked identities. `sampleOpportunity(slug)` and `sampleApplication(id)`
-back the detail pages and return `null` for an unknown key, which the page
-turns into the panel's 404.
-
-Every date is relative to `now` through `tashkentInstant`, and every signed-in
-route is `force-dynamic`, so the demo never shows a deadline that has passed.
-Tests pin the catalogue's coverage, the three languages, the count
-consistency, and that no real partner is named.
+Every read is a function in `src/lib/api/<domain>.server.ts` that calls the
+backend through `authed()` — which attaches the session's access token,
+rotates it once on a 401 when a cookie can be written, and otherwise ends the
+session through `/api/auth/session/expired` — and parses the body with a
+schema from `src/lib/api/schemas.ts`. The frontend type of an opportunity, an
+application, a profile, the record, a notification or the preferences is the
+schema's output; the two renames the backend needs (`sourcedByYvc`,
+`readAt`) happen in the schema, nowhere else. Public opportunity reads use the
+plain client. Detail reads are wrapped in React `cache()` so `generateMetadata`
+and the page share one request. A `404` from a detail read becomes the panel's
+404 through `notFound()`.
 
 ## Entry scenes and smooth scrolling
 
@@ -166,7 +166,7 @@ its own `Scene` and rises once as it scrolls in.
 | `localePrefix: "always"`, `localeCookie: false`, `alternateLinks: false`     | `src/i18n/routing.ts`                                          | Same reasons as the marketing site: one language per URL, nothing stored, nothing in headers                                        |
 | `timeZone: "Asia/Tashkent"` and named date formats                           | `src/i18n/request.ts`                                          | Server and client format every date identically; the panel uses `day`, `date`, `weekday` and `time`                                 |
 | Port 3001                                                                    | `package.json`, `.claude/launch.json`, `src/lib/seo/origin.ts` | The marketing site takes 3000 and the API takes 4000, so all three run side by side; `v-web`'s `NEXT_PUBLIC_APP_ORIGIN` points here |
-| `dynamic = "force-dynamic"` on the volunteer layout and every signed-in page | `(volunteer)/`                                                 | Sample dates are relative to the request                                                                                            |
+| `dynamic = "force-dynamic"` on the volunteer layout and every signed-in page | `(volunteer)/`                                                 | Every signed-in screen reads the backend per request                                                                                            |
 | `experimental.globalNotFound`                                                | `next.config.ts`                                               | The root layout sits under `[locale]`, so a 404 for an unmatched URL cannot be composed from a layout                               |
 | `X-Robots-Tag: noindex` on every response                                    | `src/lib/security/headers.ts`                                  | Every screen is private; the plan introduces a per-route policy only when a public route exists                                     |
 | Theme in `localStorage`, not a cookie                                        | `src/lib/theme.ts`                                             | A cookie would reach the server; the boot script applies the stored value before paint                                              |
@@ -184,14 +184,12 @@ than Radix; the profile form is an uncontrolled form rather than React Hook
 Form. Each of those returns only when a phase of the implementation plan names
 a concrete need.
 
-## Presented, not implemented
+## Not implemented
 
-Sign-in, account creation, password reset, applying, withdrawing, saving a
-profile, saving an opportunity beyond the page, storing a preference, linking
-or unlinking a sign-in method, signing out everywhere, deleting an account.
-This repository presents them; it does not implement them, and every control
-that would do one of them is either local state only or disabled with a
-`PreviewNote` beside it.
+Google sign-in (the button renders `disabled` with a note), email and password
+(the backend has none, so no form exists), linking or unlinking a sign-in
+method, signing out everywhere, deleting an account, marking one notification
+read on its own. Nothing presents them as working.
 
 ## Needs verification
 

@@ -23,7 +23,7 @@ inside the source. Compiler and linter directives are not comments and stay.
    namespace for the page's own copy with at least a `metaTitle`, `title` and
    `description`.
 3. **Create** `src/app/[locale]/(volunteer)/<path>/page.tsx` following the
-   record page: `dynamic = "force-dynamic"` while it renders the sample,
+   record page: `dynamic = "force-dynamic"` because it reads the backend per request,
    `generateMetadata` reading the catalog, a default export that awaits
    `params` and calls `setRequestLocale`, and a synchronous component that
    opens with `PageHeader` and composes `Panel`s.
@@ -56,15 +56,16 @@ being Cyrillic. Uzbek plurals use `other` alone; Russian needs `one`, `few`,
 `other`.
 
 Proper nouns stay in code, not in the catalogs: the organisation name in
-`src/lib/content/org.ts`, and sample titles and organisers as `LocalizedText`
-in `src/lib/sample/volunteer.ts`.
+`src/lib/content/org.ts`. Opportunity titles and organisers arrive from the
+backend in one language and are rendered as they arrive.
 
 ## Add a locale
 
 1. Add the code to `locales` and a native label to `localeNames` in
    `src/i18n/routing.ts`.
 2. Add `src/i18n/messages/<code>.json` with the full key set.
-3. Give every `LocalizedText` in the sample a value for it.
+3. Add the code to `AUTH_LOCALES` in `v-backend`, or the Telegram ticket
+   request will reject it.
 4. Confirm the typefaces cover the script.
 
 ## Add a colour or token
@@ -98,20 +99,24 @@ with an icon and a word; provisional material is a `StatusChip` with words.
 
 Answer one question a volunteer has (see
 [`../product/VOLUNTEER_DASHBOARD.md`](../product/VOLUNTEER_DASHBOARD.md)), give
-the panel a domain rule under `src/lib/<domain>/` with a test, extend the sample
-so the panel has content, add its copy to the three catalogs, and compose it
+the panel a domain rule under `src/lib/<domain>/` with a test, a read in
+`src/lib/api/<domain>.server.ts` parsed by a schema in `src/lib/api/schemas.ts`
+(with a fixture in `e2e/stub-backend.mjs`), add its copy to the three catalogs,
+and compose it
 with `Panel`. Lists inside a panel use `padding="none"` and rows with their own
 padding. Decide whether it belongs in the main column or the aside by urgency,
 and keep the order the same on every width.
 
-## Add a switch or a control that cannot write yet
+## Add a switch or a control that writes
 
-Use `Switch` from `src/components/ui/switch.tsx`: uncontrolled with
-`defaultChecked` for a preference that lives only on the page, controlled with
-`checked` when something real owns the state (the theme). A button whose
-action needs the backend is rendered `disabled` with a `PreviewNote` beside it;
-a control that only changes what the page shows (save, filters) keeps working
-and the page says its changes are not stored.
+Use `Switch` from `src/components/ui/switch.tsx` controlled with `checked`
+from an optimistic value, and call a Server Action from
+`src/lib/<domain>/actions.ts` inside a transition — `PreferenceSwitches` is the
+pattern. A form posts to its action through `useActionState` and renders the
+`ActionResult` with `ActionStatus` — `ProfileForm` and `AnswersForm` are the
+patterns. A control whose backing does not exist yet is rendered `disabled`
+with a visible note, as the Google button is; never one that looks live and
+does nothing.
 
 ## Link to something outside the application
 

@@ -44,9 +44,10 @@ blank in `.env.example`; see
 changes. Add another only when executable code consumes it, document it there,
 and add a value-free placeholder.
 
-`npm run test:e2e` pins all four variables to empty, so the smoke suite keeps
-testing the unconfigured, unguarded baseline no matter what a machine has in
-`.env.local`.
+`npm run test:e2e` starts `e2e/stub-backend.mjs` on port 3212 and pins
+`VOLONTYORLAR_API_URL` to it with a throwaway session secret, so the smoke
+suite exercises sign-in, every guard and every write against a deterministic
+backend no matter what a machine has in `.env.local`.
 
 To work on sign-in locally, set the two server-only variables in `.env.local`:
 
@@ -59,8 +60,9 @@ with `v-backend` running on 4000 with `AUTH_ENABLED=true` and its bot
 registered. The full procedure, including how the bot token is obtained from
 BotFather, is in
 [`../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
-Leave both blank to work on anything else: the app then keeps its unguarded
-preview behaviour.
+Leave either blank and no one can sign in: every `(volunteer)` route redirects
+to `/login`, and the Telegram button returns `?telegram=unavailable`. There is
+no preview mode.
 
 Never place a session secret, an API origin, a bot token, or a Google client
 secret in a `NEXT_PUBLIC_*` variable. Next.js embeds those values in browser
@@ -71,11 +73,11 @@ bundles.
 | Layer          | Tool            | Scope                                                                                                                                                                                                                                          |
 | -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Rules          | Vitest          | Levels and reliability, deadline state, calendar days, profile completion, application predicates, the route registry, origins, headers                                                                                                        |
-| Sample         | Vitest          | The sample volunteer has content for every block, dates relative to now, three languages, and no real organiser                                                                                                                                |
+| Schemas        | Vitest          | Every backend response shape parses through `src/lib/api/schemas.ts`, including the renames and the unread flag; the answer and profile form parsers |
 | Content        | Vitest          | Catalog key parity, ICU argument parity, empty and placeholder strings, Uzbek turned comma, Russian Cyrillic                                                                                                                                   |
 | Tokens         | Vitest          | Contrast contract in both themes, no bold display face, no literal hex                                                                                                                                                                         |
-| Components     | Testing Library | The auth form's submit and password reveal, the tab bar's active section, the language switcher, the theme switch, scenes                                                                                                                      |
-| Critical paths | Playwright      | Each locale, the root redirect, language switching, every sign-in option landing on the dashboard, the reset status, the dashboard's blocks and meter, section navigation, the theme switch, horizontal overflow, reduced motion, headers, 404 |
+| Components     | Testing Library | The tab bar's active section, the language switcher, the theme switch, scenes |
+| Critical paths | Playwright      | Against `e2e/stub-backend.mjs`: each locale, the root redirect, language switching, the Telegram handoff, an invalid and a valid login token, every guard, the dashboard, section navigation, notifications, sign-out, saving, applying, a draft, submitting, withdrawing, the profile and preferences persisting, the theme switch, horizontal overflow, reduced motion, headers, 404 |
 
 Playwright runs the smoke suite in Chromium desktop and mobile, Firefox
 desktop, and WebKit mobile, and builds the app itself through its `webServer`
@@ -112,5 +114,6 @@ Before a public launch:
    values, and point `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` at
    `https://<this origin>/api/auth/telegram/complete`. Verify the completion
    link opens correctly inside Telegram's in-app browser on the real origin.
-5. Do not deploy the sample dashboard as a product. Every screen behind sign-in
-   says it is a preview; the implementation plan is what removes those labels.
+5. The panel reads `v-backend` on every request. Deploy the backend first,
+   then this app; a response the schemas in `src/lib/api/schemas.ts` cannot
+   parse renders the load-error panel rather than a guess.

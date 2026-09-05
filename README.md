@@ -16,11 +16,13 @@ cp .env.example .env.local
 npm run dev
 ```
 
-http://localhost:3001 redirects to `/uz/login`. Every option on the sign-in,
-sign-up and reset pages opens the panel: there is no backend yet, so the forms
-are interface only and every screen renders a clearly labelled sample
-volunteer. Run `../v-web` on port 3000 at the same time and its "Log in" button
-points here through `NEXT_PUBLIC_APP_ORIGIN`.
+http://localhost:3001 redirects to `/uz/login`. Sign-in is Telegram: the
+button hands off to the bot and the completion link writes the session cookie.
+Everything behind it reads `v-backend`, so set `VOLONTYORLAR_API_URL` and
+`VOLONTYORLAR_SESSION_SECRET` in `.env.local` (see
+`docs/operations/DEVELOPMENT_AND_DEPLOYMENT.md`). Run `../v-web` on port 3000
+at the same time and its "Log in" button points here through
+`NEXT_PUBLIC_APP_ORIGIN`.
 
 ## Commands
 
@@ -37,9 +39,8 @@ points here through `NEXT_PUBLIC_APP_ORIGIN`.
 
 ## What is here
 
-- The three authentication surfaces: log in with Google, Telegram, or email and
-  password; create an account with full name, email and password; reset a
-  password by email. All three are interface only and say so on screen.
+- The two sign-in surfaces: log in and create an account, both with Telegram.
+  Google renders disabled with a note; there is no email or password.
 - A product panel: a sidebar and a minimal top bar with notifications and an
   account menu on desktop; a top bar and a four-tab bar on a phone.
 - The dashboard: greeting and level, three figures, the next commitment,

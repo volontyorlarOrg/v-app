@@ -33,10 +33,15 @@ The browser never verifies an identity. Telegram proves who the volunteer is,
 this application only decides what is worth rendering. Every write is still
 authorised by the backend.
 
-Sign-in turns on only when both `VOLONTYORLAR_API_URL` and
-`VOLONTYORLAR_SESSION_SECRET` are set. While either is blank the application
-keeps its earlier behaviour: no cookie, no guarded route, and the Telegram
-button is a labelled preview like the other two methods.
+Sign-in needs both `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.
+The route guards in `src/proxy.ts` do not depend on them: a `(volunteer)` URL
+without a valid cookie is always redirected to `/login?next=`. While either
+value is blank no cookie can be written and the Telegram handoff returns to
+`/login?telegram=unavailable`, so the application is closed rather than open.
+
+The cookie is `Secure` in a production build unless `NEXT_PUBLIC_SITE_URL` is
+explicitly an `http:` origin, so a production build served locally over plain
+HTTP (the Playwright suite) still receives its own cookie.
 
 ### The session cookie
 
@@ -74,16 +79,17 @@ browser, which does not share them, so the backend also echoes the locale back
 on the completion link and the destination falls back to the dashboard.
 
 The one browser-storage value remains the light/dark theme choice in
-`localStorage`. Nothing personal appears in a URL; the reset flow carries only
-`?reset=sent` and sign-in carries only `?telegram=expired|unavailable`.
+`localStorage`. Nothing personal appears in a URL;
+sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
+same-origin `?next=` path checked by `safeReturnPath`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
 
 ## Not implemented
 
-- Google and email/password sign-in; both remain labelled previews
+- Google sign-in; the button renders disabled with a note
+- email/password sign-in; the backend has none, so the app shows no form
 - account linking, settings, and "sign out everywhere"
-- form submission, validation, or rate limiting for the email forms
 - analytics, monitoring, or error reporting
 
 They are designed in
