@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 export type FieldControlProps = {
   id: string;
   "aria-describedby": string | undefined;
+  role?: "group";
+  "aria-labelledby"?: string;
 };
 
 export const controlClass =
@@ -15,27 +17,46 @@ export function Field({
   label,
   help,
   trailing,
+  group = false,
   className,
   children,
 }: {
   label: string;
   help?: string;
   trailing?: ReactNode;
+  group?: boolean;
   className?: string;
   children: (control: FieldControlProps) => ReactNode;
 }) {
   const id = useId();
   const helpId = `${id}-help`;
+  const labelId = `${id}-label`;
+  const describedBy = help ? helpId : undefined;
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="text-sm font-semibold text-ink">
-          {label}
-        </label>
+        {group ? (
+          <span id={labelId} className="text-sm font-semibold text-ink">
+            {label}
+          </span>
+        ) : (
+          <label htmlFor={id} className="text-sm font-semibold text-ink">
+            {label}
+          </label>
+        )}
         {trailing}
       </div>
-      {children({ id, "aria-describedby": help ? helpId : undefined })}
+      {children(
+        group
+          ? {
+              id,
+              "aria-describedby": describedBy,
+              role: "group",
+              "aria-labelledby": labelId,
+            }
+          : { id, "aria-describedby": describedBy },
+      )}
       {help ? (
         <p id={helpId} className="text-xs leading-5 text-ink-muted">
           {help}

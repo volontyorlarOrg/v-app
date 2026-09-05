@@ -174,9 +174,11 @@ docs/                           -> stable project documentation and the plan
 - No personal data in URLs (sign-in carries only
   `?telegram=expired|unavailable|cancelled|phoneRequired`, `?session=expired`
   and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
-  `state`), no tokens in browser storage;
-  the theme choice is the only stored value. Session tokens live only in the
-  encrypted `httpOnly` cookie and must never be passed to a Client Component.
+  `state`), no tokens in browser storage; the theme and the interface language
+  are the only stored values, and both live in readable cookies shared with the
+  marketing site (`src/lib/preferences.ts`) rather than in `localStorage`, which
+  cannot cross the two origins. Session tokens live only in the encrypted
+  `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in
   `src/lib/record/levels.ts`. Never duplicate a formula into JSX, never invent
   one, never count unconfirmed attendance against a volunteer, and never show

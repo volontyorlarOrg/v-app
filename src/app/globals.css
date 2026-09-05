@@ -100,6 +100,12 @@
     scroll-padding-top: 4.5rem;
   }
 
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
   body {
     background-color: var(--color-paper);
     background-image:

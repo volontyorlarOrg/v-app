@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { THEME_COOKIE_NAME } from "@/lib/theme";
 
 function stubMatchMedia(matching: Record<string, boolean>) {
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -17,6 +17,7 @@ function stubMatchMedia(matching: Record<string, boolean>) {
 describe("ThemeToggle", () => {
   beforeEach(() => {
     localStorage.clear();
+    document.cookie = `${THEME_COOKIE_NAME}=; path=/; max-age=0`;
     delete document.documentElement.dataset.theme;
     delete document.documentElement.dataset.motion;
     stubMatchMedia({});
@@ -46,7 +47,7 @@ describe("ThemeToggle", () => {
 
   it("prefers a stored choice over the system preference", () => {
     stubMatchMedia({ "(prefers-color-scheme: dark)": true });
-    localStorage.setItem(THEME_STORAGE_KEY, "light");
+    document.cookie = `${THEME_COOKIE_NAME}=light; path=/`;
     render(<ThemeToggle label="Dark theme" />);
     expect(document.documentElement.dataset.theme).toBe("light");
   });
@@ -57,11 +58,11 @@ describe("ThemeToggle", () => {
 
     await user.click(screen.getByRole("switch"));
     expect(document.documentElement.dataset.theme).toBe("dark");
-    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
+    expect(document.cookie).toContain(`${THEME_COOKIE_NAME}=dark`);
 
     await user.click(screen.getByRole("switch"));
     expect(document.documentElement.dataset.theme).toBe("light");
-    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+    expect(document.cookie).toContain(`${THEME_COOKIE_NAME}=light`);
   });
 
   it("leaves motion off under prefers-reduced-motion", () => {
