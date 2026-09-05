@@ -61,3 +61,17 @@ export type VolunteerProfile = ProfileFields & {
   skills: string[];
   links: string[];
 };
+
+export const EMPTY_PROFILE: VolunteerProfile = {
+  fullName: "",
+  bio: "",
+  region: null,
+  school: "",
+  gradeYear: "",
+  city: "",
+  languages: [],
+  skills: [],
+  phone: "",
+  telegram: "",
+  links: [],
+};

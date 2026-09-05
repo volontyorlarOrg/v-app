@@ -2,12 +2,12 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { defaultLocale, isLocale, routing } from "@/i18n/routing";
-import { isAuthConfigured } from "@/lib/auth/config";
 import { refreshSession } from "@/lib/auth/refresh";
 import {
   SESSION_COOKIE_NAME,
   decryptSession,
   encryptSession,
+  isAccessTokenExpired,
   isAccessTokenExpiring,
   sessionCookieOptions,
   type SessionPayload,
@@ -38,20 +38,23 @@ function expireSessionCookie(response: NextResponse) {
 }
 
 export default async function proxy(request: NextRequest) {
-  if (!isAuthConfigured()) return intl(request);
-
   const { pathname, search } = request.nextUrl;
   const guard = guardFor(pathname);
   const locale = localeOf(pathname);
 
-  let session = await decryptSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  const current = await decryptSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  let session: SessionPayload | null = current;
   let rotated: SessionPayload | null = null;
   let refreshFailed = false;
 
-  if (session && isAccessTokenExpiring(session) && isNavigation(request)) {
-    rotated = session.refreshToken ? await refreshSession(session.refreshToken) : null;
-    refreshFailed = rotated === null;
-    session = rotated;
+  if (current && isAccessTokenExpiring(current) && isNavigation(request)) {
+    rotated = current.refreshToken ? await refreshSession(current.refreshToken) : null;
+    if (rotated) {
+      session = rotated;
+    } else if (isAccessTokenExpired(current)) {
+      refreshFailed = true;
+      session = null;
+    }
   }
 
   if (guard === "session" && !session) {

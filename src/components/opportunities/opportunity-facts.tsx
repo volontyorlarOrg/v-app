@@ -1,9 +1,8 @@
 import { BadgeCheck } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
-import type { Locale } from "@/i18n/routing";
-import { localized, type OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary } from "@/lib/opportunities/types";
 
 export function OpportunityFacts({
   opportunity,
@@ -14,7 +13,6 @@ export function OpportunityFacts({
 }) {
   const t = useTranslations("opportunities");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   const starts = new Date(opportunity.startsAt);
   const ends = opportunity.endsAt ? new Date(opportunity.endsAt) : null;
@@ -25,8 +23,8 @@ export function OpportunityFacts({
   const place = remote
     ? t(`format.${opportunity.format}`)
     : [
-        opportunity.locationName ? localized(opportunity.locationName, locale) : null,
-        opportunity.city ? localized(opportunity.city, locale) : null,
+        opportunity.locationName ? opportunity.locationName : null,
+        opportunity.city ? opportunity.city : null,
         t(`regions.${opportunity.region}`),
       ]
         .filter(Boolean)
@@ -38,7 +36,7 @@ export function OpportunityFacts({
       label: t("detail.organiser"),
       value: (
         <span className="inline-flex items-center gap-1.5">
-          {localized(opportunity.organization.name, locale)}
+          {opportunity.organization.name}
           {opportunity.organization.verified ? (
             <BadgeCheck aria-label={t("verified")} className="size-4 text-primary" />
           ) : null}

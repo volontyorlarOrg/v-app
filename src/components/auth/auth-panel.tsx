@@ -7,13 +7,3 @@ export function AuthPanel({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-export function AuthDivider({ label }: { label: string }) {
-  return (
-    <p className="my-6 flex items-center gap-4 text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-      <span aria-hidden="true" className="h-px flex-1 bg-border" />
-      {label}
-      <span aria-hidden="true" className="h-px flex-1 bg-border" />
-    </p>
-  );
-}

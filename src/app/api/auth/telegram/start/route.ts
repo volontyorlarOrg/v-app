@@ -10,6 +10,7 @@ import {
   safeReturnPath,
 } from "@/lib/auth/session";
 import { botDeepLink, telegramTicketSchema } from "@/lib/auth/telegram";
+import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { localePath } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -18,11 +19,10 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const localeParam = url.searchParams.get("locale");
   const locale = isLocale(localeParam) ? localeParam : defaultLocale;
-  const loginUrl = new URL(localePath(locale, "login"), request.url);
+  const loginPath = localePath(locale, "login");
 
   if (!isAuthConfigured()) {
-    loginUrl.searchParams.set("telegram", "unavailable");
-    return NextResponse.redirect(loginUrl, 303);
+    return relativeRedirect(withQuery(loginPath, { telegram: "unavailable" }));
   }
 
   let ticket;
@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[telegram-auth] ticket request failed:", error);
-    loginUrl.searchParams.set("telegram", "unavailable");
-    return NextResponse.redirect(loginUrl, 303);
+    return relativeRedirect(withQuery(loginPath, { telegram: "unavailable" }));
   }
 
   const response = NextResponse.redirect(

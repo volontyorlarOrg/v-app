@@ -4,13 +4,11 @@
     "organizationShortName": "Volontyorlar",
     "tagline": "Oʻzbekistondagi yoshlar uchun volontyorlik",
     "location": "Oʻzbekiston",
-    "sample": {
-      "chip": "Namuna maʼlumot",
-      "body": "Bu panelda namunaviy volontyor koʻrsatilgan. Hozircha undagi hech narsa haqiqiy hisobga ulanmagan."
-    },
-    "preview": {
-      "chip": "Koʻrib chiqish",
-      "notSaved": "Bu sahifadagi oʻzgarishlar hali hech qayerda saqlanmaydi. Saqlash backend bilan birga keladi."
+    "volunteer": "Volontyor",
+    "error": {
+      "title": "Sahifani yuklab boʻlmadi",
+      "body": "Server bilan bogʻlanib boʻlmadi. Bir ozdan keyin qayta urinib koʻring.",
+      "retry": "Qayta urinish"
     }
   },
   "nav": {
@@ -45,65 +43,35 @@
       "label": "Hisob menyusi"
     }
   },
-  "notifications": {
-    "kinds": {
-      "attendanceConfirmed": "Tashkilotchi {title} tadbirida qatnashganingizni tasdiqladi.",
-      "applicationAccepted": "Siz {title} tadbiriga qabul qilindingiz.",
-      "applicationUnderReview": "{title} uchun arizangiz koʻrib chiqilmoqda.",
-      "deadlineSoon": "{title} ertaga yopiladi.",
-      "newOpportunity": "Hududingizda yangi imkoniyat: {title}."
-    }
-  },
   "auth": {
-    "preview": {
-      "chip": "Koʻrib chiqish",
-      "body": "Kirish hali ulanmagan. Quyidagi har bir variant namunaviy panelni ochadi.",
-      "bodyTelegram": "Telegram orqali kirish ishlaydi. Google va email hali ulanmagan va namunaviy panelni ochadi."
-    },
     "providers": {
       "google": "Google orqali davom etish",
       "telegram": "Telegram orqali davom etish",
-      "or": "yoki email bilan"
+      "googleUnavailable": "Google orqali kirish hozircha mavjud emas."
     },
     "telegram": {
       "handoff": "Keyingi qadamda Telegram ochiladi. Bot oʻsha chatga yuboradigan havola orqali kirishni yakunlang.",
       "expired": "Bu kirish havolasining muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
       "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring."
     },
-    "fields": {
-      "fullName": "Toʻliq ism",
-      "email": "Email",
-      "password": "Parol",
-      "passwordHelp": "Kamida 8 ta belgi.",
-      "showPassword": "Parolni koʻrsatish",
-      "hidePassword": "Parolni yashirish"
-    },
     "login": {
       "metaTitle": "Kirish",
       "title": "Xush kelibsiz.",
       "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻrish uchun kiring.",
-      "submit": "Kirish",
-      "forgot": "Parolni unutdingizmi?",
       "noAccount": "Volontyorlarda yangimisiz?",
-      "createAccount": "Hisob yaratish",
-      "resetSent": "Agar bu email hisobga tegishli boʻlsa, tiklash havolasi yuborildi."
+      "createAccount": "Hisob yaratish"
     },
     "signup": {
       "metaTitle": "Hisob yaratish",
       "title": "Hisobingizni yarating.",
-      "lead": "Bitta profil — har bir ariza uchun. Uni bir marta toʻldirasiz.",
-      "submit": "Hisob yaratish",
+      "lead": "Telegram orqali davom eting — hisobingiz birinchi kirishda yaratiladi.",
       "legal": "Davom etish orqali siz <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozilik bildirasiz.",
       "legalPlain": "Davom etish orqali siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
       "haveAccount": "Hisobingiz bormi?",
       "logIn": "Kirish"
     },
-    "forgot": {
-      "metaTitle": "Parolni tiklash",
-      "title": "Parolingizni tiklang.",
-      "lead": "Roʻyxatdan oʻtgan emailingizni kiriting, sizga havola yuboramiz.",
-      "submit": "Tiklash havolasini yuborish",
-      "back": "Kirishga qaytish"
+    "session": {
+      "expired": "Seansingiz tugadi. Qaytadan kiring."
     }
   },
   "dashboard": {
@@ -157,16 +125,7 @@
       "viewAll": "Barcha saqlanganlar",
       "empty": "Koʻrib chiqayotganda imkoniyatni saqlang — u sizni shu yerda kutadi."
     },
-    "activity": {
-      "title": "Yaqinda",
-      "kinds": {
-        "attendanceConfirmed": "Tashkilotchi {title} tadbirida qatnashganingizni tasdiqladi",
-        "applicationAccepted": "Siz {title} tadbiriga qabul qilindingiz",
-        "applicationSubmitted": "Siz {title} tadbiriga ariza berdingiz",
-        "opportunitySaved": "Siz {title} imkoniyatini saqladingiz",
-        "levelReached": "Siz {title} darajasiga yetdingiz"
-      }
-    }
+    "greetingAnonymous": "Salom."
   },
   "record": {
     "metaTitle": "Mening tarixim",
@@ -259,9 +218,35 @@
       "fromProfile": "Profilingizdan",
       "fromProfileHelp": "Tashkilotchi javoblaringiz bilan birga koʻradigan maʼlumot.",
       "withdraw": "Arizani qaytarib olish",
-      "withdrawPreview": "Qaytarib olish backend bilan birga ochiladi.",
-      "continuePreview": "Qoralamani tahrirlash backend bilan birga ochiladi.",
-      "viewOpportunity": "Imkoniyatni koʻrish"
+      "viewOpportunity": "Imkoniyatni koʻrish",
+      "withdrawConfirm": "Arizani qaytarib olasizmi? Buni bekor qilib boʻlmaydi.",
+      "withdrawYes": "Ha, qaytarib olish",
+      "withdrawing": "Qaytarib olinmoqda…",
+      "cancel": "Bekor qilish",
+      "withdrawErrors": {
+        "applicationCannotBeWithdrawn": "Bu arizani qaytarib olib boʻlmaydi.",
+        "fallback": "Qaytarib olib boʻlmadi. Qayta urinib koʻring."
+      },
+      "reviewerNote": "Tashkilotchi izohi",
+      "question": "{number}-savol"
+    },
+    "form": {
+      "save": "Qoralamani saqlash",
+      "saving": "Saqlanmoqda…",
+      "submit": "Arizani yuborish",
+      "submitting": "Yuborilmoqda…",
+      "savedDraft": "Qoralama saqlandi.",
+      "choose": "Tanlang",
+      "fieldRequired": "Bu javob majburiy.",
+      "fieldInvalid": "Bu javobni tekshiring.",
+      "errors": {
+        "profileRequired": "Yuborishdan oldin profilingizni toʻldiring.",
+        "profileLink": "Profilga oʻtish",
+        "opportunityUnavailable": "Bu imkoniyat endi ariza qabul qilmaydi.",
+        "invalidAnswers": "Baʼzi javoblarni qayta tekshirish kerak.",
+        "applicationNotEditable": "Bu arizani endi tahrirlab boʻlmaydi.",
+        "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring."
+      }
     }
   },
   "opportunities": {
@@ -299,7 +284,8 @@
       "view": "Koʻrish",
       "save": "Saqlash",
       "saved": "Saqlangan",
-      "sourced": "Volontyorlar topgan"
+      "sourced": "Volontyorlar topgan",
+      "saveError": "Saqlab boʻlmadi"
     },
     "detail": {
       "back": "Barcha imkoniyatlar",
@@ -321,7 +307,13 @@
       "maxLength": "{count} tagacha belgi",
       "apply": "Ariza berish",
       "applyClosed": "Arizalar yopilgan",
-      "applyPreview": "Ariza berish backend bilan birga ochiladi. Hozircha tugma — koʻrib chiqish."
+      "applying": "Boshlanmoqda…",
+      "viewApplication": "Arizani koʻrish",
+      "applyErrors": {
+        "opportunityUnavailable": "Bu imkoniyat hozir ariza qabul qilmayapti.",
+        "opportunityNotFound": "Bu imkoniyat endi mavjud emas.",
+        "fallback": "Arizani boshlab boʻlmadi. Qayta urinib koʻring."
+      }
     },
     "status": {
       "open": "Ochiq",
@@ -358,7 +350,8 @@
       "tashkent-region": "Toshkent viloyati",
       "tashkent-city": "Toshkent shahri",
       "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
-    }
+    },
+    "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring."
   },
   "saved": {
     "metaTitle": "Saqlanganlar",
@@ -404,23 +397,26 @@
       "contact": "Siz bilan bogʻlanish usuli"
     },
     "save": "Profilni saqlash",
-    "saved": "Faqat shu koʻrib chiqishda saqlandi.",
+    "saved": "Profil saqlandi.",
     "completion": {
       "label": "Profil toʻliqligi",
       "value": "{percent}% toʻldirilgan",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
       "why": "Toʻliq profil — tashkilotchi sizni baholay oladi va siz bilan bogʻlana oladi."
-    }
+    },
+    "saving": "Saqlanmoqda…",
+    "saveError": "Profilni saqlab boʻlmadi. Belgilangan maydonlarni tekshiring.",
+    "fieldInvalid": "Bu maydonni tekshiring."
   },
   "settings": {
     "metaTitle": "Sozlamalar",
     "title": "Sozlamalar",
     "description": "Bildirishnomalar, maxfiylik, koʻrinish va hisobingiz.",
-    "preview": "Bu sahifadagi tugmachalar koʻrinishni oʻzgartiradi, lekin hali hech narsa saqlanmaydi. Sozlamalarni saqlash backend bilan birga keladi.",
     "preferences": {
       "title": "Maxfiylik va koʻrinish",
-      "description": "Boshqalar nimani koʻrishi va ilova sizga qanday koʻrinishi."
+      "description": "Boshqalar nimani koʻrishi va ilova sizga qanday koʻrinishi.",
+      "saveError": "Sozlama saqlanmadi. Qayta urinib koʻring."
     },
     "accountGroup": {
       "title": "Hisob va kirish",

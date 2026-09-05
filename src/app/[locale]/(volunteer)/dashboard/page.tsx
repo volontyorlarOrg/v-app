@@ -12,17 +12,28 @@ import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { isUpcomingCommitment } from "@/lib/applications/status";
-import { profileCompletion } from "@/lib/profile/completion";
+import { listApplications } from "@/lib/api/applications.server";
+import { getProfile } from "@/lib/api/profile.server";
+import { getRecord } from "@/lib/api/record.server";
+import { requireSession } from "@/lib/api/session.server";
+import {
+  isUpcomingCommitment,
+  type ApplicationSummary,
+} from "@/lib/applications/status";
+import {
+  EMPTY_PROFILE,
+  profileCompletion,
+  type VolunteerProfile,
+} from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
   isReliabilityMeaningful,
   levelProgress,
   reliabilityPercent,
   type Level,
+  type VolunteerRecord,
 } from "@/lib/record/levels";
 import { navHref } from "@/lib/routing/routes";
-import { sampleVolunteer } from "@/lib/sample/volunteer";
 
 export const dynamic = "force-dynamic";
 
@@ -41,23 +52,47 @@ export default async function DashboardPage({
 }: PageProps<"/[locale]/dashboard">) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <Dashboard />;
+
+  const [session, profile, volunteerRecord, applications] = await Promise.all([
+    requireSession(),
+    getProfile(),
+    getRecord(),
+    listApplications(),
+  ]);
+
+  return (
+    <Dashboard
+      displayName={profile?.fullName.trim() || session.displayName?.trim() || ""}
+      profile={profile ?? EMPTY_PROFILE}
+      record={volunteerRecord}
+      applications={applications.items}
+    />
+  );
 }
 
-function Dashboard() {
+function Dashboard({
+  displayName,
+  profile,
+  record: volunteerRecord,
+  applications: all,
+}: {
+  displayName: string;
+  profile: VolunteerProfile;
+  record: VolunteerRecord;
+  applications: readonly ApplicationSummary[];
+}) {
   const t = useTranslations("dashboard");
   const record = useTranslations("record");
-  const common = useTranslations("common");
   const applicationsT = useTranslations("applications");
   const format = useFormatter();
 
   const now = new Date();
-  const volunteer = sampleVolunteer(now);
-  const progress = levelProgress(volunteer.record.counts);
-  const percent = reliabilityPercent(volunteer.record.counts);
-  const meaningful = isReliabilityMeaningful(volunteer.record.counts);
-  const completion = profileCompletion(volunteer.profile);
+  const progress = levelProgress(volunteerRecord.counts);
+  const percent = reliabilityPercent(volunteerRecord.counts);
+  const meaningful = isReliabilityMeaningful(volunteerRecord.counts);
+  const completion = profileCompletion(profile);
   const levelName = (level: Level) => record(`level.${level}`);
+  const firstName = displayName.split(/\s+/)[0] ?? "";
 
   const lead = progress.next
     ? progress.eventsNeeded !== null
@@ -82,7 +117,7 @@ function Dashboard() {
     {
       id: "events",
       label: t("tiles.events"),
-      value: format.number(volunteer.record.counts.attended),
+      value: format.number(volunteerRecord.counts.attended),
       achievement: true,
     },
     {
@@ -95,14 +130,12 @@ function Dashboard() {
       id: "hours",
       label: t("tiles.hours"),
       value:
-        volunteer.record.hours === undefined
-          ? "—"
-          : format.number(volunteer.record.hours),
-      note: volunteer.record.hoursVerified ? undefined : t("tiles.hoursUnverified"),
+        volunteerRecord.hours === undefined ? "—" : format.number(volunteerRecord.hours),
+      note: volunteerRecord.hoursVerified ? undefined : t("tiles.hoursUnverified"),
     },
   ];
 
-  const commitments = volunteer.applications
+  const commitments = all
     .filter((application) => isUpcomingCommitment(application, now))
     .sort(
       (a, b) =>
@@ -110,7 +143,7 @@ function Dashboard() {
         new Date(b.opportunity.startsAt).getTime(),
     );
 
-  const applications = [...volunteer.applications]
+  const applications = [...all]
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, APPLICATIONS_SHOWN);
 
@@ -119,8 +152,7 @@ function Dashboard() {
       <section className="dashboard-hero">
         <div className="min-w-0 py-1">
           <PageHeader
-            chip={common("sample.chip")}
-            title={t("greeting", { name: volunteer.firstName })}
+            title={firstName ? t("greeting", { name: firstName }) : t("greetingAnonymous")}
             description={lead}
             actions={
               <Link
@@ -131,9 +163,6 @@ function Dashboard() {
               </Link>
             }
           />
-          <p className="enter-rise mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted [--enter-delay:90ms]">
-            {common("sample.body")}
-          </p>
         </div>
         <ImpactOrbit />
       </section>
@@ -175,7 +204,7 @@ function Dashboard() {
             description={t("progress.description")}
             action={{ href: navHref("record"), label: t("record.viewAll") }}
           >
-            <RecordProgress record={volunteer.record} />
+            <RecordProgress record={volunteerRecord} />
             <div className="mt-5 border-t border-border pt-5">
               <ProfileMeter completion={completion} />
             </div>

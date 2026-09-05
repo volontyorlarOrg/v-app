@@ -1,13 +1,12 @@
 import { BadgeCheck } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import {
   DeadlineText,
   OpportunityStatusChip,
 } from "@/components/dashboard/opportunity-status";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
-import { localized, type OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { opportunityHref } from "@/lib/routing/routes";
 
 export function OpportunityRows({
@@ -21,7 +20,6 @@ export function OpportunityRows({
 }) {
   const t = useTranslations("opportunities");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   if (opportunities.length === 0) {
     return (
@@ -36,7 +34,7 @@ export function OpportunityRows({
           opportunity.format === "remote"
             ? t(`format.${opportunity.format}`)
             : opportunity.city
-              ? localized(opportunity.city, locale)
+              ? opportunity.city
               : t(`regions.${opportunity.region}`);
 
         return (
@@ -53,11 +51,11 @@ export function OpportunityRows({
                 href={opportunityHref(opportunity.slug)}
                 className="text-ink hover:text-primary-ink"
               >
-                {localized(opportunity.title, locale)}
+                {opportunity.title}
               </Link>
             </h3>
             <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
-              <span>{localized(opportunity.organization.name, locale)}</span>
+              <span>{opportunity.organization.name}</span>
               {opportunity.organization.verified ? (
                 <BadgeCheck
                   aria-label={t("verified")}

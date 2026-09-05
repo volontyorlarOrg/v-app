@@ -25,3 +25,16 @@ export function isAuthConfigured(): boolean {
 export function isProduction(): boolean {
   return process.env.NODE_ENV === "production";
 }
+
+export function isSecureCookieTransport(): boolean {
+  if (!isProduction()) return false;
+
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return true;
+
+  try {
+    return new URL(raw).protocol !== "http:";
+  } catch {
+    return true;
+  }
+}

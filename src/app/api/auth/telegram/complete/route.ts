@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
@@ -13,6 +13,7 @@ import {
   sessionCookieOptions,
   toSessionPayload,
 } from "@/lib/auth/session";
+import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -28,12 +29,13 @@ export async function GET(request: NextRequest) {
       ? hintedLocale
       : defaultLocale;
 
-  const loginUrl = new URL(localePath(locale, "login"), request.url);
+  const loginPath = localePath(locale, "login");
   const token = url.searchParams.get("token");
 
   if (!token || !isAuthConfigured()) {
-    loginUrl.searchParams.set("telegram", token ? "unavailable" : "expired");
-    return NextResponse.redirect(loginUrl, 303);
+    return relativeRedirect(
+      withQuery(loginPath, { telegram: token ? "unavailable" : "expired" }),
+    );
   }
 
   let session;
@@ -47,21 +49,17 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[telegram-auth] token redemption failed:", error);
-    loginUrl.searchParams.set("telegram", "expired");
-    return NextResponse.redirect(loginUrl, 303);
+    return relativeRedirect(withQuery(loginPath, { telegram: "expired" }));
   }
 
   const cookieValue = await encryptSession(toSessionPayload(session));
 
   if (!cookieValue) {
-    loginUrl.searchParams.set("telegram", "unavailable");
-    return NextResponse.redirect(loginUrl, 303);
+    return relativeRedirect(withQuery(loginPath, { telegram: "unavailable" }));
   }
 
   const returnTo = safeReturnPath(request.cookies.get(RETURN_TO_COOKIE_NAME)?.value);
-  const destination = new URL(returnTo ?? localePath(locale, HOME_ROUTE), request.url);
-
-  const response = NextResponse.redirect(destination, 303);
+  const response = relativeRedirect(returnTo ?? localePath(locale, HOME_ROUTE));
   response.cookies.set(SESSION_COOKIE_NAME, cookieValue, sessionCookieOptions());
   response.cookies.delete(RETURN_TO_COOKIE_NAME);
   response.cookies.delete(LOCALE_HINT_COOKIE_NAME);

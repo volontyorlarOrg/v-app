@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import { LocaleSwitcher } from "@/components/app/locale-switcher";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { PreviewNote } from "@/components/app/preview-note";
+import { ThemeSwitch } from "@/components/app/theme-switch";
+import { SignOutForm } from "@/components/auth/sign-out-form";
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { IdentityList } from "@/components/settings/identity-list";
@@ -13,14 +14,18 @@ import {
   PreferenceSwitches,
   type PreferenceItem,
 } from "@/components/settings/preference-switches";
-import { ThemeSwitch } from "@/components/app/theme-switch";
 import { buttonClass } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
-import type { PreferenceKey } from "@/lib/account/types";
+import type { Locale } from "@/i18n/routing";
+import type { LinkedIdentities, PreferenceKey, Preferences } from "@/lib/account/types";
+import { getMe, getPreferences } from "@/lib/api/account.server";
+import { getProfile } from "@/lib/api/profile.server";
+import { requireSession } from "@/lib/api/session.server";
 import { REGIONS } from "@/lib/opportunities/types";
-import { profileCompletion } from "@/lib/profile/completion";
-import { sampleVolunteer } from "@/lib/sample/volunteer";
-import { navHref } from "@/lib/routing/routes";
+import {
+  EMPTY_PROFILE,
+  profileCompletion,
+  type VolunteerProfile,
+} from "@/lib/profile/completion";
 
 export const dynamic = "force-dynamic";
 
@@ -35,17 +40,52 @@ export async function generateMetadata({
 export default async function ProfilePage({ params }: PageProps<"/[locale]/profile">) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <Profile />;
+
+  const [session, profile, me, preferences] = await Promise.all([
+    requireSession(),
+    getProfile(),
+    getMe(),
+    getPreferences(),
+  ]);
+
+  const values: VolunteerProfile = profile ?? {
+    ...EMPTY_PROFILE,
+    fullName: me.displayName?.trim() || session.displayName?.trim() || "",
+  };
+  const identities: LinkedIdentities = {
+    telegram: me.telegramIdentity
+      ? { username: me.telegramIdentity.username ?? "" }
+      : null,
+    google: null,
+    email: null,
+  };
+
+  return (
+    <Profile
+      locale={locale as Locale}
+      values={values}
+      preferences={preferences}
+      identities={identities}
+    />
+  );
 }
 
-function Profile() {
+function Profile({
+  locale,
+  values,
+  preferences,
+  identities,
+}: {
+  locale: Locale;
+  values: VolunteerProfile;
+  preferences: Preferences;
+  identities: LinkedIdentities;
+}) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
-  const common = useTranslations("common");
   const settings = useTranslations("settings");
   const nav = useTranslations("nav");
-  const volunteer = sampleVolunteer();
-  const completion = profileCompletion(volunteer.profile);
+  const completion = profileCompletion(values);
 
   const fieldKeys = [
     "fullName",
@@ -83,21 +123,17 @@ function Profile() {
     key,
     label: settings(`${group}.${name}`),
     description: settings(`${group}.${name}Help`),
-    defaultChecked: volunteer.preferences[key],
+    checked: preferences[key],
   });
 
   return (
     <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        chip={common("sample.chip")}
-      />
+      <PageHeader title={t("title")} description={t("description")} />
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="enter-rise min-w-0 [--enter-delay:90ms]">
           <ProfileForm
-            values={volunteer.profile}
+            values={values}
             regions={REGIONS.map((region) => ({
               value: region,
               label: opportunities(`regions.${region}`),
@@ -110,7 +146,10 @@ function Profile() {
                 fieldKeys.map((key) => [key, t(`fields.${key}`)]),
               ) as Record<(typeof fieldKeys)[number], string>,
               save: t("save"),
+              saving: t("saving"),
               saved: t("saved"),
+              saveError: t("saveError"),
+              fieldInvalid: t("fieldInvalid"),
             }}
           />
         </div>
@@ -118,10 +157,6 @@ function Profile() {
           <Panel id="completion" title={t("completion.label")}>
             <ProfileMeter completion={completion} withAction={false} />
           </Panel>
-          <PreviewNote
-            chip={common("preview.chip")}
-            body={common("preview.notSaved")}
-          />
         </div>
       </div>
 
@@ -135,7 +170,9 @@ function Profile() {
             items={[
               preference("notifyTelegram", "notifications", "telegram"),
               preference("remindDeadlines", "notifications", "deadlines"),
+              preference("notifyDecisions", "notifications", "decisions"),
             ]}
+            errorLabel={settings("preferences.saveError")}
           />
         </Panel>
 
@@ -148,7 +185,9 @@ function Profile() {
             <PreferenceSwitches
               items={[
                 preference("profileToOrganisers", "privacy", "profileToOrganisers"),
+                preference("levelPublic", "privacy", "levelPublic"),
               ]}
+              errorLabel={settings("preferences.saveError")}
             />
             <div className="border-t border-border pt-5">
               <ThemeSwitch
@@ -177,7 +216,7 @@ function Profile() {
           className="xl:col-span-2"
         >
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <IdentityList identities={volunteer.identities} />
+            <IdentityList identities={identities} />
             <div className="border-t border-border pt-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
               <h3 className="font-sans text-sm font-semibold text-ink">
                 {settings("session.title")}
@@ -185,16 +224,16 @@ function Profile() {
               <p className="mt-1 text-sm text-ink-muted">
                 {settings("session.description")}
               </p>
-              <Link
-                href={navHref("login")}
+              <SignOutForm
+                locale={locale}
+                label={settings("session.signOut")}
+                showIcon={false}
                 className={buttonClass({
                   variant: "outline",
                   size: "sm",
                   className: "mt-4",
                 })}
-              >
-                {settings("session.signOut")}
-              </Link>
+              />
             </div>
           </div>
         </Panel>

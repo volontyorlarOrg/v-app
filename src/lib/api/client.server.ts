@@ -135,6 +135,7 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
     const error = new ApiError(codeForStatus(response.status), {
       status: response.status,
       requestId,
+      details: payload,
     });
     logFailure(method, path, error, requestId);
     throw error;

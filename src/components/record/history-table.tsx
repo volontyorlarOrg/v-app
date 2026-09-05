@@ -5,11 +5,9 @@ import {
   Hourglass,
   type LucideIcon,
 } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import { StateChip, type ChipTone } from "@/components/dashboard/state-chip";
-import type { Locale } from "@/i18n/routing";
-import { localized } from "@/lib/opportunities/types";
 import type { AttendanceOutcome, ParticipationEntry } from "@/lib/record/levels";
 
 const PRESENTATION: Record<AttendanceOutcome, { tone: ChipTone; Icon: LucideIcon }> = {
@@ -22,7 +20,6 @@ const PRESENTATION: Record<AttendanceOutcome, { tone: ChipTone; Icon: LucideIcon
 export function HistoryTable({ entries }: { entries: readonly ParticipationEntry[] }) {
   const t = useTranslations("record");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   if (entries.length === 0) {
     return <p className="px-5 py-6 text-sm text-ink-muted">{t("history.empty")}</p>;
@@ -59,10 +56,10 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
                 </td>
                 <td className="px-5 py-3">
                   <p className="font-semibold text-ink">
-                    {localized(entry.opportunityTitle, locale)}
+                    {entry.opportunityTitle}
                   </p>
                   <p className="text-xs text-ink-muted">
-                    {localized(entry.organization, locale)}
+                    {entry.organization}
                   </p>
                 </td>
                 <td className="px-5 py-3">

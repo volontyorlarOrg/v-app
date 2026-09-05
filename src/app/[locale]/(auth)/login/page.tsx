@@ -2,17 +2,16 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { AuthForm } from "@/components/auth/auth-form";
 import { AuthIntro } from "@/components/auth/auth-intro";
-import { AuthDivider, AuthPanel } from "@/components/auth/auth-panel";
+import { AuthPanel } from "@/components/auth/auth-panel";
 import { AuthStatus } from "@/components/auth/auth-status";
-import { PreviewNotice } from "@/components/auth/preview-notice";
 import { ProviderButtons, telegramStartHref } from "@/components/auth/provider-buttons";
 import { Link } from "@/i18n/navigation";
-import { isAuthConfigured } from "@/lib/auth/config";
-import { safeReturnPath } from "@/lib/auth/session";
+import { isSessionStatus, safeReturnPath, type SessionStatus } from "@/lib/auth/session";
 import { isTelegramStatus, type TelegramStatus } from "@/lib/auth/telegram";
-import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -29,78 +28,50 @@ export default async function LoginPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { reset, telegram, next } = await searchParams;
-  const telegramEnabled = isAuthConfigured();
+  const { telegram, session, next } = await searchParams;
 
   return (
     <Login
-      resetSent={reset === "sent"}
       telegramStatus={isTelegramStatus(telegram) ? telegram : null}
-      telegramHref={
-        telegramEnabled
-          ? telegramStartHref(
-              locale,
-              safeReturnPath(typeof next === "string" ? next : null),
-            )
-          : null
-      }
+      sessionStatus={isSessionStatus(session) ? session : null}
+      telegramHref={telegramStartHref(
+        locale,
+        safeReturnPath(typeof next === "string" ? next : null),
+      )}
     />
   );
 }
 
 function Login({
-  resetSent,
   telegramStatus,
+  sessionStatus,
   telegramHref,
 }: {
-  resetSent: boolean;
   telegramStatus: TelegramStatus | null;
-  telegramHref: string | null;
+  sessionStatus: SessionStatus | null;
+  telegramHref: string;
 }) {
   const t = useTranslations("auth");
 
   return (
     <>
       <AuthIntro title={t("login.title")} lead={t("login.lead")} />
-      <PreviewNotice
-        chip={t("preview.chip")}
-        body={telegramHref ? t("preview.bodyTelegram") : t("preview.body")}
-      />
 
       {telegramStatus ? (
         <AuthStatus>{t(`telegram.${telegramStatus}`)}</AuthStatus>
       ) : null}
-      {resetSent ? <AuthStatus tone="done">{t("login.resetSent")}</AuthStatus> : null}
+      {sessionStatus ? <AuthStatus>{t(`session.${sessionStatus}`)}</AuthStatus> : null}
 
       <AuthPanel>
         <ProviderButtons
-          href={navHref(HOME_ROUTE)}
           telegramHref={telegramHref}
-          google={t("providers.google")}
           telegram={t("providers.telegram")}
+          google={t("providers.google")}
+          googleUnavailable={t("providers.googleUnavailable")}
         />
-        {telegramHref ? (
-          <p className="mt-3 text-xs leading-relaxed text-ink-muted">
-            {t("telegram.handoff")}
-          </p>
-        ) : null}
-        <AuthDivider label={t("providers.or")} />
-        <AuthForm
-          destination={navHref(HOME_ROUTE)}
-          submitLabel={t("login.submit")}
-          passwordLabels={{
-            show: t("fields.showPassword"),
-            hide: t("fields.hidePassword"),
-          }}
-          fields={[
-            { name: "email", label: t("fields.email") },
-            {
-              name: "password",
-              label: t("fields.password"),
-              trailing: { href: navHref("forgotPassword"), label: t("login.forgot") },
-            },
-          ]}
-        />
+        <p className="mt-4 text-xs leading-relaxed text-ink-muted">
+          {t("telegram.handoff")}
+        </p>
       </AuthPanel>
 
       <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">

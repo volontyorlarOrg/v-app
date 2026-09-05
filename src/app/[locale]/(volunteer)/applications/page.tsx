@@ -6,14 +6,15 @@ import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { Segmented, type SegmentedItem } from "@/components/app/segmented";
 import { ApplicationRows } from "@/components/dashboard/application-rows";
+import { listApplications } from "@/lib/api/applications.server";
 import {
   APPLICATION_GROUPS,
   inApplicationGroup,
   isApplicationGroup,
   type ApplicationGroup,
+  type ApplicationSummary,
 } from "@/lib/applications/status";
 import { navHref } from "@/lib/routing/routes";
-import { sampleVolunteer } from "@/lib/sample/volunteer";
 
 export const dynamic = "force-dynamic";
 
@@ -32,18 +33,22 @@ export default async function ApplicationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { group } = await searchParams;
+  const [{ group }, applications] = await Promise.all([searchParams, listApplications()]);
   const selected = isApplicationGroup(group) ? group : "all";
-  return <Applications group={selected} />;
+  return <Applications group={selected} applications={applications.items} />;
 }
 
-function Applications({ group }: { group: ApplicationGroup }) {
+function Applications({
+  group,
+  applications,
+}: {
+  group: ApplicationGroup;
+  applications: readonly ApplicationSummary[];
+}) {
   const t = useTranslations("applications");
-  const common = useTranslations("common");
 
   const now = new Date();
-  const volunteer = sampleVolunteer(now);
-  const sorted = [...volunteer.applications].sort(
+  const sorted = [...applications].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
   const shown = sorted.filter((application) =>
@@ -64,11 +69,7 @@ function Applications({ group }: { group: ApplicationGroup }) {
 
   return (
     <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        chip={common("sample.chip")}
-      />
+      <PageHeader title={t("title")} description={t("description")} />
       <Segmented
         label={t("groups.label")}
         items={items}

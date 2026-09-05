@@ -7,8 +7,13 @@ import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { HistoryTable } from "@/components/record/history-table";
-import { isReliabilityMeaningful, reliabilityPercent } from "@/lib/record/levels";
-import { sampleVolunteer } from "@/lib/sample/volunteer";
+import { getHistory, getRecord } from "@/lib/api/record.server";
+import {
+  isReliabilityMeaningful,
+  reliabilityPercent,
+  type ParticipationEntry,
+  type VolunteerRecord,
+} from "@/lib/record/levels";
 
 export const dynamic = "force-dynamic";
 
@@ -23,16 +28,20 @@ export async function generateMetadata({
 export default async function RecordPage({ params }: PageProps<"/[locale]/record">) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <Record />;
+
+  const [volunteerRecord, history] = await Promise.all([getRecord(), getHistory()]);
+  return <Record record={volunteerRecord} history={history.items} />;
 }
 
-function Record() {
+function Record({
+  record,
+  history,
+}: {
+  record: VolunteerRecord;
+  history: readonly ParticipationEntry[];
+}) {
   const t = useTranslations("record");
-  const common = useTranslations("common");
   const format = useFormatter();
-  const now = new Date();
-  const volunteer = sampleVolunteer(now);
-  const { record } = volunteer;
   const percent = reliabilityPercent(record.counts);
   const meaningful = isReliabilityMeaningful(record.counts);
 
@@ -67,11 +76,7 @@ function Record() {
 
   return (
     <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        chip={common("sample.chip")}
-      />
+      <PageHeader title={t("title")} description={t("description")} />
       <StatTiles stats={stats} className="mt-6" />
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
@@ -84,7 +89,7 @@ function Record() {
           description={t("history.description")}
           padding="none"
         >
-          <HistoryTable entries={volunteer.history} />
+          <HistoryTable entries={history} />
         </Panel>
       </div>
     </>

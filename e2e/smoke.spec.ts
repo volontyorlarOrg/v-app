@@ -6,6 +6,11 @@ async function isMobile(page: Page) {
   return (page.viewportSize()?.width ?? 1280) < 1024;
 }
 
+async function signIn(page: Page, locale = "en") {
+  await page.goto(`/api/auth/telegram/complete?token=e2e-valid&locale=${locale}`);
+  await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
+}
+
 test.describe("locale routing", () => {
   for (const locale of LOCALES) {
     test(`the ${locale} sign-in page renders in ${locale}`, async ({ page }) => {
@@ -29,86 +34,105 @@ test.describe("locale routing", () => {
   });
 });
 
-test.describe("sign-in preview", () => {
-  test("says on screen that sign-in is not connected", async ({ page }) => {
+test.describe("sign-in", () => {
+  test("offers Telegram as the way in and keeps Google inert", async ({ page }) => {
     await page.goto("/en/login");
-    await expect(page.getByRole("note")).toContainText(/not connected/i);
+    await expect(page.getByRole("link", { name: "Continue with Telegram" })).toHaveAttribute(
+      "href",
+      "/api/auth/telegram/start?locale=en",
+    );
+    await expect(page.getByRole("button", { name: "Continue with Google" })).toBeDisabled();
+    await expect(page.getByText("Google sign-in isn't available yet.")).toBeVisible();
+    await expect(page.getByLabel("Email")).toHaveCount(0);
+    await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
   });
 
-  test("the email form opens the dashboard without sending anything", async ({
-    page,
-  }) => {
-    await page.goto("/en/login");
-    await page.getByLabel("Email").fill("dilnoza@example.org");
-    await page.getByLabel("Password", { exact: true }).fill("preview-only");
-    await page.getByRole("button", { name: "Log in" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
-    expect(page.url()).not.toContain("dilnoza");
+  test("the Telegram button hands off to the bot with a one-time ticket", async ({ request }) => {
+    const response = await request.get("/api/auth/telegram/start?locale=en", {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(303);
+    expect(response.headers()["location"]).toMatch(
+      /^https:\/\/t\.me\/volontyor_uz_bot\?start=/,
+    );
   });
 
-  test("Google and Telegram open the dashboard", async ({ page }) => {
-    await page.goto("/en/login");
-    await page.getByRole("link", { name: "Continue with Google" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
-
-    await page.goto("/en/login");
-    await page.getByRole("link", { name: "Continue with Telegram" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
-  });
-
-  test("sign-up has the three fields and also opens the dashboard", async ({
-    page,
-  }) => {
+  test("create account is the same Telegram flow", async ({ page }) => {
     await page.goto("/en/login");
     await page.getByRole("link", { name: "Create an account" }).click();
     await expect(page).toHaveURL(/\/en\/signup$/);
+    await expect(page.getByRole("link", { name: "Continue with Telegram" })).toBeVisible();
+    await expect(page.getByLabel("Full name")).toHaveCount(0);
+    await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
+  });
 
-    await page.getByLabel("Full name").fill("Dilnoza Karimova");
-    await page.getByLabel("Email").fill("dilnoza@example.org");
-    await page.getByLabel("Password", { exact: true }).fill("preview-only");
-    await page.getByRole("button", { name: "Create account" }).click();
+  test("the password reset route no longer exists", async ({ page }) => {
+    const response = await page.goto("/en/forgot-password");
+    expect(response?.status()).toBe(404);
+  });
+
+  test("a bad login token goes back to sign-in with a message and no session", async ({
+    page,
+  }) => {
+    await page.goto("/api/auth/telegram/complete?token=bad-token&locale=en");
+    await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
+    await expect(page.getByRole("status")).toContainText(/expired/i);
+
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/login\?next=/);
+  });
+
+  test("a valid login token signs in and the dashboard greets the volunteer", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Dilnoza");
+    await expect(page.getByText("Sample data")).toHaveCount(0);
+  });
+
+  test("the panel is not reachable without a session", async ({ page }) => {
+    for (const path of ["/en/dashboard", "/en/opportunities", "/en/profile", "/en/record"]) {
+      await page.goto(path);
+      await expect(page, path).toHaveURL(/\/en\/login\?next=/);
+    }
+  });
+
+  test("a signed-in volunteer is sent from sign-in to the dashboard", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/login");
     await expect(page).toHaveURL(/\/en\/dashboard$/);
   });
 
-  test("password reset returns to sign-in with a status message", async ({ page }) => {
-    await page.goto("/en/login");
-    await page.getByRole("link", { name: "Forgot password?" }).click();
-    await expect(page).toHaveURL(/\/en\/forgot-password$/);
-
-    await page.getByLabel("Email").fill("dilnoza@example.org");
-    await page.getByRole("button", { name: "Send reset link" }).click();
-    await expect(page).toHaveURL(/\/en\/login\?reset=sent$/);
-    await expect(page.getByRole("status")).toContainText(/reset link/i);
+  test("an ended session returns to sign-in with a message", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/api/auth/session/expired?locale=en");
+    await expect(page).toHaveURL(/\/en\/login\?session=expired$/);
+    await expect(page.getByRole("status")).toContainText(/session ended/i);
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 });
 
 test.describe("the panel", () => {
-  test("greets the sample volunteer and labels the data as a sample", async ({
-    page,
-  }) => {
-    await page.goto("/en/dashboard");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Dilnoza");
-    await expect(page.getByText("Sample data").first()).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
   });
 
-  test("shows the three dashboard decisions without hiding later content", async ({
+  test("shows the three dashboard decisions on the volunteer's own data", async ({
     page,
   }) => {
-    await page.goto("/en/dashboard");
     for (const name of ["Next up", "Your applications", "Your progress"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
     }
-    const progress = page.getByRole("heading", { level: 2, name: "Your progress" });
-    await progress.scrollIntoViewIfNeeded();
-    await expect(progress).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Riverbank clean-up" }).first(),
+    ).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveAttribute("aria-valuenow", "83");
   });
 
   test("reaches every section from the shell, with an h1 on each", async ({ page }) => {
-    await page.goto("/en/dashboard");
     const mobile = await isMobile(page);
     const navigation = page.getByRole("navigation", {
       name: mobile ? "App sections" : "Main navigation",
@@ -132,31 +156,38 @@ test.describe("the panel", () => {
     }
   });
 
-  test("the notifications menu opens, counts unread and marks them read", async ({
+  test("the notifications menu shows the backend's messages and marks them read", async ({
     page,
   }) => {
-    await page.goto("/en/dashboard");
-    const bell = page.getByRole("button", { name: /Notifications \(\d+\)/ });
+    const bell = page.getByRole("button", { name: "Notifications (1)" });
     await bell.click();
-    await expect(page.getByText("Notifications", { exact: true })).toBeVisible();
+    await expect(page.getByText("You were accepted to Riverbank clean-up")).toBeVisible();
     await page.getByRole("button", { name: "Mark all as read" }).click();
+    await expect(
+      page.getByRole("button", { name: "Notifications", exact: true }),
+    ).toBeVisible();
+
+    await page.reload();
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),
     ).toBeVisible();
   });
 
-  test("the account menu keeps one profile destination and sign out", async ({ page }) => {
-    await page.goto("/en/dashboard");
+  test("the account menu keeps one profile destination and really signs out", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: /Account menu/ }).click();
     const menu = page.getByRole("navigation", { name: "Account menu" });
     await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
     await expect(menu.getByRole("link", { name: "Settings" })).toHaveCount(0);
-    await menu.getByRole("link", { name: "Sign out" }).click();
+    await menu.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/en\/login$/);
+
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
   test("the theme switch flips the document theme", async ({ page }) => {
-    await page.goto("/en/dashboard");
     const toggle = page.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await toggle.click();
@@ -165,10 +196,11 @@ test.describe("the panel", () => {
 
   test("nothing overflows horizontally", async ({ page }) => {
     for (const path of [
-      "/uz/dashboard",
-      "/ru/opportunities",
-      "/uz/record",
-      "/ru/settings",
+      "/en/dashboard",
+      "/en/opportunities",
+      "/en/record",
+      "/en/profile",
+      "/en/applications/app-book-drive",
     ]) {
       await page.goto(path);
       const overflow = await page.evaluate(
@@ -194,6 +226,10 @@ test.describe("the panel", () => {
 });
 
 test.describe("opportunities", () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
   test("saved opportunities are a view and the old route redirects to it", async ({
     page,
   }) => {
@@ -209,7 +245,7 @@ test.describe("opportunities", () => {
     await expect(page.getByRole("article")).toHaveCount(2);
   });
 
-  test("filtering by region puts the filter in the URL and narrows the list", async ({
+  test("filtering by region puts the filter in the URL and asks the backend", async ({
     page,
   }) => {
     await page.goto("/en/opportunities");
@@ -242,6 +278,21 @@ test.describe("opportunities", () => {
     await expect(page.getByRole("article").first()).toBeVisible();
   });
 
+  test("saving an opportunity persists on the backend", async ({ page }) => {
+    await page.goto("/en/opportunities/winter-book-drive");
+    const save = page.getByRole("button", { name: /^Save$|^Saved$/ }).first();
+    await expect(save).toHaveAttribute("aria-pressed", "false");
+    await save.click();
+    await expect(save).toHaveAttribute("aria-pressed", "true");
+
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: /^Save$|^Saved$/ }).first(),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page.goto("/en/opportunities?view=saved");
+    await expect(page.getByRole("article")).toHaveCount(3);
+  });
+
   test("opening an opportunity shows the facts, requirements and questions", async ({
     page,
   }) => {
@@ -250,10 +301,30 @@ test.describe("opportunities", () => {
     for (const name of ["At a glance", "What you need", "What you will be asked"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
     }
-    await expect(page.getByRole("button", { name: "Apply" })).toBeDisabled();
-    const save = page.getByRole("button", { name: /^Save$|^Saved$/ }).first();
-    await save.click();
-    await expect(save).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("link", { name: "Continue draft" }).first()).toBeVisible();
+  });
+
+  test("applying creates a draft and submitting it needs the required answer", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities/remote-translation-support");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
+
+    await page.getByRole("button", { name: "Submit application" }).click();
+    await expect(page.getByRole("alert").first()).toContainText(/required/i);
+
+    await page.locator('select[name^="answer."]').selectOption("uz-en");
+    await page.getByRole("checkbox", { name: "Google Docs" }).check();
+    await page.getByRole("button", { name: "Submit application" }).click();
+    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(0);
+    await expect(page.getByText("Uzbek and English")).toBeVisible();
+  });
+
+  test("a closed opportunity cannot be applied to", async ({ page }) => {
+    await page.goto("/en/opportunities/read-aloud-day");
+    await expect(page.getByRole("button", { name: "Applications are closed" })).toBeDisabled();
   });
 
   test("an unknown opportunity is a 404 inside the panel", async ({ page }) => {
@@ -266,9 +337,11 @@ test.describe("opportunities", () => {
 });
 
 test.describe("applications, record, profile and settings", () => {
-  test("applications filter by group and open a detail with a timeline", async ({
-    page,
-  }) => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
+  test("applications filter by group and a draft can be saved", async ({ page }) => {
     await page.goto("/en/applications?group=drafts");
     await expect(page.getByRole("link", { name: /Drafts/ })).toHaveAttribute(
       "aria-current",
@@ -282,7 +355,28 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Progress" }),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Continue draft" })).toBeDisabled();
+
+    await page.getByRole("textbox", { name: /Why does this matter/ }).fill("Because books.");
+    await page.getByRole("button", { name: "Save draft" }).click();
+    await expect(page.getByRole("status").last()).toContainText("Draft saved.");
+
+    await page.reload();
+    await expect(page.getByRole("textbox", { name: /Why does this matter/ })).toHaveValue(
+      "Because books.",
+    );
+  });
+
+  test("an accepted application can be withdrawn after confirming", async ({ page }) => {
+    await page.goto("/en/applications/app-riverbank");
+    await page.getByRole("button", { name: "Withdraw application" }).click();
+    await page.getByRole("button", { name: "Yes, withdraw" }).click();
+    await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Withdraw application" })).toHaveCount(0);
+  });
+
+  test("an unknown application is a 404", async ({ page }) => {
+    const response = await page.goto("/en/applications/does-not-exist");
+    expect(response?.status()).toBe(404);
   });
 
   test("the record shows a history table with the awaiting-confirmation rule", async ({
@@ -290,27 +384,37 @@ test.describe("applications, record, profile and settings", () => {
   }) => {
     await page.goto("/en/record");
     await expect(page.getByRole("table")).toBeVisible();
+    await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
-  test("the profile form saves only in the preview and says so", async ({ page }) => {
+  test("the profile form saves to the backend", async ({ page }) => {
     await page.goto("/en/profile");
     await page.getByLabel("Short introduction").fill("Second-year student.");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page.getByRole("status")).toContainText(/preview/i);
+    await expect(page.getByRole("status").last()).toContainText("Profile saved.");
+
+    await page.reload();
+    await expect(page.getByLabel("Short introduction")).toHaveValue("Second-year student.");
+    await expect(
+      page.getByRole("progressbar", { name: "Profile completeness" }),
+    ).toHaveAttribute("aria-valuenow", "100");
   });
 
-  test("legacy settings redirects to profile where preferences still work", async ({
+  test("legacy settings redirects to profile where preferences persist", async ({
     page,
   }) => {
     await page.goto("/en/settings");
     await expect(page).toHaveURL(/\/en\/profile$/);
     const telegram = page.getByRole("switch", { name: "Telegram messages" });
-    const telegramBefore = await telegram.getAttribute("aria-checked");
+    await expect(telegram).toHaveAttribute("aria-checked", "true");
     await telegram.click();
-    await expect(telegram).not.toHaveAttribute(
+    await expect(telegram).toHaveAttribute("aria-checked", "false");
+
+    await page.reload();
+    await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveAttribute(
       "aria-checked",
-      telegramBefore ?? "false",
+      "false",
     );
 
     const dark = page.getByRole("switch", { name: "Dark theme" }).last();

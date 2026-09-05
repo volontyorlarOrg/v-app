@@ -14,6 +14,8 @@ export const API_ERROR_CODES = [
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
 
+export type FieldErrors = Record<string, string[]>;
+
 const INTERNAL_CODES = new Set<ApiErrorCode>([
   "server",
   "invalidResponse",
@@ -24,6 +26,7 @@ export class ApiError extends Error {
   readonly code: ApiErrorCode;
   readonly status: number;
   readonly requestId: string | undefined;
+  readonly details: unknown;
 
   constructor(
     code: ApiErrorCode,
@@ -32,6 +35,7 @@ export class ApiError extends Error {
       message?: string;
       requestId?: string;
       cause?: unknown;
+      details?: unknown;
     } = {},
   ) {
     super(options.message ?? code, { cause: options.cause });
@@ -39,6 +43,7 @@ export class ApiError extends Error {
     this.code = code;
     this.status = options.status ?? 0;
     this.requestId = options.requestId;
+    this.details = options.details;
   }
 
   get isUserFacing(): boolean {
@@ -52,6 +57,28 @@ export class ApiError extends Error {
       this.code === "server" ||
       this.code === "rateLimited"
     );
+  }
+
+  get backendCode(): string | null {
+    const details = this.details;
+    if (!details || typeof details !== "object") return null;
+    const code = (details as { code?: unknown }).code;
+    return typeof code === "string" && code ? code : null;
+  }
+
+  get fieldErrors(): FieldErrors {
+    const details = this.details;
+    if (!details || typeof details !== "object") return {};
+    const errors = (details as { errors?: unknown }).errors;
+    if (!errors || typeof errors !== "object") return {};
+
+    const output: FieldErrors = {};
+    for (const [field, messages] of Object.entries(errors)) {
+      if (Array.isArray(messages)) {
+        output[field] = messages.filter((item): item is string => typeof item === "string");
+      }
+    }
+    return output;
   }
 }
 
