@@ -50,9 +50,11 @@
       "googleUnavailable": "Google sign-in isn't available yet."
     },
     "telegram": {
-      "handoff": "Telegram opens next. Finish signing in from the link the bot sends you in that chat.",
-      "expired": "That sign-in link had expired or was already used. Start again with Telegram.",
-      "unavailable": "Telegram sign-in is unavailable right now. Try again in a moment."
+      "handoff": "Telegram opens next. Enter your phone number there, confirm in your Telegram app, and you come straight back here signed in.",
+      "expired": "That sign-in had expired or was already used. Start again with Telegram.",
+      "unavailable": "Telegram sign-in is unavailable right now. Try again in a moment.",
+      "cancelled": "Sign-in was cancelled in Telegram. Start again whenever you are ready.",
+      "phoneRequired": "Signing in needs your phone number. Start again and let Telegram share it."
     },
     "login": {
       "metaTitle": "Log in",

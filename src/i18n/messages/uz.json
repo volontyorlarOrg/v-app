@@ -50,9 +50,11 @@
       "googleUnavailable": "Google orqali kirish hozircha mavjud emas."
     },
     "telegram": {
-      "handoff": "Keyingi qadamda Telegram ochiladi. Bot oʻsha chatga yuboradigan havola orqali kirishni yakunlang.",
-      "expired": "Bu kirish havolasining muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
-      "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring."
+      "handoff": "Keyingi qadamda Telegram ochiladi. U yerda telefon raqamingizni kiriting, Telegram ilovasida tasdiqlang — va tizimga kirgan holda shu yerga qaytasiz.",
+      "expired": "Bu kirish muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
+      "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring.",
+      "cancelled": "Kirish Telegramda bekor qilindi. Tayyor boʻlganingizda qaytadan boshlang.",
+      "phoneRequired": "Kirish uchun telefon raqamingiz kerak. Qaytadan boshlang va Telegramga uni ulashishga ruxsat bering."
     },
     "login": {
       "metaTitle": "Kirish",
