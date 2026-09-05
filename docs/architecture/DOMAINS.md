@@ -36,15 +36,32 @@ The three repositories run side by side locally on fixed ports:
 | `../v-app` (this) | 3001 | `NEXT_PUBLIC_APP_ORIGIN` in `v-web`; `TELEGRAM_AUTH_COMPLETE_URL` and `CORS_ORIGINS` in `v-backend` |
 | `../v-backend`    | 4000 | `VOLONTYORLAR_API_URL` here, server-only                                                            |
 
+## Verified
+
+| Decision                            | Value                                                                  | Evidence                                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Production origin of the application | `https://app.volontyorlar.uz`                                          | `NEXT_PUBLIC_SITE_URL` in the `env/` store's production file, and the Telegram OIDC redirect registered against that host |
+| Public marketing domain             | `https://volontyorlar.uz`                                              | `NEXT_PUBLIC_MARKETING_URL` in the same file                                                    |
+| Hosting provider                    | Vercel, one project per frontend; the API is a Render service          | `env/SERVICE_SETUP.md` and `env/README.md`                                                      |
+| Deployment trigger                  | A push to `main`                                                       | Both frontends deploy from `main`                                                               |
+| Shared registrable domain           | `volontyorlar.uz`, so the preference cookies reach both origins        | The two origins above differ only by the `app` label                                            |
+
+The shared domain is not configured anywhere. `src/lib/preferences.ts` derives
+it as the longest whole-label suffix the configured origins have in common, so
+the theme and language cookies are scoped to `.volontyorlar.uz` in production
+and stay host-only on `localhost`, where the two ports share a cookie anyway.
+Fewer than two labels in common yields no domain at all, which keeps the cookie
+off a public suffix.
+
+Nothing above is hard-coded: every origin is still read from configuration, and
+the real values live in the `env/` store outside version control.
+
 ## Needs verification
 
-| Decision                                                                            | Current evidence |
-| ----------------------------------------------------------------------------------- | ---------------- |
-| Production origin of the application                                                | None             |
-| Public marketing domain                                                             | None             |
-| Hosting provider                                                                    | None             |
-| Cookie domain and whether the app and the marketing site share a registrable domain | None             |
-| Preview deployment policy                                                           | None             |
+| Decision                  | Current evidence |
+| ------------------------- | ---------------- |
+| Preview deployment policy | None             |
+| Rollback procedure        | None             |
 
 Do not copy hostnames, project identifiers, or environment values from any
 reference repository. Add them only once they are verified externally and

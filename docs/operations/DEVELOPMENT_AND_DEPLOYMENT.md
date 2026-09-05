@@ -97,24 +97,35 @@ smoke suite. CI deliberately supplies no environment variables.
 
 ## Deployment
 
-**Needs verification.** The hosting provider, production origin, environment
-values, and deployment trigger are not decided.
+This application is a Vercel project serving `https://app.volontyorlar.uz`. A
+push to `main` is the deployment trigger. The marketing site is a second Vercel
+project on `https://volontyorlar.uz`, and the API is a Render service; the whole
+picture, and every real value, lives in the `env/` store beside these
+repositories, which is deliberately outside version control.
 
-Before a public launch:
+Environment values are set in the Vercel project, not in this repository. It
+carries a value-free `.env.example` and nothing else. `VOLONTYORLAR_API_URL` and
+`VOLONTYORLAR_SESSION_SECRET` are server-only and must never gain a
+`NEXT_PUBLIC_` prefix; the two `NEXT_PUBLIC_` origins are inlined at build time,
+so changing one needs a rebuild, not just a restart.
 
-1. Set `NEXT_PUBLIC_SITE_URL` to the canonical HTTPS origin so HSTS and
-   `upgrade-insecure-requests` switch on.
-2. Set `NEXT_PUBLIC_MARKETING_URL` so the about, privacy and terms links
-   render.
+For a release:
+
+1. Deploy the backend first. The panel reads `v-backend` on every request, and a
+   response the schemas in `src/lib/api/schemas.ts` cannot parse renders the
+   load-error panel rather than a guess.
+2. Deploy this application and the marketing site together when a change touches
+   the shared preference cookies in `src/lib/preferences.ts`. Until both run the
+   same code the older origin ignores what the newer one writes; nothing breaks,
+   the preference simply stops crossing.
 3. Confirm the host does not strip or override the response headers in
-   `next.config.ts`, and that it supports the proxy (Next.js middleware). The
-   route guards live in the proxy, so a host that does not run it leaves the
-   `(volunteer)` layout check as the only gate.
-4. Set `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` as server-only
-   values, point `TELEGRAM_OIDC_REDIRECT_URI` in `v-backend` at
-   `https://<this origin>/api/auth/telegram/callback`, and register that same
-   URL under the bot's Login Widget in BotFather. Verify a real sign-in from a
-   phone on the real origin.
-5. The panel reads `v-backend` on every request. Deploy the backend first,
-   then this app; a response the schemas in `src/lib/api/schemas.ts` cannot
-   parse renders the load-error panel rather than a guess.
+   `next.config.ts`, and that it runs the proxy. The route guards live there, so
+   a host that does not run it leaves the `(volunteer)` layout check as the only
+   gate.
+
+Sign-in is already live: `TELEGRAM_OIDC_REDIRECT_URI` in `v-backend` points at
+`https://app.volontyorlar.uz/api/auth/telegram/callback`, and that same URL is
+registered under the bot's Login Widget in BotFather. Changing this origin means
+changing both, in step, or sign-in stops at Telegram's redirect. The full
+procedure is
+[`../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
