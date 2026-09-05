@@ -1,5 +1,3 @@
-import type { Locale } from "@/i18n/routing";
-
 export const REGIONS = [
   "andijan",
   "bukhara",
@@ -19,37 +17,39 @@ export const REGIONS = [
 
 export type Region = (typeof REGIONS)[number];
 
+export function isRegion(value: unknown): value is Region {
+  return typeof value === "string" && (REGIONS as readonly string[]).includes(value);
+}
+
 export const OPPORTUNITY_FORMATS = ["onsite", "remote", "hybrid"] as const;
 export type OpportunityFormat = (typeof OPPORTUNITY_FORMATS)[number];
 
 export const OPPORTUNITY_STATUSES = ["open", "closed", "full"] as const;
 export type OpportunityStatus = (typeof OPPORTUNITY_STATUSES)[number];
 
-export type LocalizedText = Record<Locale, string>;
-
-export function localized(text: LocalizedText, locale: Locale): string {
-  return text[locale];
-}
-
 export type Organization = {
   id: string;
-  name: LocalizedText;
+  name: string;
+  slug: string;
+  logoUrl?: string;
   verified: boolean;
 };
 
 export type OpportunitySummary = {
   id: string;
   slug: string;
-  title: LocalizedText;
+  title: string;
+  summary: string;
   organization: Organization;
   region: Region;
-  city?: LocalizedText;
-  locationName?: LocalizedText;
+  city?: string;
+  locationName?: string;
   format: OpportunityFormat;
   status: OpportunityStatus;
   startsAt: string;
   endsAt?: string;
   applicationDeadline: string;
+  imageUrl?: string;
   capacity?: number;
   spotsRemaining?: number;
 };
@@ -62,12 +62,12 @@ export const QUESTION_TYPES = [
 ] as const;
 export type QuestionType = (typeof QUESTION_TYPES)[number];
 
-export type QuestionOption = { value: string; label: LocalizedText };
+export type QuestionOption = { value: string; label: string };
 
 export type ApplicationQuestion = {
   id: string;
-  prompt: LocalizedText;
-  help?: LocalizedText;
+  prompt: string;
+  helpText?: string;
   type: QuestionType;
   required: boolean;
   maxLength?: number;
@@ -75,8 +75,8 @@ export type ApplicationQuestion = {
 };
 
 export type OpportunityDetail = OpportunitySummary & {
-  description: LocalizedText;
-  requirements: LocalizedText[];
+  description: string;
+  requirements: string[];
   questions: ApplicationQuestion[];
   sourcedByTeam: boolean;
 };

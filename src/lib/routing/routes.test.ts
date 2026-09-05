@@ -89,7 +89,6 @@ describe("app route registry", () => {
 describe("locale-aware paths", () => {
   it("gives next-intl an unprefixed href", () => {
     expect(navHref("dashboard")).toBe("/dashboard");
-    expect(navHref("forgotPassword")).toBe("/forgot-password");
     expect(opportunityHref("winter-book-drive")).toBe(
       "/opportunities/winter-book-drive",
     );

@@ -1,37 +1,38 @@
 import { GoogleMark, TelegramMark } from "@/components/brand/provider-marks";
 import { buttonClass } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
 
 export function ProviderButtons({
-  href,
   telegramHref,
-  google,
   telegram,
+  google,
+  googleUnavailable,
 }: {
-  href: string;
-  telegramHref: string | null;
-  google: string;
+  telegramHref: string;
   telegram: string;
+  google: string;
+  googleUnavailable: string;
 }) {
-  const className = buttonClass({ variant: "outline", className: "w-full" });
-
   return (
     <div className="flex flex-col gap-3">
-      <Link href={href} className={className}>
+      <a href={telegramHref} rel="nofollow" className={buttonClass({ className: "w-full" })}>
+        <TelegramMark className="size-5" />
+        {telegram}
+      </a>
+      <button
+        type="button"
+        disabled
+        aria-describedby="google-unavailable"
+        className={buttonClass({
+          variant: "outline",
+          className: "w-full disabled:cursor-not-allowed disabled:opacity-50",
+        })}
+      >
         <GoogleMark className="size-5" />
         {google}
-      </Link>
-      {telegramHref ? (
-        <a href={telegramHref} rel="nofollow" className={className}>
-          <TelegramMark className="size-5" />
-          {telegram}
-        </a>
-      ) : (
-        <Link href={href} className={className}>
-          <TelegramMark className="size-5" />
-          {telegram}
-        </Link>
-      )}
+      </button>
+      <p id="google-unavailable" className="text-xs leading-relaxed text-ink-muted">
+        {googleUnavailable}
+      </p>
     </div>
   );
 }

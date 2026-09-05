@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   decryptSession,
   encryptSession,
+  isAccessTokenExpired,
   isAccessTokenExpiring,
+  isSessionStatus,
   safeReturnPath,
   sessionCookieOptions,
   toSessionPayload,
@@ -129,5 +131,31 @@ describe("toSessionPayload", () => {
         roles: ["admin"],
       }).roles,
     ).toEqual(["admin"]);
+  });
+});
+
+describe("isAccessTokenExpired", () => {
+  const session = { accessTokenExpiresAt: 1_000 };
+
+  it("is false while the token still has time left, even inside the refresh skew", () => {
+    expect(isAccessTokenExpired(session, 900_000)).toBe(false);
+    expect(isAccessTokenExpired(session, 999_000)).toBe(false);
+  });
+
+  it("is true once the expiry has passed", () => {
+    expect(isAccessTokenExpired(session, 1_000_000)).toBe(true);
+    expect(isAccessTokenExpired(session, 1_500_000)).toBe(true);
+  });
+
+  it("never expires a session that carries no expiry", () => {
+    expect(isAccessTokenExpired({}, Number.MAX_SAFE_INTEGER)).toBe(false);
+  });
+});
+
+describe("isSessionStatus", () => {
+  it("accepts only the statuses sign-in can carry", () => {
+    expect(isSessionStatus("expired")).toBe(true);
+    expect(isSessionStatus("telegram")).toBe(false);
+    expect(isSessionStatus(undefined)).toBe(false);
   });
 });

@@ -6,32 +6,35 @@ import type { Metadata } from "next";
 
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { PreviewNote } from "@/components/app/preview-note";
+import { AnswersForm, type AnswerField } from "@/components/applications/answers-form";
 import { ApplicationTimeline } from "@/components/applications/application-timeline";
+import { WithdrawForm } from "@/components/applications/withdraw-form";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { getApplication } from "@/lib/api/applications.server";
+import { getOpportunity } from "@/lib/api/opportunities.server";
+import { getProfile } from "@/lib/api/profile.server";
 import {
   isEditable,
   isWithdrawable,
+  type AnswerValue,
   type ApplicationDetail,
+  type ProfileSnapshot,
 } from "@/lib/applications/status";
-import { localized } from "@/lib/opportunities/types";
-import { navHref, opportunityHref } from "@/lib/routing/routes";
-import { sampleApplication, sampleVolunteer } from "@/lib/sample/volunteer";
+import { isRegion, type ApplicationQuestion } from "@/lib/opportunities/types";
+import { localePath, navHref, opportunityHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/applications/[id]">): Promise<Metadata> {
-  const { locale, id } = await params;
-  const application = sampleApplication(id);
-  return application
-    ? { title: localized(application.opportunity.title, locale as Locale) }
-    : {};
+  const { id } = await params;
+  const application = await getApplication(id);
+  return application ? { title: application.opportunity.title } : {};
 }
 
 export default async function ApplicationPage({
@@ -41,50 +44,108 @@ export default async function ApplicationPage({
   setRequestLocale(locale);
 
   const now = new Date();
-  const application = sampleApplication(id, now);
+  const application = await getApplication(id);
   if (!application) notFound();
 
-  return <Application application={application} now={now} />;
+  const [opportunity, profile] = await Promise.all([
+    getOpportunity(application.opportunity.slug),
+    application.profileSnapshot ? null : getProfile(),
+  ]);
+
+  const snapshot: ProfileSnapshot = application.profileSnapshot ?? {
+    fullName: profile?.fullName,
+    region: profile?.region ?? undefined,
+    school: profile?.school,
+    phone: profile?.phone,
+    telegram: profile?.telegram,
+  };
+
+  return (
+    <Application
+      application={application}
+      questions={opportunity?.questions ?? null}
+      snapshot={snapshot}
+      now={now}
+    />
+  );
+}
+
+function answerText(
+  value: AnswerValue,
+  question: ApplicationQuestion | undefined,
+): string {
+  if (typeof value === "string") {
+    return question?.options?.find((option) => option.value === value)?.label ?? value;
+  }
+  return value
+    .map(
+      (item) =>
+        question?.options?.find((option) => option.value === item)?.label ?? item,
+    )
+    .join(", ");
 }
 
 function Application({
   application,
+  questions,
+  snapshot,
   now,
 }: {
   application: ApplicationDetail;
+  questions: readonly ApplicationQuestion[] | null;
+  snapshot: ProfileSnapshot;
   now: Date;
 }) {
   const t = useTranslations("applications");
   const profileT = useTranslations("profile");
   const opportunitiesT = useTranslations("opportunities");
-  const common = useTranslations("common");
   const locale = useLocale() as Locale;
-  const volunteer = sampleVolunteer(now);
 
-  const snapshot = [
+  const questionById = new Map((questions ?? []).map((question) => [question.id, question]));
+  const draft = isEditable(application.status);
+  const answers = Object.fromEntries(
+    application.answers
+      .filter((answer): answer is typeof answer & { questionId: string } =>
+        Boolean(answer.questionId),
+      )
+      .map((answer) => [answer.questionId, answer.value]),
+  ) as Record<string, AnswerValue>;
+
+  const fields: AnswerField[] = (questions ?? []).map((question) => ({
+    ...question,
+    help: [
+      question.helpText,
+      question.required ? opportunitiesT("detail.required") : opportunitiesT("detail.optional"),
+      question.maxLength
+        ? opportunitiesT("detail.maxLength", { count: question.maxLength })
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  }));
+
+  const rows = [
     {
       key: "fullName",
       label: profileT("fields.fullName"),
-      value: volunteer.profile.fullName,
+      value: snapshot.fullName?.trim() || "—",
     },
     {
       key: "region",
       label: profileT("fields.region"),
-      value: volunteer.profile.region
-        ? opportunitiesT(`regions.${volunteer.profile.region}`)
-        : "—",
+      value: isRegion(snapshot.region) ? opportunitiesT(`regions.${snapshot.region}`) : "—",
     },
     {
       key: "school",
       label: profileT("fields.school"),
-      value: volunteer.profile.school || "—",
+      value: snapshot.school?.trim() || "—",
     },
     {
       key: "contact",
       label: profileT("fields.contact"),
-      value: volunteer.profile.telegram
-        ? `@${volunteer.profile.telegram}`
-        : volunteer.profile.phone || "—",
+      value: snapshot.telegram?.trim()
+        ? `@${snapshot.telegram.trim()}`
+        : snapshot.phone?.trim() || "—",
     },
   ];
 
@@ -101,9 +162,8 @@ function Application({
       <PageHeader
         className="mt-3"
         eyebrow={t("detail.eyebrow")}
-        chip={common("sample.chip")}
-        title={localized(application.opportunity.title, locale)}
-        description={localized(application.opportunity.organization.name, locale)}
+        title={application.opportunity.title}
+        description={application.opportunity.organization.name}
         actions={<ApplicationStatusChip status={application.status} />}
       />
 
@@ -114,27 +174,59 @@ function Application({
           </Panel>
 
           <Panel id="answers" title={t("detail.answers")}>
-            {application.opportunity.title && application.answers.length === 0 ? (
+            {draft && questions ? (
+              fields.length === 0 ? (
+                <div className="flex flex-col gap-5">
+                  <p className="text-sm text-ink-muted">{t("detail.noQuestions")}</p>
+                  <AnswersForm
+                    applicationId={application.id}
+                    questions={fields}
+                    answers={answers}
+                    labels={answersLabels(t, localePath(locale, "profile"))}
+                  />
+                </div>
+              ) : (
+                <AnswersForm
+                  applicationId={application.id}
+                  questions={fields}
+                  answers={answers}
+                  labels={answersLabels(t, localePath(locale, "profile"))}
+                />
+              )
+            ) : application.answers.length === 0 ? (
               <p className="text-sm text-ink-muted">
-                {application.status === "draft"
-                  ? t("detail.answersEmpty")
-                  : t("detail.noQuestions")}
+                {draft ? t("detail.answersEmpty") : t("detail.noQuestions")}
               </p>
             ) : (
               <dl className="flex flex-col gap-5">
-                {application.answers.map((answer) => (
-                  <div key={answer.prompt.en}>
-                    <dt className="font-semibold text-ink">
-                      {localized(answer.prompt, locale)}
-                    </dt>
-                    <dd className="mt-1.5 leading-relaxed text-ink-muted">
-                      {localized(answer.value, locale)}
-                    </dd>
-                  </div>
-                ))}
+                {application.answers.map((answer, index) => {
+                  const question = answer.questionId
+                    ? questionById.get(answer.questionId)
+                    : undefined;
+                  return (
+                    <div key={answer.questionId ?? index}>
+                      <dt className="font-semibold text-ink">
+                        {answer.prompt ??
+                          question?.prompt ??
+                          t("detail.question", { number: index + 1 })}
+                      </dt>
+                      <dd className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
+                        {answerText(answer.value, question)}
+                      </dd>
+                    </div>
+                  );
+                })}
               </dl>
             )}
           </Panel>
+
+          {application.reviewerNote ? (
+            <Panel id="reviewer-note" title={t("detail.reviewerNote")}>
+              <p className="leading-relaxed whitespace-pre-line text-ink">
+                {application.reviewerNote}
+              </p>
+            </Panel>
+          ) : null}
 
           <Panel
             id="snapshot"
@@ -142,7 +234,7 @@ function Application({
             description={t("detail.fromProfileHelp")}
           >
             <dl className="grid gap-4 sm:grid-cols-2">
-              {snapshot.map((item) => (
+              {rows.map((item) => (
                 <div key={item.key}>
                   <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                     {item.label}
@@ -169,28 +261,23 @@ function Application({
             </Link>
           </Panel>
 
-          {isEditable(application.status) || isWithdrawable(application.status) ? (
+          {isWithdrawable(application.status) ? (
             <Panel id="actions">
-              <button
-                type="button"
-                disabled
-                className={buttonClass({
-                  variant: isEditable(application.status) ? "primary" : "outline",
-                  className: "w-full",
-                })}
-              >
-                {isEditable(application.status)
-                  ? t("continueDraft")
-                  : t("detail.withdraw")}
-              </button>
-              <PreviewNote
-                chip={common("preview.chip")}
-                body={
-                  isEditable(application.status)
-                    ? t("detail.continuePreview")
-                    : t("detail.withdrawPreview")
-                }
-                className="mt-4"
+              <WithdrawForm
+                applicationId={application.id}
+                labels={{
+                  withdraw: t("detail.withdraw"),
+                  confirm: t("detail.withdrawConfirm"),
+                  yes: t("detail.withdrawYes"),
+                  withdrawing: t("detail.withdrawing"),
+                  cancel: t("detail.cancel"),
+                  errors: {
+                    applicationCannotBeWithdrawn: t(
+                      "detail.withdrawErrors.applicationCannotBeWithdrawn",
+                    ),
+                  },
+                  fallback: t("detail.withdrawErrors.fallback"),
+                }}
               />
             </Panel>
           ) : null}
@@ -198,4 +285,28 @@ function Application({
       </div>
     </>
   );
+}
+
+function answersLabels(
+  t: ReturnType<typeof useTranslations<"applications">>,
+  profileHref: string,
+) {
+  return {
+    save: t("form.save"),
+    saving: t("form.saving"),
+    submit: t("form.submit"),
+    submitting: t("form.submitting"),
+    savedDraft: t("form.savedDraft"),
+    choose: t("form.choose"),
+    fieldRequired: t("form.fieldRequired"),
+    fieldInvalid: t("form.fieldInvalid"),
+    errors: {
+      profileRequired: t("form.errors.profileRequired"),
+      opportunityUnavailable: t("form.errors.opportunityUnavailable"),
+      invalidAnswers: t("form.errors.invalidAnswers"),
+      applicationNotEditable: t("form.errors.applicationNotEditable"),
+    },
+    fallback: t("form.errors.fallback"),
+    profileLink: { href: profileHref, label: t("form.errors.profileLink") },
+  };
 }

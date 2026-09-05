@@ -22,7 +22,9 @@ export function IdentityList({ identities }: { identities: LinkedIdentities }) {
       icon: <TelegramMark className="size-5" />,
       name: t("telegram"),
       detail: identities.telegram
-        ? `@${identities.telegram.username}`
+        ? identities.telegram.username
+          ? `@${identities.telegram.username}`
+          : t("connected")
         : t("notConnected"),
       connected: identities.telegram !== null,
     },

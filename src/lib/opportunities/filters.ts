@@ -1,10 +1,7 @@
-import type { Locale } from "@/i18n/routing";
-
 import { canApply } from "./deadline";
 import {
   OPPORTUNITY_FORMATS,
   REGIONS,
-  localized,
   type OpportunityFormat,
   type OpportunitySummary,
   type Region,
@@ -32,6 +29,11 @@ export const DEFAULT_FILTERS: OpportunityFilters = {
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 const MAX_QUERY_LENGTH = 120;
+
+const API_SORTS: Record<OpportunitySort, "deadline" | "startDate"> = {
+  deadline: "deadline",
+  start: "startDate",
+};
 
 function first(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -73,19 +75,28 @@ export function filtersToQuery(filters: OpportunityFilters): Record<string, stri
   return query;
 }
 
+export function filtersToApiQuery(
+  filters: OpportunityFilters,
+): Record<string, string | boolean | undefined> {
+  return {
+    q: filters.q || undefined,
+    region: filters.region ?? undefined,
+    format: filters.format ?? undefined,
+    openOnly: filters.openOnly || undefined,
+    sort: API_SORTS[filters.sort],
+  };
+}
+
 export function filterOpportunities<T extends OpportunitySummary>(
   list: readonly T[],
   filters: OpportunityFilters,
-  locale: Locale,
   now: Date,
 ): T[] {
   const needle = filters.q.toLocaleLowerCase();
 
   const matches = list.filter((opportunity) => {
-    const haystack = `${localized(opportunity.title, locale)} ${localized(
-      opportunity.organization.name,
-      locale,
-    )}`.toLocaleLowerCase();
+    const haystack =
+      `${opportunity.title} ${opportunity.organization.name}`.toLocaleLowerCase();
 
     return (
       (!needle || haystack.includes(needle)) &&

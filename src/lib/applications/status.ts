@@ -1,4 +1,4 @@
-import type { LocalizedText, OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary, QuestionType } from "@/lib/opportunities/types";
 
 export const APPLICATION_STATUSES = [
   "draft",
@@ -19,18 +19,48 @@ export type ApplicationSummary = {
   createdAt: string;
   updatedAt: string;
   submittedAt?: string;
+  reviewedAt?: string;
+  withdrawnAt?: string;
 };
 
+export type AnswerValue = string | string[];
+
 export type ApplicationAnswer = {
-  prompt: LocalizedText;
-  value: LocalizedText;
+  questionId?: string;
+  prompt?: string;
+  type?: QuestionType;
+  value: AnswerValue;
+};
+
+export type ProfileSnapshot = {
+  fullName?: string;
+  region?: string;
+  school?: string;
+  phone?: string;
+  telegram?: string;
 };
 
 export type ApplicationDetail = ApplicationSummary & {
   answers: ApplicationAnswer[];
-  reviewedAt?: string;
-  decidedAt?: string;
+  profileSnapshot?: ProfileSnapshot;
+  reviewerNote?: string;
 };
+
+export function decidedAt(
+  application: Pick<ApplicationSummary, "status" | "reviewedAt" | "withdrawnAt" | "updatedAt">,
+): string | undefined {
+  switch (application.status) {
+    case "withdrawn":
+      return application.withdrawnAt ?? application.updatedAt;
+    case "accepted":
+    case "rejected":
+      return application.reviewedAt ?? application.updatedAt;
+    case "closed":
+      return application.updatedAt;
+    default:
+      return undefined;
+  }
+}
 
 const EDITABLE = new Set<ApplicationStatus>(["draft"]);
 const WITHDRAWABLE = new Set<ApplicationStatus>([
@@ -95,8 +125,8 @@ export type TimelineEntry = { step: TimelineStep; state: TimelineState; at?: str
 
 export function applicationTimeline(
   application: Pick<
-    ApplicationDetail,
-    "status" | "submittedAt" | "reviewedAt" | "decidedAt"
+    ApplicationSummary,
+    "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt"
   >,
 ): TimelineEntry[] {
   const submitted: TimelineEntry = {
@@ -112,7 +142,7 @@ export function applicationTimeline(
   const decided: TimelineEntry = {
     step: "decided",
     state: "done",
-    at: application.decidedAt,
+    at: decidedAt(application),
   };
 
   switch (application.status) {

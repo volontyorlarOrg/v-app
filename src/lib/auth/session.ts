@@ -1,7 +1,7 @@
 import { EncryptJWT, jwtDecrypt } from "jose";
 import { z } from "zod";
 
-import { isProduction, sessionSecret } from "@/lib/auth/config";
+import { isSecureCookieTransport, sessionSecret } from "@/lib/auth/config";
 
 export const SESSION_COOKIE_NAME = "volontyorlar_session";
 export const RETURN_TO_COOKIE_NAME = "volontyorlar_return_to";
@@ -79,10 +79,28 @@ export function isAccessTokenExpiring(
   return session.accessTokenExpiresAt - ACCESS_TOKEN_REFRESH_SKEW_SECONDS <= nowSeconds;
 }
 
+export function isAccessTokenExpired(
+  session: Pick<SessionPayload, "accessTokenExpiresAt">,
+  now: number = Date.now(),
+): boolean {
+  if (session.accessTokenExpiresAt === undefined) return false;
+  return session.accessTokenExpiresAt <= Math.floor(now / 1000);
+}
+
+export const SESSION_STATUSES = ["expired"] as const;
+export type SessionStatus = (typeof SESSION_STATUSES)[number];
+
+export function isSessionStatus(value: unknown): value is SessionStatus {
+  return (
+    typeof value === "string" &&
+    (SESSION_STATUSES as readonly string[]).includes(value)
+  );
+}
+
 export function sessionCookieOptions() {
   return {
     httpOnly: true,
-    secure: isProduction(),
+    secure: isSecureCookieTransport(),
     sameSite: "lax" as const,
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,
@@ -92,7 +110,7 @@ export function sessionCookieOptions() {
 export function handoffCookieOptions() {
   return {
     httpOnly: true,
-    secure: isProduction(),
+    secure: isSecureCookieTransport(),
     sameSite: "lax" as const,
     path: "/",
     maxAge: HANDOFF_MAX_AGE_SECONDS,

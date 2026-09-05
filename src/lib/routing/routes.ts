@@ -3,7 +3,6 @@ import type { Locale } from "@/i18n/routing";
 export type RouteKey =
   | "login"
   | "signup"
-  | "forgotPassword"
   | "dashboard"
   | "opportunities"
   | "applications"
@@ -39,15 +38,6 @@ export const appRoutes: readonly AppRoute[] = [
   {
     key: "signup",
     path: "/signup",
-    area: "auth",
-    guard: "guest",
-    inNav: false,
-    inTabBar: false,
-    inAccountMenu: false,
-  },
-  {
-    key: "forgotPassword",
-    path: "/forgot-password",
     area: "auth",
     guard: "guest",
     inNav: false,

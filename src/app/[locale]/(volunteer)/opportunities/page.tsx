@@ -10,6 +10,8 @@ import { OpportunityFilters } from "@/components/opportunities/opportunity-filte
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { listOpportunities } from "@/lib/api/opportunities.server";
+import { listSaved, savedIds } from "@/lib/api/saved.server";
 import {
   OPPORTUNITY_SORTS,
   activeFilterCount,
@@ -17,10 +19,12 @@ import {
   parseOpportunityFilters,
   type OpportunityFilters as Filters,
 } from "@/lib/opportunities/filters";
-import { OPPORTUNITY_FORMATS, REGIONS } from "@/lib/opportunities/types";
+import {
+  OPPORTUNITY_FORMATS,
+  REGIONS,
+  type OpportunitySummary,
+} from "@/lib/opportunities/types";
 import { localePath, navHref } from "@/lib/routing/routes";
-import { sampleOpportunities } from "@/lib/sample/opportunities";
-import { sampleVolunteer } from "@/lib/sample/volunteer";
 
 export const dynamic = "force-dynamic";
 
@@ -44,30 +48,54 @@ export default async function OpportunitiesPage({
 }: PageProps<"/[locale]/opportunities">) {
   const { locale } = await params;
   setRequestLocale(locale);
+
   const query = await searchParams;
+  const filters = parseOpportunityFilters(query);
+  const view = opportunityView(query.view);
+  const now = new Date();
+
+  const [saved, catalogue] = await Promise.all([
+    listSaved(),
+    view === "all" ? listOpportunities(filters) : null,
+  ]);
+  const list =
+    view === "saved"
+      ? filterOpportunities(saved.items, filters, now)
+      : (catalogue?.items ?? []);
+
   return (
     <Opportunities
-      filters={parseOpportunityFilters(query)}
-      view={opportunityView(query.view)}
+      filters={filters}
+      view={view}
+      list={list}
+      total={view === "saved" ? list.length : (catalogue?.total ?? 0)}
+      savedCount={saved.total}
+      saved={savedIds(saved)}
+      now={now}
     />
   );
 }
 
-function Opportunities({ filters, view }: { filters: Filters; view: OpportunityView }) {
+function Opportunities({
+  filters,
+  view,
+  list,
+  total,
+  savedCount,
+  saved,
+  now,
+}: {
+  filters: Filters;
+  view: OpportunityView;
+  list: readonly OpportunitySummary[];
+  total: number;
+  savedCount: number;
+  saved: ReadonlySet<string>;
+  now: Date;
+}) {
   const t = useTranslations("opportunities");
-  const common = useTranslations("common");
   const locale = useLocale() as Locale;
 
-  const now = new Date();
-  const volunteer = sampleVolunteer(now);
-  const catalogue = sampleOpportunities(now);
-  const source =
-    view === "saved"
-      ? catalogue.filter((opportunity) =>
-          volunteer.savedSlugs.includes(opportunity.slug),
-        )
-      : catalogue;
-  const list = filterOpportunities(source, filters, locale, now);
   const activeCount = activeFilterCount(filters);
   const views: SegmentedItem[] = [
     {
@@ -75,24 +103,19 @@ function Opportunities({ filters, view }: { filters: Filters; view: OpportunityV
       href: navHref("opportunities"),
       label: t("views.all"),
       active: view === "all",
-      count: catalogue.length,
     },
     {
       key: "saved",
       href: `${navHref("opportunities")}?view=saved`,
       label: t("views.saved"),
       active: view === "saved",
-      count: volunteer.savedSlugs.length,
+      count: savedCount,
     },
   ];
 
   return (
     <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        chip={common("sample.chip")}
-      />
+      <PageHeader title={t("title")} description={t("description")} />
 
       <Segmented
         label={t("views.label")}
@@ -143,7 +166,10 @@ function Opportunities({ filters, view }: { filters: Filters; view: OpportunityV
         role="status"
         className="enter-rise mt-4 text-sm text-ink-muted [--enter-delay:160ms]"
       >
-        {t("count", { count: list.length })}
+        {t("count", { count: total })}
+        {total > list.length
+          ? ` · ${t("showingOf", { shown: list.length, total })}`
+          : null}
       </p>
 
       {list.length === 0 ? (
@@ -167,7 +193,7 @@ function Opportunities({ filters, view }: { filters: Filters; view: OpportunityV
             <li key={opportunity.id} className="flex">
               <OpportunityCard
                 opportunity={opportunity}
-                saved={volunteer.savedSlugs.includes(opportunity.slug)}
+                saved={saved.has(opportunity.id)}
                 now={now}
               />
             </li>

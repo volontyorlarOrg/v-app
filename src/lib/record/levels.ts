@@ -1,5 +1,3 @@
-import type { LocalizedText } from "@/lib/opportunities/types";
-
 export const LEVELS = ["newcomer", "active", "trusted", "core"] as const;
 export type Level = (typeof LEVELS)[number];
 
@@ -113,8 +111,8 @@ export type AttendanceOutcome = (typeof ATTENDANCE_OUTCOMES)[number];
 
 export type ParticipationEntry = {
   id: string;
-  opportunityTitle: LocalizedText;
-  organization: LocalizedText;
+  opportunityTitle: string;
+  organization: string;
   eventDate: string;
   outcome: AttendanceOutcome;
   hours?: number;

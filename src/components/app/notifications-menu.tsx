@@ -1,13 +1,15 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 
+import { markAllReadAction } from "@/lib/notifications/actions";
 import { cn } from "@/lib/utils";
 
 export type NotificationItem = {
   id: string;
-  text: string;
+  title: string;
+  body: string;
   time: string;
   unread: boolean;
 };
@@ -27,6 +29,7 @@ export function NotificationsMenu({
 }) {
   const [open, setOpen] = useState(false);
   const [allRead, setAllRead] = useState(false);
+  const [pending, startTransition] = useTransition();
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -52,6 +55,13 @@ export function NotificationsMenu({
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
+
+  function markAllRead() {
+    startTransition(async () => {
+      const result = await markAllReadAction();
+      if (result.status === "ok") setAllRead(true);
+    });
+  }
 
   return (
     <div ref={rootRef} className="relative">
@@ -85,8 +95,9 @@ export function NotificationsMenu({
           {unread > 0 ? (
             <button
               type="button"
-              onClick={() => setAllRead(true)}
-              className="text-xs font-semibold text-primary-ink underline-offset-4 hover:underline"
+              disabled={pending}
+              onClick={markAllRead}
+              className="text-xs font-semibold text-primary-ink underline-offset-4 hover:underline disabled:opacity-70"
             >
               {markAllLabel}
             </button>
@@ -109,7 +120,10 @@ export function NotificationsMenu({
                   )}
                 />
                 <div className="min-w-0">
-                  <p className="text-sm leading-snug text-ink">{item.text}</p>
+                  <p className="text-sm leading-snug font-semibold text-ink">{item.title}</p>
+                  {item.body ? (
+                    <p className="mt-0.5 text-sm leading-snug text-ink-muted">{item.body}</p>
+                  ) : null}
                   <p className="mt-1 text-xs text-ink-muted">{item.time}</p>
                 </div>
               </li>

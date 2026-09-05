@@ -1,20 +1,18 @@
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import type { ApplicationSummary } from "@/lib/applications/status";
-import { localized, type OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { navHref, opportunityHref } from "@/lib/routing/routes";
 
 export function placeOf(
   opportunity: OpportunitySummary,
-  locale: Locale,
   t: (key: string) => string,
 ): string {
   if (opportunity.format === "remote") return t(`format.${opportunity.format}`);
   const named = opportunity.locationName ?? opportunity.city;
-  return named ? localized(named, locale) : t(`regions.${opportunity.region}`);
+  return named ? named : t(`regions.${opportunity.region}`);
 }
 
 export function NextUp({
@@ -25,7 +23,6 @@ export function NextUp({
   const t = useTranslations("dashboard.nextUp");
   const opportunities = useTranslations("opportunities");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   if (commitments.length === 0) {
     return (
@@ -71,12 +68,12 @@ export function NextUp({
                   href={opportunityHref(opportunity.slug)}
                   className="text-ink hover:text-primary-ink"
                 >
-                  {localized(opportunity.title, locale)}
+                  {opportunity.title}
                 </Link>
               </h3>
               <p className="mt-1 text-sm text-ink-muted">
-                {localized(opportunity.organization.name, locale)} ·{" "}
-                {placeOf(opportunity, locale, opportunities)}
+                {opportunity.organization.name} ·{" "}
+                {placeOf(opportunity, opportunities)}
               </p>
               <p className="tabular mt-1 text-sm text-ink-muted">
                 {format.dateTime(starts, "weekday")}, {format.dateTime(starts, "time")}

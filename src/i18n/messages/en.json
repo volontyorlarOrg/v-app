@@ -4,13 +4,11 @@
     "organizationShortName": "Volontyorlar",
     "tagline": "Volunteering for young people in Uzbekistan",
     "location": "Uzbekistan",
-    "sample": {
-      "chip": "Sample data",
-      "body": "This panel shows an illustrative volunteer. Nothing on it is connected to a real account yet."
-    },
-    "preview": {
-      "chip": "Preview",
-      "notSaved": "Changes on this page are not saved anywhere yet. Saving arrives with the backend."
+    "volunteer": "Volunteer",
+    "error": {
+      "title": "Couldn't load this page",
+      "body": "We couldn't reach the server. Please try again in a moment.",
+      "retry": "Try again"
     }
   },
   "nav": {
@@ -45,65 +43,35 @@
       "label": "Account menu"
     }
   },
-  "notifications": {
-    "kinds": {
-      "attendanceConfirmed": "The organiser confirmed you attended {title}.",
-      "applicationAccepted": "You were accepted to {title}.",
-      "applicationUnderReview": "Your application to {title} is under review.",
-      "deadlineSoon": "{title} closes tomorrow.",
-      "newOpportunity": "New in your region: {title}."
-    }
-  },
   "auth": {
-    "preview": {
-      "chip": "Preview",
-      "body": "Sign-in is not connected yet. Every option below opens the sample panel.",
-      "bodyTelegram": "Telegram sign-in works. Google and email are not connected yet and still open the sample panel."
-    },
     "providers": {
       "google": "Continue with Google",
       "telegram": "Continue with Telegram",
-      "or": "or with email"
+      "googleUnavailable": "Google sign-in isn't available yet."
     },
     "telegram": {
       "handoff": "Telegram opens next. Finish signing in from the link the bot sends you in that chat.",
       "expired": "That sign-in link had expired or was already used. Start again with Telegram.",
       "unavailable": "Telegram sign-in is unavailable right now. Try again in a moment."
     },
-    "fields": {
-      "fullName": "Full name",
-      "email": "Email",
-      "password": "Password",
-      "passwordHelp": "At least 8 characters.",
-      "showPassword": "Show password",
-      "hidePassword": "Hide password"
-    },
     "login": {
       "metaTitle": "Log in",
       "title": "Welcome back.",
       "lead": "Log in to see your applications, your record and what is coming up.",
-      "submit": "Log in",
-      "forgot": "Forgot password?",
       "noAccount": "New to Volontyorlar?",
-      "createAccount": "Create an account",
-      "resetSent": "If that email belongs to an account, a reset link is on its way."
+      "createAccount": "Create an account"
     },
     "signup": {
       "metaTitle": "Create an account",
       "title": "Create your account.",
-      "lead": "One profile, reused for every application. Fill it in once.",
-      "submit": "Create account",
+      "lead": "Continue with Telegram — your account is created the first time you sign in.",
       "legal": "By continuing you agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
       "legalPlain": "By continuing you agree to the Terms and the Privacy Policy.",
       "haveAccount": "Already have an account?",
       "logIn": "Log in"
     },
-    "forgot": {
-      "metaTitle": "Reset password",
-      "title": "Reset your password.",
-      "lead": "Enter the email you signed up with and we will send you a link.",
-      "submit": "Send reset link",
-      "back": "Back to log in"
+    "session": {
+      "expired": "Your session ended. Sign in again."
     }
   },
   "dashboard": {
@@ -157,16 +125,7 @@
       "viewAll": "All saved",
       "empty": "Save an opportunity while browsing and it waits for you here."
     },
-    "activity": {
-      "title": "Recently",
-      "kinds": {
-        "attendanceConfirmed": "The organiser confirmed you attended {title}",
-        "applicationAccepted": "You were accepted to {title}",
-        "applicationSubmitted": "You applied to {title}",
-        "opportunitySaved": "You saved {title}",
-        "levelReached": "You reached the {title} level"
-      }
-    }
+    "greetingAnonymous": "Hello."
   },
   "record": {
     "metaTitle": "My record",
@@ -259,9 +218,35 @@
       "fromProfile": "From your profile",
       "fromProfileHelp": "What the organiser sees alongside your answers.",
       "withdraw": "Withdraw application",
-      "withdrawPreview": "Withdrawing opens with the backend.",
-      "continuePreview": "Editing a draft opens with the backend.",
-      "viewOpportunity": "View opportunity"
+      "viewOpportunity": "View opportunity",
+      "withdrawConfirm": "Withdraw this application? This can't be undone.",
+      "withdrawYes": "Yes, withdraw",
+      "withdrawing": "Withdrawing…",
+      "cancel": "Cancel",
+      "withdrawErrors": {
+        "applicationCannotBeWithdrawn": "This application can't be withdrawn.",
+        "fallback": "Couldn't withdraw. Please try again."
+      },
+      "reviewerNote": "Note from the organiser",
+      "question": "Question {number}"
+    },
+    "form": {
+      "save": "Save draft",
+      "saving": "Saving…",
+      "submit": "Submit application",
+      "submitting": "Submitting…",
+      "savedDraft": "Draft saved.",
+      "choose": "Choose",
+      "fieldRequired": "This answer is required.",
+      "fieldInvalid": "Check this answer.",
+      "errors": {
+        "profileRequired": "Complete your profile before submitting.",
+        "profileLink": "Go to your profile",
+        "opportunityUnavailable": "This opportunity is no longer taking applications.",
+        "invalidAnswers": "Some answers need another look.",
+        "applicationNotEditable": "This application can no longer be edited.",
+        "fallback": "That didn't save. Please try again."
+      }
     }
   },
   "opportunities": {
@@ -299,7 +284,8 @@
       "view": "View",
       "save": "Save",
       "saved": "Saved",
-      "sourced": "Sourced by Volontyorlar"
+      "sourced": "Sourced by Volontyorlar",
+      "saveError": "Couldn't save"
     },
     "detail": {
       "back": "All opportunities",
@@ -321,7 +307,13 @@
       "maxLength": "up to {count} characters",
       "apply": "Apply",
       "applyClosed": "Applications are closed",
-      "applyPreview": "Applying opens with the backend. Until then the button is a preview."
+      "applying": "Starting…",
+      "viewApplication": "View your application",
+      "applyErrors": {
+        "opportunityUnavailable": "This opportunity isn't taking applications right now.",
+        "opportunityNotFound": "This opportunity is no longer available.",
+        "fallback": "Couldn't start your application. Please try again."
+      }
     },
     "status": {
       "open": "Open",
@@ -358,7 +350,8 @@
       "tashkent-region": "Tashkent Region",
       "tashkent-city": "Tashkent City",
       "karakalpakstan": "Karakalpakstan"
-    }
+    },
+    "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest."
   },
   "saved": {
     "metaTitle": "Saved",
@@ -404,23 +397,26 @@
       "contact": "A way to reach you"
     },
     "save": "Save profile",
-    "saved": "Saved in this preview only.",
+    "saved": "Profile saved.",
     "completion": {
       "label": "Profile completeness",
       "value": "{percent}% complete",
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
       "why": "A complete profile means an organiser can evaluate and contact you."
-    }
+    },
+    "saving": "Saving…",
+    "saveError": "Couldn't save your profile. Check the marked fields.",
+    "fieldInvalid": "Check this field."
   },
   "settings": {
     "metaTitle": "Settings",
     "title": "Settings",
     "description": "Notifications, privacy, appearance, and your account.",
-    "preview": "Switches on this page change what you see, and nothing is stored yet. Saving preferences arrives with the backend.",
     "preferences": {
       "title": "Privacy and appearance",
-      "description": "What others can see and how this app looks to you."
+      "description": "What others can see and how this app looks to you.",
+      "saveError": "That setting didn't save. Please try again."
     },
     "accountGroup": {
       "title": "Account and access",

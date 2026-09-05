@@ -1,11 +1,9 @@
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import type { ApplicationSummary } from "@/lib/applications/status";
-import { localized } from "@/lib/opportunities/types";
 import { applicationHref } from "@/lib/routing/routes";
 
 export function ApplicationRows({
@@ -19,7 +17,6 @@ export function ApplicationRows({
 }) {
   const t = useTranslations("applications");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   if (applications.length === 0) {
     return (
@@ -63,11 +60,11 @@ export function ApplicationRows({
               href={applicationHref(application.id)}
               className="text-ink hover:text-primary-ink"
             >
-              {localized(application.opportunity.title, locale)}
+              {application.opportunity.title}
             </Link>
           </h3>
           <p className="mt-1 text-sm text-ink-muted">
-            {localized(application.opportunity.organization.name, locale)}
+            {application.opportunity.organization.name}
             {application.status === "draft" ? (
               <>
                 {" · "}

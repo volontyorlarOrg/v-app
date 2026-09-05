@@ -1,5 +1,5 @@
 import { BadgeCheck, CalendarDays, MapPin, Monitor, Users } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 
 import {
   DeadlineText,
@@ -8,8 +8,7 @@ import {
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
-import { localized, type OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { opportunityHref } from "@/lib/routing/routes";
 
 export function OpportunityCard({
@@ -23,13 +22,12 @@ export function OpportunityCard({
 }) {
   const t = useTranslations("opportunities");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
 
   const remote = opportunity.format === "remote";
   const place = remote
     ? t(`format.${opportunity.format}`)
     : opportunity.city
-      ? localized(opportunity.city, locale)
+      ? opportunity.city
       : t(`regions.${opportunity.region}`);
 
   return (
@@ -44,12 +42,12 @@ export function OpportunityCard({
           href={opportunityHref(opportunity.slug)}
           className="text-ink hover:text-primary-ink"
         >
-          {localized(opportunity.title, locale)}
+          {opportunity.title}
         </Link>
       </h3>
 
       <p className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
-        <span>{localized(opportunity.organization.name, locale)}</span>
+        <span>{opportunity.organization.name}</span>
         {opportunity.organization.verified ? (
           <BadgeCheck aria-label={t("verified")} className="size-3.5 text-primary" />
         ) : null}
@@ -80,9 +78,11 @@ export function OpportunityCard({
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-5">
         <SaveButton
+          opportunityId={opportunity.id}
           saved={saved}
           saveLabel={t("card.save")}
           savedLabel={t("card.saved")}
+          errorLabel={t("card.saveError")}
           className="-ml-4"
         />
         <Link
