@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.STUB_PORT ?? 3212);
+const APP_URL = process.env.E2E_APP_URL ?? "http://127.0.0.1:3211";
 const ACCESS_TOKEN_TTL_SECONDS = 45;
 const DAY = 86_400_000;
 const START = Date.now();
@@ -275,7 +276,9 @@ function freshState() {
 
 const sessions = new Map();
 const refreshTokens = new Map();
+const pendingStates = new Set();
 let issued = 0;
+let started = 0;
 
 function issueSession(state) {
   issued += 1;
@@ -388,11 +391,24 @@ const server = createServer(async (request, response) => {
 
   if (path === "/" || path === "/health/live") return send(response, 200, { status: "ok" });
 
-  if (path === "/auth/telegram/ticket" && method === "POST") {
-    return send(response, 201, { ticket: "e2e-ticket", botUsername: "volontyor_uz_bot", expiresAt: at(0, 23) });
+  if (path === "/auth/telegram/authorize" && method === "POST") {
+    started += 1;
+    const state = `e2e-state-${String(started).padStart(4, "0")}-minted-by-the-stub`;
+    pendingStates.add(state);
+    const authorizationUrl = `http://127.0.0.1:${PORT}/oauth/auth?state=${encodeURIComponent(state)}`;
+    return send(response, 201, { authorizationUrl, state, expiresAt: at(0, 23) });
   }
-  if (path === "/auth/telegram/complete" && method === "POST") {
-    if (body.loginToken !== "e2e-valid") return send(response, 401, { code: "invalidLoginToken" });
+  if (path === "/oauth/auth" && method === "GET") {
+    const callback = new URL("/api/auth/telegram/callback", APP_URL);
+    callback.searchParams.set("code", "e2e-code");
+    callback.searchParams.set("state", url.searchParams.get("state") ?? "");
+    response.writeHead(302, { location: callback.toString() });
+    return response.end();
+  }
+  if (path === "/auth/telegram/callback" && method === "POST") {
+    if (!pendingStates.delete(body.state)) return send(response, 401, { code: "invalidLoginState" });
+    if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
+    if (body.code !== "e2e-code") return send(response, 401, { code: "invalidAuthorizationCode" });
     return send(response, 201, issueSession(freshState()));
   }
   if (path === "/auth/refresh" && method === "POST") {

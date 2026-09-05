@@ -7,8 +7,16 @@ async function isMobile(page: Page) {
 }
 
 async function signIn(page: Page, locale = "en") {
-  await page.goto(`/api/auth/telegram/complete?token=e2e-valid&locale=${locale}`);
+  await page.goto(`/api/auth/telegram/start?locale=${locale}`);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
+}
+
+async function startedState(page: Page) {
+  const response = await page.request.get("/api/auth/telegram/start?locale=en", {
+    maxRedirects: 0,
+  });
+  const location = response.headers()["location"] ?? "";
+  return new URL(location).searchParams.get("state") ?? "";
 }
 
 test.describe("locale routing", () => {
@@ -47,14 +55,17 @@ test.describe("sign-in", () => {
     await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
   });
 
-  test("the Telegram button hands off to the bot with a one-time ticket", async ({ request }) => {
+  test("the Telegram button hands the browser to Telegram's sign-in page with a bound state", async ({
+    request,
+  }) => {
     const response = await request.get("/api/auth/telegram/start?locale=en", {
       maxRedirects: 0,
     });
     expect(response.status()).toBe(303);
-    expect(response.headers()["location"]).toMatch(
-      /^https:\/\/t\.me\/volontyor_uz_bot\?start=/,
-    );
+    const location = response.headers()["location"] ?? "";
+    expect(location).toMatch(/\/oauth\/auth\?state=e2e-state-/);
+    const state = new URL(location).searchParams.get("state") ?? "";
+    expect(response.headers()["set-cookie"]).toContain(`volontyorlar_auth_state=${state}`);
   });
 
   test("create account is the same Telegram flow", async ({ page }) => {
@@ -71,10 +82,13 @@ test.describe("sign-in", () => {
     expect(response?.status()).toBe(404);
   });
 
-  test("a bad login token goes back to sign-in with a message and no session", async ({
+  test("a callback whose state is not the one this browser started is refused", async ({
     page,
   }) => {
-    await page.goto("/api/auth/telegram/complete?token=bad-token&locale=en");
+    await startedState(page);
+    await page.goto(
+      "/api/auth/telegram/callback?code=e2e-code&state=e2e-state-0000-never-minted-here",
+    );
     await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
     await expect(page.getByRole("status")).toContainText(/expired/i);
 
@@ -82,12 +96,52 @@ test.describe("sign-in", () => {
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
-  test("a valid login token signs in and the dashboard greets the volunteer", async ({
+  test("a state can be redeemed only once", async ({ page }) => {
+    const state = await startedState(page);
+    const handoff = (await page.context().cookies()).filter(
+      (cookie) => cookie.name !== "volontyorlar_session",
+    );
+    await page.goto(`/api/auth/telegram/callback?code=e2e-code&state=${state}`);
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+
+    await page.context().clearCookies();
+    await page.context().addCookies(handoff);
+    await page.goto(`/api/auth/telegram/callback?code=e2e-code&state=${state}`);
+    await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
+  });
+
+  test("a sign-in that did not share a phone number is refused with a message", async ({
+    page,
+  }) => {
+    const state = await startedState(page);
+    await page.goto(`/api/auth/telegram/callback?code=no-phone&state=${state}`);
+    await expect(page).toHaveURL(/\/en\/login\?telegram=phoneRequired$/);
+    await expect(page.getByRole("status")).toContainText(/phone number/i);
+
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/login\?next=/);
+  });
+
+  test("declining in Telegram returns to sign-in as cancelled", async ({ page }) => {
+    await startedState(page);
+    await page.goto("/api/auth/telegram/callback?error=access_denied");
+    await expect(page).toHaveURL(/\/en\/login\?telegram=cancelled$/);
+    await expect(page.getByRole("status")).toContainText(/cancelled/i);
+  });
+
+  test("completing Telegram sign-in lands on the dashboard, which greets the volunteer", async ({
     page,
   }) => {
     await signIn(page);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Dilnoza");
     await expect(page.getByText("Sample data")).toHaveCount(0);
+  });
+
+  test("sign-in returns to the page that required it", async ({ page }) => {
+    await page.goto("/en/record");
+    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Frecord$/);
+    await page.getByRole("link", { name: "Continue with Telegram" }).click();
+    await expect(page).toHaveURL(/\/en\/record$/);
   });
 
   test("the panel is not reachable without a session", async ({ page }) => {

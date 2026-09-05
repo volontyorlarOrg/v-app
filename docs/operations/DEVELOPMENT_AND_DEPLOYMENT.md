@@ -56,9 +56,9 @@ VOLONTYORLAR_API_URL=http://localhost:4000
 VOLONTYORLAR_SESSION_SECRET=$(openssl rand -base64 48)
 ```
 
-with `v-backend` running on 4000 with `AUTH_ENABLED=true` and its bot
-registered. The full procedure, including how the bot token is obtained from
-BotFather, is in
+with `v-backend` running on 4000 with `AUTH_ENABLED=true` and its Login
+Widget configured. The full procedure, including how the client id and secret
+are obtained from BotFather, is in
 [`../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
 Leave either blank and no one can sign in: every `(volunteer)` route redirects
 to `/login`, and the Telegram button returns `?telegram=unavailable`. There is
@@ -77,7 +77,7 @@ bundles.
 | Content        | Vitest          | Catalog key parity, ICU argument parity, empty and placeholder strings, Uzbek turned comma, Russian Cyrillic                                                                                                                                   |
 | Tokens         | Vitest          | Contrast contract in both themes, no bold display face, no literal hex                                                                                                                                                                         |
 | Components     | Testing Library | The tab bar's active section, the language switcher, the theme switch, scenes |
-| Critical paths | Playwright      | Against `e2e/stub-backend.mjs`: each locale, the root redirect, language switching, the Telegram handoff, an invalid and a valid login token, every guard, the dashboard, section navigation, notifications, sign-out, saving, applying, a draft, submitting, withdrawing, the profile and preferences persisting, the theme switch, horizontal overflow, reduced motion, headers, 404 |
+| Critical paths | Playwright      | Against `e2e/stub-backend.mjs`: each locale, the root redirect, language switching, the Telegram handoff, a foreign, a reused and a valid callback, a refused phone number, a cancelled consent, the return path, every guard, the dashboard, section navigation, notifications, sign-out, saving, applying, a draft, submitting, withdrawing, the profile and preferences persisting, the theme switch, horizontal overflow, reduced motion, headers, 404 |
 
 Playwright runs the smoke suite in Chromium desktop and mobile, Firefox
 desktop, and WebKit mobile, and builds the app itself through its `webServer`
@@ -111,9 +111,10 @@ Before a public launch:
    route guards live in the proxy, so a host that does not run it leaves the
    `(volunteer)` layout check as the only gate.
 4. Set `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` as server-only
-   values, and point `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` at
-   `https://<this origin>/api/auth/telegram/complete`. Verify the completion
-   link opens correctly inside Telegram's in-app browser on the real origin.
+   values, point `TELEGRAM_OIDC_REDIRECT_URI` in `v-backend` at
+   `https://<this origin>/api/auth/telegram/callback`, and register that same
+   URL under the bot's Login Widget in BotFather. Verify a real sign-in from a
+   phone on the real origin.
 5. The panel reads `v-backend` on every request. Deploy the backend first,
    then this app; a response the schemas in `src/lib/api/schemas.ts` cannot
    parse renders the load-error panel rather than a guess.

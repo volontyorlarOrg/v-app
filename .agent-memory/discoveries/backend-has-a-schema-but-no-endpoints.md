@@ -15,7 +15,9 @@ Checked in September 2026 against `../v-backend` (`docs/api/openapi.json` and
   errors), `invalidAnswers` (400, `answers.<questionId>`), `profileRequired`,
   `opportunityUnavailable`, `applicationNotEditable`,
   `applicationCannotBeWithdrawn` (409), `*NotFound` (404).
-- Authentication is Telegram deep-link tickets plus JWT access and rotating
+- Authentication is Telegram's OpenID Connect flow (`POST
+  /auth/telegram/authorize` → `oauth.telegram.org` → `POST
+  /auth/telegram/callback { state, code }`) plus JWT access and rotating
   refresh tokens (`POST /auth/refresh` revokes the old token; a reuse is a
   409 `refreshTokenReused`). There is no email or Google identity model.
 

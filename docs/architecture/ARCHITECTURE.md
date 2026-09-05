@@ -4,8 +4,8 @@
 
 A single Next.js 16 App Router application: React 19, strict TypeScript,
 Tailwind CSS 4, and `next-intl`. Every screen is a Server Component. Sign-in
-is Telegram, completed by two route handlers that write an encrypted session
-cookie; every signed-in screen reads `v-backend` through the server-only client
+is Telegram's OpenID Connect flow, carried by two route handlers that end by
+writing an encrypted session cookie; every signed-in screen reads `v-backend` through the server-only client
 in `src/lib/api/`, and every write is a Server Action.
 
 ```mermaid
@@ -15,7 +15,7 @@ flowchart LR
   Locale --> Root["/[locale] → redirect to /login"]
   Locale --> Auth["(auth) layout: lockup, language, theme, dot grid"]
   Auth --> AuthPages["login · signup"]
-  AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,complete}"]
+  AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,callback}"]
   Handlers -- session cookie --> Panel
   Locale --> Panel["(volunteer) layout: AppShell = sidebar + top bar + tab bar"]
   Panel --> Dashboard["dashboard"]
@@ -31,7 +31,7 @@ flowchart LR
 | Location                                                          | Responsibility                                                                                                                                                                                                                                                                |
 | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/proxy.ts`                                                    | Sends a prefix-less URL to a locale using `Accept-Language`; once sign-in is configured, also reads the session cookie, enforces each route's `guard`, rotates an expiring access token on a navigation, and marks signed-in responses `private, no-store`                    |
-| `src/app/api/auth/telegram/{start,complete}/route.ts`             | The two hops of Telegram sign-in: mint a ticket and redirect into the bot; redeem the one-time login token and write the session cookie                                                                                                                                       |
+| `src/app/api/auth/telegram/{start,callback}/route.ts`             | The two hops of Telegram sign-in: ask the backend for the authorization URL, bind its `state` to this browser with a cookie and redirect to Telegram; on return, check the state, redeem the code through the backend and write the session cookie                                |
 | `src/lib/auth/`                                                   | `config.ts` reads the two server-only variables; `session.ts` holds the cookie schema, its JWE encryption and `safeReturnPath`; `session.server.ts` reads and writes it through `cookies()`; `refresh.ts` rotates a refresh token; `actions.ts` is the sign-out Server Action |
 | `src/lib/api/`                                                    | `client.server.ts`, the one server-only fetch wrapper: timeout, request id, Zod response parsing, normalised `ApiError` codes                                                                                                                                                 |
 | `src/app/[locale]/layout.tsx`                                     | Root document, `lang`, the two typefaces, the theme boot script, `noindex`, the client provider with `messages={null}`                                                                                                                                                        |

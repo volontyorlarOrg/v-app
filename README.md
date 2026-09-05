@@ -17,7 +17,8 @@ npm run dev
 ```
 
 http://localhost:3001 redirects to `/uz/login`. Sign-in is Telegram: the
-button hands off to the bot and the completion link writes the session cookie.
+button hands off to Telegram's sign-in page, and the callback route writes
+the session cookie.
 Everything behind it reads `v-backend`, so set `VOLONTYORLAR_API_URL` and
 `VOLONTYORLAR_SESSION_SECRET` in `.env.local` (see
 `docs/operations/DEVELOPMENT_AND_DEPLOYMENT.md`). Run `../v-web` on port 3000

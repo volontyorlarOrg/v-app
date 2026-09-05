@@ -44,10 +44,13 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 **Every screen behind sign-in reads `v-backend`; nothing is a sample.** So:
 
 - **Telegram is the only way in.** `/login` and `/signup` both offer "Continue
-  with Telegram"; the backend creates the account on the first sign-in. The
-  Google button renders `disabled` with a note that it is not available yet.
-  There is no email or password anywhere — the backend has none, so the app
-  shows none, and `/forgot-password` is a 404;
+  with Telegram", which sends the browser to Telegram's own sign-in page
+  (OpenID Connect): the volunteer enters their phone number, confirms in the
+  Telegram app, and comes back to `/api/auth/telegram/callback` signed in. The
+  backend creates the account on the first sign-in and requires the shared
+  phone number. The Google button renders `disabled` with a note that it is
+  not available yet. There is no email or password anywhere — the backend has
+  none, so the app shows none, and `/forgot-password` is a 404;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
   Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
   or not they are set; unset, no session can exist and the Telegram handoff
@@ -115,7 +118,7 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 
 ```text
 src/app/[locale]/(auth)/        -> login and signup; both are the Telegram handoff
-src/app/api/auth/telegram/      -> start and complete: the two hops of Telegram sign-in
+src/app/api/auth/telegram/      -> start and callback: the two hops of Telegram sign-in
 src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
 src/lib/api/                    -> the server-only client, per-domain reads, the Zod schemas, error codes, ActionResult
@@ -168,8 +171,10 @@ docs/                           -> stable project documentation and the plan
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.
-- No personal data in URLs (sign-in carries only `?telegram=expired|unavailable`,
-  `?session=expired` and a same-origin `?next=`), no tokens in browser storage;
+- No personal data in URLs (sign-in carries only
+  `?telegram=expired|unavailable|cancelled|phoneRequired`, `?session=expired`
+  and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
+  `state`), no tokens in browser storage;
   the theme choice is the only stored value. Session tokens live only in the
   encrypted `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in

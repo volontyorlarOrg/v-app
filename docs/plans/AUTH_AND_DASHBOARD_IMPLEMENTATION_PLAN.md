@@ -45,34 +45,40 @@ This is the design the archived foundation already had (`legacy/src/lib/auth/`)
 and the backend already expects (`docs/security/AUTH_AND_PRIVACY.md` in
 `v-backend`).
 
-### 1.1 Telegram (primary, already designed)
+### 1.1 Telegram (primary, live)
+
+Telegram's OpenID Connect flow, authorization code with PKCE. The bot only
+represents the application on Telegram's sign-in page and delivers
+notifications; it answers no messages.
 
 ```mermaid
 sequenceDiagram
   participant B as Browser
   participant A as v-app (server)
   participant API as v-backend
-  participant TG as Telegram
+  participant TG as oauth.telegram.org
   B->>A: GET /api/auth/telegram/start?locale&next
-  A->>API: POST /auth/telegram/ticket
-  API-->>A: { ticket, botUsername, expiresAt }
-  A-->>B: 302 t.me/<bot>?start=<ticket>
-  B->>TG: Start
-  TG->>API: webhook (verified secret) with telegram user + ticket
-  API->>API: bind identity, mint one-time login token, mark ticket verified
-  API->>TG: send completion link into the user's chat
-  TG-->>B: user taps link in their own chat
-  B->>A: GET /api/auth/telegram/complete?token
-  A->>API: POST /auth/telegram/complete { token }
-  API-->>A: { accessToken, refreshToken, expiresIn, user }
-  A->>A: encrypt session cookie (httpOnly, secure, lax)
-  A-->>B: 302 /{locale}/dashboard (or safe `next`)
+  A->>API: POST /auth/telegram/authorize { locale }
+  API->>API: store hash(state), PKCE verifier, locale (10 min)
+  API-->>A: { authorizationUrl, state, expiresAt }
+  A-->>B: 303 authorizationUrl + httpOnly cookies: state, locale, return-to
+  B->>TG: phone number, confirmation in the Telegram app, consent
+  TG-->>B: 302 /api/auth/telegram/callback?code&state
+  B->>A: GET callback
+  A->>A: state must equal the cookie
+  A->>API: POST /auth/telegram/callback { state, code }
+  API->>API: consume state once, redeem code with client secret + verifier, verify ID token (keys, iss, aud)
+  API->>API: require phone_number; bind TelegramIdentity, write verified phone to the profile
+  API-->>A: { accessToken, refreshToken, accessTokenExpiresAt, userId, displayName?, roles }
+  A->>A: encrypt session cookie (httpOnly, secure, lax); delete the handoff cookies
+  A-->>B: 303 /{locale}/dashboard (or safe `next`)
 ```
 
-The property that must survive any redesign: **the tab that minted the ticket
-never signs in by itself.** A forwarded deep link must not authenticate the
-forwarder. The completion link lands in the Telegram chat of whoever pressed
-Start, so it reaches the account holder.
+The property that must survive any redesign: **a callback signs in only the
+browser that started it.** The `state` is single-use on the backend and bound
+to the browser by a cookie in the app, so a callback URL forwarded or replayed
+lands on `/login?telegram=expired` with no session. The phone number is the
+one Telegram verified; it is never typed into the app.
 
 ### 1.2 Google (OpenID Connect, authorization code with PKCE)
 
@@ -188,8 +194,8 @@ for every credential change.
 
 | Endpoint                                                      | Purpose                                                                        | Notes                                                       |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `POST /auth/telegram/ticket`                                  | Mint a ticket                                                                  | Already designed                                            |
-| `POST /auth/telegram/complete`                                | Redeem the one-time login token                                                | Already designed                                            |
+| `POST /auth/telegram/authorize`                               | Mint the state and PKCE verifier, return Telegram's authorization URL          | Live                                                        |
+| `POST /auth/telegram/callback`                                | Consume the state, redeem the code, verify the ID token, upsert identity       | Live                                                        |
 | `POST /auth/google/exchange`                                  | Exchange code + PKCE verifier, verify the ID token, upsert identity            | New                                                         |
 | `POST /auth/email/register`                                   | Create an email identity, hash the password, send verification                 | New; rate limited                                           |
 | `POST /auth/email/login`                                      | Verify the password, issue tokens                                              | New; uniform timing; lockout                                |
@@ -305,18 +311,16 @@ Labels earned: all of them, once Phase F landed.
 ### Phase D — Telegram — **done**
 
 1. Route handlers `src/app/api/auth/telegram/start/route.ts` and
-   `complete/route.ts` call the two backend endpoints.
+   `callback/route.ts` call the two backend endpoints.
 2. The login and sign-up pages explain the handoff (`auth.telegram.handoff`)
    and never poll.
-3. `TELEGRAM_AUTH_COMPLETE_URL` in `v-backend` points at
-   `/api/auth/telegram/complete` **without** a locale in the path. The locale
-   travels with the ticket instead: `POST /auth/telegram/ticket` takes it, the
-   backend stores it on the ticket and echoes it back as `?locale=` on the
-   completion link. The plan's original path-based idea does not survive the
-   Telegram in-app browser, which does not share the cookies of the tab that
-   started the flow. A short-lived cookie is still set as a second source, and
-   the default locale is the last fallback.
-4. An expired or reused token redirects to `/{locale}/login?telegram=expired`
+3. `TELEGRAM_OIDC_REDIRECT_URI` in `v-backend` points at
+   `/api/auth/telegram/callback` **without** a locale in the path, because it
+   must equal the URL registered in BotFather. The locale travels in the
+   `volontyorlar_auth_locale` cookie set by the start route, and the default
+   locale is the fallback; the callback happens in the same browser, so the
+   cookie is there.
+4. An unknown, expired or reused state redirects to `/{locale}/login?telegram=expired`
    with translated copy. The starting tab never receives a session; only the
    browser that opens the one-time link does.
 

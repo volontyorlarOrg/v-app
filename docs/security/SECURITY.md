@@ -23,13 +23,15 @@ The root layout also sends `robots: noindex` in the document, and
 **Known weakness:** `script-src` and `style-src` allow `'unsafe-inline'`, for
 the same reason the marketing site does. Revisit when a third-party script is
 introduced; Phase C of the plan adds `https://accounts.google.com` to
-`form-action`. Telegram sign-in needed no CSP change: the redirect to `t.me`
-is a navigation, and the API calls are server-to-server.
+`form-action`. Telegram sign-in needed no CSP change: the redirect to
+`oauth.telegram.org` and its return are navigations, and the code exchange is
+server-to-server from `v-backend`.
 
 ## Trust boundary
 
 The browser never verifies an identity. Telegram proves who the volunteer is,
-`v-backend` verifies that proof with the bot token and issues the tokens, and
+`v-backend` redeems the authorization code with the client secret, verifies
+the ID token against Telegram's published keys and issues the tokens, and
 this application only decides what is worth rendering. Every write is still
 authorised by the backend.
 
@@ -72,11 +74,15 @@ Sign-out is a Server Action, not a link, so it cannot be triggered by a
 prefetch or a cross-site request. It revokes the refresh token at the backend
 first, then clears the cookie, then redirects — and works without JavaScript.
 
-Two short-lived `httpOnly` cookies carry the handoff into Telegram:
-`volontyorlar_return_to` and `volontyorlar_auth_locale`, both 15 minutes, both
-deleted on completion. The volunteer usually finishes in Telegram's own
-browser, which does not share them, so the backend also echoes the locale back
-on the completion link and the destination falls back to the dashboard.
+Three short-lived `httpOnly` cookies carry the handoff into Telegram:
+`volontyorlar_auth_state`, `volontyorlar_return_to` and
+`volontyorlar_auth_locale`, all 15 minutes, all deleted on return. The callback
+signs in only when the `state` Telegram echoes equals the one in this
+browser's cookie, and the backend consumes that state once, so a callback URL
+opened in another browser, or a second time, lands on `/login?telegram=expired`
+without a session. Telegram's own `error=access_denied` becomes
+`?telegram=cancelled`, and a sign-in without a shared phone number
+`?telegram=phoneRequired`.
 
 The one browser-storage value remains the light/dark theme choice in
 `localStorage`. Nothing personal appears in a URL;
@@ -112,6 +118,6 @@ for how the keys are obtained and set.
 ## Needs verification
 
 - Whether the eventual host applies or overrides these headers
-- Cookie behaviour inside the Telegram in-app browser on the real production
-  origin, which is where the completion link is opened
+- Cookie behaviour when the sign-in is started from inside Telegram's in-app
+  browser on the real production origin
 - HTTPS behaviour and HSTS preload eligibility on the production origin
