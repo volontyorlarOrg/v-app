@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { apiBaseUrl, isAuthConfigured, sessionSecret } from "@/lib/auth/config";
+import {
+  AUTH_REQUEST_TIMEOUT_MS,
+  AUTH_ROUTE_MAX_DURATION_SECONDS,
+  apiBaseUrl,
+  isAuthConfigured,
+  sessionSecret,
+} from "@/lib/auth/config";
 
 const SECRET = "test-session-secret-of-at-least-32-characters";
 
@@ -46,5 +52,12 @@ describe("isAuthConfigured", () => {
 
     vi.stubEnv("VOLONTYORLAR_SESSION_SECRET", SECRET);
     expect(isAuthConfigured()).toBe(true);
+  });
+});
+
+describe("auth request budget", () => {
+  it("outlasts a cold backend without exceeding the route's own limit", () => {
+    expect(AUTH_REQUEST_TIMEOUT_MS).toBeGreaterThan(50_000);
+    expect(AUTH_REQUEST_TIMEOUT_MS).toBeLessThan(AUTH_ROUTE_MAX_DURATION_SECONDS * 1000);
   });
 });

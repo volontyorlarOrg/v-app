@@ -2,7 +2,10 @@ import type { NextRequest, NextResponse } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
-import { isAuthConfigured } from "@/lib/auth/config";
+import {
+  AUTH_REQUEST_TIMEOUT_MS,
+  isAuthConfigured,
+} from "@/lib/auth/config";
 import {
   LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
@@ -23,6 +26,7 @@ import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 function clearHandoff(response: NextResponse) {
   response.cookies.delete(AUTH_STATE_COOKIE_NAME);
@@ -62,6 +66,7 @@ export async function GET(request: NextRequest) {
       body: { state, code },
       schema: issuedSessionSchema,
       cache: "no-store",
+      timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
     });
   } catch (error) {
     const status = telegramStatusForError(error);
