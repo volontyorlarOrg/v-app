@@ -2,7 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
-import { apiBaseUrl, isAuthConfigured } from "@/lib/auth/config";
+import {
+  AUTH_REQUEST_TIMEOUT_MS,
+  apiBaseUrl,
+  isAuthConfigured,
+} from "@/lib/auth/config";
 import {
   LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
@@ -18,6 +22,7 @@ import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { localePath } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -37,6 +42,7 @@ export async function GET(request: NextRequest) {
       body: { locale },
       schema: telegramAuthorizationSchema,
       cache: "no-store",
+      timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
     });
   } catch (error) {
     console.error("[telegram-auth] authorize request failed:", error);

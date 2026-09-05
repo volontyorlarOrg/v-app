@@ -1,5 +1,8 @@
 const MINIMUM_SESSION_SECRET_LENGTH = 32;
 
+export const AUTH_ROUTE_MAX_DURATION_SECONDS = 60;
+export const AUTH_REQUEST_TIMEOUT_MS = 55_000;
+
 export function apiBaseUrl(): string | null {
   const raw = process.env.VOLONTYORLAR_API_URL?.trim();
   if (!raw) return null;
