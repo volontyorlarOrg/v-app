@@ -73,6 +73,11 @@ dot grid; the sign-in pages have no such wrapper and keep the grid.
 - A skip link is the first focusable element of every page.
 - The base layer gives every focusable element a 3px `primary-ink` outline at
   3px offset; nothing removes it.
+- The base layer restores `cursor: pointer` on `button`, `[role="button"]`
+  and `summary`. Tailwind 4 no longer ships v3's pointer rule in Preflight, so
+  without this every control sits under the browser arrow. The `:not(:disabled)`
+  guard keeps a disabled control from claiming to be clickable, and anchors are
+  untouched because the browser already points at them.
 - Controls clear 44px: buttons, switches (the 28px track sits in a 44px
   button), selects, the search field, tab-bar targets at 56px.
 - Every disclosure (language, notifications, account) sets `aria-expanded` and

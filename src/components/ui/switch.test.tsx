@@ -25,6 +25,22 @@ describe("Switch", () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true);
   });
 
+  it("toggles when its visible label is clicked", async () => {
+    const user = userEvent.setup();
+    const onCheckedChange = vi.fn();
+    render(
+      <Switch
+        label="Telegram messages"
+        description="From the bot"
+        onCheckedChange={onCheckedChange}
+      />,
+    );
+
+    await user.click(screen.getByText("Telegram messages"));
+    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-checked", "true");
+  });
+
   it("submits a hidden value only while it is on", async () => {
     const user = userEvent.setup();
     const { container } = render(<Switch label="Open only" name="open" />);

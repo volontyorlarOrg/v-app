@@ -24,7 +24,7 @@ export function ProviderButtons({
         aria-describedby="google-unavailable"
         className={buttonClass({
           variant: "outline",
-          className: "w-full disabled:cursor-not-allowed disabled:opacity-50",
+          className: "w-full disabled:opacity-50",
         })}
       >
         <GoogleMark className="size-5" />

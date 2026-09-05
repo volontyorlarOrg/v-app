@@ -73,6 +73,7 @@ export function AnswersForm({
             key={question.id}
             label={`${String(index + 1).padStart(2, "0")} · ${question.prompt}`}
             help={question.help}
+            group={question.type === "multi_select"}
           >
             {(control) => (
               <div>
@@ -110,14 +111,10 @@ export function AnswersForm({
                     ))}
                   </Select>
                 ) : (
-                  <ul
-                    id={control.id}
-                    aria-describedby={control["aria-describedby"]}
-                    className="flex flex-col gap-2"
-                  >
+                  <ul {...control} className="flex flex-col gap-2">
                     {(question.options ?? []).map((option) => (
                       <li key={option.value}>
-                        <label className="flex min-h-11 items-center gap-3 text-sm text-ink">
+                        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-ink">
                           <input
                             type="checkbox"
                             name={name}
@@ -135,7 +132,9 @@ export function AnswersForm({
                 )}
                 {errors ? (
                   <p role="alert" className="mt-1.5 text-sm text-ink">
-                    {isRequiredError(errors) ? labels.fieldRequired : labels.fieldInvalid}
+                    {isRequiredError(errors)
+                      ? labels.fieldRequired
+                      : labels.fieldInvalid}
                   </p>
                 ) : null}
               </div>
@@ -148,7 +147,10 @@ export function AnswersForm({
         <button
           type="submit"
           disabled={busy}
-          className={buttonClass({ variant: "outline", className: "disabled:opacity-70" })}
+          className={buttonClass({
+            variant: "outline",
+            className: "disabled:opacity-70",
+          })}
         >
           {saving ? labels.saving : labels.save}
         </button>

@@ -84,8 +84,11 @@ without a session. Telegram's own `error=access_denied` becomes
 `?telegram=cancelled`, and a sign-in without a shared phone number
 `?telegram=phoneRequired`.
 
-The one browser-storage value remains the light/dark theme choice in
-`localStorage`. Nothing personal appears in a URL;
+The only stored values remain the light/dark theme choice and the interface
+language, both in readable cookies shared with the marketing site so a choice
+made on either origin holds on the other. Neither identifies a visitor, neither
+is `httpOnly` because the theme is applied by a script before paint, and the
+privacy page names both. Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
 same-origin `?next=` path checked by `safeReturnPath`.
 
