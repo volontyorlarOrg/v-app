@@ -24,6 +24,18 @@ export async function writeSession(payload: SessionPayload): Promise<boolean> {
   return true;
 }
 
+export async function canWriteSession(): Promise<boolean> {
+  try {
+    const store = await cookies();
+    const current = store.get(SESSION_COOKIE_NAME);
+    if (!current) return false;
+    store.set(SESSION_COOKIE_NAME, current.value, sessionCookieOptions());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function clearSession(): Promise<void> {
   const store = await cookies();
   store.set(SESSION_COOKIE_NAME, "", { ...sessionCookieOptions(), maxAge: 0 });

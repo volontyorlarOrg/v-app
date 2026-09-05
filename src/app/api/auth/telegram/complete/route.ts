@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
+import { isApiError } from "@/lib/api/errors";
 import { isAuthConfigured } from "@/lib/auth/config";
 import {
   LOCALE_HINT_COOKIE_NAME,
@@ -48,7 +49,11 @@ export async function GET(request: NextRequest) {
       cache: "no-store",
     });
   } catch (error) {
-    console.error("[telegram-auth] token redemption failed:", error);
+    if (isApiError(error) && (error.code === "unauthenticated" || error.code === "validation")) {
+      console.warn("[telegram-auth] login token rejected:", error.code);
+    } else {
+      console.error("[telegram-auth] token redemption failed:", error);
+    }
     return relativeRedirect(withQuery(loginPath, { telegram: "expired" }));
   }
 

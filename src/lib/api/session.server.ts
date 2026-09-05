@@ -8,7 +8,7 @@ import { api, type ApiRequest } from "@/lib/api/client.server";
 import { isApiError } from "@/lib/api/errors";
 import { refreshSession } from "@/lib/auth/refresh";
 import { isAccessTokenExpiring, type SessionPayload } from "@/lib/auth/session";
-import { getSession, writeSession } from "@/lib/auth/session.server";
+import { canWriteSession, getSession, writeSession } from "@/lib/auth/session.server";
 
 export const SESSION_EXPIRED_PATH = "/api/auth/session/expired";
 
@@ -29,15 +29,12 @@ export async function requireSession(): Promise<SessionPayload> {
 
 async function rotate(session: SessionPayload): Promise<SessionPayload | null> {
   if (!session.refreshToken) return null;
+  if (!(await canWriteSession())) return null;
 
   const rotated = await refreshSession(session.refreshToken);
   if (!rotated) return null;
 
-  try {
-    return (await writeSession(rotated)) ? rotated : null;
-  } catch {
-    return null;
-  }
+  return (await writeSession(rotated)) ? rotated : null;
 }
 
 type AuthedRequest<TSchema extends z.ZodType | undefined> = Omit<
