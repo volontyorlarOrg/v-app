@@ -15,6 +15,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
   `v-web`'s tokens, motion, catalogs and registry, and what happened to the
   previous foundation
+- `decisions/ivory-ink-and-one-blue.md` — what the marketing site's move to
+  ivory, ink and one blue meant for the panel: where orange went, why the
+  primary button inverts, and why the ground is flat
 - `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo said
   it was a sample while it existed (historical; the sample is gone)
 - `decisions/every-screen-reads-the-backend.md` — why the sample and the

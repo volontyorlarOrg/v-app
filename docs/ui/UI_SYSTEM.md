@@ -14,10 +14,20 @@ with different values under `:root[data-theme="dark"]`.
 themes, and `src/app/typography.test.ts` refuses a bold display face and a
 literal hex anywhere under `src/`.
 
-Product additions: `--text-figure` for stat tiles, `.meter` / `.meter-fill`
-for progress bars, `.tab-bar` for the safe-area inset. The workspace's flat
-ground is `bg-surface-sunk` on the shell's column, which covers the `body`
-dot grid; the sign-in pages have no such wrapper and keep the grid.
+Product additions: `--text-figure` for stat tiles, `--text-page-title` for
+the serif `h1` of every section, `.meter` / `.meter-fill` for progress bars,
+`.tab-bar` for the safe-area inset. The ground is flat everywhere: `body`
+paints `paper`, the shell's column paints `surface-sunk` over it, and the
+sign-in pages sit on the paper itself. There is no grid, wash or gradient,
+and the token test asserts there is none.
+
+The fills follow the marketing site's rule. `action` is the primary button
+and takes an `ink-inverse` label; it is ink in the light theme and ivory in
+the dark. `accent` is the one blue fill — the sign-in, apply and submit
+actions, the achievement chip, the reached level, a switch that is on, the
+notification badge, the meters — and takes `knockout`. `accent-soft` with
+`primary-ink` is the tint behind anything selected or owned by the system.
+`brand` is the mark alone.
 
 ## Composition primitives
 
@@ -28,7 +38,7 @@ dot grid; the sign-in pages have no such wrapper and keep the grid.
 | `TopBar`                                                                                     | `NotificationsMenu`, language, theme, `UserMenu`; the brand mark below the large breakpoint                                                           |
 | `TabBar`                                                                                     | Fixed four-tab bar below the large breakpoint with icons from `route-icons.ts`                                                                        |
 | `Panel`                                                                                      | The unit of every screen: bordered surface, optional titled header with an action link, `padding="none"` for lists                                    |
-| `StatTiles`                                                                                  | A row of figures: label, serif figure, note; orange when the figure is the person's                                                                   |
+| `StatTiles`                                                                                  | A row of figures: label, serif figure, note; the text blue when the figure is the person's                                                                   |
 | `PageHeader`                                                                                 | Eyebrow and sample chip, serif `h1`, description, actions on the right                                                                                |
 | `Segmented`                                                                                  | Pill links for a status group filter, with counts and `aria-current`                                                                                  |
 | `StateChip`                                                                                  | Icon-plus-word pill in `neutral`, `structure` or `achievement`; `ApplicationStatusChip`, `OpportunityStatusChip` and the history outcomes build on it |
