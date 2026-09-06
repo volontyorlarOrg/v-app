@@ -5,9 +5,20 @@ import type { Metadata } from "next";
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { AuthStatus } from "@/components/auth/auth-status";
-import { ProviderButtons, telegramStartHref } from "@/components/auth/provider-buttons";
+import { CredentialsSection } from "@/components/auth/credentials-section";
+import {
+  ProviderButtons,
+  googleStartHref,
+  telegramStartHref,
+} from "@/components/auth/provider-buttons";
 import { Link } from "@/i18n/navigation";
-import { isSessionStatus, safeReturnPath, type SessionStatus } from "@/lib/auth/session";
+import { isGoogleConfigured } from "@/lib/auth/config";
+import { isGoogleStatus, type GoogleStatus } from "@/lib/auth/google";
+import {
+  isSessionStatus,
+  safeReturnPath,
+  type SessionStatus,
+} from "@/lib/auth/session";
 import { isTelegramStatus, type TelegramStatus } from "@/lib/auth/telegram";
 import { navHref } from "@/lib/routing/routes";
 
@@ -28,30 +39,43 @@ export default async function LoginPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { telegram, session, next } = await searchParams;
+  const { telegram, google, session, next } = await searchParams;
+  const returnTo = safeReturnPath(typeof next === "string" ? next : null);
 
   return (
     <Login
+      locale={locale}
+      next={returnTo}
       telegramStatus={isTelegramStatus(telegram) ? telegram : null}
+      googleStatus={isGoogleStatus(google) ? google : null}
       sessionStatus={isSessionStatus(session) ? session : null}
-      telegramHref={telegramStartHref(
-        locale,
-        safeReturnPath(typeof next === "string" ? next : null),
-      )}
+      telegramHref={telegramStartHref(locale, returnTo)}
+      googleHref={isGoogleConfigured() ? googleStartHref(locale, returnTo) : null}
     />
   );
 }
 
 function Login({
+  locale,
+  next,
   telegramStatus,
+  googleStatus,
   sessionStatus,
   telegramHref,
+  googleHref,
 }: {
+  locale: string;
+  next: string | null;
   telegramStatus: TelegramStatus | null;
+  googleStatus: GoogleStatus | null;
   sessionStatus: SessionStatus | null;
   telegramHref: string;
+  googleHref: string | null;
 }) {
   const t = useTranslations("auth");
+  const signupHref = next
+    ? `${navHref("signup")}?next=${encodeURIComponent(next)}`
+    : navHref("signup");
 
   return (
     <>
@@ -60,24 +84,28 @@ function Login({
       {telegramStatus ? (
         <AuthStatus>{t(`telegram.${telegramStatus}`)}</AuthStatus>
       ) : null}
+      {googleStatus ? <AuthStatus>{t(`google.${googleStatus}`)}</AuthStatus> : null}
       {sessionStatus ? <AuthStatus>{t(`session.${sessionStatus}`)}</AuthStatus> : null}
 
       <AuthPanel>
         <ProviderButtons
           telegramHref={telegramHref}
+          googleHref={googleHref}
           telegram={t("providers.telegram")}
           google={t("providers.google")}
           googleUnavailable={t("providers.googleUnavailable")}
         />
         <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-          {t("telegram.handoff")}
+          {googleHref ? t("providers.handoff") : t("telegram.handoff")}
         </p>
+
+        <CredentialsSection mode="login" locale={locale} next={next} />
       </AuthPanel>
 
       <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">
         {t("login.noAccount")}{" "}
         <Link
-          href={navHref("signup")}
+          href={signupHref}
           className="font-semibold text-primary-ink underline-offset-4 hover:underline"
         >
           {t("login.createAccount")}

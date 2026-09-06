@@ -9,6 +9,7 @@ export const LOCALE_HINT_COOKIE_NAME = "volontyorlar_auth_locale";
 
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 export const HANDOFF_MAX_AGE_SECONDS = 60 * 15;
+export const GOOGLE_HANDOFF_MAX_AGE_SECONDS = 60 * 10;
 export const ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 60;
 
 export const ROLES = ["volunteer", "partner", "admin"] as const;
@@ -32,6 +33,7 @@ export const issuedSessionSchema = z.object({
   accessTokenExpiresAt: z.number().int().positive().optional(),
   displayName: z.string().optional(),
   roles: z.array(z.enum(ROLES)).optional(),
+  isNewUser: z.boolean().optional(),
 });
 
 export type IssuedSession = z.infer<typeof issuedSessionSchema>;
@@ -92,8 +94,7 @@ export type SessionStatus = (typeof SESSION_STATUSES)[number];
 
 export function isSessionStatus(value: unknown): value is SessionStatus {
   return (
-    typeof value === "string" &&
-    (SESSION_STATUSES as readonly string[]).includes(value)
+    typeof value === "string" && (SESSION_STATUSES as readonly string[]).includes(value)
   );
 }
 
@@ -107,13 +108,13 @@ export function sessionCookieOptions() {
   };
 }
 
-export function handoffCookieOptions() {
+export function handoffCookieOptions({ crossSite = false } = {}) {
   return {
     httpOnly: true,
-    secure: isSecureCookieTransport(),
-    sameSite: "lax" as const,
+    secure: crossSite ? true : isSecureCookieTransport(),
+    sameSite: crossSite ? ("none" as const) : ("lax" as const),
     path: "/",
-    maxAge: HANDOFF_MAX_AGE_SECONDS,
+    maxAge: crossSite ? GOOGLE_HANDOFF_MAX_AGE_SECONDS : HANDOFF_MAX_AGE_SECONDS,
   };
 }
 

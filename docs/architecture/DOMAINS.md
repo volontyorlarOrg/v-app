@@ -11,13 +11,20 @@ configuration through `src/lib/seo/origin.ts`:
 | `hasVerifiedSiteOrigin()`                           | `NEXT_PUBLIC_SITE_URL`      | `false`; transport-only headers stay off                    |
 | `marketingOrigin()` / `marketingHref(locale, page)` | `NEXT_PUBLIC_MARKETING_URL` | `null`; the about, privacy and terms links are not rendered |
 
-Sign-in adds two server-only values, read through `src/lib/auth/config.ts`:
+Sign-in adds three server-only values, read through `src/lib/auth/config.ts`:
 
-| Helper               | Source                        | Behaviour when unset                                      |
-| -------------------- | ----------------------------- | --------------------------------------------------------- |
-| `apiBaseUrl()`       | `VOLONTYORLAR_API_URL`        | `null`                                                    |
-| `sessionSecret()`    | `VOLONTYORLAR_SESSION_SECRET` | `null` below 32 characters                                |
-| `isAuthConfigured()` | both of the above             | `false`; no route is guarded and Telegram stays a preview |
+| Helper                 | Source                             | Behaviour when unset                                        |
+| ---------------------- | ---------------------------------- | ----------------------------------------------------------- |
+| `apiBaseUrl()`         | `VOLONTYORLAR_API_URL`             | `null`                                                      |
+| `sessionSecret()`      | `VOLONTYORLAR_SESSION_SECRET`      | `null` below 32 characters                                  |
+| `googleClientId()`     | `VOLONTYORLAR_GOOGLE_CLIENT_ID`    | `null`, and also for a value that is not a Google client id |
+| `isAuthConfigured()`   | the first two                      | `false`; no route is guarded and no sign-in can start       |
+| `isGoogleConfigured()` | the first two and the client id    | `false`; the Google button is not rendered                  |
+
+The Google client id is public information — it travels in the authorization
+URL — but it stays server-only because only `/api/auth/google/start` reads it,
+and a value the pattern rejects hides the button instead of sending a
+volunteer to an error page.
 
 Neither may ever take a `NEXT_PUBLIC_` prefix, and neither is read from a
 Client Component. `VOLONTYORLAR_SESSION_SECRET` is the input to the SHA-256

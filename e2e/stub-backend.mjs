@@ -277,8 +277,13 @@ function freshState() {
 const sessions = new Map();
 const refreshTokens = new Map();
 const pendingStates = new Set();
+const googleChallenges = new Set();
+const SEEDED_EMAIL = "dilnoza@example.org";
+const SEEDED_PASSWORD = "seven purple lanterns";
+const passwordAccounts = new Map([[SEEDED_EMAIL, SEEDED_PASSWORD]]);
 let issued = 0;
 let started = 0;
+let challenged = 0;
 
 function issueSession(state) {
   issued += 1;
@@ -410,6 +415,30 @@ const server = createServer(async (request, response) => {
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
     if (body.code !== "e2e-code") return send(response, 401, { code: "invalidAuthorizationCode" });
     return send(response, 201, issueSession(freshState()));
+  }
+  if (path === "/auth/google/challenge" && method === "POST") {
+    challenged += 1;
+    const suffix = String(challenged).padStart(4, "0");
+    const state = `e2e-google-state-${suffix}-minted-by-the-stub`;
+    googleChallenges.add(state);
+    return send(response, 201, { state, nonce: `e2e-google-nonce-${suffix}-minted`, expiresAt: at(0, 23) });
+  }
+  if (path === "/auth/google/complete" && method === "POST") {
+    if (!googleChallenges.delete(body.state)) return send(response, 401, { code: "invalidGoogleState" });
+    if (body.credential !== "e2e-google-id-token") return send(response, 401, { code: "invalidGoogleCredential" });
+    return send(response, 200, issueSession(freshState()));
+  }
+  if (path === "/auth/password/signup" && method === "POST") {
+    if (body.email === SEEDED_EMAIL) return send(response, 409, { code: "emailUnavailable" });
+    if (String(body.password ?? "").length < 15) return send(response, 422, { code: "weakPassword" });
+    passwordAccounts.set(body.email, body.password);
+    return send(response, 201, issueSession(freshState()));
+  }
+  if (path === "/auth/password/login" && method === "POST") {
+    if (passwordAccounts.get(body.email) !== body.password) {
+      return send(response, 401, { code: "invalidCredentials" });
+    }
+    return send(response, 200, issueSession(freshState()));
   }
   if (path === "/auth/refresh" && method === "POST") {
     const state = refreshTokens.get(body.refreshToken);

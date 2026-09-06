@@ -48,30 +48,73 @@
     "providers": {
       "google": "Google orqali davom etish",
       "telegram": "Telegram orqali davom etish",
-      "googleUnavailable": "Google orqali kirish hozircha mavjud emas."
+      "handoff": "Keyingi qadamda Telegram yoki Google ochiladi va siz tizimga kirgan holda qaytasiz.",
+      "googleUnavailable": "Hozircha mavjud emas."
     },
     "telegram": {
-      "handoff": "Keyingi qadamda Telegram ochiladi. U yerda telefon raqamingizni kiriting, Telegram ilovasida tasdiqlang — va tizimga kirgan holda shu yerga qaytasiz.",
+      "handoff": "Keyingi qadamda Telegram ochiladi va siz tizimga kirgan holda qaytasiz.",
       "expired": "Bu kirish muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
       "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring.",
       "cancelled": "Kirish Telegramda bekor qilindi. Tayyor boʻlganingizda qaytadan boshlang.",
       "phoneRequired": "Kirish uchun telefon raqamingiz kerak. Qaytadan boshlang va Telegramga uni ulashishga ruxsat bering."
     },
+    "google": {
+      "unavailable": "Hozir Google orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring yoki Telegram orqali davom eting.",
+      "expired": "Google orqali kirish muddati tugagan yoki u allaqachon ishlatilgan. Qaytadan boshlang.",
+      "cancelled": "Kirish Google tomonida bekor qilindi. Tayyor boʻlganingizda qaytadan boshlang.",
+      "disabled": "Bu hisob yopilgan, shuning uchun tizimga kirib boʻlmaydi.",
+      "tooMany": "Juda koʻp urinish boʻldi. Bir daqiqa kutib, qayta urinib koʻring.",
+      "conflict": "Bu Google hisobini mavjud hisobga avtomatik biriktirib boʻlmaydi. Avvalgidek kiring yoki boshqa Google hisobidan foydalaning."
+    },
+    "form": {
+      "divider": "yoki email orqali",
+      "fullName": "Toʻliq ism",
+      "email": "Email",
+      "password": "Parol",
+      "passwordHint": "Kamida {min} ta belgi. Bir-biriga bogʻliq boʻlmagan bir necha soʻz — eslash oson, topish qiyin.",
+      "reveal": "Parolni koʻrsatish",
+      "conceal": "Parolni yashirish"
+    },
+    "errors": {
+      "invalidCredentials": "Bu email va parol hech qanday hisobga mos kelmadi. Tekshirib koʻring yoki Telegram yoxud Google orqali davom eting.",
+      "emailTaken": "Bu email allaqachon band. Kiring yoki boshqa email kiriting.",
+      "weakPassword": "Bu parolni topish juda oson. Bir-biriga bogʻliq boʻlmagan bir necha soʻzdan foydalaning.",
+      "accountDisabled": "Bu hisob yopilgan, shuning uchun tizimga kirib boʻlmaydi.",
+      "rateLimited": "Juda koʻp urinish boʻldi. Bir daqiqa kutib, qayta urinib koʻring.",
+      "authUnavailable": "Hozir email orqali kirish mavjud emas. Telegram orqali davom eting yoki keyinroq urinib koʻring.",
+      "validationFailed": "Yuqoridagi maydonlarni tekshirib, qaytadan urinib koʻring.",
+      "network": "Serverga ulanib boʻlmadi. Internet aloqasini tekshiring va qayta urinib koʻring.",
+      "unknown": "Nimadir xato ketdi. Bir ozdan keyin qayta urinib koʻring."
+    },
+    "fieldErrors": {
+      "required": "Bu maydon toʻldirilishi kerak.",
+      "email": "Email manzilini kiriting, masalan name@example.com.",
+      "emailLong": "Bu email juda uzun.",
+      "nameLong": "Bu ism juda uzun.",
+      "passwordShort": "Kamida {min} ta belgi kiriting.",
+      "passwordLong": "Koʻpi bilan {max} ta belgi kiriting.",
+      "invalid": "Bu maydonni tekshiring.",
+      "passwordRefused": "Bu parol qabul qilinmadi. Uzunroq parol yoki bir-biriga bogʻliq boʻlmagan bir necha soʻz kiriting."
+    },
     "login": {
       "metaTitle": "Kirish",
       "title": "Xush kelibsiz.",
-      "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻrish uchun kiring.",
+      "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻring.",
       "noAccount": "Volontyorlarda yangimisiz?",
-      "createAccount": "Hisob yaratish"
+      "createAccount": "Hisob yaratish",
+      "submit": "Kirish",
+      "pending": "Kirilmoqda…"
     },
     "signup": {
       "metaTitle": "Hisob yaratish",
       "title": "Hisobingizni yarating.",
-      "lead": "Telegram orqali davom eting — hisobingiz birinchi kirishda yaratiladi.",
+      "lead": "Hisobingiz birinchi kirishda yaratiladi.",
       "legal": "Davom etish orqali siz <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozilik bildirasiz.",
       "legalPlain": "Davom etish orqali siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
       "haveAccount": "Hisobingiz bormi?",
-      "logIn": "Kirish"
+      "logIn": "Kirish",
+      "submit": "Hisob yaratish",
+      "pending": "Hisob yaratilmoqda…"
     },
     "session": {
       "expired": "Seansingiz tugadi. Qaytadan kiring."

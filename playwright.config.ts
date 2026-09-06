@@ -40,6 +40,8 @@ export default defineConfig({
         NEXT_PUBLIC_MARKETING_URL: "",
         VOLONTYORLAR_API_URL: stubURL,
         VOLONTYORLAR_SESSION_SECRET: "e2e-only-session-secret-that-is-long-enough-0123456789",
+        VOLONTYORLAR_GOOGLE_CLIENT_ID:
+          "123456789012-e2eclientidforthelocalsuite.apps.googleusercontent.com",
       },
     },
   ],

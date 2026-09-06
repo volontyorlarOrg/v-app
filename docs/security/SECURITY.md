@@ -22,10 +22,10 @@ The root layout also sends `robots: noindex` in the document, and
 
 **Known weakness:** `script-src` and `style-src` allow `'unsafe-inline'`, for
 the same reason the marketing site does. Revisit when a third-party script is
-introduced; Phase C of the plan adds `https://accounts.google.com` to
-`form-action`. Telegram sign-in needed no CSP change: the redirect to
-`oauth.telegram.org` and its return are navigations, and the code exchange is
-server-to-server from `v-backend`.
+introduced. Neither Telegram nor Google sign-in needed a CSP change: both
+buttons are ordinary navigations, Google's answer is a form post it serves
+itself under its own policy, and no provider script is loaded. `form-action`
+stays `'self'`.
 
 ## Trust boundary
 
@@ -73,6 +73,23 @@ the window is narrow and the cost is one extra sign-in.
 Sign-out is a Server Action, not a link, so it cannot be triggered by a
 prefetch or a cross-site request. It revokes the refresh token at the backend
 first, then clears the cookie, then redirects — and works without JavaScript.
+
+Google's handoff is the same shape with one difference. `/api/auth/google/start`
+asks `v-backend` for a browser-bound challenge, keeps its `state` in
+`volontyorlar_google_state` and sends the nonce to Google inside the
+authorization URL; Google answers with a **cross-site form post** to
+`/api/auth/google/callback`, which a `SameSite=Lax` cookie would not survive, so
+the three Google handoff cookies are set `SameSite=None; Secure` for their 15
+minutes, and they expire in ten to match the backend's own challenge window.
+`Secure` is unconditional there, which browsers still honour on
+`http://localhost` and nowhere else on plain HTTP. The callback also refuses a
+post whose `Origin` is neither `https://accounts.google.com` nor this host, so
+the only cross-site poster it accepts is Google itself. The callback signs in only
+when the posted `state` equals that cookie, the backend consumes the challenge
+once and checks the ID token's signature, issuer, audience and its own stored
+nonce, and a refusal lands on `/login?google=…` with no session. The token
+arrives in a request body and is read by a route handler; it never reaches
+JavaScript, a query string or storage.
 
 Three short-lived `httpOnly` cookies carry the handoff into Telegram:
 `volontyorlar_auth_state`, `volontyorlar_return_to` and

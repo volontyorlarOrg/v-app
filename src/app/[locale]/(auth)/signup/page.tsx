@@ -4,9 +4,16 @@ import type { Metadata } from "next";
 
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthPanel } from "@/components/auth/auth-panel";
-import { ProviderButtons, telegramStartHref } from "@/components/auth/provider-buttons";
+import { CredentialsSection } from "@/components/auth/credentials-section";
+import {
+  ProviderButtons,
+  googleStartHref,
+  telegramStartHref,
+} from "@/components/auth/provider-buttons";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { isGoogleConfigured } from "@/lib/auth/config";
+import { safeReturnPath } from "@/lib/auth/session";
 import { navHref } from "@/lib/routing/routes";
 import { marketingHref } from "@/lib/seo/origin";
 
@@ -20,19 +27,46 @@ export async function generateMetadata({
   return { title: t("metaTitle") };
 }
 
-export default async function SignupPage({ params }: PageProps<"/[locale]/signup">) {
+export default async function SignupPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/signup">) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <Signup locale={locale as Locale} telegramHref={telegramStartHref(locale)} />;
+
+  const { next } = await searchParams;
+  const returnTo = safeReturnPath(typeof next === "string" ? next : null);
+
+  return (
+    <Signup
+      locale={locale as Locale}
+      next={returnTo}
+      telegramHref={telegramStartHref(locale, returnTo)}
+      googleHref={isGoogleConfigured() ? googleStartHref(locale, returnTo) : null}
+    />
+  );
 }
 
 const legalLinkClass =
   "font-semibold text-primary-ink hover:underline underline-offset-4";
 
-function Signup({ locale, telegramHref }: { locale: Locale; telegramHref: string }) {
+function Signup({
+  locale,
+  next,
+  telegramHref,
+  googleHref,
+}: {
+  locale: Locale;
+  next: string | null;
+  telegramHref: string;
+  googleHref: string | null;
+}) {
   const t = useTranslations("auth");
   const terms = marketingHref(locale, "terms");
   const privacy = marketingHref(locale, "privacy");
+  const loginHref = next
+    ? `${navHref("login")}?next=${encodeURIComponent(next)}`
+    : navHref("login");
 
   return (
     <>
@@ -41,13 +75,17 @@ function Signup({ locale, telegramHref }: { locale: Locale; telegramHref: string
       <AuthPanel>
         <ProviderButtons
           telegramHref={telegramHref}
+          googleHref={googleHref}
           telegram={t("providers.telegram")}
           google={t("providers.google")}
           googleUnavailable={t("providers.googleUnavailable")}
         />
         <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-          {t("telegram.handoff")}
+          {googleHref ? t("providers.handoff") : t("telegram.handoff")}
         </p>
+
+        <CredentialsSection mode="signup" locale={locale} next={next} />
+
         <p className="mt-5 text-xs leading-relaxed text-ink-muted">
           {terms && privacy
             ? t.rich("signup.legal", {
@@ -68,7 +106,7 @@ function Signup({ locale, telegramHref }: { locale: Locale; telegramHref: string
 
       <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">
         {t("signup.haveAccount")}{" "}
-        <Link href={navHref("login")} className={legalLinkClass}>
+        <Link href={loginHref} className={legalLinkClass}>
           {t("signup.logIn")}
         </Link>
       </p>

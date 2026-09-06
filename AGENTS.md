@@ -43,14 +43,24 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 
 **Every screen behind sign-in reads `v-backend`; nothing is a sample.** So:
 
-- **Telegram is the only way in.** `/login` and `/signup` both offer "Continue
-  with Telegram", which sends the browser to Telegram's own sign-in page
-  (OpenID Connect): the volunteer enters their phone number, confirms in the
-  Telegram app, and comes back to `/api/auth/telegram/callback` signed in. The
-  backend creates the account on the first sign-in and requires the shared
-  phone number. The Google button renders `disabled` with a note that it is
-  not available yet. There is no email or password anywhere — the backend has
-  none, so the app shows none, and `/forgot-password` is a 404;
+- **Three ways in, one session cookie.** `/login` and `/signup` both offer
+  "Continue with Telegram" and "Continue with Google" above a rule, and an
+  email and password form below it. **Telegram** sends the browser to
+  Telegram's own OpenID Connect page: phone number, confirmation in the app,
+  back to `/api/auth/telegram/callback`. **Google** is OpenID Connect too, but
+  the browser asks `accounts.google.com` for an **ID token**
+  (`response_type=id_token`, `response_mode=form_post`) posted straight back to
+  `/api/auth/google/callback`, so no authorization code is exchanged, no Google
+  client secret exists in either repository, and no third-party script is
+  loaded; the button renders `disabled` with a note until
+  `VOLONTYORLAR_GOOGLE_CLIENT_ID` is set, and
+  [`docs/operations/GOOGLE_SIGN_IN_SETUP.md`](docs/operations/GOOGLE_SIGN_IN_SETUP.md)
+  is how it is set. **Email and password** are two Server Actions over
+  `POST /auth/password/login` and `POST /auth/password/signup`; a new password
+  is at least 15 characters because the backend measures its strength. The
+  backend creates the account on the first sign-in. There is still no password
+  reset and no email verification — the backend has neither — so nothing on
+  screen offers one and `/forgot-password` is a 404;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
   Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
   or not they are set; unset, no session can exist and the Telegram handoff
@@ -66,8 +76,8 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 - a section that fails to load renders `LoadErrorPanel` with a retry inside
   `PanelErrorBoundary`. The palette still defines no red: error states use
   the sunk surface and ink;
-- the plan that got here, and the two phases still open (Google, email and
-  password), is
+- the plan that got here, and the phases still open (account linking,
+  hardening), is
   [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
   the keys and the bot are set up from
   [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
@@ -132,8 +142,9 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 ## Repository map
 
 ```text
-src/app/[locale]/(auth)/        -> login and signup; both are the Telegram handoff
+src/app/[locale]/(auth)/        -> login and signup; providers, a rule, and the email form
 src/app/api/auth/telegram/      -> start and callback: the two hops of Telegram sign-in
+src/app/api/auth/google/        -> start and callback: the challenge, then Google's posted ID token
 src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
 src/lib/api/                    -> the server-only client on openapi-fetch, the generated API types,
@@ -190,9 +201,12 @@ docs/                           -> stable project documentation and the plan
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.
 - No personal data in URLs (sign-in carries only
-  `?telegram=expired|unavailable|cancelled|phoneRequired`, `?session=expired`
+  `?telegram=expired|unavailable|cancelled|phoneRequired`,
+  `?google=expired|unavailable|cancelled|disabled|tooMany`, `?session=expired`
   and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
-  `state`), no tokens in browser storage; the theme and the interface language
+  `state`, and Google posts its one-time `id_token` in a form body, never a
+  query string), no credentials in a URL — the email forms are gated by client
+  validation before they submit, no tokens in browser storage; the theme and the interface language
   are the only stored values, and both live in readable cookies shared with the
   marketing site (`src/lib/preferences.ts`) rather than in `localStorage`, which
   cannot cross the two origins. Session tokens live only in the encrypted
@@ -205,7 +219,8 @@ docs/                           -> stable project documentation and the plan
   in `src/lib/api/schemas.ts`; a page renders the schema's output or the
   load-error panel, never a fallback value it made up.
 - A control that cannot do its job is `disabled` with a visible note, as the
-  Google button is. Never a button that looks live and does nothing.
+  Google button is while its client id is unset. Never a button that looks
+  live and does nothing.
 - Preserve reduced-motion behaviour, keyboard access, visible focus states, one
   logical `h1` per page, and responsive behaviour.
 - Update `/docs` when stable environment or architecture behaviour changes.

@@ -20,6 +20,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/every-screen-reads-the-backend.md` — why the sample and the
   email forms were removed, why the proxy guards unconditionally, and the
   cookie and refresh rules that came with real data
+- `decisions/google-sign-in-is-an-id-token-redirect.md` — why Google sign-in
+  is a redirect that returns an ID token rather than Google Identity Services,
+  and why its handoff cookies are `SameSite=None`
 - `decisions/telegram-sign-in-is-openid-connect.md` — why the bot deep link
   was replaced by Telegram's OpenID Connect page, what the state cookie
   protects, and why the phone number is required

@@ -8,7 +8,7 @@ order that keeps every intermediate state honest. Read
 
 | Layer          | State today                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `v-app` (this) | **Phases A, D and F are done.** Telegram sign-in, the encrypted session cookie, the route guards, proxy-side refresh, sign-out, and every section on backend data: `src/lib/api/*.server.ts` reads parsed by Zod schemas, and a Server Action for every write. The sample is deleted. Google renders disabled with a note; email and password (Phase B) and Google (Phase C) remain unbuilt on both sides. |
+| `v-app` (this) | **Phases A, B, C, D and F are done.** Telegram sign-in, the encrypted session cookie, the route guards, proxy-side refresh, sign-out, and every section on backend data: `src/lib/api/*.server.ts` reads parsed by Zod schemas, and a Server Action for every write. The sample is deleted. Google and the email forms are live against the routes `v-backend` exposes; account linking (Phase E) and hardening (Phase G) remain. |
 | `v-backend`    | Product endpoints exist. The Telegram ticket, webhook, completion, refresh and logout routes are implemented and now consumed by this app; `AuthTicket` also carries the volunteer's locale. Bot setup is `../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`.                                                                                                                                                                                                                                                                                                |
 | `v-web`        | Links to the app through `NEXT_PUBLIC_APP_ORIGIN`; hides the sign-in action while it is unset.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | Archive        | `docs/reference/foundation-v1/legacy/` holds a previous, dependency-heavy implementation of the session cookie, the server-only API client, the Telegram route handlers, a profile form, an application form with essay autosave, and their tests. Port ideas from it; do not restore it wholesale.                                                                                                                                                                                                                                                            |
@@ -266,7 +266,27 @@ Built as described below, with two deviations worth knowing:
 
 Labels earned: all of them, once Phase F landed.
 
-### Phase B — Email and password
+### Phase B — Email and password — **done**
+
+Built against the routes `v-backend` actually exposes, which are not the ones
+guessed below: `POST /auth/password/login` and `POST /auth/password/signup`
+with `{ fullName, email, password }`, both answering with the same session
+shape as Telegram. Four deviations worth knowing:
+
+- there is **no reset and no verification path**, because the backend has
+  neither endpoint. `/forgot-password` stays a 404 and nothing on screen
+  offers recovery. This is the next gap to close, and it needs the email
+  provider decision this plan already lists;
+- the error colour decision stayed "none". `FieldError` grew an alert icon and
+  a heavier weight, and an invalid control takes an `ink` edge, so an error is
+  carried by icon, weight and words rather than a hue;
+- a new password is at least 15 characters, mirroring the backend's own
+  minimum; strength itself is measured server-side, and `weakPassword` is a
+  code the catalog translates;
+- `logInAction` and `createAccountAction` live in `src/lib/auth/actions.ts`
+  beside `signOut`, return the `ActionResult` envelope, and redirect on
+  success. `next-safe-action` stayed out.
+
 
 1. Server Actions in `src/lib/auth/actions.ts`: `logIn`, `createAccount`,
    `requestReset`, `resetPassword`. Each validates with a Zod schema whose
@@ -294,7 +314,32 @@ Labels earned: all of them, once Phase F landed.
    once the actions are live; the provider buttons keep a per-button note
    until their phases land.
 
-### Phase C — Google
+### Phase C — Google — **done**
+
+Built as a redirect, but not the authorization-code flow sketched below: the
+backend verifies an **ID token** and never exchanges a code, so
+`/api/auth/google/start` takes a browser-bound challenge from
+`POST /auth/google/challenge`, sends the browser to
+`accounts.google.com/o/oauth2/v2/auth` with `response_type=id_token`,
+`response_mode=form_post` and that challenge's nonce, and
+`/api/auth/google/callback` forwards Google's posted token to
+`POST /auth/google/complete`. Consequences:
+
+- **no Google client secret exists** in either repository, and no
+  `accounts.google.com` script is loaded, so the CSP needed no change at all
+  and `form-action` stays `'self'`;
+- the client id is server-only (`VOLONTYORLAR_GOOGLE_CLIENT_ID`), not
+  `NEXT_PUBLIC_`, because only the start route reads it. An unset or malformed
+  value hides the button;
+- Google's answer is a cross-site form post, so the three handoff cookies are
+  `SameSite=None; Secure` for their 15 minutes;
+- the brand decision was made: the button keeps the **monochrome** mark in
+  `currentColor`. The palette admits no third hue and a test refuses a literal
+  hex anywhere under `src/`, so the coloured "G" would have been a token
+  exception in both themes. Revisit if Google's branding review ever asks.
+
+Setup is [`../operations/GOOGLE_SIGN_IN_SETUP.md`](../operations/GOOGLE_SIGN_IN_SETUP.md).
+
 
 1. Route handlers `src/app/api/auth/google/start/route.ts` and
    `callback/route.ts`: state, nonce, PKCE, short-lived httpOnly cookie for

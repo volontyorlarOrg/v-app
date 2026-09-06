@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { PASSWORD_MIN_LENGTH } from "@/lib/auth/credentials";
+
 const LOCALES = ["uz", "ru", "en"] as const;
 
 async function isMobile(page: Page) {
@@ -9,6 +11,37 @@ async function isMobile(page: Page) {
 async function signIn(page: Page, locale = "en") {
   await page.goto(`/api/auth/telegram/start?locale=${locale}`);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
+}
+
+const PASSPHRASE = "seven purple lanterns";
+
+async function postGoogleAnswer(page: Page, state: string) {
+  await page.goto("/en/login");
+  await page.evaluate(
+    (posted) => {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/api/auth/google/callback";
+      for (const [name, value] of Object.entries(posted)) {
+        const field = document.createElement("input");
+        field.type = "hidden";
+        field.name = name;
+        field.value = value;
+        form.append(field);
+      }
+      document.body.append(form);
+      form.submit();
+    },
+    { id_token: "e2e-google-id-token", state },
+  );
+}
+
+async function googleState(page: Page) {
+  const response = await page.request.get("/api/auth/google/start?locale=en", {
+    maxRedirects: 0,
+  });
+  const location = response.headers()["location"] ?? "";
+  return new URL(location).searchParams.get("state") ?? "";
 }
 
 async function startedState(page: Page) {
@@ -43,16 +76,138 @@ test.describe("locale routing", () => {
 });
 
 test.describe("sign-in", () => {
-  test("offers Telegram as the way in and keeps Google inert", async ({ page }) => {
+  test("offers Telegram, Google and the email form", async ({ page }) => {
     await page.goto("/en/login");
-    await expect(page.getByRole("link", { name: "Continue with Telegram" })).toHaveAttribute(
-      "href",
-      "/api/auth/telegram/start?locale=en",
+    await expect(
+      page.getByRole("link", { name: "Continue with Telegram" }),
+    ).toHaveAttribute("href", "/api/auth/telegram/start?locale=en");
+    await expect(
+      page.getByRole("link", { name: "Continue with Google" }),
+    ).toHaveAttribute("href", "/api/auth/google/start?locale=en");
+    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+  });
+
+  test("the Google button asks Google for an ID token bound to this browser", async ({
+    request,
+  }) => {
+    const response = await request.get("/api/auth/google/start?locale=en", {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(303);
+    const location = new URL(response.headers()["location"] ?? "");
+    expect(`${location.origin}${location.pathname}`).toBe(
+      "https://accounts.google.com/o/oauth2/v2/auth",
     );
-    await expect(page.getByRole("button", { name: "Continue with Google" })).toBeDisabled();
-    await expect(page.getByText("Google sign-in isn't available yet.")).toBeVisible();
-    await expect(page.getByLabel("Email")).toHaveCount(0);
-    await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
+    expect(location.searchParams.get("response_type")).toBe("id_token");
+    expect(location.searchParams.get("response_mode")).toBe("form_post");
+    expect(location.searchParams.get("scope")).toBe("openid email profile");
+    expect(location.searchParams.get("nonce")).toMatch(/^e2e-google-nonce-/);
+    const state = location.searchParams.get("state") ?? "";
+    const cookie = response.headers()["set-cookie"] ?? "";
+    expect(cookie).toContain(`volontyorlar_google_state=${state}`);
+    expect(cookie).toContain("Secure");
+    expect(cookie.toLowerCase()).toContain("samesite=none");
+  });
+
+  test("a Google post whose state is not the one this browser started is refused", async ({
+    page,
+  }) => {
+    await googleState(page);
+    await postGoogleAnswer(page, "e2e-google-state-9999-never-minted-here");
+    await expect(page).toHaveURL(/\/en\/login\?google=expired$/);
+
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/login\?next=/);
+  });
+
+  test("completing Google sign-in lands on the dashboard", async ({ page }) => {
+    const state = await googleState(page);
+    await postGoogleAnswer(page, state);
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+
+    await page.goto("/en/dashboard");
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+  });
+
+  test("the email form names a malformed address before it reaches the backend", async ({
+    page,
+  }) => {
+    await page.goto("/en/login");
+    await page.getByLabel("Email").fill("not-an-email");
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Log in" }).click();
+
+    await expect(
+      page.getByText("Enter an email address, like name@example.com."),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/en\/login$/);
+  });
+
+  test("email and password sign-in lands on the dashboard", async ({ page }) => {
+    await page.goto("/en/login");
+    await page.getByLabel("Email").fill("dilnoza@example.org");
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Log in" }).click();
+
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+  });
+
+  test("a wrong password is refused without naming which half was wrong", async ({
+    page,
+  }) => {
+    await page.goto("/en/login");
+    await page.getByLabel("Email").fill("dilnoza@example.org");
+    await page.getByLabel("Password", { exact: true }).fill("not the passphrase");
+    await page.getByRole("button", { name: "Log in" }).click();
+
+    await expect(
+      page.getByText("That email and password do not match an account.", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/en\/login$/);
+  });
+
+  test("a short password is refused in the browser, with the rule in words", async ({
+    page,
+  }) => {
+    await page.goto("/en/signup");
+    await page.getByLabel("Full name").fill("Malika Karimova");
+    await page.getByLabel("Email").fill("malika@example.org");
+    await page.getByLabel("Password", { exact: true }).fill("ab");
+    await page.getByRole("button", { name: "Create account" }).click();
+
+    await expect(
+      page.getByText(`Use at least ${PASSWORD_MIN_LENGTH} characters.`),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/en\/signup$/);
+  });
+
+  test("an address that already has an account is named by the backend", async ({
+    page,
+  }) => {
+    await page.goto("/en/signup");
+    await page.getByLabel("Full name").fill("Dilnoza Karimova");
+    await page.getByLabel("Email").fill("dilnoza@example.org");
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Create account" }).click();
+
+    await expect(
+      page.getByText("An account already uses that email.", { exact: false }),
+    ).toBeVisible();
+  });
+
+  test("creating an account with an email lands on the dashboard", async ({
+    page,
+  }, info) => {
+    await page.goto("/en/signup");
+    await page.getByLabel("Full name").fill("Malika Karimova");
+    await page.getByLabel("Email").fill(`malika-${info.project.name}@example.org`);
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Create account" }).click();
+
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
   });
 
   test("the Telegram button hands the browser to Telegram's sign-in page with a bound state", async ({
@@ -65,16 +220,25 @@ test.describe("sign-in", () => {
     const location = response.headers()["location"] ?? "";
     expect(location).toMatch(/\/oauth\/auth\?state=e2e-state-/);
     const state = new URL(location).searchParams.get("state") ?? "";
-    expect(response.headers()["set-cookie"]).toContain(`volontyorlar_auth_state=${state}`);
+    expect(response.headers()["set-cookie"]).toContain(
+      `volontyorlar_auth_state=${state}`,
+    );
   });
 
-  test("create account is the same Telegram flow", async ({ page }) => {
+  test("create account offers the same three ways in, plus a name", async ({
+    page,
+  }) => {
     await page.goto("/en/login");
     await page.getByRole("link", { name: "Create an account" }).click();
     await expect(page).toHaveURL(/\/en\/signup$/);
-    await expect(page.getByRole("link", { name: "Continue with Telegram" })).toBeVisible();
-    await expect(page.getByLabel("Full name")).toHaveCount(0);
-    await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Continue with Telegram" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Continue with Google" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Full name")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
   });
 
   test("the password reset route no longer exists", async ({ page }) => {
@@ -145,13 +309,20 @@ test.describe("sign-in", () => {
   });
 
   test("the panel is not reachable without a session", async ({ page }) => {
-    for (const path of ["/en/dashboard", "/en/opportunities", "/en/profile", "/en/record"]) {
+    for (const path of [
+      "/en/dashboard",
+      "/en/opportunities",
+      "/en/profile",
+      "/en/record",
+    ]) {
       await page.goto(path);
       await expect(page, path).toHaveURL(/\/en\/login\?next=/);
     }
   });
 
-  test("a signed-in volunteer is sent from sign-in to the dashboard", async ({ page }) => {
+  test("a signed-in volunteer is sent from sign-in to the dashboard", async ({
+    page,
+  }) => {
     await signIn(page);
     await page.goto("/en/login");
     await expect(page).toHaveURL(/\/en\/dashboard$/);
@@ -215,7 +386,9 @@ test.describe("the panel", () => {
   }) => {
     const bell = page.getByRole("button", { name: "Notifications (1)" });
     await bell.click();
-    await expect(page.getByText("You were accepted to Riverbank clean-up")).toBeVisible();
+    await expect(
+      page.getByText("You were accepted to Riverbank clean-up"),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Mark all as read" }).click();
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),
@@ -356,7 +529,9 @@ test.describe("opportunities", () => {
     for (const name of ["At a glance", "What you need", "What you will be asked"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
     }
-    await expect(page.getByRole("link", { name: "Continue draft" }).first()).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Continue draft" }).first(),
+    ).toBeVisible();
   });
 
   test("applying creates a draft and submitting it needs the required answer", async ({
@@ -373,13 +548,17 @@ test.describe("opportunities", () => {
     await page.getByRole("checkbox", { name: "Google Docs" }).check();
     await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(
+      0,
+    );
     await expect(page.getByText("Uzbek and English")).toBeVisible();
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {
     await page.goto("/en/opportunities/read-aloud-day");
-    await expect(page.getByRole("button", { name: "Applications are closed" })).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "Applications are closed" }),
+    ).toBeDisabled();
   });
 
   test("an unknown opportunity is a 404 inside the panel", async ({ page }) => {
@@ -411,22 +590,28 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("heading", { level: 2, name: "Progress" }),
     ).toBeVisible();
 
-    await page.getByRole("textbox", { name: /Why does this matter/ }).fill("Because books.");
+    await page
+      .getByRole("textbox", { name: /Why does this matter/ })
+      .fill("Because books.");
     await page.getByRole("button", { name: "Save draft" }).click();
     await expect(page.getByRole("status").last()).toContainText("Draft saved.");
 
     await page.reload();
-    await expect(page.getByRole("textbox", { name: /Why does this matter/ })).toHaveValue(
-      "Because books.",
-    );
+    await expect(
+      page.getByRole("textbox", { name: /Why does this matter/ }),
+    ).toHaveValue("Because books.");
   });
 
-  test("an accepted application can be withdrawn after confirming", async ({ page }) => {
+  test("an accepted application can be withdrawn after confirming", async ({
+    page,
+  }) => {
     await page.goto("/en/applications/app-riverbank");
     await page.getByRole("button", { name: "Withdraw application" }).click();
     await page.getByRole("button", { name: "Yes, withdraw" }).click();
     await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: "Withdraw application" })).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Withdraw application" }),
+    ).toHaveCount(0);
   });
 
   test("an unknown application is a 404", async ({ page }) => {
@@ -450,7 +635,9 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("status").last()).toContainText("Profile saved.");
 
     await page.reload();
-    await expect(page.getByLabel("Short introduction")).toHaveValue("Second-year student.");
+    await expect(page.getByLabel("Short introduction")).toHaveValue(
+      "Second-year student.",
+    );
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveAttribute("aria-valuenow", "100");
@@ -468,10 +655,9 @@ test.describe("applications, record, profile and settings", () => {
     await expect(telegram).toBeEnabled();
 
     await page.reload();
-    await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveAttribute(
-      "aria-checked",
-      "false",
-    );
+    await expect(
+      page.getByRole("switch", { name: "Telegram messages" }),
+    ).toHaveAttribute("aria-checked", "false");
 
     const dark = page.getByRole("switch", { name: "Dark theme" }).last();
     const before = await page.locator("html").getAttribute("data-theme");

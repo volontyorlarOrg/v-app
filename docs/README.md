@@ -16,6 +16,7 @@ Use this file to route project questions to the smallest relevant source.
 | Applied UI system, localization behaviour, accessibility rules                | [`ui/UI_SYSTEM.md`](ui/UI_SYSTEM.md)                                                                                   |
 | Security headers, CSP, secrets, trust boundaries                              | [`security/SECURITY.md`](security/SECURITY.md)                                                                         |
 | Setup, commands, environment, CI, deployment                                  | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](operations/DEVELOPMENT_AND_DEPLOYMENT.md)                                 |
+| Creating the Google OAuth client and wiring "Continue with Google"            | [`operations/GOOGLE_SIGN_IN_SETUP.md`](operations/GOOGLE_SIGN_IN_SETUP.md)                                             |
 | Adding a section, copy, locale, token, component, or link                     | [`operations/EXTENDING.md`](operations/EXTENDING.md)                                                                   |
 | A non-obvious decision, discovery, or gotcha                                  | [`../.agent-memory/README.md`](../.agent-memory/README.md)                                                             |
 
