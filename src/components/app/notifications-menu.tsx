@@ -78,7 +78,7 @@ export function NotificationsMenu({
         {unread > 0 ? (
           <span
             aria-hidden="true"
-            className="tabular absolute -top-1 -right-1 inline-flex min-w-5 items-center justify-center rounded-full bg-action px-1.5 text-xs leading-5 font-bold text-knockout"
+            className="tabular absolute -top-1 -right-1 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-xs leading-5 font-semibold text-knockout"
           >
             {unread}
           </span>
@@ -88,7 +88,7 @@ export function NotificationsMenu({
       <div
         id={panelId}
         hidden={!open}
-        className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-lg border border-border bg-surface shadow-[0_18px_40px_-32px_rgb(28_36_43/0.45)]"
+        className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-border bg-surface-raised shadow-[0_18px_40px_-32px_rgb(20_20_19/0.35)]"
       >
         <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
           <p className="text-sm font-semibold text-ink">{title}</p>

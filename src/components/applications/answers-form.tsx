@@ -125,7 +125,7 @@ export function AnswersForm({
                             defaultChecked={
                               Array.isArray(current) && current.includes(option.value)
                             }
-                            className="size-5 accent-action"
+                            className="size-5 accent-accent"
                           />
                           {option.label}
                         </label>
@@ -157,7 +157,7 @@ export function AnswersForm({
           formAction={submit}
           formNoValidate
           disabled={busy}
-          className={buttonClass({ className: "disabled:opacity-70" })}
+          className={buttonClass({ variant: "accent", className: "disabled:opacity-70" })}
         >
           {submitting ? labels.submitting : labels.submit}
         </button>

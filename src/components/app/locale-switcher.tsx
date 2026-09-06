@@ -65,7 +65,7 @@ export function LocaleSwitcher({
         id={panelId}
         aria-label={label}
         hidden={!open}
-        className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-border bg-surface p-1 shadow-[0_18px_40px_-32px_rgb(28_36_43/0.45)]"
+        className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-surface-raised p-1.5 shadow-[0_18px_40px_-32px_rgb(20_20_19/0.35)]"
       >
         {locales.map((locale) => {
           const isActive = locale === active;
@@ -79,9 +79,9 @@ export function LocaleSwitcher({
               aria-current={isActive ? "page" : undefined}
               onClick={() => setOpen(false)}
               className={cn(
-                "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-semibold transition-colors",
+                "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-surface-soft text-primary-ink"
+                  ? "bg-accent-soft text-primary-ink"
                   : "text-ink hover:bg-surface-sunk hover:text-primary-ink",
               )}
             >

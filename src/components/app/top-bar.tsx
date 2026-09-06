@@ -16,7 +16,7 @@ import { ORGANIZATION_NAME } from "@/lib/content/org";
 import { navHref } from "@/lib/routing/routes";
 
 const signOutClass =
-  "flex min-h-11 w-full items-center gap-2 rounded-md border-t border-border px-3 text-sm font-semibold text-ink transition-colors hover:bg-surface-sunk hover:text-primary-ink";
+  "flex min-h-11 w-full items-center gap-2 rounded-md border-t border-border px-3 text-sm font-medium text-ink transition-colors hover:bg-surface-sunk hover:text-primary-ink";
 
 export function TopBar({
   user,
@@ -30,11 +30,11 @@ export function TopBar({
   const t = useTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-border bg-paper/95 backdrop-blur-sm">
       <div className="flex min-h-14 items-center gap-2 px-4 sm:px-6 lg:px-8">
         <Link
           href={navHref("dashboard")}
-          className="-m-1 rounded-lg p-1 text-primary lg:hidden"
+          className="-m-1 rounded-lg p-1 text-brand lg:hidden"
           aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
         >
           <BrandMark className="size-8" />

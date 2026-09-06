@@ -11,7 +11,7 @@ export function Avatar({
     <span
       aria-hidden="true"
       className={cn(
-        "inline-grid size-10 shrink-0 place-items-center rounded-full bg-surface-soft text-sm font-bold tracking-[0.02em] text-primary-ink",
+        "inline-grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold tracking-[0.02em] text-primary-ink",
         className,
       )}
     >

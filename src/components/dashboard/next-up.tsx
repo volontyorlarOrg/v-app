@@ -51,7 +51,7 @@ export function NextUp({
             key={id}
             className="grid grid-cols-[3.5rem_1fr] gap-x-4 border-t border-border px-5 py-4 first:border-t-0"
           >
-            <div className="rounded-lg bg-surface-soft py-2 text-center">
+            <div className="rounded-md bg-accent-soft py-2 text-center">
               <time
                 dateTime={opportunity.startsAt}
                 className="display-face tabular block text-3xl leading-none text-primary-ink"

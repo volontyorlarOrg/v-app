@@ -45,7 +45,7 @@ export function SaveButton({
         className={cn(
           "inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors disabled:opacity-70",
           optimistic
-            ? "bg-surface-soft text-primary-ink"
+            ? "bg-accent-soft text-primary-ink"
             : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
         )}
       >

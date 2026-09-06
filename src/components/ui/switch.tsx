@@ -63,7 +63,7 @@ export function Switch({
           aria-hidden="true"
           className={cn(
             "relative inline-flex h-7 w-12 items-center rounded-full border transition-colors",
-            on ? "border-action bg-action" : "border-border-control bg-surface-sunk",
+            on ? "border-accent bg-accent" : "border-border-control bg-surface-sunk",
           )}
         >
           <span
