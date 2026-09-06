@@ -15,6 +15,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
   `v-web`'s tokens, motion, catalogs and registry, and what happened to the
   previous foundation
+- `decisions/ivory-ink-and-one-blue.md` — what the marketing site's move to
+  ivory, ink and one blue meant for the panel: where orange went, why the
+  primary button inverts, and why the ground is flat
 - `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo said
   it was a sample while it existed (historical; the sample is gone)
 - `decisions/every-screen-reads-the-backend.md` — why the sample and the
@@ -28,6 +31,11 @@ folder. Never store secrets or unverified external claims.
 - `decisions/error-codes-not-messages.md` — errors are codes the catalog
   translates, never sentences from a server
 - `decisions/no-comments-in-source.md` — where the explanations went
+- `decisions/library-layer-in-one-decision.md` — why shadcn/ui, React Hook
+  Form, `nuqs`, TanStack Query, Sonner and `openapi-fetch` arrived together,
+  which component each one replaced, and what stayed hand-rolled
+- `gotchas/cva-contracts-from-client-modules.md` — why a `cva` contract a
+  Server Component calls must not sit in a `"use client"` file
 - `decisions/no-essays-in-browser-storage.md` — why long answers never touch
   `localStorage`
 - `decisions/why-no-cache-components.md` — why PPR is not enabled

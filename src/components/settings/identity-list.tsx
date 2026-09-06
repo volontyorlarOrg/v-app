@@ -58,7 +58,7 @@ export function IdentityList({ identities }: { identities: LinkedIdentities }) {
           key={row.key}
           className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0"
         >
-          <span className="inline-grid size-10 shrink-0 place-items-center rounded-full bg-surface-soft text-primary-ink">
+          <span className="inline-grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft text-primary-ink">
             {row.icon}
           </span>
           <div className="min-w-0 flex-1">

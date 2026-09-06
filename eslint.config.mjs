@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     ".vscode/**",
     "*.tsbuildinfo",
     "docs/**",
+    "src/lib/api/generated/**",
   ]),
 ]);
 

@@ -8,6 +8,14 @@ import {
 import { useFormatter, useTranslations } from "next-intl";
 
 import { StateChip, type ChipTone } from "@/components/dashboard/state-chip";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import type { AttendanceOutcome, ParticipationEntry } from "@/lib/record/levels";
 
 const PRESENTATION: Record<AttendanceOutcome, { tone: ChipTone; Icon: LucideIcon }> = {
@@ -26,55 +34,43 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[40rem] text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-            <th scope="col" className="px-5 py-3 font-semibold">
-              {t("history.date")}
-            </th>
-            <th scope="col" className="px-5 py-3 font-semibold">
-              {t("history.event")}
-            </th>
-            <th scope="col" className="px-5 py-3 font-semibold">
-              {t("history.outcome")}
-            </th>
-            <th scope="col" className="px-5 py-3 text-right font-semibold">
-              {t("history.hours")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => {
-            const { tone, Icon } = PRESENTATION[entry.outcome];
-            return (
-              <tr key={entry.id} className="border-b border-border last:border-b-0">
-                <td className="tabular px-5 py-3 whitespace-nowrap text-ink-muted">
-                  <time dateTime={entry.eventDate}>
-                    {format.dateTime(new Date(entry.eventDate), "day")}
-                  </time>
-                </td>
-                <td className="px-5 py-3">
-                  <p className="font-semibold text-ink">
-                    {entry.opportunityTitle}
-                  </p>
-                  <p className="text-xs text-ink-muted">
-                    {entry.organization}
-                  </p>
-                </td>
-                <td className="px-5 py-3">
-                  <StateChip tone={tone} icon={<Icon aria-hidden="true" />}>
-                    {t(`outcomes.${entry.outcome}`)}
-                  </StateChip>
-                </td>
-                <td className="tabular px-5 py-3 text-right text-ink">
-                  {entry.hours !== undefined ? format.number(entry.hours) : "—"}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <Table className="min-w-[40rem]">
+      <TableHeader>
+        <TableRow>
+          <TableHead scope="col">{t("history.date")}</TableHead>
+          <TableHead scope="col">{t("history.event")}</TableHead>
+          <TableHead scope="col">{t("history.outcome")}</TableHead>
+          <TableHead scope="col" className="text-right">
+            {t("history.hours")}
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {entries.map((entry) => {
+          const { tone, Icon } = PRESENTATION[entry.outcome];
+          return (
+            <TableRow key={entry.id}>
+              <TableCell className="tabular whitespace-nowrap text-ink-muted">
+                <time dateTime={entry.eventDate}>
+                  {format.dateTime(new Date(entry.eventDate), "day")}
+                </time>
+              </TableCell>
+              <TableCell>
+                <p className="font-semibold text-ink">{entry.opportunityTitle}</p>
+                <p className="text-xs text-ink-muted">{entry.organization}</p>
+              </TableCell>
+              <TableCell>
+                <StateChip tone={tone} icon={<Icon aria-hidden="true" />}>
+                  {t(`outcomes.${entry.outcome}`)}
+                </StateChip>
+              </TableCell>
+              <TableCell className="tabular text-right text-ink">
+                {entry.hours !== undefined ? format.number(entry.hours) : "—"}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

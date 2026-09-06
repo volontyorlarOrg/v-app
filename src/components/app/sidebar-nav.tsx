@@ -25,9 +25,9 @@ function Items({
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors",
+                "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
                 active
-                  ? "bg-surface-soft text-primary-ink"
+                  ? "bg-accent-soft text-primary-ink"
                   : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
               )}
             >

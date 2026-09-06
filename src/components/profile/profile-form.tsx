@@ -1,14 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
+import { useId, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Panel } from "@/components/app/panel";
-import { buttonClass } from "@/components/ui/button";
-import { Field, Input, Select, Textarea } from "@/components/ui/field";
-import { idleResult, type ActionResult } from "@/lib/api/action-result";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { useActionForm } from "@/hooks/use-action-form";
 import { updateProfileAction } from "@/lib/profile/actions";
 import type { VolunteerProfile } from "@/lib/profile/completion";
+import {
+  PROFILE_NAME_MIN_LENGTH,
+  PROFILE_TEXT_LIMITS,
+  profileFormSchema,
+  profileFormValues,
+  type ProfileFormValues,
+} from "@/lib/profile/input";
 
 export type ProfileFormLabels = {
   sections: Record<
@@ -43,13 +61,31 @@ export type ProfileFormLabels = {
   fieldInvalid: string;
 };
 
-function FieldError({ result, name, label }: { result: ActionResult; name: string; label: string }) {
-  if (result.status !== "error" || !result.fields[name]) return null;
+function ProfileField({
+  id,
+  label,
+  help,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  help?: string;
+  error?: string;
+  children: ReactNode;
+}) {
   return (
-    <p role="alert" className="mt-1.5 text-sm text-ink">
-      {label}
-    </p>
+    <Field invalid={Boolean(error)}>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      {children}
+      {help ? <FieldDescription id={`${id}-help`}>{help}</FieldDescription> : null}
+      <FieldError>{error}</FieldError>
+    </Field>
   );
+}
+
+function SubsectionTitle({ children }: { children: ReactNode }) {
+  return <h3 className="mb-4 font-sans text-sm font-semibold text-ink">{children}</h3>;
 }
 
 export function ProfileForm({
@@ -61,212 +97,197 @@ export function ProfileForm({
   regions: readonly { value: string; label: string }[];
   labels: ProfileFormLabels;
 }) {
-  const [result, action, pending] = useActionState(updateProfileAction, idleResult);
-  const invalid = (name: string) =>
-    result.status === "error" && result.fields[name] ? true : undefined;
+  const id = useId();
+  const { form, result, pending, formProps } = useActionForm({
+    schema: profileFormSchema,
+    defaultValues: profileFormValues(values),
+    action: updateProfileAction,
+    onSuccess: () => toast.success(labels.saved),
+  });
+  const { register, formState } = form;
+
+  const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
+  const invalid = (name: keyof ProfileFormValues) =>
+    Boolean(formState.errors[name]) ||
+    (result.status === "error" && Boolean(result.fields[name]));
+  const errorFor = (name: keyof ProfileFormValues) =>
+    invalid(name) ? labels.fieldInvalid : undefined;
+  const control = (name: keyof ProfileFormValues, help?: string) => ({
+    id: fieldId(name),
+    "aria-describedby": help ? `${fieldId(name)}-help` : undefined,
+    "aria-invalid": invalid(name) || undefined,
+    ...register(name),
+  });
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form {...formProps} className="flex flex-col gap-6">
       <Panel title={labels.sections.identity}>
-        <div className="flex flex-col gap-5">
-          <Field label={labels.fields.fullName}>
-            {(control) => (
-              <div>
-                <Input
-                  {...control}
-                  name="fullName"
-                  defaultValue={values.fullName}
-                  autoComplete="name"
-                  required
-                  minLength={2}
-                  maxLength={120}
-                  aria-invalid={invalid("fullName")}
-                />
-                <FieldError result={result} name="fullName" label={labels.fieldInvalid} />
-              </div>
-            )}
-          </Field>
-          <Field label={labels.fields.bio} help={labels.fields.bioHelp}>
-            {(control) => (
-              <div>
-                <Textarea
-                  {...control}
-                  name="bio"
-                  defaultValue={values.bio}
-                  maxLength={600}
-                  aria-invalid={invalid("bio")}
-                />
-                <FieldError result={result} name="bio" label={labels.fieldInvalid} />
-              </div>
-            )}
-          </Field>
-          <div className="border-t border-border pt-5">
-            <h3 className="mb-4 font-sans text-sm font-semibold text-ink">
-              {labels.sections.education}
-            </h3>
+        <FieldGroup>
+          <ProfileField
+            id={fieldId("fullName")}
+            label={labels.fields.fullName}
+            error={errorFor("fullName")}
+          >
+            <Input
+              {...control("fullName")}
+              defaultValue={values.fullName}
+              autoComplete="name"
+              required
+              minLength={PROFILE_NAME_MIN_LENGTH}
+              maxLength={PROFILE_TEXT_LIMITS.fullName}
+            />
+          </ProfileField>
+          <ProfileField
+            id={fieldId("bio")}
+            label={labels.fields.bio}
+            help={labels.fields.bioHelp}
+            error={errorFor("bio")}
+          >
+            <Textarea
+              {...control("bio", labels.fields.bioHelp)}
+              defaultValue={values.bio}
+              maxLength={PROFILE_TEXT_LIMITS.bio}
+            />
+          </ProfileField>
+          <Separator />
+          <div>
+            <SubsectionTitle>{labels.sections.education}</SubsectionTitle>
             <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              <Field label={labels.fields.school}>
-                {(control) => (
-                  <div>
-                    <Input
-                      {...control}
-                      name="school"
-                      defaultValue={values.school}
-                      maxLength={160}
-                      aria-invalid={invalid("school")}
-                    />
-                    <FieldError result={result} name="school" label={labels.fieldInvalid} />
-                  </div>
-                )}
-              </Field>
-              <Field label={labels.fields.gradeYear}>
-                {(control) => (
-                  <div>
-                    <Input
-                      {...control}
-                      name="gradeYear"
-                      defaultValue={values.gradeYear}
-                      maxLength={40}
-                      aria-invalid={invalid("gradeYear")}
-                    />
-                    <FieldError result={result} name="gradeYear" label={labels.fieldInvalid} />
-                  </div>
-                )}
-              </Field>
+              <ProfileField
+                id={fieldId("school")}
+                label={labels.fields.school}
+                error={errorFor("school")}
+              >
+                <Input
+                  {...control("school")}
+                  defaultValue={values.school}
+                  maxLength={PROFILE_TEXT_LIMITS.school}
+                />
+              </ProfileField>
+              <ProfileField
+                id={fieldId("gradeYear")}
+                label={labels.fields.gradeYear}
+                error={errorFor("gradeYear")}
+              >
+                <Input
+                  {...control("gradeYear")}
+                  defaultValue={values.gradeYear}
+                  maxLength={PROFILE_TEXT_LIMITS.gradeYear}
+                />
+              </ProfileField>
             </div>
           </div>
-          <div className="border-t border-border pt-5">
-            <h3 className="mb-4 font-sans text-sm font-semibold text-ink">
-              {labels.sections.location}
-            </h3>
+          <Separator />
+          <div>
+            <SubsectionTitle>{labels.sections.location}</SubsectionTitle>
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label={labels.fields.region}>
-                {(control) => (
-                  <Select {...control} name="region" defaultValue={values.region ?? ""}>
-                    <option value="">{labels.fields.regionAny}</option>
-                    {regions.map((region) => (
-                      <option key={region.value} value={region.value}>
-                        {region.label}
-                      </option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <Field label={labels.fields.city}>
-                {(control) => (
-                  <div>
-                    <Input
-                      {...control}
-                      name="city"
-                      defaultValue={values.city}
-                      maxLength={80}
-                      aria-invalid={invalid("city")}
-                    />
-                    <FieldError result={result} name="city" label={labels.fieldInvalid} />
-                  </div>
-                )}
-              </Field>
+              <ProfileField id={fieldId("region")} label={labels.fields.region}>
+                <NativeSelect {...control("region")} defaultValue={values.region ?? ""}>
+                  <NativeSelectOption value="">
+                    {labels.fields.regionAny}
+                  </NativeSelectOption>
+                  {regions.map((region) => (
+                    <NativeSelectOption key={region.value} value={region.value}>
+                      {region.label}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </ProfileField>
+              <ProfileField
+                id={fieldId("city")}
+                label={labels.fields.city}
+                error={errorFor("city")}
+              >
+                <Input
+                  {...control("city")}
+                  defaultValue={values.city}
+                  maxLength={PROFILE_TEXT_LIMITS.city}
+                />
+              </ProfileField>
             </div>
           </div>
-        </div>
+        </FieldGroup>
       </Panel>
 
       <Panel title={labels.sections.skills}>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field label={labels.fields.languages} help={labels.fields.languagesHelp}>
-            {(control) => (
-              <div>
-                <Input
-                  {...control}
-                  name="languages"
-                  defaultValue={values.languages.join(", ")}
-                  aria-invalid={invalid("languages")}
-                />
-                <FieldError result={result} name="languages" label={labels.fieldInvalid} />
-              </div>
-            )}
-          </Field>
-          <Field label={labels.fields.skills} help={labels.fields.skillsHelp}>
-            {(control) => (
-              <div>
-                <Input
-                  {...control}
-                  name="skills"
-                  defaultValue={values.skills.join(", ")}
-                  aria-invalid={invalid("skills")}
-                />
-                <FieldError result={result} name="skills" label={labels.fieldInvalid} />
-              </div>
-            )}
-          </Field>
-        </div>
+        <FieldGroup className="grid sm:grid-cols-2">
+          <ProfileField
+            id={fieldId("languages")}
+            label={labels.fields.languages}
+            help={labels.fields.languagesHelp}
+            error={errorFor("languages")}
+          >
+            <Input
+              {...control("languages", labels.fields.languagesHelp)}
+              defaultValue={values.languages.join(", ")}
+            />
+          </ProfileField>
+          <ProfileField
+            id={fieldId("skills")}
+            label={labels.fields.skills}
+            help={labels.fields.skillsHelp}
+            error={errorFor("skills")}
+          >
+            <Input
+              {...control("skills", labels.fields.skillsHelp)}
+              defaultValue={values.skills.join(", ")}
+            />
+          </ProfileField>
+        </FieldGroup>
       </Panel>
 
       <Panel title={labels.sections.contact}>
-        <div className="flex flex-col gap-5">
+        <FieldGroup>
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label={labels.fields.phone} help={labels.fields.phoneHelp}>
-              {(control) => (
-                <div>
-                  <Input
-                    {...control}
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    defaultValue={values.phone}
-                    aria-invalid={invalid("phone")}
-                  />
-                  <FieldError result={result} name="phone" label={labels.fieldInvalid} />
-                </div>
-              )}
-            </Field>
-            <Field label={labels.fields.telegram} help={labels.fields.telegramHelp}>
-              {(control) => (
-                <div>
-                  <Input
-                    {...control}
-                    name="telegram"
-                    defaultValue={values.telegram}
-                    aria-invalid={invalid("telegram")}
-                  />
-                  <FieldError result={result} name="telegram" label={labels.fieldInvalid} />
-                </div>
-              )}
-            </Field>
+            <ProfileField
+              id={fieldId("phone")}
+              label={labels.fields.phone}
+              help={labels.fields.phoneHelp}
+              error={errorFor("phone")}
+            >
+              <Input
+                {...control("phone", labels.fields.phoneHelp)}
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                defaultValue={values.phone}
+              />
+            </ProfileField>
+            <ProfileField
+              id={fieldId("telegram")}
+              label={labels.fields.telegram}
+              help={labels.fields.telegramHelp}
+              error={errorFor("telegram")}
+            >
+              <Input
+                {...control("telegram", labels.fields.telegramHelp)}
+                defaultValue={values.telegram}
+              />
+            </ProfileField>
           </div>
-          <div className="border-t border-border pt-5">
-            <h3 className="mb-4 font-sans text-sm font-semibold text-ink">
-              {labels.sections.links}
-            </h3>
-            <Field label={labels.fields.links} help={labels.fields.linksHelp}>
-              {(control) => (
-                <div>
-                  <Input
-                    {...control}
-                    name="links"
-                    defaultValue={values.links.join(", ")}
-                    aria-invalid={invalid("links")}
-                  />
-                  <FieldError result={result} name="links" label={labels.fieldInvalid} />
-                </div>
-              )}
-            </Field>
+          <Separator />
+          <div>
+            <SubsectionTitle>{labels.sections.links}</SubsectionTitle>
+            <ProfileField
+              id={fieldId("links")}
+              label={labels.fields.links}
+              help={labels.fields.linksHelp}
+              error={errorFor("links")}
+            >
+              <Input
+                {...control("links", labels.fields.linksHelp)}
+                defaultValue={values.links.join(", ")}
+              />
+            </ProfileField>
           </div>
-        </div>
+        </FieldGroup>
       </Panel>
 
       <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          disabled={pending}
-          className={buttonClass({ className: "disabled:opacity-70" })}
-        >
+        <Button type="submit" disabled={pending} className="disabled:opacity-70">
           {pending ? labels.saving : labels.save}
-        </button>
-        {result.status === "ok" ? (
-          <ActionStatus tone="done">{labels.saved}</ActionStatus>
-        ) : result.status === "error" ? (
+        </Button>
+        {result.status === "error" ? (
           <ActionStatus tone="error">{labels.saveError}</ActionStatus>
         ) : null}
       </div>

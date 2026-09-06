@@ -4,6 +4,7 @@ import { Onest, Source_Serif_4 } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+import { Providers } from "@/components/app/providers";
 import { ThemeScript } from "@/components/app/theme-script";
 import { routing } from "@/i18n/routing";
 import { siteOrigin } from "@/lib/seo/origin";
@@ -66,7 +67,9 @@ export default async function LocaleLayout({
         <ThemeScript />
       </head>
       <body className="flex min-h-full flex-col">
-        <NextIntlClientProvider messages={null}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider messages={null}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

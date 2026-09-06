@@ -1,11 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import { ActionStatus } from "@/components/app/action-status";
-import { buttonClass } from "@/components/ui/button";
-import { idleResult } from "@/lib/api/action-result";
+import { Button } from "@/components/ui/button";
+import { useActionForm } from "@/hooks/use-action-form";
 import { applyAction } from "@/lib/opportunities/actions";
+import { applyFormSchema } from "@/lib/opportunities/apply";
 
 export type ApplyLabels = {
   apply: string;
@@ -21,18 +20,27 @@ export function ApplyForm({
   opportunityId: string;
   labels: ApplyLabels;
 }) {
-  const [result, action, pending] = useActionState(applyAction, idleResult);
+  const { form, result, pending, formProps } = useActionForm({
+    schema: applyFormSchema,
+    defaultValues: { opportunityId },
+    action: applyAction,
+  });
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <input type="hidden" name="opportunityId" value={opportunityId} />
-      <button
+    <form {...formProps} className="flex flex-col gap-4">
+      <input
+        type="hidden"
+        {...form.register("opportunityId")}
+        defaultValue={opportunityId}
+      />
+      <Button
         type="submit"
+        variant="accent"
         disabled={pending}
-        className={buttonClass({ className: "w-full disabled:opacity-70" })}
+        className="w-full disabled:opacity-70"
       >
         {pending ? labels.applying : labels.apply}
-      </button>
+      </Button>
       {result.status === "error" ? (
         <ActionStatus tone="error">
           {labels.errors[result.code] ?? labels.fallback}

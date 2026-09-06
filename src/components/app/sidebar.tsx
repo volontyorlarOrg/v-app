@@ -1,10 +1,10 @@
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Avatar } from "@/components/app/avatar";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
 import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
@@ -34,7 +34,7 @@ export function Sidebar({
   });
 
   return (
-    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-surface">
+    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-paper">
       <div className="px-5 pt-5 pb-4">
         <Link
           href={navHref("dashboard")}
@@ -56,7 +56,9 @@ export function Sidebar({
 
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
-          <Avatar initials={user.initials} />
+          <Avatar aria-hidden="true">
+            <AvatarFallback>{user.initials}</AvatarFallback>
+          </Avatar>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-ink">{user.name}</p>
             <p className="text-xs font-semibold text-accent-ink">{user.level}</p>

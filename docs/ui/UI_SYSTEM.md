@@ -14,39 +14,64 @@ with different values under `:root[data-theme="dark"]`.
 themes, and `src/app/typography.test.ts` refuses a bold display face and a
 literal hex anywhere under `src/`.
 
-Product additions: `--text-figure` for stat tiles, `.meter` / `.meter-fill`
-for progress bars, `.tab-bar` for the safe-area inset. The workspace's flat
-ground is `bg-surface-sunk` on the shell's column, which covers the `body`
-dot grid; the sign-in pages have no such wrapper and keep the grid.
+The same block aliases the token set under the names shadcn/ui components
+expect — `background`, `foreground`, `card`, `popover`, `muted`,
+`muted-foreground`, `input`, `ring`, `primary-foreground` and `radius` — each
+as a `var()` reference to a brand token, so `bg-popover` is `surface-raised`
+and `text-muted-foreground` is `ink-muted` in both themes without a second
+palette. `accent` is not aliased: it is the brand's one blue fill, and a menu
+item's focus surface uses `muted` with `primary-ink` instead. There is no
+`destructive` alias, because the palette defines no red.
+
+Product additions: `--text-figure` for stat tiles, `--text-page-title` for
+the serif `h1` of every section, `.meter` / `.meter-fill` for progress bars,
+`.tab-bar` for the safe-area inset. The ground is flat everywhere: `body`
+paints `paper`, the shell's column paints `surface-sunk` over it, and the
+sign-in pages sit on the paper itself. There is no grid, wash or gradient,
+and the token test asserts there is none.
+
+The fills follow the marketing site's rule. `action` is the primary button
+and takes an `ink-inverse` label; it is ink in the light theme and ivory in
+the dark. `accent` is the one blue fill — the sign-in, apply and submit
+actions, the achievement chip, the reached level, a switch that is on, the
+notification badge, the meters — and takes `knockout`. `accent-soft` with
+`primary-ink` is the tint behind anything selected or owned by the system.
+`brand` is the mark alone. A shadcn variant that fills with `action` labels
+it `ink-inverse`, never `knockout`, because `knockout` stays ivory in the
+dark theme and `action` becomes ivory with it.
 
 ## Composition primitives
 
-| Component                                                                                    | Role                                                                                                                                                  |
-| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AppShell`                                                                                   | Skip link, sidebar, minimal top bar, workspace, footer, and tab bar                                                                                   |
-| `Sidebar` / `SidebarNav`                                                                     | The desktop navigation: lockup, main sections, account routes, the user card with level, sign out                                                     |
-| `TopBar`                                                                                     | `NotificationsMenu`, language, theme, `UserMenu`; the brand mark below the large breakpoint                                                           |
-| `TabBar`                                                                                     | Fixed four-tab bar below the large breakpoint with icons from `route-icons.ts`                                                                        |
-| `Panel`                                                                                      | The unit of every screen: bordered surface, optional titled header with an action link, `padding="none"` for lists                                    |
-| `StatTiles`                                                                                  | A row of figures: label, serif figure, note; orange when the figure is the person's                                                                   |
-| `PageHeader`                                                                                 | Eyebrow and sample chip, serif `h1`, description, actions on the right                                                                                |
-| `Segmented`                                                                                  | Pill links for a status group filter, with counts and `aria-current`                                                                                  |
-| `StateChip`                                                                                  | Icon-plus-word pill in `neutral`, `structure` or `achievement`; `ApplicationStatusChip`, `OpportunityStatusChip` and the history outcomes build on it |
-| `StatusChip`                                                                                 | Dashed pill for sample, preview and not-connected material                                                                                            |
-| `PreviewNote`                                                                                | The dashed chip plus a sentence, beside every control that cannot write yet                                                                           |
-| `Switch`                                                                                     | A `role="switch"` toggle, uncontrolled or controlled, with an optional hidden form value                                                              |
-| `ThemeSwitch`                                                                                | The switch bound to the real theme, for settings                                                                                                      |
-| `Field` / `Input` / `Textarea` / `Select`                                                    | Labelled controls at 48px with optional help and a trailing link                                                                                      |
-| `NextUp`, `ApplicationRows`, `OpportunityRows`, `ActivityFeed`                               | Ruled row lists for panels                                                                                                                            |
-| `RecordProgress`                                                                             | The level rail and the next-level meter                                                                                                               |
-| `ProfileMeter`                                                                               | The completeness bar with the missing fields                                                                                                          |
-| `OpportunityFilters`, `OpportunityCard`, `OpportunityFacts`, `SaveButton`                    | The opportunities section                                                                                                                             |
-| `ApplicationTimeline`                                                                        | Submitted, under review, decision, with dates                                                                                                         |
-| `HistoryTable`                                                                               | The participation history, scrolling inside its panel on a phone                                                                                      |
-| `ProfileForm`, `PreferenceSwitches`, `IdentityList`                                          | The profile editor and the settings groups                                                                                                            |
-| `AuthIntro` / `PreviewNotice` / `AuthPanel` / `AuthDivider` / `ProviderButtons` / `AuthForm` | The sign-in surfaces                                                                                                                                  |
-| `ImpactOrbit`                                                                                | Lazy Three.js progress object with a static no-WebGL and reduced-motion fallback                                                                      |
-| `buttonClass`, `Scene`, `SplitWords`, `ThemeToggle`, `LocaleSwitcher`                        | Shared interaction and entrance utilities                                                                                                             |
+| Component                                                                                           | Role                                                                                                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AppShell`                                                                                          | Skip link, sidebar, minimal top bar, workspace, footer, and tab bar                                                                                                                  |
+| `Sidebar` / `SidebarNav`                                                                            | The desktop navigation: lockup, main sections, account routes, the user card with level, sign out                                                                                    |
+| `TopBar`                                                                                            | `NotificationsMenu`, language, theme, `UserMenu`; the brand mark below the large breakpoint                                                                                          |
+| `TabBar`                                                                                            | Fixed four-tab bar below the large breakpoint with icons from `route-icons.ts`                                                                                                       |
+| `Panel`                                                                                             | The unit of every screen, composed from `Card`: bordered surface, optional titled header with an action link, `padding="none"` for lists                                             |
+| `StatTiles`                                                                                         | A row of figures: label, serif figure, note; the text blue when the figure is the person's                                                                                                  |
+| `PageHeader`                                                                                        | Eyebrow and sample chip, serif `h1`, description, actions on the right                                                                                                               |
+| `Segmented`                                                                                         | Pill links for a status group filter, with counts and `aria-current`; styled by `toggleVariants`, because shadcn's toggle group is buttons and a filter must stay a URL              |
+| `StateChip`                                                                                         | Icon-plus-word pill in `neutral`, `structure` or `achievement`, the matching `Badge` variants; `ApplicationStatusChip`, `OpportunityStatusChip` and the history outcomes build on it |
+| `StatusChip`                                                                                        | Dashed pill for sample, preview and not-connected material; the `status` variant of `Badge`                                                                                          |
+| `PreviewNote`                                                                                       | The dashed chip plus a sentence, beside every control that cannot write yet                                                                                                          |
+| `Switch` / `SwitchControl`                                                                          | The labelled `role="switch"` row, uncontrolled or controlled, with an optional hidden form value; `SwitchControl` is the Radix switch inside it, as a `track` or as an `icon` button |
+| `ThemeSwitch`                                                                                       | The switch bound to the real theme, for settings                                                                                                                                     |
+| `Field` / `FieldLabel` / `FieldDescription` / `FieldError` with `Input`, `Textarea`, `NativeSelect` | Labelled controls at 48px with optional help and an inline error; the select stays native so a phone opens its own picker                                                            |
+| `NextUp`, `ApplicationRows`, `OpportunityRows`, `ActivityFeed`                                      | Ruled row lists for panels                                                                                                                                                           |
+| `RecordProgress`                                                                                    | The level rail and the next-level meter, a `Progress` with `aria-valuetext`                                                                                                          |
+| `ProfileMeter`                                                                                      | The completeness bar with the missing fields, a `Progress` with `aria-valuetext`                                                                                                     |
+| `OpportunityFilters`, `OpportunityCard`, `OpportunityFacts`, `SaveButton`                           | The opportunities section                                                                                                                                                            |
+| `ApplicationTimeline`                                                                               | Submitted, under review, decision, with dates                                                                                                                                        |
+| `HistoryTable`                                                                                      | The participation history on `Table`, scrolling inside its panel on a phone                                                                                                          |
+| `ProfileForm`, `PreferenceSwitches`, `IdentityList`                                                 | The profile editor and the settings groups                                                                                                                                           |
+| `AuthIntro` / `PreviewNotice` / `AuthPanel` / `AuthDivider` / `ProviderButtons` / `AuthForm`        | The sign-in surfaces                                                                                                                                                                 |
+| `ImpactOrbit`                                                                                       | Lazy Three.js progress object with a static no-WebGL and reduced-motion fallback                                                                                                     |
+| `Button` / `buttonClass`, `Scene`, `SplitWords`, `ThemeToggle`, `LocaleSwitcher`                    | Shared interaction and entrance utilities                                                                                                                                            |
+| `DropdownMenu` / `Popover`                                                                          | The language and account menus, and the notifications panel                                                                                                                          |
+| `AlertDialog`                                                                                       | The withdraw confirmation                                                                                                                                                            |
+| `Avatar` / `Separator` / `Skeleton`                                                                 | Initials in the sidebar and the account menu, the rule between form sub-sections, the `loading.tsx` placeholders                                                                     |
+| `Toaster`                                                                                           | Sonner, mounted once by `Providers`, themed from `src/lib/theme.ts`                                                                                                                  |
 
 ## Localization behaviour
 
@@ -82,7 +107,10 @@ dot grid; the sign-in pages have no such wrapper and keep the grid.
   button), selects, the search field, tab-bar targets at 56px.
 - Every disclosure (language, notifications, account) sets `aria-expanded` and
   `aria-controls`, closes on Escape with focus returned, and closes on an
-  outside pointer.
+  outside pointer. The language and account menus are Radix menus, so arrow
+  keys move between items; the notifications panel is a labelled dialog.
+- A saved profile or draft is announced by a toast in a live region; a failed
+  action stays an inline alert beside the control.
 - Status is never carried by colour alone: every chip has an icon and a word,
   the meters are `progressbar`s with `aria-valuetext`, the level rail names the
   current level, the timeline states its dates or "not yet" in words.

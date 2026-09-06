@@ -66,7 +66,7 @@ opportunities section.
 A derived feed available to the notification model and future activity views:
 attendance confirmed, application accepted, application submitted,
 opportunity saved, level reached. The first, second and fifth belong to the
-person and are marked in orange. There is no backend endpoint for it yet; the
+person and take the blue fill. There is no backend endpoint for it yet; the
 plan proposes one. → `src/lib/activity/types.ts`
 
 ## Review / Rating

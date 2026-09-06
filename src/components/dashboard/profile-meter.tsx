@@ -1,8 +1,8 @@
 import { CircleCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { CSSProperties } from "react";
 
 import { buttonClass } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Link } from "@/i18n/navigation";
 import type { ProfileCompletion } from "@/lib/profile/completion";
 import { navHref } from "@/lib/routing/routes";
@@ -35,20 +35,12 @@ export function ProfileMeter({
         )}
       </div>
 
-      <div
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={completion.percent}
-        aria-valuetext={value}
+      <Progress
+        value={completion.percent}
+        valueText={value}
         aria-label={t("completion.label")}
-        className="meter mt-3"
-      >
-        <div
-          className="meter-fill"
-          style={{ "--meter-progress": completion.percent / 100 } as CSSProperties}
-        />
-      </div>
+        className="mt-3"
+      />
 
       {completion.complete ? (
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">
