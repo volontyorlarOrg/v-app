@@ -5,6 +5,7 @@
     "tagline": "Oʻzbekistondagi yoshlar uchun volontyorlik",
     "location": "Oʻzbekiston",
     "volunteer": "Volontyor",
+    "loading": "Yuklanmoqda…",
     "error": {
       "title": "Sahifani yuklab boʻlmadi",
       "body": "Server bilan bogʻlanib boʻlmadi. Bir ozdan keyin qayta urinib koʻring.",
