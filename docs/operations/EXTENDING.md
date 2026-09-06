@@ -91,9 +91,21 @@ is hidden, has a static reduced-motion alternative, and disposes its resources.
 Server Components are the default. `"use client"` is justified by event
 handlers, client state, browser APIs, or an interactive primitive, with the
 boundary as low as possible. Client components receive translated copy from
-their server parents. Shared action styling comes from `buttonClass`; solid
-actions use `action`, never `primary` or `primary-ink`. Status is a `StateChip`
-with an icon and a word; provisional material is a `StatusChip` with words.
+their server parents. Shared action styling comes from `Button` and
+`buttonClass`; solid actions use `action`, never `primary` or `primary-ink`.
+Status is a `StateChip` with an icon and a word; provisional material is a
+`StatusChip` with words.
+
+Interactive primitives come from shadcn/ui. `npx shadcn@latest add <name>`
+writes the registry source into `src/components/ui/`; edit it before use.
+Remove the `tw-animate-css` classes (`animate-in`, `fade-in-0`, `data-open:`),
+the `destructive` role and the `cn-*` utilities, and keep only colours that are
+tokens or the aliases `globals.css` declares for shadcn's names. Do not let the
+CLI rewrite `globals.css`: its oklch palette would shadow the brand tokens. A
+component nothing uses is not added. A file that exports a `cva` contract a
+Server Component calls (`toggle.tsx`, `badge.tsx`, `button.tsx`) must not
+carry `"use client"`: a function from a client module cannot be called on the
+server, and the Radix modules are already marked client on their own.
 
 ## Add a dashboard panel
 
@@ -110,13 +122,20 @@ and keep the order the same on every width.
 ## Add a switch or a control that writes
 
 Use `Switch` from `src/components/ui/switch.tsx` controlled with `checked`
-from an optimistic value, and call a Server Action from
-`src/lib/<domain>/actions.ts` inside a transition — `PreferenceSwitches` is the
-pattern. A form posts to its action through `useActionState` and renders the
-`ActionResult` with `ActionStatus` — `ProfileForm` and `AnswersForm` are the
-patterns. A control whose backing does not exist yet is rendered `disabled`
-with a visible note, as the Google button is; never one that looks live and
-does nothing.
+from `useOptimisticServerAction(value, action)` in
+`src/hooks/use-server-action.ts`, which wraps the Server Action from
+`src/lib/<domain>/actions.ts` in TanStack Query's `useMutation`, shows the
+requested value while it is pending, and turns an `ActionResult` error into
+`isError` — `PreferenceSwitches` and `SaveButton` are the patterns. A form gets
+a Zod schema beside its FormData parser in `src/lib/<domain>/` that mirrors the
+server's rules, then `useActionForm({ schema, defaultValues, action })` from
+`src/hooks/use-action-form.ts`: React Hook Form validates on the client, the
+form still posts to the Server Action through `useActionState`, and the
+`ActionResult` renders through `ActionStatus` for errors and a Sonner toast for
+a success that used to be a status line — `ProfileForm` is the pattern, and
+`AnswersForm` shows two actions on one form. A control whose backing does not
+exist yet is rendered `disabled` with a visible note, as the Google button is;
+never one that looks live and does nothing.
 
 ## Link to something outside the application
 
@@ -125,12 +144,22 @@ Never hard-code an origin. The marketing site resolves through
 buttons are links to the dashboard until their phase in the plan replaces them
 with route handlers.
 
+## Regenerate the API types
+
+`npm run api:types` reads `../v-backend/docs/api/openapi.json` and rewrites
+`src/lib/api/generated/schema.d.ts`. The backend writes that document with
+`npm run openapi:generate`, which boots the Nest application and therefore
+needs its Postgres and Redis. Commit the regenerated file; the response
+contract stays the Zod schema in `src/lib/api/schemas.ts`.
+
 ## Add a dependency
 
 The default answer is no. `docs/architecture/ARCHITECTURE.md` lists what was
-removed and why, and the implementation plan names the dependencies each phase
-is allowed to add: `zod` and `jose` at the session boundary, nothing else
-without a concrete, implemented requirement.
+removed, what `feat/ui-libraries` added and why, and what stays out. A new
+dependency needs a concrete, implemented requirement, and the answer for a UI
+primitive is a shadcn component on `radix-ui`, for a form React Hook Form and
+Zod, for URL state `nuqs`, for a client-side mutation TanStack Query — not a
+second library for the same job.
 
 ## Checks
 
