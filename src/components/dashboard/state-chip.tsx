@@ -6,8 +6,8 @@ export type ChipTone = "neutral" | "structure" | "achievement";
 
 const toneClass: Record<ChipTone, string> = {
   neutral: "border border-border-control text-ink-muted",
-  structure: "bg-surface-soft text-primary-ink",
-  achievement: "border border-accent/50 bg-surface text-accent-ink",
+  structure: "bg-accent-soft text-primary-ink",
+  achievement: "bg-accent text-knockout",
 };
 
 export function StateChip({

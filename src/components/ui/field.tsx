@@ -9,7 +9,7 @@ export type FieldControlProps = {
 };
 
 export const controlClass =
-  "min-h-12 w-full rounded-lg border border-border-control bg-surface px-4 text-base text-ink transition-colors hover:border-primary-ink disabled:opacity-60";
+  "min-h-12 w-full rounded-md border border-border-control bg-surface px-4 text-base text-ink transition-colors hover:border-primary-ink disabled:opacity-60";
 
 export function Field({
   label,

@@ -29,7 +29,7 @@ export function ApplyForm({
       <button
         type="submit"
         disabled={pending}
-        className={buttonClass({ className: "w-full disabled:opacity-70" })}
+        className={buttonClass({ variant: "accent", className: "w-full disabled:opacity-70" })}
       >
         {pending ? labels.applying : labels.apply}
       </button>

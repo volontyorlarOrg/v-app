@@ -26,10 +26,10 @@ export function Segmented({
           href={item.href}
           aria-current={item.active ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors",
+            "inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
             item.active
-              ? "border-action bg-action text-knockout"
-              : "border-border-control bg-surface text-ink hover:border-primary-ink hover:text-primary-ink",
+              ? "border-action bg-action text-ink-inverse"
+              : "border-border-control bg-surface text-ink hover:border-ink",
           )}
         >
           {item.label}
@@ -37,7 +37,7 @@ export function Segmented({
             <span
               className={cn(
                 "tabular text-xs",
-                item.active ? "text-band-copy" : "text-ink-muted",
+                item.active ? "text-ink-inverse/70" : "text-ink-muted",
               )}
             >
               {item.count}
