@@ -1,8 +1,7 @@
 "use client";
 
-import { useOptimistic, useState, useTransition } from "react";
-
 import { Switch } from "@/components/ui/switch";
+import { useOptimisticServerAction } from "@/hooks/use-server-action";
 import { updatePreferenceAction } from "@/lib/account/actions";
 import type { PreferenceKey } from "@/lib/account/types";
 
@@ -20,29 +19,20 @@ function PreferenceSwitch({
   item: PreferenceItem;
   errorLabel: string;
 }) {
-  const [optimistic, setOptimistic] = useOptimistic(item.checked);
-  const [pending, startTransition] = useTransition();
-  const [failed, setFailed] = useState(false);
-
-  function onChange(next: boolean) {
-    setFailed(false);
-    startTransition(async () => {
-      setOptimistic(next);
-      const result = await updatePreferenceAction(item.key, next);
-      if (result.status !== "ok") setFailed(true);
-    });
-  }
+  const update = useOptimisticServerAction(item.checked, (next: boolean) =>
+    updatePreferenceAction(item.key, next),
+  );
 
   return (
     <div className="py-3 first:pt-0 last:pb-0">
       <Switch
         label={item.label}
         description={item.description}
-        checked={optimistic}
-        disabled={pending}
-        onCheckedChange={onChange}
+        checked={update.optimistic}
+        disabled={update.isPending}
+        onCheckedChange={(next) => update.mutate(next)}
       />
-      {failed ? (
+      {update.isError ? (
         <p role="alert" className="mt-1 text-xs text-ink-muted">
           {errorLabel}
         </p>

@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import type { CSSProperties } from "react";
 
+import { Progress } from "@/components/ui/progress";
 import {
   LEVELS,
   LEVEL_THRESHOLDS,
@@ -72,20 +72,13 @@ export function RecordProgress({ record }: { record: VolunteerRecord }) {
               {done}/{needed}
             </span>
           </div>
-          <div
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={needed}
-            aria-valuenow={done}
-            aria-valuetext={nextText}
+          <Progress
+            value={done}
+            max={needed}
+            valueText={nextText}
             aria-label={t("next.label", { level: t(`level.${progress.next}`) })}
-            className="meter mt-2"
-          >
-            <div
-              className="meter-fill"
-              style={{ "--meter-progress": done / needed } as CSSProperties}
-            />
-          </div>
+            className="mt-2"
+          />
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">{nextText}</p>
         </div>
       ) : (

@@ -20,6 +20,11 @@ import {
   type OpportunityFilters as Filters,
 } from "@/lib/opportunities/filters";
 import {
+  opportunityViewParser,
+  serializeOpportunitySearch,
+  type OpportunityView,
+} from "@/lib/opportunities/search-params";
+import {
   OPPORTUNITY_FORMATS,
   REGIONS,
   type OpportunitySummary,
@@ -27,12 +32,6 @@ import {
 import { localePath, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
-
-type OpportunityView = "all" | "saved";
-
-function opportunityView(value: string | string[] | undefined): OpportunityView {
-  return value === "saved" ? "saved" : "all";
-}
 
 export async function generateMetadata({
   params,
@@ -51,7 +50,7 @@ export default async function OpportunitiesPage({
 
   const query = await searchParams;
   const filters = parseOpportunityFilters(query);
-  const view = opportunityView(query.view);
+  const view = opportunityViewParser.parseServerSide(query.view);
   const now = new Date();
 
   const [saved, catalogue] = await Promise.all([
@@ -100,13 +99,13 @@ function Opportunities({
   const views: SegmentedItem[] = [
     {
       key: "all",
-      href: navHref("opportunities"),
+      href: serializeOpportunitySearch(navHref("opportunities"), { view: "all" }),
       label: t("views.all"),
       active: view === "all",
     },
     {
       key: "saved",
-      href: `${navHref("opportunities")}?view=saved`,
+      href: serializeOpportunitySearch(navHref("opportunities"), { view: "saved" }),
       label: t("views.saved"),
       active: view === "saved",
       count: savedCount,
@@ -151,13 +150,8 @@ function Opportunities({
             value,
             label: t(`filters.sortBy.${value}`),
           }))}
-          values={filters}
           hiddenValue={view === "saved" ? { name: "view", value: "saved" } : undefined}
-          clearHref={
-            view === "saved"
-              ? `${navHref("opportunities")}?view=saved`
-              : navHref("opportunities")
-          }
+          clearHref={serializeOpportunitySearch(navHref("opportunities"), { view })}
           activeCount={activeCount}
         />
       </div>

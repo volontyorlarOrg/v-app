@@ -31,12 +31,12 @@ export function AppShell({
     <div className="flex min-h-full flex-1 flex-col lg:flex-row">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-knockout"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-ink-inverse"
       >
         {t("skipToContent")}
       </a>
       <Sidebar user={user} signOutLocale={signOutLocale} />
-      <div className="workspace-backdrop flex min-h-full min-w-0 flex-1 flex-col bg-surface-sunk">
+      <div className="flex min-h-full min-w-0 flex-1 flex-col bg-surface-sunk">
         <TopBar
           user={user}
           notifications={notifications}

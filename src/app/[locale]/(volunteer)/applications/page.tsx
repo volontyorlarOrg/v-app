@@ -8,9 +8,12 @@ import { Segmented, type SegmentedItem } from "@/components/app/segmented";
 import { ApplicationRows } from "@/components/dashboard/application-rows";
 import { listApplications } from "@/lib/api/applications.server";
 import {
+  loadApplicationsSearch,
+  serializeApplicationsSearch,
+} from "@/lib/applications/search-params";
+import {
   APPLICATION_GROUPS,
   inApplicationGroup,
-  isApplicationGroup,
   type ApplicationGroup,
   type ApplicationSummary,
 } from "@/lib/applications/status";
@@ -33,9 +36,11 @@ export default async function ApplicationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [{ group }, applications] = await Promise.all([searchParams, listApplications()]);
-  const selected = isApplicationGroup(group) ? group : "all";
-  return <Applications group={selected} applications={applications.items} />;
+  const [{ group }, applications] = await Promise.all([
+    loadApplicationsSearch(searchParams),
+    listApplications(),
+  ]);
+  return <Applications group={group} applications={applications.items} />;
 }
 
 function Applications({
@@ -57,10 +62,7 @@ function Applications({
 
   const items: SegmentedItem[] = APPLICATION_GROUPS.map((key) => ({
     key,
-    href:
-      key === "all"
-        ? navHref("applications")
-        : `${navHref("applications")}?group=${key}`,
+    href: serializeApplicationsSearch(navHref("applications"), { group: key }),
     label: t(`groups.${key}`),
     active: key === group,
     count: sorted.filter((application) => inApplicationGroup(application.status, key))

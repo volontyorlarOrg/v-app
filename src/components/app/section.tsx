@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Scene, SplitWords } from "@/components/motion/scene";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type Tone = "paper" | "sunk" | "soft" | "ink";
@@ -9,7 +10,7 @@ const toneClass: Record<Tone, string> = {
   paper: "bg-transparent text-ink",
   sunk: "bg-surface-sunk text-ink",
   soft: "bg-surface-soft text-ink",
-  ink: "bg-band text-knockout",
+  ink: "border-t border-t-primary bg-band text-knockout",
 };
 
 export function Section({
@@ -49,18 +50,12 @@ export function Eyebrow({
   return (
     <p
       className={cn(
-        "flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase",
-        tone === "primary" ? "text-primary-ink" : "text-band-copy",
+        "flex items-center gap-2.5 text-xs font-semibold tracking-[0.12em] uppercase",
+        tone === "primary" ? "text-ink-muted" : "text-band-copy",
         className,
       )}
     >
-      <span
-        aria-hidden="true"
-        className={cn(
-          "h-px w-6 shrink-0",
-          tone === "primary" ? "bg-primary" : "bg-band-copy",
-        )}
-      />
+      <span aria-hidden="true" className="h-px w-6 shrink-0 bg-primary" />
       {children}
     </p>
   );
@@ -88,7 +83,7 @@ export function SectionHeader({
       ) : null}
       <h2
         className={cn(
-          "mt-5 text-headline text-balance [--scene-delay:100ms]",
+          "mt-6 text-headline text-balance [--scene-delay:100ms]",
           tone === "inverse" && "text-knockout",
         )}
       >
@@ -116,13 +111,8 @@ export function StatusChip({
   className?: string;
 }) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border border-dashed border-border-control px-3 py-1.5 text-xs font-semibold tracking-[0.1em] text-ink-muted uppercase",
-        className,
-      )}
-    >
+    <Badge variant="status" className={className}>
       {children}
-    </span>
+    </Badge>
   );
 }
