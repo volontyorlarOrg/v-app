@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { profileInputFromFormData } from "@/lib/profile/input";
+import {
+  profileFormSchema,
+  profileFormValues,
+  profileInputFromFormData,
+} from "@/lib/profile/input";
 
 function form(entries: Record<string, string>): FormData {
   const data = new FormData();
@@ -18,7 +22,8 @@ describe("profileInputFromFormData", () => {
         skills: "translation",
         telegram: "@dilnoza_k",
         region: "samarkand",
-        links: "https://a.example, https://b.example, https://c.example, https://d.example",
+        links:
+          "https://a.example, https://b.example, https://c.example, https://d.example",
       }),
     );
 
@@ -34,5 +39,59 @@ describe("profileInputFromFormData", () => {
     expect(input.region).toBeNull();
     expect(input.bio).toBe("");
     expect(input.languages).toEqual([]);
+  });
+});
+
+describe("profileFormSchema", () => {
+  const valid = {
+    fullName: "Dilnoza Karimova",
+    bio: "",
+    school: "",
+    gradeYear: "",
+    region: "",
+    city: "",
+    languages: "",
+    skills: "",
+    phone: "",
+    telegram: "",
+    links: "",
+  };
+
+  it("mirrors the form's own constraints: a name of at least two characters, bounded text", () => {
+    expect(profileFormSchema.safeParse(valid).success).toBe(true);
+    expect(profileFormSchema.safeParse({ ...valid, fullName: " " }).success).toBe(
+      false,
+    );
+    expect(profileFormSchema.safeParse({ ...valid, fullName: "D" }).success).toBe(
+      false,
+    );
+    expect(
+      profileFormSchema.safeParse({ ...valid, bio: "x".repeat(601) }).success,
+    ).toBe(false);
+    expect(profileFormSchema.safeParse({ ...valid, region: "samarkand" }).success).toBe(
+      true,
+    );
+    expect(profileFormSchema.safeParse({ ...valid, region: "atlantis" }).success).toBe(
+      false,
+    );
+  });
+
+  it("turns a stored profile into the form's default values", () => {
+    const values = profileFormValues({
+      fullName: "Dilnoza",
+      bio: "",
+      school: "",
+      gradeYear: "",
+      region: null,
+      city: "",
+      languages: ["uz", "ru"],
+      skills: [],
+      phone: "",
+      telegram: "dilnoza_k",
+      links: [],
+    });
+    expect(values.region).toBe("");
+    expect(values.languages).toBe("uz, ru");
+    expect(values.telegram).toBe("dilnoza_k");
   });
 });
