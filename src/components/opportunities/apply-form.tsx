@@ -33,7 +33,12 @@ export function ApplyForm({
         {...form.register("opportunityId")}
         defaultValue={opportunityId}
       />
-      <Button type="submit" disabled={pending} className="w-full disabled:opacity-70">
+      <Button
+        type="submit"
+        variant="accent"
+        disabled={pending}
+        className="w-full disabled:opacity-70"
+      >
         {pending ? labels.applying : labels.apply}
       </Button>
       {result.status === "error" ? (

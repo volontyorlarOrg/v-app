@@ -9,10 +9,10 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-action px-2.5 py-1 text-knockout",
+        default: "bg-accent px-2.5 py-1 text-knockout",
         neutral: "border border-input px-2.5 py-1 text-muted-foreground",
-        structure: "bg-surface-soft px-2.5 py-1 text-primary-ink",
-        achievement: "border border-accent/50 bg-surface px-2.5 py-1 text-accent-ink",
+        structure: "bg-accent-soft px-2.5 py-1 text-primary-ink",
+        achievement: "bg-accent px-2.5 py-1 text-knockout",
         status:
           "border border-dashed border-input px-3 py-1.5 tracking-[0.1em] text-muted-foreground uppercase",
       },

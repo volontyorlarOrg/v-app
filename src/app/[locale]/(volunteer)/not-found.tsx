@@ -10,10 +10,10 @@ export default function VolunteerNotFound() {
 
   return (
     <Panel className="mx-auto max-w-lg">
-      <p className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+      <p className="text-xs font-semibold tracking-[0.12em] text-ink-muted uppercase">
         404
       </p>
-      <h1 className="mt-3 text-3xl tracking-[-0.025em]">{t("title")}</h1>
+      <h1 className="mt-3 text-3xl tracking-[-0.02em]">{t("title")}</h1>
       <p className="mt-2 text-ink-muted">{t("description")}</p>
       <Link
         href={navHref("dashboard")}

@@ -33,7 +33,7 @@ export function Segmented({
             <span
               className={cn(
                 "tabular text-xs",
-                item.active ? "text-band-copy" : "text-ink-muted",
+                item.active ? "text-ink-inverse/70" : "text-ink-muted",
               )}
             >
               {item.count}

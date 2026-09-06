@@ -17,16 +17,28 @@ literal hex anywhere under `src/`.
 The same block aliases the token set under the names shadcn/ui components
 expect — `background`, `foreground`, `card`, `popover`, `muted`,
 `muted-foreground`, `input`, `ring`, `primary-foreground` and `radius` — each
-as a `var()` reference to a brand token, so `bg-popover` is `surface` and
-`text-muted-foreground` is `ink-muted` in both themes without a second palette.
-`accent` is not aliased: it is the orange brand token, and a menu item's focus
-surface uses `muted` with `primary-ink` instead. There is no `destructive`
-alias, because the palette defines no red.
+as a `var()` reference to a brand token, so `bg-popover` is `surface-raised`
+and `text-muted-foreground` is `ink-muted` in both themes without a second
+palette. `accent` is not aliased: it is the brand's one blue fill, and a menu
+item's focus surface uses `muted` with `primary-ink` instead. There is no
+`destructive` alias, because the palette defines no red.
 
-Product additions: `--text-figure` for stat tiles, `.meter` / `.meter-fill`
-for progress bars, `.tab-bar` for the safe-area inset. The workspace's flat
-ground is `bg-surface-sunk` on the shell's column, which covers the `body`
-dot grid; the sign-in pages have no such wrapper and keep the grid.
+Product additions: `--text-figure` for stat tiles, `--text-page-title` for
+the serif `h1` of every section, `.meter` / `.meter-fill` for progress bars,
+`.tab-bar` for the safe-area inset. The ground is flat everywhere: `body`
+paints `paper`, the shell's column paints `surface-sunk` over it, and the
+sign-in pages sit on the paper itself. There is no grid, wash or gradient,
+and the token test asserts there is none.
+
+The fills follow the marketing site's rule. `action` is the primary button
+and takes an `ink-inverse` label; it is ink in the light theme and ivory in
+the dark. `accent` is the one blue fill — the sign-in, apply and submit
+actions, the achievement chip, the reached level, a switch that is on, the
+notification badge, the meters — and takes `knockout`. `accent-soft` with
+`primary-ink` is the tint behind anything selected or owned by the system.
+`brand` is the mark alone. A shadcn variant that fills with `action` labels
+it `ink-inverse`, never `knockout`, because `knockout` stays ivory in the
+dark theme and `action` becomes ivory with it.
 
 ## Composition primitives
 
@@ -37,7 +49,7 @@ dot grid; the sign-in pages have no such wrapper and keep the grid.
 | `TopBar`                                                                                            | `NotificationsMenu`, language, theme, `UserMenu`; the brand mark below the large breakpoint                                                                                          |
 | `TabBar`                                                                                            | Fixed four-tab bar below the large breakpoint with icons from `route-icons.ts`                                                                                                       |
 | `Panel`                                                                                             | The unit of every screen, composed from `Card`: bordered surface, optional titled header with an action link, `padding="none"` for lists                                             |
-| `StatTiles`                                                                                         | A row of figures: label, serif figure, note; orange when the figure is the person's                                                                                                  |
+| `StatTiles`                                                                                         | A row of figures: label, serif figure, note; the text blue when the figure is the person's                                                                                                  |
 | `PageHeader`                                                                                        | Eyebrow and sample chip, serif `h1`, description, actions on the right                                                                                                               |
 | `Segmented`                                                                                         | Pill links for a status group filter, with counts and `aria-current`; styled by `toggleVariants`, because shadcn's toggle group is buttons and a filter must stay a URL              |
 | `StateChip`                                                                                         | Icon-plus-word pill in `neutral`, `structure` or `achievement`, the matching `Badge` variants; `ApplicationStatusChip`, `OpportunityStatusChip` and the history outcomes build on it |

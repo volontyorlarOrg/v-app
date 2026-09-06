@@ -13,7 +13,7 @@ flowchart LR
   Visitor --> Proxy[src/proxy.ts locale routing]
   Proxy --> Locale["/[locale] root layout"]
   Locale --> Root["/[locale] → redirect to /login"]
-  Locale --> Auth["(auth) layout: lockup, language, theme, dot grid"]
+  Locale --> Auth["(auth) layout: lockup, language, theme, on the paper"]
   Auth --> AuthPages["login · signup"]
   AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,callback}"]
   Handlers -- session cookie --> Panel

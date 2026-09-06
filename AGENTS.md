@@ -20,7 +20,7 @@ from there.
 It is not the marketing site's layout. The signed-in product is a **panel**: a
 sidebar and a top bar with notifications and an account menu on desktop, a top
 bar and a four-destination tab bar on a phone, and panels of content on a flat
-workspace. Only the sign-in pages keep the marketing site's whiteboard ground.
+workspace. The sign-in pages sit directly on the marketing site's ivory paper.
 See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
@@ -178,14 +178,17 @@ docs/                           -> stable project documentation and the plan
   the tab bar, the account menu, the proxy's `guard` and the tests all read
   from it. Detail pages
   hang off a section through `opportunityHref` and `applicationHref`.
-- Two brand colours with a role each. **Blue is the institution**: navigation,
-  structure, chips for a system state, primary actions, the mark. **Orange is
-  the person**: the level reached, an accepted application, a confirmed
-  attendance, the record's figures, a completed profile. Blue and orange sit
-  1.25:1 apart and must never be combined. Each hue has a graphics value and a
-  text value. The palette defines no red; an error colour needs a decision
-  before it is used (see the plan). Use semantic tokens, never a literal hex.
-  Solid fills use `action` and `band`, never `primary-ink`.
+- Ivory paper, ink, and one blue, the marketing site's register. **Ink
+  carries weight**: the primary button, the active filter, a done node.
+  **Blue is the accent, in three strengths**: a tint (`accent-soft`) for what
+  is selected or a state the system owns, a fill (`accent`) for what the
+  person achieved and the one apply or sign-in action on a screen, and text
+  (`primary-ink`) for the person's own figures and links. The mark alone keeps
+  the delivered `#007FC2` through `brand`. There is no second hue and no red;
+  an error colour needs a decision before it is used (see the plan). Use
+  semantic tokens, never a literal hex. A label on a fill uses the fill's
+  pair — `ink-inverse` on `action`, `knockout` on `accent` — because the
+  primary button inverts in the dark theme.
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.

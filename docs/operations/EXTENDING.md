@@ -75,9 +75,11 @@ and they are the marketing site's tokens. Change them there first, then copy;
 this repository does not fork the palette. A product-only token (like
 `--text-figure`) is added in the same commit as its dark value and its
 assertion in `src/app/design-tokens.test.ts`. Before reaching for a colour,
-check the role split in `../../DESIGN.md`: blue is the institution, orange is
-the person, there is no third hue and no red until the plan's error-colour
-decision is made.
+check the named rules in `../../DESIGN.md`: ink carries weight, one blue does
+every accent's job in three strengths (tint, fill, text), there is no second
+hue and no red until the plan's error-colour decision is made. A label on a
+fill uses the fill's pair — `ink-inverse` on `action`, `knockout` on `accent`
+— because the primary button inverts in the dark theme.
 
 ## Add motion to a block
 

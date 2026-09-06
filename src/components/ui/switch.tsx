@@ -39,7 +39,7 @@ function SwitchControl({
         <span
           aria-hidden="true"
           data-slot="switch-track"
-          className="relative inline-flex h-7 w-12 items-center rounded-full border transition-colors group-data-[state=checked]/switch:border-action group-data-[state=checked]/switch:bg-action group-data-[state=unchecked]/switch:border-input group-data-[state=unchecked]/switch:bg-muted"
+          className="relative inline-flex h-7 w-12 items-center rounded-full border transition-colors group-data-[state=checked]/switch:border-accent group-data-[state=checked]/switch:bg-accent group-data-[state=unchecked]/switch:border-input group-data-[state=unchecked]/switch:bg-muted"
         >
           <SwitchPrimitive.Thumb
             data-slot="switch-thumb"

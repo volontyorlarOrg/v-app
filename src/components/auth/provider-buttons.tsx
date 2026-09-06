@@ -14,7 +14,11 @@ export function ProviderButtons({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <a href={telegramHref} rel="nofollow" className={buttonClass({ className: "w-full" })}>
+      <a
+        href={telegramHref}
+        rel="nofollow"
+        className={buttonClass({ variant: "accent", className: "w-full" })}
+      >
         <TelegramMark className="size-5" />
         {telegram}
       </a>
