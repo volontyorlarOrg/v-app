@@ -4,7 +4,7 @@ import { SplitWords } from "@/components/motion/scene";
 export function AuthIntro({ title, lead }: { title: string; lead: string }) {
   return (
     <div className="hero-copy">
-      <BrandMark className="enter-rise size-12 text-brand" />
+      <BrandMark className="enter-rise size-12 text-primary" />
       <h1 className="page-display enter-words mt-6 [--enter-delay:120ms]">
         <SplitWords text={title} />
       </h1>

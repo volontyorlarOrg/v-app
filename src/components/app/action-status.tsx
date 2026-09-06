@@ -20,9 +20,9 @@ export function ActionStatus({
     <p
       role={tone === "error" ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-3 rounded-md px-4 py-3 text-sm leading-relaxed",
-        tone === "info" && "bg-accent-soft text-primary-ink",
-        tone === "done" && "bg-accent-soft text-accent-ink",
+        "flex items-start gap-3 rounded-lg px-4 py-3 text-sm leading-relaxed",
+        tone === "info" && "bg-surface-soft text-primary-ink",
+        tone === "done" && "bg-surface-soft text-accent-ink",
         tone === "error" && "border border-border-control bg-surface-sunk text-ink",
         className,
       )}

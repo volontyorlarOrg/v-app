@@ -10,9 +10,9 @@ const toggleVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-transparent text-foreground hover:bg-muted hover:text-primary-ink aria-[current=page]:bg-accent-soft aria-[current=page]:text-primary-ink data-[state=on]:bg-accent-soft data-[state=on]:text-primary-ink",
+          "border-transparent bg-transparent text-foreground hover:bg-muted hover:text-primary-ink aria-[current=page]:bg-surface-soft aria-[current=page]:text-primary-ink data-[state=on]:bg-surface-soft data-[state=on]:text-primary-ink",
         outline:
-          "border-input bg-surface text-foreground hover:border-primary-ink hover:text-primary-ink aria-[current=page]:border-action aria-[current=page]:bg-action aria-[current=page]:text-ink-inverse data-[state=on]:border-action data-[state=on]:bg-action data-[state=on]:text-ink-inverse",
+          "border-input bg-surface text-foreground hover:border-primary-ink hover:text-primary-ink aria-[current=page]:border-action aria-[current=page]:bg-action aria-[current=page]:text-knockout data-[state=on]:border-action data-[state=on]:bg-action data-[state=on]:text-knockout",
       },
       size: {
         default: "min-h-10 px-4",

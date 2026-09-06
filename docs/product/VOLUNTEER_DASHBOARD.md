@@ -47,9 +47,8 @@ actionable instead of making it another catalogue.
 - **Drafts are the most useful row.** A draft shows its deadline and a
   "continue draft" link, because an unsent application is the most common way
   a volunteer loses a place.
-- **The blue fill marks what the person did** — an acceptance, a
-  confirmation, a reached level — and the text blue marks the person's own
-  figures and a complete profile; a tint marks what the system owns.
+- **Orange marks what the person did** — the level, an acceptance, a
+  confirmation, the record's figures, a complete profile — and nothing else.
 - **Empty states say what fills them.** "An accepted application appears here
   with its date and place", with a link to browse.
 - **Sample data says it is sample data**, in the hero and in the shell, and it

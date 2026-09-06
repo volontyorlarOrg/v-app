@@ -25,11 +25,11 @@ export function TopBar({
   const t = useTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-paper/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm">
       <div className="flex min-h-14 items-center gap-2 px-4 sm:px-6 lg:px-8">
         <Link
           href={navHref("dashboard")}
-          className="-m-1 rounded-lg p-1 text-brand lg:hidden"
+          className="-m-1 rounded-lg p-1 text-primary lg:hidden"
           aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
         >
           <BrandMark className="size-8" />

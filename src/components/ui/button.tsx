@@ -9,12 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-action text-ink-inverse hover:bg-action-hover",
-        accent: "bg-accent text-knockout hover:bg-primary-deep",
+        primary: "bg-action text-knockout hover:bg-action-hover",
         outline:
-          "border border-border-control bg-transparent text-ink hover:border-ink hover:bg-ink hover:text-ink-inverse",
-        ghost: "text-primary-ink hover:bg-accent-soft",
-        inverse: "bg-knockout text-band hover:bg-primary-muted hover:text-primary-deep",
+          "border border-border-control bg-transparent text-ink hover:border-primary-ink hover:bg-surface-soft hover:text-primary-ink",
+        ghost: "text-primary-ink hover:bg-surface-soft",
+        inverse:
+          "bg-knockout text-action hover:bg-primary-muted hover:text-primary-deep",
       },
       size: {
         sm: "min-h-11 px-5 text-sm",

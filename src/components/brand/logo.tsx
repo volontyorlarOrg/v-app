@@ -51,11 +51,11 @@ export function BrandLockup({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark
-        className={cn("size-8", tone === "primary" ? "text-brand" : "text-knockout")}
+        className={cn("size-8", tone === "primary" ? "text-primary" : "text-knockout")}
       />
       <span
         className={cn(
-          "hidden text-base leading-none font-semibold tracking-[-0.02em] lowercase min-[360px]:inline",
+          "hidden text-base leading-none font-bold tracking-[-0.02em] lowercase min-[360px]:inline",
           tone === "primary" ? "text-ink" : "text-knockout",
         )}
       >
