@@ -1,14 +1,19 @@
 import "server-only";
 
+import createClient, { type Client, type Middleware } from "openapi-fetch";
 import type { z } from "zod";
 
+import type { paths } from "@/lib/api/generated/schema";
 import { apiBaseUrl } from "@/lib/auth/config";
 import { ApiError, classifyApiError, codeForStatus } from "@/lib/api/errors";
 
 const DEFAULT_TIMEOUT_MS = 12_000;
+const REQUEST_ID_HEADER = "X-Request-Id";
 
 type QueryValue = string | number | boolean | null | undefined;
 export type QueryParams = Record<string, QueryValue | readonly string[]>;
+
+export type ApiPath = Extract<keyof paths, string> | (string & {});
 
 export type ApiRequest<TSchema extends z.ZodType | undefined = undefined> = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
@@ -27,21 +32,79 @@ type ApiResult<TSchema extends z.ZodType | undefined> = TSchema extends z.ZodTyp
   ? z.infer<TSchema>
   : unknown;
 
-function buildUrl(baseUrl: string, path: string, query?: QueryParams): string {
-  const url = new URL(
-    path.startsWith("/") ? `${baseUrl}${path}` : `${baseUrl}/${path}`,
-  );
+type RawRequest = (
+  method: string,
+  path: string,
+  init: {
+    params: { query: Record<string, unknown> };
+    body?: unknown;
+    headers?: Record<string, string>;
+    signal: AbortSignal;
+    parseAs: "text";
+    fetch: (request: Request) => Promise<Response>;
+  },
+) => Promise<{ data?: unknown; error?: unknown; response: Response }>;
 
+function requestIdOf(request: Request): string {
+  return request.headers.get(REQUEST_ID_HEADER) ?? "";
+}
+
+function parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+const identifyRequest: Middleware = {
+  onRequest({ request }) {
+    if (!request.headers.has(REQUEST_ID_HEADER)) {
+      request.headers.set(REQUEST_ID_HEADER, crypto.randomUUID());
+    }
+    request.headers.set("Accept", "application/json");
+    return request;
+  },
+};
+
+const classifyFailure: Middleware = {
+  async onResponse({ request, response }) {
+    if (response.ok) return undefined;
+
+    const text = await response.clone().text();
+    throw new ApiError(codeForStatus(response.status), {
+      status: response.status,
+      requestId: requestIdOf(request),
+      details: text ? parseJson(text) : null,
+    });
+  },
+  onError({ request, error }) {
+    const classified = classifyApiError(error);
+    return new ApiError(classified.code, {
+      cause: error,
+      requestId: requestIdOf(request),
+    });
+  },
+};
+
+let cachedClient: { baseUrl: string; client: Client<paths> } | null = null;
+
+function clientFor(baseUrl: string): Client<paths> {
+  if (cachedClient?.baseUrl === baseUrl) return cachedClient.client;
+
+  const client = createClient<paths>({ baseUrl });
+  client.use(identifyRequest, classifyFailure);
+  cachedClient = { baseUrl, client };
+  return client;
+}
+
+function cleanQuery(query: QueryParams | undefined): Record<string, unknown> {
+  const output: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value === undefined || value === null || value === "") continue;
-    if (Array.isArray(value)) {
-      for (const item of value) url.searchParams.append(key, item);
-    } else {
-      url.searchParams.set(key, String(value));
-    }
+    output[key] = Array.isArray(value) ? [...value] : value;
   }
-
-  return url.toString();
+  return output;
 }
 
 function requestSignal(
@@ -52,29 +115,30 @@ function requestSignal(
   return signal ? AbortSignal.any([signal, timeout]) : timeout;
 }
 
-async function readBody(response: Response): Promise<unknown> {
-  if (response.status === 204) return null;
-
-  const text = await response.text();
-  if (!text) return null;
-
-  try {
-    return JSON.parse(text) as unknown;
-  } catch {
-    return null;
-  }
+function nextFetch(
+  init: Pick<ApiRequest, "cache" | "revalidate" | "tags" | "accessToken">,
+) {
+  const { cache, revalidate, tags, accessToken } = init;
+  return (request: Request) =>
+    fetch(request, {
+      cache: cache ?? (accessToken ? "no-store" : undefined),
+      next:
+        revalidate !== undefined || tags
+          ? { revalidate, tags: tags ? [...tags] : undefined }
+          : undefined,
+    });
 }
 
-function logFailure(method: string, path: string, error: ApiError, requestId: string) {
+function logFailure(method: string, path: string, error: ApiError) {
   console.error(
     `[api] ${method} ${path} -> ${error.code}` +
       (error.status ? ` (${error.status})` : "") +
-      ` [${requestId}]`,
+      ` [${error.requestId ?? ""}]`,
   );
 }
 
 export async function api<TSchema extends z.ZodType | undefined = undefined>(
-  path: string,
+  path: ApiPath,
   init: ApiRequest<TSchema> = {},
 ): Promise<ApiResult<TSchema>> {
   const {
@@ -85,9 +149,6 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
     timeoutMs = DEFAULT_TIMEOUT_MS,
     signal,
     accessToken,
-    cache,
-    revalidate,
-    tags,
   } = init;
 
   const baseUrl = apiBaseUrl();
@@ -98,48 +159,26 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
     });
   }
 
-  const requestId = crypto.randomUUID();
-  const url = buildUrl(baseUrl, path, query);
-
-  const headers = new Headers({
-    Accept: "application/json",
-    "X-Request-Id": requestId,
-  });
-
-  if (body !== undefined) headers.set("Content-Type", "application/json");
-  if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
-
+  const request = clientFor(baseUrl).request as unknown as RawRequest;
+  let data: unknown;
   let response: Response;
 
   try {
-    response = await fetch(url, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+    ({ data, response } = await request(method, path, {
+      params: { query: cleanQuery(query) },
+      body,
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
       signal: requestSignal(signal, timeoutMs),
-      cache: cache ?? (accessToken ? "no-store" : undefined),
-      next:
-        revalidate !== undefined || tags
-          ? { revalidate, tags: tags ? [...tags] : undefined }
-          : undefined,
-    });
+      parseAs: "text",
+      fetch: nextFetch(init),
+    }));
   } catch (cause) {
     const error = classifyApiError(cause);
-    logFailure(method, path, error, requestId);
+    logFailure(method, path, error);
     throw error;
   }
 
-  const payload = await readBody(response);
-
-  if (!response.ok) {
-    const error = new ApiError(codeForStatus(response.status), {
-      status: response.status,
-      requestId,
-      details: payload,
-    });
-    logFailure(method, path, error, requestId);
-    throw error;
-  }
+  const payload = typeof data === "string" && data ? parseJson(data) : null;
 
   if (!schema) return payload as ApiResult<TSchema>;
 
@@ -149,10 +188,10 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
     const error = new ApiError("invalidResponse", {
       status: response.status,
       message: `Response from ${method} ${path} did not match its schema.`,
-      requestId,
+      requestId: response.headers.get(REQUEST_ID_HEADER) ?? undefined,
       cause: parsed.error,
     });
-    logFailure(method, path, error, requestId);
+    logFailure(method, path, error);
     throw error;
   }
 
@@ -160,7 +199,7 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
 }
 
 export function authedApi<TSchema extends z.ZodType | undefined = undefined>(
-  path: string,
+  path: ApiPath,
   accessToken: string,
   init?: Omit<ApiRequest<TSchema>, "accessToken">,
 ): Promise<ApiResult<TSchema>> {
