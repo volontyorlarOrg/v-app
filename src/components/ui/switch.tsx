@@ -1,8 +1,55 @@
 "use client";
 
-import { useId, useState } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { useId, useState, type ComponentProps } from "react";
+import { Switch as SwitchPrimitive } from "radix-ui";
 
 import { cn } from "@/lib/utils";
+
+const switchVariants = cva(
+  "group/switch inline-flex shrink-0 items-center outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        track: "-my-2 h-11 px-1",
+        icon: "",
+      },
+    },
+    defaultVariants: {
+      variant: "track",
+    },
+  },
+);
+
+function SwitchControl({
+  className,
+  variant,
+  children,
+  ...props
+}: ComponentProps<typeof SwitchPrimitive.Root> & VariantProps<typeof switchVariants>) {
+  return (
+    <SwitchPrimitive.Root
+      data-slot="switch"
+      className={cn(switchVariants({ variant }), className)}
+      {...props}
+    >
+      {variant === "icon" ? (
+        children
+      ) : (
+        <span
+          aria-hidden="true"
+          data-slot="switch-track"
+          className="relative inline-flex h-7 w-12 items-center rounded-full border transition-colors group-data-[state=checked]/switch:border-action group-data-[state=checked]/switch:bg-action group-data-[state=unchecked]/switch:border-input group-data-[state=unchecked]/switch:bg-muted"
+        >
+          <SwitchPrimitive.Thumb
+            data-slot="switch-thumb"
+            className="pointer-events-none block size-5 rounded-full bg-knockout ring-1 ring-input/40 transition-transform data-[state=checked]:translate-x-[1.375rem] data-[state=unchecked]:translate-x-0.5"
+          />
+        </span>
+      )}
+    </SwitchPrimitive.Root>
+  );
+}
 
 export function Switch({
   label,
@@ -27,8 +74,7 @@ export function Switch({
   const [internal, setInternal] = useState(defaultChecked);
   const on = checked ?? internal;
 
-  function toggle() {
-    const next = !on;
+  function toggle(next: boolean) {
     if (checked === undefined) setInternal(next);
     onCheckedChange?.(next);
   }
@@ -49,31 +95,15 @@ export function Switch({
         ) : null}
       </div>
       {name && on ? <input type="hidden" name={name} value="1" /> : null}
-      <button
-        type="button"
-        role="switch"
-        aria-checked={on}
+      <SwitchControl
+        checked={on}
+        onCheckedChange={toggle}
+        disabled={disabled}
         aria-labelledby={`${id}-label`}
         aria-describedby={description ? `${id}-description` : undefined}
-        disabled={disabled}
-        onClick={toggle}
-        className="-my-2 inline-flex h-11 shrink-0 items-center px-1 disabled:opacity-50"
-      >
-        <span
-          aria-hidden="true"
-          className={cn(
-            "relative inline-flex h-7 w-12 items-center rounded-full border transition-colors",
-            on ? "border-action bg-action" : "border-border-control bg-surface-sunk",
-          )}
-        >
-          <span
-            className={cn(
-              "absolute left-0.5 size-5 rounded-full bg-knockout ring-1 ring-border-control/40 transition-transform",
-              on && "translate-x-5",
-            )}
-          />
-        </span>
-      </button>
+      />
     </div>
   );
 }
+
+export { SwitchControl, switchVariants };
