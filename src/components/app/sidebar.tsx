@@ -34,7 +34,7 @@ export function Sidebar({
   });
 
   return (
-    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-paper">
+    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-surface">
       <div className="px-5 pt-5 pb-4">
         <Link
           href={navHref("dashboard")}

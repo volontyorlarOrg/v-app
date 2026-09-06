@@ -35,7 +35,6 @@ export function ApplyForm({
       />
       <Button
         type="submit"
-        variant="accent"
         disabled={pending}
         className="w-full disabled:opacity-70"
       >

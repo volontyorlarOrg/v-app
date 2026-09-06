@@ -27,7 +27,7 @@ export function StatTiles({
           className="enter-rise rounded-xl border border-border bg-surface px-5 py-4"
           style={{ "--enter-delay": `${120 + index * 70}ms` } as CSSProperties}
         >
-          <dt className="text-xs font-semibold tracking-[0.12em] text-ink-muted uppercase">
+          <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
             {stat.label}
           </dt>
           <dd

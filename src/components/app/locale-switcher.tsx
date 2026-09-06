@@ -50,9 +50,9 @@ export function LocaleSwitcher({
               key={locale}
               asChild
               className={cn(
-                "min-h-11 gap-3 text-sm font-medium",
+                "min-h-11 gap-3 text-sm font-semibold",
                 isActive
-                  ? "bg-accent-soft text-primary-ink focus:bg-accent-soft"
+                  ? "bg-surface-soft text-primary-ink focus:bg-surface-soft"
                   : "text-ink hover:bg-surface-sunk hover:text-primary-ink",
               )}
             >
