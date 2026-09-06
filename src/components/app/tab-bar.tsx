@@ -19,7 +19,7 @@ export function TabBar({
   return (
     <nav
       aria-label={label}
-      className="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface lg:hidden"
+      className="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-paper lg:hidden"
     >
       <ul
         className="grid"
