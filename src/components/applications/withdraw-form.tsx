@@ -1,11 +1,23 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
-import { buttonClass } from "@/components/ui/button";
-import { idleResult } from "@/lib/api/action-result";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { useActionForm } from "@/hooks/use-action-form";
 import { withdrawApplicationAction } from "@/lib/applications/actions";
+import { withdrawFormSchema } from "@/lib/applications/withdraw";
 
 export type WithdrawLabels = {
   withdraw: string;
@@ -24,47 +36,58 @@ export function WithdrawForm({
   applicationId: string;
   labels: WithdrawLabels;
 }) {
-  const [confirming, setConfirming] = useState(false);
-  const [result, action, pending] = useActionState(withdrawApplicationAction, idleResult);
+  const [open, setOpen] = useState(false);
+  const { form, formRef, result, pending, formProps } = useActionForm({
+    schema: withdrawFormSchema,
+    defaultValues: { applicationId },
+    action: withdrawApplicationAction,
+    onSuccess: () => setOpen(false),
+  });
 
   return (
-    <div className="flex flex-col gap-4">
-      {confirming ? (
-        <form action={action} className="flex flex-col gap-3">
-          <input type="hidden" name="applicationId" value={applicationId} />
-          <p className="text-sm leading-relaxed text-ink">{labels.confirm}</p>
-          <div className="flex flex-wrap gap-2">
-            <button
+    <AlertDialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!pending) setOpen(next);
+      }}
+    >
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" className="w-full">
+          {labels.withdraw}
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <form {...formProps} className="contents">
+          <input
+            type="hidden"
+            {...form.register("applicationId")}
+            defaultValue={applicationId}
+          />
+          <AlertDialogHeader>
+            <AlertDialogTitle>{labels.withdraw}</AlertDialogTitle>
+            <AlertDialogDescription>{labels.confirm}</AlertDialogDescription>
+          </AlertDialogHeader>
+          {result.status === "error" ? (
+            <ActionStatus tone="error">
+              {labels.errors[result.code] ?? labels.fallback}
+            </ActionStatus>
+          ) : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>{labels.cancel}</AlertDialogCancel>
+            <AlertDialogAction
               type="submit"
               disabled={pending}
-              className={buttonClass({ size: "sm", className: "disabled:opacity-70" })}
+              className="disabled:opacity-70"
+              onClick={(event) => {
+                event.preventDefault();
+                formRef.current?.requestSubmit();
+              }}
             >
               {pending ? labels.withdrawing : labels.yes}
-            </button>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => setConfirming(false)}
-              className={buttonClass({ variant: "ghost", size: "sm" })}
-            >
-              {labels.cancel}
-            </button>
-          </div>
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </form>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          className={buttonClass({ variant: "outline", className: "w-full" })}
-        >
-          {labels.withdraw}
-        </button>
-      )}
-      {result.status === "error" ? (
-        <ActionStatus tone="error">
-          {labels.errors[result.code] ?? labels.fallback}
-        </ActionStatus>
-      ) : null}
-    </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
