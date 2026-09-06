@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Scene, SplitWords } from "@/components/motion/scene";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type Tone = "paper" | "sunk" | "soft" | "ink";
@@ -116,13 +117,8 @@ export function StatusChip({
   className?: string;
 }) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border border-dashed border-border-control px-3 py-1.5 text-xs font-semibold tracking-[0.1em] text-ink-muted uppercase",
-        className,
-      )}
-    >
+    <Badge variant="status" className={className}>
       {children}
-    </span>
+    </Badge>
   );
 }

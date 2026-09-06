@@ -5,6 +5,7 @@
     "tagline": "Volunteering for young people in Uzbekistan",
     "location": "Uzbekistan",
     "volunteer": "Volunteer",
+    "loading": "Loading…",
     "error": {
       "title": "Couldn't load this page",
       "body": "We couldn't reach the server. Please try again in a moment.",

@@ -1,6 +1,14 @@
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -24,35 +32,35 @@ export function Panel({
   const titleId = id ? `${id}-title` : undefined;
 
   return (
-    <section
-      aria-labelledby={titleId}
-      className={cn(
-        "max-w-full min-w-0 rounded-xl border border-border bg-surface",
-        className,
-      )}
-    >
-      {title ? (
-        <header className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
-          <div className="min-w-0">
-            <h2 id={titleId} className="font-sans text-base font-semibold text-ink">
-              {title}
-            </h2>
-            {description ? (
-              <p className="mt-0.5 text-sm text-ink-muted">{description}</p>
-            ) : null}
-          </div>
-          {action ? (
-            <Link
-              href={action.href}
-              className="inline-flex min-h-8 shrink-0 items-center gap-1 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-            >
-              {action.label}
-              <ArrowRight aria-hidden="true" className="size-4" />
-            </Link>
-          ) : null}
-        </header>
-      ) : null}
-      <div className={cn(padding === "md" && "px-5 py-4")}>{children}</div>
-    </section>
+    <Card asChild className={cn("max-w-full min-w-0", className)}>
+      <section aria-labelledby={titleId}>
+        {title ? (
+          <CardHeader asChild>
+            <header>
+              <div className="min-w-0">
+                <CardTitle asChild>
+                  <h2 id={titleId}>{title}</h2>
+                </CardTitle>
+                {description ? <CardDescription>{description}</CardDescription> : null}
+              </div>
+              {action ? (
+                <CardAction asChild>
+                  <Link
+                    href={action.href}
+                    className="inline-flex min-h-8 items-center gap-1 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+                  >
+                    {action.label}
+                    <ArrowRight aria-hidden="true" className="size-4" />
+                  </Link>
+                </CardAction>
+              ) : null}
+            </header>
+          </CardHeader>
+        ) : null}
+        <CardContent className={cn(padding === "none" && "p-0")}>
+          {children}
+        </CardContent>
+      </section>
+    </Card>
   );
 }

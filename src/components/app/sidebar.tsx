@@ -1,10 +1,10 @@
 import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Avatar } from "@/components/app/avatar";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
 import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
@@ -56,7 +56,9 @@ export function Sidebar({
 
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
-          <Avatar initials={user.initials} />
+          <Avatar aria-hidden="true">
+            <AvatarFallback>{user.initials}</AvatarFallback>
+          </Avatar>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-ink">{user.name}</p>
             <p className="text-xs font-semibold text-accent-ink">{user.level}</p>
