@@ -41,3 +41,14 @@ export function isSecureCookieTransport(): boolean {
     return true;
   }
 }
+
+const GOOGLE_CLIENT_ID_PATTERN = /^[0-9]+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$/;
+
+export function googleClientId(): string | null {
+  const value = process.env.VOLONTYORLAR_GOOGLE_CLIENT_ID?.trim();
+  return value && GOOGLE_CLIENT_ID_PATTERN.test(value) ? value : null;
+}
+
+export function isGoogleConfigured(): boolean {
+  return isAuthConfigured() && googleClientId() !== null;
+}

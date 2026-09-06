@@ -1,5 +1,6 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import { Label } from "@/components/ui/label";
@@ -58,10 +59,14 @@ function FieldError({ className, children, ...props }: ComponentProps<"p">) {
     <p
       role="alert"
       data-slot="field-error"
-      className={cn("text-sm text-foreground", className)}
+      className={cn(
+        "flex items-start gap-2 text-sm font-medium text-foreground",
+        className,
+      )}
       {...props}
     >
-      {children}
+      <TriangleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+      <span className="min-w-0">{children}</span>
     </p>
   );
 }
