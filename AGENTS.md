@@ -91,7 +91,14 @@ authorisation.
 - Tailwind CSS 4 with the semantic tokens copied from `v-web` in
   `src/app/globals.css`
 - `next-intl` for `uz` / `ru` / `en` routing and one catalog per locale
-- `class-variance-authority`, `clsx`, `tailwind-merge`, Lucide icons
+- shadcn/ui components in `src/components/ui/`, built on `radix-ui`,
+  `class-variance-authority`, `clsx`, `tailwind-merge` and Lucide icons; the
+  CLI is configured by `components.json`
+- React Hook Form with `@hookform/resolvers` and `zod` for the forms, `nuqs`
+  for URL state, TanStack Query around the Server Actions that toggle state,
+  Sonner for toasts
+- `openapi-fetch` over `src/lib/api/generated/schema.d.ts`, generated from
+  `v-backend`'s OpenAPI document by `npm run api:types`
 - Vitest + Testing Library for units and components, Playwright for smoke paths
 - npm with a committed lockfile
 
@@ -104,10 +111,18 @@ Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every
 backend response) and `server-only` (keeping the API client and the cookie
 reader out of client bundles).
 
-Still not installed, on purpose, until the implementation plan reaches the
-phase that needs them: React Hook Form, `next-safe-action`, `nuqs`, TanStack
-Query, Sonner, Radix, `motion`, `date-fns`, and any auth SDK. The previous
-foundation used all of them; it is archived under
+The library layer arrived in one decision, `feat/ui-libraries`, once the
+hand-rolled primitives had each grown their own keyboard, focus and state
+handling: `radix-ui` through the shadcn/ui components in `src/components/ui/`,
+React Hook Form with `@hookform/resolvers` and the existing `zod` in front of
+the four forms, `nuqs` for the opportunity filters and the application group,
+TanStack Query's `useMutation` around the Server Actions behind a switch or a
+save button, Sonner for the outcomes that used to be a status line, and
+`openapi-fetch` with `openapi-typescript` under the server-only client. Every
+read is still server-only and every write is still a Server Action; the
+libraries sit in front of that architecture, not instead of it. Still out, on
+purpose: `next-safe-action`, `next-themes`, `motion`, `date-fns`, and any auth
+SDK. The previous foundation is archived under
 `docs/reference/foundation-v1/legacy/` as reference material, not live code.
 
 For framework behaviour, read `node_modules/next/dist/docs/` before relying on
@@ -121,7 +136,10 @@ src/app/[locale]/(auth)/        -> login and signup; both are the Telegram hando
 src/app/api/auth/telegram/      -> start and callback: the two hops of Telegram sign-in
 src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
-src/lib/api/                    -> the server-only client, per-domain reads, the Zod schemas, error codes, ActionResult
+src/lib/api/                    -> the server-only client on openapi-fetch, the generated API types,
+                                   per-domain reads, the Zod schemas, error codes, ActionResult
+src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
+                                   around the Server Actions
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
                                    applications[/id], saved, record, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
@@ -223,3 +241,13 @@ with reduced motion.
 
 To add anything — a section, copy, a locale, a token, a component, an external
 link — follow [`docs/operations/EXTENDING.md`](docs/operations/EXTENDING.md).
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
