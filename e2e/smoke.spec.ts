@@ -52,6 +52,116 @@ async function startedState(page: Page) {
   return new URL(location).searchParams.get("state") ?? "";
 }
 
+async function createAccount(page: Page, email: string) {
+  await page.goto("/en/signup");
+  await page.getByLabel("Full name").fill("Malika Karimova");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/en\/welcome$/);
+}
+
+test.describe("welcome flow", () => {
+  test("saves every step to the profile and ends on the first opportunity", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `flow-${info.project.name}@example.org`);
+    await expect(page.getByRole("list", { name: "Setup steps" })).toBeVisible();
+    await page.getByRole("button", { name: "Start" }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Full name")).toHaveValue("Malika Karimova");
+    await page
+      .getByLabel("Short introduction")
+      .fill("I read to younger pupils on Saturdays.");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Where you study" }),
+    ).toBeVisible();
+    await page
+      .getByLabel("School, college, or university")
+      .fill("Academic lyceum No. 1");
+    await page.getByLabel("Region").selectOption("tashkent-city");
+    await page.getByLabel("Languages you speak").fill("Uzbek, English");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "How organisers reach you" }),
+    ).toBeVisible();
+    await page.getByLabel("Telegram username").fill("malika_k");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "What we may send you" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Your profile is complete.", { exact: false }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Find your first opportunity" }).click();
+    await expect(page).toHaveURL(/\/en\/opportunities$/);
+
+    await page.goto("/en/profile");
+    await expect(page.getByLabel("School, college, or university")).toHaveValue(
+      "Academic lyceum No. 1",
+    );
+    await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
+    await expect(page.getByLabel("Short introduction")).toHaveValue(
+      "I read to younger pupils on Saturdays.",
+    );
+
+    await page.goto("/en/dashboard");
+    await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
+      0,
+    );
+  });
+
+  test("skipping keeps a way back, remembers the step, and can be dismissed", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `skip-${info.project.name}@example.org`);
+    await page.getByRole("link", { name: "Skip for now" }).click();
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+
+    const resume = page.getByRole("region", { name: "Finish your pass" });
+    await expect(resume).toBeVisible();
+    await resume.getByRole("link", { name: "Continue setup" }).click();
+    await expect(page).toHaveURL(/\/en\/welcome$/);
+
+    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Skip this step" }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Where you study" }),
+    ).toBeVisible();
+    await expect(page.getByText("Step 2 of 4")).toBeVisible();
+
+    await page.reload();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Where you study" }),
+    ).toBeVisible();
+
+    await page.goto("/en/dashboard");
+    await expect(page.getByText("1 of 4 steps done", { exact: false })).toBeVisible();
+    await page.getByRole("button", { name: "Not now" }).click();
+    await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
+    await page.reload();
+    await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
+  });
+
+  test("a returning volunteer is not interrupted", async ({ page }) => {
+    await signIn(page);
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
+  });
+});
+
 test.describe("locale routing", () => {
   for (const locale of LOCALES) {
     test(`the ${locale} sign-in page renders in ${locale}`, async ({ page }) => {
@@ -198,7 +308,7 @@ test.describe("sign-in", () => {
     ).toBeVisible();
   });
 
-  test("creating an account with an email lands on the dashboard", async ({
+  test("creating an account with an email opens the welcome flow", async ({
     page,
   }, info) => {
     await page.goto("/en/signup");
@@ -207,7 +317,8 @@ test.describe("sign-in", () => {
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/en\/welcome$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Malika");
   });
 
   test("the Telegram button hands the browser to Telegram's sign-in page with a bound state", async ({

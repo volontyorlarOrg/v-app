@@ -60,7 +60,12 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   is at least 15 characters because the backend measures its strength. The
   backend creates the account on the first sign-in. There is still no password
   reset and no email verification — the backend has neither — so nothing on
-  screen offers one and `/forgot-password` is a 404;
+  screen offers one and `/forgot-password` is a 404. A **new** account (the
+  email sign-up, or Telegram and Google when the backend says `isNewUser`)
+  lands on `/welcome`, the four-step welcome flow described in
+  [`docs/product/ONBOARDING.md`](docs/product/ONBOARDING.md); its only state
+  is a readable, app-only progress cookie, and every step saves through the
+  existing profile and preferences actions;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
   Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
   or not they are set; unset, no session can exist and the Telegram handoff
@@ -114,8 +119,9 @@ authorisation.
 
 There is no theme or general animation library. Light and dark are one token
 set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
-CSS, and `three` is isolated to the lazy dashboard progress object. Panels and
-task content never depend on JavaScript for visibility or scrolling.
+CSS, and `three` is isolated to two lazy objects: the dashboard progress orbit
+and the welcome flow's pass. Panels and task content never depend on
+JavaScript for visibility or scrolling.
 
 Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every
 backend response) and `server-only` (keeping the API client and the cookie
@@ -151,6 +157,7 @@ src/lib/api/                    -> the server-only client on openapi-fetch, the 
                                    per-domain reads, the Zod schemas, error codes, ActionResult
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
                                    around the Server Actions
+src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
                                    applications[/id], saved, record, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
@@ -159,10 +166,11 @@ src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
 src/lib/{record,opportunities,applications,profile,notifications,account}/
                                 -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
+src/lib/onboarding/             -> the welcome flow's steps, pass parts, and progress cookie
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
-src/components/{ui,brand,motion,app,auth,dashboard,opportunities,applications,record,profile,settings}/
+src/components/{ui,brand,motion,app,auth,onboarding,dashboard,opportunities,applications,record,profile,settings}/
 e2e/                            -> Playwright smoke suite
 docs/                           -> stable project documentation and the plan
 .agent-memory/                  -> durable decisions, discoveries, gotchas
@@ -206,10 +214,12 @@ docs/                           -> stable project documentation and the plan
   and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
   `state`, and Google posts its one-time `id_token` in a form body, never a
   query string), no credentials in a URL — the email forms are gated by client
-  validation before they submit, no tokens in browser storage; the theme and the interface language
-  are the only stored values, and both live in readable cookies shared with the
-  marketing site (`src/lib/preferences.ts`) rather than in `localStorage`, which
-  cannot cross the two origins. Session tokens live only in the encrypted
+  validation before they submit, no tokens in browser storage; the theme, the
+  interface language, and the welcome flow's progress are the only stored
+  values. The first two live in readable cookies shared with the marketing
+  site (`src/lib/preferences.ts`) rather than in `localStorage`, which cannot
+  cross the two origins; the third is an app-only readable cookie holding a
+  step name and nothing else (`src/lib/onboarding/state.ts`). Session tokens live only in the encrypted
   `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in
   `src/lib/record/levels.ts`. Never duplicate a formula into JSX, never invent

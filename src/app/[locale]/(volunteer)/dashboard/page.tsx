@@ -8,6 +8,7 @@ import { StatTiles, type Stat } from "@/components/app/stat-tile";
 import { ApplicationRows } from "@/components/dashboard/application-rows";
 import { ImpactOrbit } from "@/components/dashboard/impact-orbit";
 import { NextUp } from "@/components/dashboard/next-up";
+import { OnboardingResume } from "@/components/onboarding/onboarding-resume";
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { buttonClass } from "@/components/ui/button";
@@ -20,6 +21,13 @@ import {
   isUpcomingCommitment,
   type ApplicationSummary,
 } from "@/lib/applications/status";
+import { isOnboardingOpen, resumeStep } from "@/lib/onboarding/state";
+import { readOnboardingState } from "@/lib/onboarding/state.server";
+import {
+  FORM_STEPS,
+  FORM_STEP_COUNT,
+  completedFormSteps,
+} from "@/lib/onboarding/steps";
 import {
   EMPTY_PROFILE,
   profileCompletion,
@@ -53,12 +61,14 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, volunteerRecord, applications] = await Promise.all([
-    requireSession(),
-    getProfile(),
-    getRecord(),
-    listApplications(),
-  ]);
+  const [session, profile, volunteerRecord, applications, onboarding] =
+    await Promise.all([
+      requireSession(),
+      getProfile(),
+      getRecord(),
+      listApplications(),
+      readOnboardingState(),
+    ]);
 
   return (
     <Dashboard
@@ -66,6 +76,9 @@ export default async function DashboardPage({
       profile={profile ?? EMPTY_PROFILE}
       record={volunteerRecord}
       applications={applications.items}
+      onboardingStepsDone={
+        isOnboardingOpen(onboarding) ? completedFormSteps(resumeStep(onboarding)) : null
+      }
     />
   );
 }
@@ -75,13 +88,16 @@ function Dashboard({
   profile,
   record: volunteerRecord,
   applications: all,
+  onboardingStepsDone,
 }: {
   displayName: string;
   profile: VolunteerProfile;
   record: VolunteerRecord;
   applications: readonly ApplicationSummary[];
+  onboardingStepsDone: number | null;
 }) {
   const t = useTranslations("dashboard");
+  const onboarding = useTranslations("onboarding");
   const record = useTranslations("record");
   const applicationsT = useTranslations("applications");
   const format = useFormatter();
@@ -130,7 +146,9 @@ function Dashboard({
       id: "hours",
       label: t("tiles.hours"),
       value:
-        volunteerRecord.hours === undefined ? "—" : format.number(volunteerRecord.hours),
+        volunteerRecord.hours === undefined
+          ? "—"
+          : format.number(volunteerRecord.hours),
       note: volunteerRecord.hoursVerified ? undefined : t("tiles.hoursUnverified"),
     },
   ];
@@ -152,7 +170,9 @@ function Dashboard({
       <section className="dashboard-hero">
         <div className="min-w-0 py-1">
           <PageHeader
-            title={firstName ? t("greeting", { name: firstName }) : t("greetingAnonymous")}
+            title={
+              firstName ? t("greeting", { name: firstName }) : t("greetingAnonymous")
+            }
             description={lead}
             actions={
               <Link
@@ -166,6 +186,37 @@ function Dashboard({
         </div>
         <ImpactOrbit />
       </section>
+
+      {onboardingStepsDone !== null ? (
+        <OnboardingResume
+          steps={FORM_STEPS.map((key, index) => ({
+            key,
+            number: index + 1,
+            label: onboarding(`rail.${key}`),
+            state:
+              index < onboardingStepsDone
+                ? "done"
+                : index === onboardingStepsDone
+                  ? "current"
+                  : "upcoming",
+          }))}
+          labels={{
+            title: onboarding("resume.title"),
+            body: onboarding("resume.body", {
+              done: onboardingStepsDone,
+              total: FORM_STEP_COUNT,
+            }),
+            continue: onboarding("resume.continue"),
+            dismiss: onboarding("resume.dismiss"),
+            rail: onboarding("rail.label"),
+            states: {
+              done: onboarding("railState.done"),
+              current: onboarding("railState.current"),
+              upcoming: onboarding("railState.upcoming"),
+            },
+          }}
+        />
+      ) : null}
 
       <StatTiles stats={stats} className="mt-6" />
 

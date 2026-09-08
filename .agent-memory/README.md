@@ -39,6 +39,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/no-essays-in-browser-storage.md` — why long answers never touch
   `localStorage`
 - `decisions/why-no-cache-components.md` — why PPR is not enabled
+- `decisions/onboarding-progress-is-a-readable-cookie.md` — why the welcome
+  flow's only browser state is a step name in a cookie, and why every answer
+  goes straight to the backend
 - `discoveries/backend-has-a-schema-but-no-endpoints.md` — the endpoints
   `v-backend` serves and the error bodies they return
 - `discoveries/onest-covers-all-three-locales.md` — the typeface and the Uzbek

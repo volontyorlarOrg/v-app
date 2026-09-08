@@ -103,9 +103,15 @@ without a session. Telegram's own `error=access_denied` becomes
 
 The only stored values remain the light/dark theme choice and the interface
 language, both in readable cookies shared with the marketing site so a choice
-made on either origin holds on the other. Neither identifies a visitor, neither
-is `httpOnly` because the theme is applied by a script before paint, and the
-privacy page names both. Nothing personal appears in a URL;
+made on either origin holds on the other, and the welcome flow's progress
+(`volontyorlar_onboarding`): a status and a step name such as `pending:about`
+or `done`, app-only, ninety days, written by the sign-up action or an OAuth
+callback for a new account and advanced by the browser as the volunteer moves
+through the steps. None identifies a visitor, none is `httpOnly` because the
+theme is applied by a script before paint and the flow updates its own
+progress, and the privacy page names the first two. The answers given in the
+flow are saved to the backend at each step and never enter browser storage.
+Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
 same-origin `?next=` path checked by `safeReturnPath`.
 

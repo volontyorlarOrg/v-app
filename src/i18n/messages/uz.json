@@ -173,6 +173,80 @@
     },
     "greetingAnonymous": "Salom."
   },
+  "onboarding": {
+    "metaTitle": "Xush kelibsiz",
+    "title": "Salom, {name}. Volontyor kartangizni yarataylik.",
+    "titleAnonymous": "Volontyor kartangizni yarataylik.",
+    "lead": "Bir marta toʻldiring. Har bir arizangiz undan foydalanadi, tashkilotchi esa tayyor volontyorni koʻradi.",
+    "stepCount": "{total} qadamdan {step}-qadam",
+    "skipForNow": "Hozircha oʻtkazib yuborish",
+    "skipStep": "Bu qadamni oʻtkazib yuborish",
+    "back": "Orqaga",
+    "continue": "Davom etish",
+    "saving": "Saqlanmoqda…",
+    "start": "Boshlash",
+    "saveError": "Saqlab boʻlmadi. Belgilangan maydonlarni tekshirib, qayta urinib koʻring.",
+    "nameNeeded": "Tashkilotchiga kerak boʻladigan yagona narsa — ismingiz.",
+    "welcome": {
+      "title": "Toʻrtta qisqa qadam, taxminan ikki daqiqa.",
+      "body": "Siz kimsiz, qayerda oʻqiysiz, tashkilotchilar siz bilan qanday bogʻlanadi va biz sizga nima yuborishimiz mumkin. Hammasini keyin profilingizda oʻzgartirish mumkin."
+    },
+    "steps": {
+      "about": {
+        "title": "Siz haqingizda",
+        "lead": "Tashkilotchi birinchi oʻqiydigan narsa."
+      },
+      "place": {
+        "title": "Qayerda oʻqiysiz",
+        "lead": "Tashkilotchilar tadbirga yaqin volontyorlarni tanlaydi."
+      },
+      "contact": {
+        "title": "Tashkilotchilar siz bilan qanday bogʻlanadi",
+        "lead": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi. Ikkitadan bittasi yetarli."
+      },
+      "preferences": {
+        "title": "Biz sizga nima yuborishimiz mumkin",
+        "lead": "Eslatmalar va qarorlar — joy jimlik tufayli yoʻqolmasin."
+      }
+    },
+    "rail": {
+      "label": "Sozlash qadamlari",
+      "welcome": "Xush kelibsiz",
+      "about": "Siz haqingizda",
+      "place": "Qayerda oʻqiysiz",
+      "contact": "Aloqa",
+      "preferences": "Bildirishnomalar",
+      "done": "Tayyor"
+    },
+    "railState": {
+      "done": "bajarildi",
+      "current": "joriy qadam",
+      "upcoming": "hali emas"
+    },
+    "done": {
+      "title": "Kartangiz tayyor.",
+      "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
+      "incomplete": "Profilingiz {percent}% toʻldirilgan. Hali yetishmayapti: {fields}.",
+      "finishOnProfile": "Profilda toʻldirish",
+      "nextTitle": "Keyin nima boʻladi",
+      "next": {
+        "apply": "Kartangiz bilan ariza bering. Hech narsani ikki marta toʻldirmaysiz.",
+        "attend": "Qatnashing. Oʻz vaqtida keling va ishni oxirigacha bajaring.",
+        "confirm": "Tashkilotchi qatnashganingizni tasdiqlaydi. Tarixingiz oʻsadi, darajangiz ham."
+      },
+      "cta": "Birinchi imkoniyatni topish",
+      "dashboard": "Bosh panelga oʻtish"
+    },
+    "resume": {
+      "title": "Kartangizni yakunlang",
+      "body": "{total} qadamdan {done} tasi bajarildi. Yakunlash taxminan ikki daqiqa oladi.",
+      "continue": "Davom ettirish",
+      "dismiss": "Hozir emas"
+    },
+    "pass": {
+      "label": "Volontyor kartangiz — qadam sayin shakllanadi"
+    }
+  },
   "record": {
     "metaTitle": "Mening tarixim",
     "title": "Tarixingiz",

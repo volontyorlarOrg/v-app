@@ -2,23 +2,24 @@
 
 Use this file to route project questions to the smallest relevant source.
 
-| Task                                                                          | Read                                                                                                                   |
-| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Product truth, the volunteer loop, levels, the three-repository boundary      | [`../PRODUCT.md`](../PRODUCT.md)                                                                                       |
-| The design system as applied to the product                                   | [`../DESIGN.md`](../DESIGN.md)                                                                                         |
-| Routes, rendering, module ownership, dependency boundary                      | [`architecture/ARCHITECTURE.md`](architecture/ARCHITECTURE.md)                                                         |
-| Origins, environment variables, hosting topology                              | [`architecture/DOMAINS.md`](architecture/DOMAINS.md)                                                                   |
-| Domain concepts and where each rule is implemented                            | [`product/DOMAIN_MODEL.md`](product/DOMAIN_MODEL.md)                                                                   |
-| What a volunteer needs on the dashboard, and why each block exists            | [`product/VOLUNTEER_DASHBOARD.md`](product/VOLUNTEER_DASHBOARD.md)                                                     |
-| **How to make sign-in and the dashboard real** — phases, contracts, decisions | [`plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md)                   |
-| Dashboard information, motion, scroll stability, and verification plan        | [`plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md`](plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md) |
-| Full frontend audit and resolved information-architecture findings            | [`reviews/FRONTEND_DIAGNOSIS.md`](reviews/FRONTEND_DIAGNOSIS.md)                                                       |
-| Applied UI system, localization behaviour, accessibility rules                | [`ui/UI_SYSTEM.md`](ui/UI_SYSTEM.md)                                                                                   |
-| Security headers, CSP, secrets, trust boundaries                              | [`security/SECURITY.md`](security/SECURITY.md)                                                                         |
-| Setup, commands, environment, CI, deployment                                  | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](operations/DEVELOPMENT_AND_DEPLOYMENT.md)                                 |
-| Creating the Google OAuth client and wiring "Continue with Google"            | [`operations/GOOGLE_SIGN_IN_SETUP.md`](operations/GOOGLE_SIGN_IN_SETUP.md)                                             |
-| Adding a section, copy, locale, token, component, or link                     | [`operations/EXTENDING.md`](operations/EXTENDING.md)                                                                   |
-| A non-obvious decision, discovery, or gotcha                                  | [`../.agent-memory/README.md`](../.agent-memory/README.md)                                                             |
+| Task                                                                               | Read                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Product truth, the volunteer loop, levels, the three-repository boundary           | [`../PRODUCT.md`](../PRODUCT.md)                                                                                       |
+| The design system as applied to the product                                        | [`../DESIGN.md`](../DESIGN.md)                                                                                         |
+| Routes, rendering, module ownership, dependency boundary                           | [`architecture/ARCHITECTURE.md`](architecture/ARCHITECTURE.md)                                                         |
+| Origins, environment variables, hosting topology                                   | [`architecture/DOMAINS.md`](architecture/DOMAINS.md)                                                                   |
+| Domain concepts and where each rule is implemented                                 | [`product/DOMAIN_MODEL.md`](product/DOMAIN_MODEL.md)                                                                   |
+| What a volunteer needs on the dashboard, and why each block exists                 | [`product/VOLUNTEER_DASHBOARD.md`](product/VOLUNTEER_DASHBOARD.md)                                                     |
+| The welcome flow for a new account: steps, skipping, the progress cookie, the pass | [`product/ONBOARDING.md`](product/ONBOARDING.md)                                                                       |
+| **How to make sign-in and the dashboard real** — phases, contracts, decisions      | [`plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md)                   |
+| Dashboard information, motion, scroll stability, and verification plan             | [`plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md`](plans/DASHBOARD_INFORMATION_MOTION_AND_STABILITY_PLAN.md) |
+| Full frontend audit and resolved information-architecture findings                 | [`reviews/FRONTEND_DIAGNOSIS.md`](reviews/FRONTEND_DIAGNOSIS.md)                                                       |
+| Applied UI system, localization behaviour, accessibility rules                     | [`ui/UI_SYSTEM.md`](ui/UI_SYSTEM.md)                                                                                   |
+| Security headers, CSP, secrets, trust boundaries                                   | [`security/SECURITY.md`](security/SECURITY.md)                                                                         |
+| Setup, commands, environment, CI, deployment                                       | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](operations/DEVELOPMENT_AND_DEPLOYMENT.md)                                 |
+| Creating the Google OAuth client and wiring "Continue with Google"                 | [`operations/GOOGLE_SIGN_IN_SETUP.md`](operations/GOOGLE_SIGN_IN_SETUP.md)                                             |
+| Adding a section, copy, locale, token, component, or link                          | [`operations/EXTENDING.md`](operations/EXTENDING.md)                                                                   |
+| A non-obvious decision, discovery, or gotcha                                       | [`../.agent-memory/README.md`](../.agent-memory/README.md)                                                             |
 
 ## Reference material
 
