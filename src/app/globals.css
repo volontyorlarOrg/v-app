@@ -432,3 +432,110 @@
     }
   }
 }
+
+@layer components {
+  .onboarding-stage {
+    position: relative;
+    height: clamp(12rem, 46vw, 15rem);
+  }
+
+  .onboarding-stage canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-scene);
+  }
+
+  .onboarding-stage[data-webgl="ready"] canvas {
+    opacity: 1;
+  }
+
+  .onboarding-pass-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transition: opacity 400ms var(--ease-scene);
+  }
+
+  .onboarding-stage[data-webgl="ready"] .onboarding-pass-fallback {
+    opacity: 0;
+  }
+
+  .onboarding-pass-fallback svg {
+    height: 100%;
+    width: auto;
+    overflow: visible;
+  }
+
+  .onboarding-pass-part {
+    transition:
+      opacity 360ms var(--ease-scene),
+      transform 360ms var(--ease-scene);
+    transform-origin: left center;
+    transform-box: fill-box;
+  }
+
+  .onboarding-pass-part[data-on="false"] {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+
+  @keyframes onboarding-step-forward {
+    from {
+      opacity: 0;
+      translate: 1.5rem 0;
+    }
+  }
+
+  @keyframes onboarding-step-back {
+    from {
+      opacity: 0;
+      translate: -1.5rem 0;
+    }
+  }
+
+  .onboarding-step {
+    animation: onboarding-step-forward 460ms var(--ease-scene) both;
+  }
+
+  .onboarding-step[data-direction="back"] {
+    animation-name: onboarding-step-back;
+  }
+
+  .onboarding-rail-node {
+    transition:
+      background-color 320ms var(--ease-scene),
+      border-color 320ms var(--ease-scene),
+      color 320ms var(--ease-scene),
+      transform 320ms var(--ease-scene);
+  }
+
+  .onboarding-rail-node[data-state="current"] {
+    transform: scale(1.12);
+  }
+
+  @media (width >= 64rem) {
+    .onboarding-stage {
+      height: 22rem;
+    }
+  }
+
+  @media print, (prefers-reduced-motion: reduce) {
+    .onboarding-step {
+      animation: none !important;
+    }
+
+    .onboarding-pass-part[data-on="false"] {
+      transform: none;
+    }
+
+    .onboarding-rail-node[data-state="current"] {
+      transform: none;
+    }
+  }
+}

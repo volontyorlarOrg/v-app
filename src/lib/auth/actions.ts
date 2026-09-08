@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
@@ -23,6 +24,8 @@ import {
   toSessionPayload,
 } from "@/lib/auth/session";
 import { clearSession, getSession, writeSession } from "@/lib/auth/session.server";
+import { onboardingPath } from "@/lib/onboarding/state";
+import { onboardingStartCookie } from "@/lib/onboarding/state.server";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
 function localeOf(formData: FormData) {
@@ -30,12 +33,13 @@ function localeOf(formData: FormData) {
   return isLocale(requested) ? requested : defaultLocale;
 }
 
-function destinationOf(formData: FormData, locale: ReturnType<typeof localeOf>) {
+function returnPathOf(formData: FormData) {
   const next = formData.get("next");
-  return (
-    safeReturnPath(typeof next === "string" ? next : null) ??
-    localePath(locale, HOME_ROUTE)
-  );
+  return safeReturnPath(typeof next === "string" ? next : null);
+}
+
+function destinationOf(formData: FormData, locale: ReturnType<typeof localeOf>) {
+  return returnPathOf(formData) ?? localePath(locale, HOME_ROUTE);
 }
 
 async function openSession(
@@ -91,7 +95,9 @@ export async function createAccountAction(
   const result = await openSession("/auth/password/signup", parsed.data);
   if (result.status !== "ok") return result;
 
-  redirect(destinationOf(formData, localeOf(formData)));
+  const store = await cookies();
+  store.set(onboardingStartCookie());
+  redirect(onboardingPath(localeOf(formData), returnPathOf(formData)));
 }
 
 export async function signOut(formData: FormData) {
