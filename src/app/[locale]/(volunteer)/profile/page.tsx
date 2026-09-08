@@ -80,6 +80,7 @@ function Profile({
   const format = useFormatter();
 
   const completion = profileCompletion(values);
+  const joinedOn = new Date(joinedAt);
   const name = values.fullName.trim() || common("volunteer");
   const initials = initialsOf(name);
   const percent = reliabilityPercent(record.counts);
@@ -149,9 +150,11 @@ function Profile({
         labels={{
           level: recordLabels(`level.${levelFor(record.counts)}`),
           complete: t("identity.complete"),
-          joined: t("identity.joined", {
-            date: format.dateTime(new Date(joinedAt), "monthYear"),
-          }),
+          joined: Number.isNaN(joinedOn.getTime())
+            ? null
+            : t("identity.joined", {
+                date: format.dateTime(joinedOn, "monthYear"),
+              }),
           bioEmpty: t("identity.bioEmpty"),
           edit: t("identity.edit"),
           record: t("identity.record"),

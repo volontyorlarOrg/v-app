@@ -79,7 +79,10 @@ function ProfileField({
       <FieldLabel htmlFor={id}>
         {label}
         {optional ? (
-          <span className="ml-2 text-xs font-normal text-ink-muted">{optional}</span>
+          <>
+            {" "}
+            <span className="ml-1 text-xs font-normal text-ink-muted">{optional}</span>
+          </>
         ) : null}
       </FieldLabel>
       {children}
