@@ -139,7 +139,6 @@ export const profileSchema = z.object({
   region: z.enum(REGIONS).nullable().default(null),
   city: z.string().default(""),
   languages: z.array(z.string()).default([]),
-  skills: z.array(z.string()).default([]),
   phone: z.string().default(""),
   phoneVerified: z.boolean().default(false),
   telegram: z.string().default(""),
@@ -195,15 +194,6 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
-export const preferencesSchema = z.object({
-  notifyTelegram: z.boolean(),
-  notifyEmail: z.boolean(),
-  remindDeadlines: z.boolean(),
-  notifyDecisions: z.boolean(),
-  profileToOrganisers: z.boolean(),
-  levelPublic: z.boolean(),
-});
-
 export const meSchema = z.object({
   id: z.string().min(1),
   displayName: optional(z.string()),
@@ -221,7 +211,6 @@ export const acknowledgementSchema = z.looseObject({});
 
 export type Me = z.infer<typeof meSchema>;
 export type Profile = z.infer<typeof profileSchema>;
-export type Preferences = z.infer<typeof preferencesSchema>;
 export type OpportunityList = z.infer<typeof opportunityListSchema>;
 export type ApplicationList = z.infer<typeof applicationListSchema>;
 export type SavedList = z.infer<typeof savedListSchema>;

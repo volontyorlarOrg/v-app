@@ -6,8 +6,6 @@ export type ProfileFields = {
   region: Region | null;
   school: string;
   languages: string[];
-  phone: string;
-  telegram: string;
 };
 
 export const COMPLETION_FIELDS = [
@@ -16,7 +14,6 @@ export const COMPLETION_FIELDS = [
   "region",
   "school",
   "languages",
-  "contact",
 ] as const;
 
 export type CompletionField = (typeof COMPLETION_FIELDS)[number];
@@ -33,8 +30,6 @@ function isFilled(profile: ProfileFields, field: CompletionField): boolean {
       return profile.school.trim().length > 0;
     case "languages":
       return profile.languages.length > 0;
-    case "contact":
-      return profile.phone.trim().length > 0 || profile.telegram.trim().length > 0;
   }
 }
 
@@ -58,7 +53,8 @@ export function profileCompletion(profile: ProfileFields): ProfileCompletion {
 export type VolunteerProfile = ProfileFields & {
   gradeYear: string;
   city: string;
-  skills: string[];
+  phone: string;
+  telegram: string;
   links: string[];
 };
 
@@ -70,7 +66,6 @@ export const EMPTY_PROFILE: VolunteerProfile = {
   gradeYear: "",
   city: "",
   languages: [],
-  skills: [],
   phone: "",
   telegram: "",
   links: [],

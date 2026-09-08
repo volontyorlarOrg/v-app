@@ -48,11 +48,9 @@
     "providers": {
       "google": "Google orqali davom etish",
       "telegram": "Telegram orqali davom etish",
-      "handoff": "Keyingi qadamda Telegram yoki Google ochiladi va siz tizimga kirgan holda qaytasiz.",
       "googleUnavailable": "Hozircha mavjud emas."
     },
     "telegram": {
-      "handoff": "Keyingi qadamda Telegram ochiladi va siz tizimga kirgan holda qaytasiz.",
       "expired": "Bu kirish muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
       "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring.",
       "cancelled": "Kirish Telegramda bekor qilindi. Tayyor boʻlganingizda qaytadan boshlang.",
@@ -71,7 +69,6 @@
       "fullName": "Toʻliq ism",
       "email": "Email",
       "password": "Parol",
-      "passwordHint": "Kamida {min} ta belgi. Bir-biriga bogʻliq boʻlmagan bir necha soʻz — eslash oson, topish qiyin.",
       "reveal": "Parolni koʻrsatish",
       "conceal": "Parolni yashirish"
     },
@@ -99,7 +96,6 @@
     "login": {
       "metaTitle": "Kirish",
       "title": "Xush kelibsiz.",
-      "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻring.",
       "noAccount": "Volontyorlarda yangimisiz?",
       "createAccount": "Hisob yaratish",
       "submit": "Kirish",
@@ -108,9 +104,8 @@
     "signup": {
       "metaTitle": "Hisob yaratish",
       "title": "Hisobingizni yarating.",
-      "lead": "Hisobingiz birinchi kirishda yaratiladi.",
-      "legal": "Davom etish orqali siz <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozilik bildirasiz.",
-      "legalPlain": "Davom etish orqali siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
+      "legal": "Davom etish orqali <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozisiz.",
+      "legalPlain": "Davom etish orqali Shartlar va Maxfiylik siyosatiga rozisiz.",
       "haveAccount": "Hisobingiz bormi?",
       "logIn": "Kirish",
       "submit": "Hisob yaratish",
@@ -411,19 +406,31 @@
   },
   "profile": {
     "metaTitle": "Profil",
-    "title": "Profilingiz",
-    "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi.",
+    "identity": {
+      "complete": "Profil toʻliq",
+      "joined": "Qoʻshilgan: {date}",
+      "bioEmpty": "Hozircha bio yoʻq. Tashkilotchi birinchi navbatda bir necha jumlani oʻqiydi.",
+      "edit": "Profilni tahrirlash",
+      "record": "Mening tarixim"
+    },
+    "stats": {
+      "events": "Tadbirlar",
+      "reliability": "Ishonchlilik",
+      "hours": "Soatlar"
+    },
+    "form": {
+      "title": "Profilingizni tahrirlang",
+      "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi."
+    },
     "sections": {
-      "identity": "Siz haqingizda",
       "education": "Taʼlim",
       "location": "Qayerdasiz",
-      "skills": "Tillar va koʻnikmalar",
       "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
       "links": "Havolalar"
     },
     "fields": {
       "fullName": "Toʻliq ism",
-      "bio": "Qisqacha tanishuv",
+      "bio": "Bio",
       "bioHelp": "Tashkilotchi birinchi oʻqiydigan bir necha jumla. Insho emas.",
       "school": "Maktab, kollej yoki universitet",
       "gradeYear": "Sinf yoki kurs",
@@ -432,92 +439,33 @@
       "city": "Shahar yoki tuman",
       "languages": "Biladigan tillaringiz",
       "languagesHelp": "Vergul bilan ajrating.",
-      "skills": "Koʻnikma va qiziqishlar",
-      "skillsHelp": "Vergul bilan ajrating.",
       "phone": "Telefon raqami",
       "phoneHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
       "telegram": "Telegram foydalanuvchi nomi",
       "telegramHelp": "@ belgisisiz.",
       "links": "Portfolio, CV yoki ijtimoiy tarmoq havolasi",
-      "linksHelp": "Ixtiyoriy. Toʻliqlikka hisoblanmaydi.",
+      "linksHelp": "Vergul bilan ajrating. Uchtagacha.",
       "contact": "Siz bilan bogʻlanish usuli"
     },
+    "completionFields": {
+      "fullName": "Toʻliq ism",
+      "bio": "Bio",
+      "region": "Hudud",
+      "school": "Maktab",
+      "languages": "Tillar"
+    },
+    "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",
+    "saving": "Saqlanmoqda…",
     "saved": "Profil saqlandi.",
+    "saveError": "Profilni saqlab boʻlmadi. Belgilangan maydonlarni tekshiring.",
+    "fieldInvalid": "Bu maydonni tekshiring.",
     "completion": {
       "label": "Profil toʻliqligi",
       "value": "{percent}% toʻldirilgan",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
-      "why": "Toʻliq profil — tashkilotchi sizni baholay oladi va siz bilan bogʻlana oladi."
-    },
-    "saving": "Saqlanmoqda…",
-    "saveError": "Profilni saqlab boʻlmadi. Belgilangan maydonlarni tekshiring.",
-    "fieldInvalid": "Bu maydonni tekshiring."
-  },
-  "settings": {
-    "metaTitle": "Sozlamalar",
-    "title": "Sozlamalar",
-    "description": "Bildirishnomalar, maxfiylik, koʻrinish va hisobingiz.",
-    "preferences": {
-      "title": "Maxfiylik va koʻrinish",
-      "description": "Boshqalar nimani koʻrishi va ilova sizga qanday koʻrinishi.",
-      "saveError": "Sozlama saqlanmadi. Qayta urinib koʻring."
-    },
-    "accountGroup": {
-      "title": "Hisob va kirish",
-      "description": "Kirish usullari, seanslar va hisob boshqaruvi."
-    },
-    "notifications": {
-      "title": "Bildirishnomalar",
-      "description": "Volontyorlar siz bilan qayerda va qachon bogʻlanadi.",
-      "telegram": "Telegram xabarlari",
-      "telegramHelp": "Volontyorlar botidan qarorlar va eslatmalar.",
-      "email": "Email dayjesti",
-      "emailHelp": "Hududingizdagi yangi imkoniyatlar haqida haftalik xulosa.",
-      "deadlines": "Muddat eslatmalari",
-      "deadlinesHelp": "Saqlangan yoki qoralama holidagi imkoniyat yopilishidan bir kun oldin.",
-      "decisions": "Ariza boʻyicha qarorlar",
-      "decisionsHelp": "Tashkilotchi qabul qilgan yoki rad etgan zahoti."
-    },
-    "privacy": {
-      "title": "Maxfiylik",
-      "description": "Tashkilotchilar va boshqa volontyorlar nimani koʻra oladi.",
-      "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
-      "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
-      "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
-      "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi."
-    },
-    "appearance": {
-      "title": "Koʻrinish",
-      "description": "Faqat shu qurilmada saqlanadi.",
-      "darkTheme": "Tungi rejim",
-      "darkThemeHelp": "Siz tanlaguningizcha tizim sozlamasiga ergashadi.",
-      "language": "Interfeys tili",
-      "languageHelp": "Bu yerda koʻradiganingizni oʻzgartiradi. Tashkilotchilar koʻradiganini oʻzgartirmaydi."
-    },
-    "account": {
-      "title": "Kirish usullari",
-      "description": "Har bir usul bitta hisobni ochadi.",
-      "telegram": "Telegram",
-      "google": "Google",
-      "email": "Email va parol",
-      "connected": "Ulangan",
-      "notConnected": "Ulanmagan",
-      "verified": "Tasdiqlangan",
-      "connect": "Ulash",
-      "disconnect": "Uzish"
-    },
-    "session": {
-      "title": "Seans",
-      "description": "Shu qurilmada yoki barcha qurilmalarda birdan chiqish.",
-      "signOut": "Chiqish",
-      "signOutEverywhere": "Hamma joydan chiqish"
-    },
-    "danger": {
-      "title": "Hisobni oʻchirish",
-      "description": "Profilingiz, arizalaringiz va tarixingizni oʻchiradi. Qaytarib boʻlmaydi.",
-      "delete": "Hisobimni oʻchirish"
+      "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi."
     }
   },
   "notFound": {

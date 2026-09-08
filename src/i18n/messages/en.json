@@ -48,11 +48,9 @@
     "providers": {
       "google": "Continue with Google",
       "telegram": "Continue with Telegram",
-      "handoff": "Telegram or Google opens next and brings you back signed in.",
       "googleUnavailable": "Not available yet."
     },
     "telegram": {
-      "handoff": "Telegram opens next and brings you back signed in.",
       "expired": "That sign-in had expired or was already used. Start again with Telegram.",
       "unavailable": "Telegram sign-in is unavailable right now. Try again in a moment.",
       "cancelled": "Sign-in was cancelled in Telegram. Start again whenever you are ready.",
@@ -71,7 +69,6 @@
       "fullName": "Full name",
       "email": "Email",
       "password": "Password",
-      "passwordHint": "At least {min} characters. A few unrelated words are easier to remember and harder to guess.",
       "reveal": "Show password",
       "conceal": "Hide password"
     },
@@ -99,7 +96,6 @@
     "login": {
       "metaTitle": "Log in",
       "title": "Welcome back.",
-      "lead": "See your applications, your record and what is coming up.",
       "noAccount": "New to Volontyorlar?",
       "createAccount": "Create an account",
       "submit": "Log in",
@@ -108,9 +104,8 @@
     "signup": {
       "metaTitle": "Create an account",
       "title": "Create your account.",
-      "lead": "Your account is created the first time you sign in.",
-      "legal": "By continuing you agree to the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
-      "legalPlain": "By continuing you agree to the Terms and the Privacy Policy.",
+      "legal": "By continuing you agree to the <terms>Terms</terms> and <privacy>Privacy Policy</privacy>.",
+      "legalPlain": "By continuing you agree to the Terms and Privacy Policy.",
       "haveAccount": "Already have an account?",
       "logIn": "Log in",
       "submit": "Create account",
@@ -411,19 +406,31 @@
   },
   "profile": {
     "metaTitle": "Profile",
-    "title": "Your profile",
-    "description": "Fill this in once. Every application reuses it.",
+    "identity": {
+      "complete": "Profile complete",
+      "joined": "Joined {date}",
+      "bioEmpty": "No bio yet. A few sentences are what an organiser reads first.",
+      "edit": "Edit profile",
+      "record": "My record"
+    },
+    "stats": {
+      "events": "Events",
+      "reliability": "Reliability",
+      "hours": "Hours"
+    },
+    "form": {
+      "title": "Edit your profile",
+      "description": "Fill this in once. Every application reuses it."
+    },
     "sections": {
-      "identity": "About you",
       "education": "Education",
       "location": "Where you are",
-      "skills": "Languages and skills",
       "contact": "How organisers reach you",
       "links": "Links"
     },
     "fields": {
       "fullName": "Full name",
-      "bio": "Short introduction",
+      "bio": "Bio",
       "bioHelp": "A few sentences an organiser reads first. Not an essay.",
       "school": "School, college, or university",
       "gradeYear": "Year or grade",
@@ -432,92 +439,33 @@
       "city": "City or district",
       "languages": "Languages you speak",
       "languagesHelp": "Separate with commas.",
-      "skills": "Skills and interests",
-      "skillsHelp": "Separate with commas.",
       "phone": "Phone number",
       "phoneHelp": "Shared with an organiser only after you apply.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @.",
       "links": "Portfolio, CV, or social link",
-      "linksHelp": "Optional. Does not count toward completeness.",
+      "linksHelp": "Separate with commas. Up to three.",
       "contact": "A way to reach you"
     },
+    "completionFields": {
+      "fullName": "Full name",
+      "bio": "Bio",
+      "region": "Region",
+      "school": "School",
+      "languages": "Languages"
+    },
+    "optional": "Optional",
     "save": "Save profile",
+    "saving": "Saving…",
     "saved": "Profile saved.",
+    "saveError": "Couldn't save your profile. Check the marked fields.",
+    "fieldInvalid": "Check this field.",
     "completion": {
       "label": "Profile completeness",
       "value": "{percent}% complete",
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
-      "why": "A complete profile means an organiser can evaluate and contact you."
-    },
-    "saving": "Saving…",
-    "saveError": "Couldn't save your profile. Check the marked fields.",
-    "fieldInvalid": "Check this field."
-  },
-  "settings": {
-    "metaTitle": "Settings",
-    "title": "Settings",
-    "description": "Notifications, privacy, appearance, and your account.",
-    "preferences": {
-      "title": "Privacy and appearance",
-      "description": "What others can see and how this app looks to you.",
-      "saveError": "That setting didn't save. Please try again."
-    },
-    "accountGroup": {
-      "title": "Account and access",
-      "description": "Sign-in methods, active sessions, and account controls."
-    },
-    "notifications": {
-      "title": "Notifications",
-      "description": "Where and when Volontyorlar reaches you.",
-      "telegram": "Telegram messages",
-      "telegramHelp": "Decisions and reminders from the Volontyorlar bot.",
-      "email": "Email digest",
-      "emailHelp": "A weekly summary of new opportunities near you.",
-      "deadlines": "Deadline reminders",
-      "deadlinesHelp": "A day before a saved or drafted opportunity closes.",
-      "decisions": "Application decisions",
-      "decisionsHelp": "The moment an organiser accepts or declines."
-    },
-    "privacy": {
-      "title": "Privacy",
-      "description": "What organisers and other volunteers can see.",
-      "profileToOrganisers": "Share my profile with organisers I apply to",
-      "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
-      "levelPublic": "Show my level on the community list",
-      "levelPublicHelp": "Off by default. Your record stays private either way."
-    },
-    "appearance": {
-      "title": "Appearance",
-      "description": "Kept on this device only.",
-      "darkTheme": "Dark theme",
-      "darkThemeHelp": "Follows your system setting until you choose.",
-      "language": "Interface language",
-      "languageHelp": "Changes what you see here. It does not change what organisers see."
-    },
-    "account": {
-      "title": "Ways to sign in",
-      "description": "Every method opens the same account.",
-      "telegram": "Telegram",
-      "google": "Google",
-      "email": "Email and password",
-      "connected": "Connected",
-      "notConnected": "Not connected",
-      "verified": "Verified",
-      "connect": "Connect",
-      "disconnect": "Disconnect"
-    },
-    "session": {
-      "title": "Session",
-      "description": "Sign out on this device, or everywhere at once.",
-      "signOut": "Sign out",
-      "signOutEverywhere": "Sign out everywhere"
-    },
-    "danger": {
-      "title": "Delete account",
-      "description": "Removes your profile, applications and record. Not reversible.",
-      "delete": "Delete my account"
+      "why": "A complete profile means an organiser can evaluate you at a glance."
     }
   },
   "notFound": {
