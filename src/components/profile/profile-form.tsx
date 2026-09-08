@@ -29,10 +29,9 @@ import {
 } from "@/lib/profile/input";
 
 export type ProfileFormLabels = {
-  sections: Record<
-    "identity" | "education" | "location" | "skills" | "contact" | "links",
-    string
-  >;
+  title: string;
+  description: string;
+  sections: Record<"education" | "location" | "contact" | "links", string>;
   fields: Record<
     | "fullName"
     | "bio"
@@ -44,8 +43,6 @@ export type ProfileFormLabels = {
     | "city"
     | "languages"
     | "languagesHelp"
-    | "skills"
-    | "skillsHelp"
     | "phone"
     | "phoneHelp"
     | "telegram"
@@ -54,6 +51,7 @@ export type ProfileFormLabels = {
     | "linksHelp",
     string
   >;
+  optional: string;
   save: string;
   saving: string;
   saved: string;
@@ -64,19 +62,26 @@ export type ProfileFormLabels = {
 function ProfileField({
   id,
   label,
+  optional,
   help,
   error,
   children,
 }: {
   id: string;
   label: string;
+  optional?: string;
   help?: string;
   error?: string;
   children: ReactNode;
 }) {
   return (
     <Field invalid={Boolean(error)}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id}>
+        {label}
+        {optional ? (
+          <span className="ml-2 text-xs font-normal text-ink-muted">{optional}</span>
+        ) : null}
+      </FieldLabel>
       {children}
       {help ? <FieldDescription id={`${id}-help`}>{help}</FieldDescription> : null}
       <FieldError>{error}</FieldError>
@@ -120,8 +125,13 @@ export function ProfileForm({
   });
 
   return (
-    <form {...formProps} className="flex flex-col gap-6">
-      <Panel title={labels.sections.identity}>
+    <form {...formProps}>
+      <Panel
+        id="edit"
+        title={labels.title}
+        description={labels.description}
+        className="scroll-mt-20"
+      >
         <FieldGroup>
           <ProfileField
             id={fieldId("fullName")}
@@ -149,6 +159,18 @@ export function ProfileForm({
               maxLength={PROFILE_TEXT_LIMITS.bio}
             />
           </ProfileField>
+          <ProfileField
+            id={fieldId("languages")}
+            label={labels.fields.languages}
+            help={labels.fields.languagesHelp}
+            error={errorFor("languages")}
+          >
+            <Input
+              {...control("languages", labels.fields.languagesHelp)}
+              defaultValue={values.languages.join(", ")}
+            />
+          </ProfileField>
+
           <Separator />
           <div>
             <SubsectionTitle>{labels.sections.education}</SubsectionTitle>
@@ -177,6 +199,7 @@ export function ProfileForm({
               </ProfileField>
             </div>
           </div>
+
           <Separator />
           <div>
             <SubsectionTitle>{labels.sections.location}</SubsectionTitle>
@@ -206,71 +229,48 @@ export function ProfileForm({
               </ProfileField>
             </div>
           </div>
-        </FieldGroup>
-      </Panel>
 
-      <Panel title={labels.sections.skills}>
-        <FieldGroup className="grid sm:grid-cols-2">
-          <ProfileField
-            id={fieldId("languages")}
-            label={labels.fields.languages}
-            help={labels.fields.languagesHelp}
-            error={errorFor("languages")}
-          >
-            <Input
-              {...control("languages", labels.fields.languagesHelp)}
-              defaultValue={values.languages.join(", ")}
-            />
-          </ProfileField>
-          <ProfileField
-            id={fieldId("skills")}
-            label={labels.fields.skills}
-            help={labels.fields.skillsHelp}
-            error={errorFor("skills")}
-          >
-            <Input
-              {...control("skills", labels.fields.skillsHelp)}
-              defaultValue={values.skills.join(", ")}
-            />
-          </ProfileField>
-        </FieldGroup>
-      </Panel>
-
-      <Panel title={labels.sections.contact}>
-        <FieldGroup>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <ProfileField
-              id={fieldId("phone")}
-              label={labels.fields.phone}
-              help={labels.fields.phoneHelp}
-              error={errorFor("phone")}
-            >
-              <Input
-                {...control("phone", labels.fields.phoneHelp)}
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                defaultValue={values.phone}
-              />
-            </ProfileField>
-            <ProfileField
-              id={fieldId("telegram")}
-              label={labels.fields.telegram}
-              help={labels.fields.telegramHelp}
-              error={errorFor("telegram")}
-            >
-              <Input
-                {...control("telegram", labels.fields.telegramHelp)}
-                defaultValue={values.telegram}
-              />
-            </ProfileField>
+          <Separator />
+          <div>
+            <SubsectionTitle>{labels.sections.contact}</SubsectionTitle>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <ProfileField
+                id={fieldId("phone")}
+                label={labels.fields.phone}
+                optional={labels.optional}
+                help={labels.fields.phoneHelp}
+                error={errorFor("phone")}
+              >
+                <Input
+                  {...control("phone", labels.fields.phoneHelp)}
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  defaultValue={values.phone}
+                />
+              </ProfileField>
+              <ProfileField
+                id={fieldId("telegram")}
+                label={labels.fields.telegram}
+                optional={labels.optional}
+                help={labels.fields.telegramHelp}
+                error={errorFor("telegram")}
+              >
+                <Input
+                  {...control("telegram", labels.fields.telegramHelp)}
+                  defaultValue={values.telegram}
+                />
+              </ProfileField>
+            </div>
           </div>
+
           <Separator />
           <div>
             <SubsectionTitle>{labels.sections.links}</SubsectionTitle>
             <ProfileField
               id={fieldId("links")}
               label={labels.fields.links}
+              optional={labels.optional}
               help={labels.fields.linksHelp}
               error={errorFor("links")}
             >
@@ -281,16 +281,16 @@ export function ProfileForm({
             </ProfileField>
           </div>
         </FieldGroup>
-      </Panel>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <Button type="submit" disabled={pending} className="disabled:opacity-70">
-          {pending ? labels.saving : labels.save}
-        </Button>
-        {result.status === "error" ? (
-          <ActionStatus tone="error">{labels.saveError}</ActionStatus>
-        ) : null}
-      </div>
+        <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-6">
+          <Button type="submit" disabled={pending} className="disabled:opacity-70">
+            {pending ? labels.saving : labels.save}
+          </Button>
+          {result.status === "error" ? (
+            <ActionStatus tone="error">{labels.saveError}</ActionStatus>
+          ) : null}
+        </div>
+      </Panel>
     </form>
   );
 }

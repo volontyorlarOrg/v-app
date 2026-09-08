@@ -69,8 +69,7 @@ flowchart LR
 | `src/components/opportunities/`                       | Filters, card, rows, facts, save button                                                                                                                                                                                                                                                                       |
 | `src/components/applications/`                        | The timeline                                                                                                                                                                                                                                                                                                  |
 | `src/components/record/`                              | The participation history table                                                                                                                                                                                                                                                                               |
-| `src/components/profile/`                             | The profile form                                                                                                                                                                                                                                                                                              |
-| `src/components/settings/`                            | Preference switches and the linked-identity list                                                                                                                                                                                                                                                              |
+| `src/components/profile/`                             | The identity card and the profile form                                                                                                                                                                                                                                                                                              |
 
 ## Dependency direction
 
@@ -174,7 +173,7 @@ regenerates the file from `../v-backend/docs/api/openapi.json`, which
 `v-backend` writes with `npm run openapi:generate`. The generated types
 describe request shapes; the response contract stays the Zod schema, which is
 why the client parses the body as text and hands it to Zod. The frontend type of an opportunity, an
-application, a profile, the record, a notification or the preferences is the
+application, a profile, the record or a notification is the
 schema's output; the two renames the backend needs (`sourcedByYvc`,
 `readAt`) happen in the schema, nowhere else. Public opportunity reads use the
 plain client. Detail reads are wrapped in React `cache()` so `generateMetadata`

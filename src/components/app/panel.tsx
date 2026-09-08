@@ -33,7 +33,7 @@ export function Panel({
 
   return (
     <Card asChild className={cn("max-w-full min-w-0", className)}>
-      <section aria-labelledby={titleId}>
+      <section id={id} aria-labelledby={titleId}>
         {title ? (
           <CardHeader asChild>
             <header>

@@ -75,7 +75,7 @@ three, and the language is carried by the URL, never by browser storage.
 ## Presented, not implemented
 
 Sign-in with Google, Telegram, or email; the reusable profile; applications;
-saved opportunities; the record and its confirmations; settings. All of it is
+saved opportunities; the record and its confirmations. All of it is
 presented in this repository as interface and sample data, none of it is
 connected, and this document is not evidence that any of it is live.
 

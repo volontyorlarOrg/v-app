@@ -7,7 +7,7 @@ export const SESSION_COOKIE_NAME = "volontyorlar_session";
 export const RETURN_TO_COOKIE_NAME = "volontyorlar_return_to";
 export const LOCALE_HINT_COOKIE_NAME = "volontyorlar_auth_locale";
 
-export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
 export const HANDOFF_MAX_AGE_SECONDS = 60 * 15;
 export const GOOGLE_HANDOFF_MAX_AGE_SECONDS = 60 * 10;
 export const ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 60;

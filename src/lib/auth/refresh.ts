@@ -5,7 +5,7 @@ import {
   type SessionPayload,
 } from "@/lib/auth/session";
 
-const REFRESH_TIMEOUT_MS = 8_000;
+const REFRESH_TIMEOUT_MS = 20_000;
 
 export async function refreshSession(
   refreshToken: string,

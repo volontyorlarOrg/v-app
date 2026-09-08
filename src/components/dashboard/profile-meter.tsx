@@ -17,7 +17,9 @@ export function ProfileMeter({
   const t = useTranslations("profile");
   const dashboard = useTranslations("dashboard.profile");
   const value = t("completion.value", { percent: completion.percent });
-  const missing = completion.missing.map((field) => t(`fields.${field}`)).join(", ");
+  const missing = completion.missing
+    .map((field) => t(`completionFields.${field}`))
+    .join(", ");
 
   return (
     <div>
