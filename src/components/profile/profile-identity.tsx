@@ -23,7 +23,7 @@ export type IdentityFact = {
 export type ProfileIdentityLabels = {
   level: string;
   complete: string;
-  joined: string;
+  joined: string | null;
   bioEmpty: string;
   edit: string;
   record: string;
@@ -90,11 +90,13 @@ export function ProfileIdentity({
               {labels.complete}
             </span>
           ) : null}
-          <p className="text-ink-muted">
-            {handle ? <span className="font-semibold">@{handle}</span> : null}
-            {handle ? <span aria-hidden="true"> · </span> : null}
-            {labels.joined}
-          </p>
+          {handle || labels.joined ? (
+            <p className="text-ink-muted">
+              {handle ? <span className="font-semibold">@{handle}</span> : null}
+              {handle && labels.joined ? <span aria-hidden="true"> · </span> : null}
+              {labels.joined}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -116,12 +118,12 @@ export function ProfileIdentity({
       <div className="flex flex-col gap-5 px-5 py-6 sm:px-7">
         <p
           className={
-            bio
+            bio.trim()
               ? "max-w-prose leading-relaxed text-pretty text-ink"
               : "max-w-prose leading-relaxed text-pretty text-ink-muted"
           }
         >
-          {bio || labels.bioEmpty}
+          {bio.trim() || labels.bioEmpty}
         </p>
 
         {facts.length || links.length ? (
