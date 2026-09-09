@@ -369,14 +369,26 @@ Setup is [`../operations/GOOGLE_SIGN_IN_SETUP.md`](../operations/GOOGLE_SIGN_IN_
    with translated copy. The starting tab never receives a session; only the
    browser that opens the one-time link does.
 
-### Phase E — Account linking and settings
+### Phase E — Account linking and settings — **done in `v-app`**
 
-1. `GET /me` drives a settings page: linked identities, verify email, link
-   Google, link Telegram, change password, sign out everywhere.
-2. Linking Telegram to an email account is an explicit action from a signed-in
-   session; the same ticket flow with the session's user attached.
-3. Deletion and data export wait for the retention policy the backend lists
-   as an open decision.
+Built as described, with the merge decision resolved: an identity another
+account owns is not joined silently, it raises a merge request that the other
+account approves after a fresh sign-in, and the requesting account survives.
+
+1. `GET /me` drives `/settings`: the Telegram, Google and password connections,
+   an action for whichever is missing, and the pending merge requests in both
+   directions. Sign-out lives there; `/profile` keeps the volunteer profile and
+   the preferences.
+2. Connecting from a signed-in session is the same two-hop handoff as sign-in
+   over `/api/auth/connect/*`, on `volontyorlar_connect_*` cookies of their own,
+   returning to `/{locale}/settings?connect=<status>`.
+3. Verifying an email connection reuses the sign-in credentials schema; there is
+   no new password, no email delivery and no verification here.
+4. Approval writes the canonical session the backend returns into the existing
+   encrypted cookie; `recentAuthenticationRequired` routes through
+   `/api/auth/connect/reauthenticate` and back to `/{locale}/settings`.
+5. Unlinking, unmerging, deletion and data export still wait for the retention
+   policy the backend lists as an open decision.
 
 ### Phase F — The dashboard on real data — **done**
 

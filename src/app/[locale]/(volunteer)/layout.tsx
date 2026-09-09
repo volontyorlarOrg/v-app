@@ -10,8 +10,9 @@ import { getMe } from "@/lib/api/account.server";
 import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
+import { mergeNotificationName } from "@/lib/notifications/types";
 import { levelFor } from "@/lib/record/levels";
-import { localePath } from "@/lib/routing/routes";
+import { localePath, navHref } from "@/lib/routing/routes";
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
@@ -29,9 +30,10 @@ export default async function VolunteerLayout({
   setRequestLocale(locale);
 
   const session = await requireSession();
-  const [record, common, format] = await Promise.all([
+  const [record, common, settings, format] = await Promise.all([
     getTranslations({ locale, namespace: "record" }),
     getTranslations({ locale, namespace: "common" }),
+    getTranslations({ locale, namespace: "settings" }),
     getFormatter({ locale }),
   ]);
   const errorLabels = {
@@ -66,13 +68,17 @@ export default async function VolunteerLayout({
   const name =
     me.displayName?.trim() || session.displayName?.trim() || common("volunteer");
   const now = new Date();
-  const notifications: NotificationItem[] = notificationList.items.map((item) => ({
-    id: item.id,
-    title: item.title,
-    body: item.body,
-    time: format.relativeTime(new Date(item.at), now),
-    unread: item.unread,
-  }));
+  const notifications: NotificationItem[] = notificationList.items.map((item) => {
+    const merge = mergeNotificationName(item.kind);
+    return {
+      id: item.id,
+      title: merge ? settings(`mergeNotifications.${merge}`) : item.title,
+      body: merge ? settings("mergeNotifications.body") : item.body,
+      time: format.relativeTime(new Date(item.at), now),
+      unread: item.unread,
+      ...(merge ? { href: navHref("settings") } : {}),
+    };
+  });
 
   return (
     <AppShell

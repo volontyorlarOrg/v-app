@@ -6,17 +6,13 @@ import { LocaleSwitcher } from "@/components/app/locale-switcher";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { ThemeSwitch } from "@/components/app/theme-switch";
-import { SignOutForm } from "@/components/auth/sign-out-form";
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { ProfileForm } from "@/components/profile/profile-form";
-import { IdentityList } from "@/components/settings/identity-list";
 import {
   PreferenceSwitches,
   type PreferenceItem,
 } from "@/components/settings/preference-switches";
-import { buttonClass } from "@/components/ui/button";
-import type { Locale } from "@/i18n/routing";
-import type { LinkedIdentities, PreferenceKey, Preferences } from "@/lib/account/types";
+import type { PreferenceKey, Preferences } from "@/lib/account/types";
 import { getMe, getPreferences } from "@/lib/api/account.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
@@ -52,34 +48,16 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
     ...EMPTY_PROFILE,
     fullName: me.displayName?.trim() || session.displayName?.trim() || "",
   };
-  const identities: LinkedIdentities = {
-    telegram: me.telegramIdentity
-      ? { username: me.telegramIdentity.username ?? "" }
-      : null,
-    google: null,
-    email: null,
-  };
 
-  return (
-    <Profile
-      locale={locale as Locale}
-      values={values}
-      preferences={preferences}
-      identities={identities}
-    />
-  );
+  return <Profile values={values} preferences={preferences} />;
 }
 
 function Profile({
-  locale,
   values,
   preferences,
-  identities,
 }: {
-  locale: Locale;
   values: VolunteerProfile;
   preferences: Preferences;
-  identities: LinkedIdentities;
 }) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
@@ -205,35 +183,6 @@ function Profile({
                 </p>
               </div>
               <LocaleSwitcher label={nav("languageLabel")} />
-            </div>
-          </div>
-        </Panel>
-
-        <Panel
-          id="account"
-          title={settings("accountGroup.title")}
-          description={settings("accountGroup.description")}
-          className="xl:col-span-2"
-        >
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <IdentityList identities={identities} />
-            <div className="border-t border-border pt-5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
-              <h3 className="font-sans text-sm font-semibold text-ink">
-                {settings("session.title")}
-              </h3>
-              <p className="mt-1 text-sm text-ink-muted">
-                {settings("session.description")}
-              </p>
-              <SignOutForm
-                locale={locale}
-                label={settings("session.signOut")}
-                showIcon={false}
-                className={buttonClass({
-                  variant: "outline",
-                  size: "sm",
-                  className: "mt-4",
-                })}
-              />
             </div>
           </div>
         </Panel>
