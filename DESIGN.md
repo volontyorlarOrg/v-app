@@ -159,7 +159,8 @@ doorway between the two.
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, applications, profile |
 
 The dashboard is the decision screen: a progress orbit, three stat tiles, then
-three panels for the next commitment, applications, and progress. Every other
+three panels for the next commitment, applications, and progress. The profile
+is the volunteer's own page: an identity card, then the editor. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 
@@ -200,7 +201,14 @@ disabled, not a red one.
 
 - **Panel** — `surface`, `border`, 20px radius, a header row with an `h2` and
   an optional action link, then content. Lists inside use `padding="none"` and
-  rows separated by hairlines with their own 20px padding.
+  rows separated by hairlines with their own 20px padding. The `id` a panel is
+  given is a real DOM id, so a panel can be an anchor target.
+- **Identity card** — the profile only. The same box, divided into ruled bands
+  instead of a header: the avatar disc beside the name, then the level and the
+  handle; a band of three serif figures from the record; then the bio, the
+  facts and the links, and the two actions. A profile that is not complete
+  gains a last band with the meter and what is still missing; a complete one
+  drops that band and gains a tick beside the level.
 - **Stat tile** — the same box carrying one label, one figure and one note.
 - **Card** — the opportunity card in a grid: chips, title, organiser, meta,
   then save and view actions along the bottom edge.
@@ -234,7 +242,9 @@ page.
 
 ## Do's and don'ts
 
-- **Do** open every section with `PageHeader` and compose it from `Panel`s.
+- **Do** open every section with `PageHeader` and compose it from `Panel`s. The
+  profile is the one exception: the volunteer's own name is the `h1`, carried
+  by the identity card, because the page is a person rather than a section.
 - **Do** carry a state with an icon and a word before a colour.
 - **Do** keep orange for a person's own action; a deadline is urgent, not an
   achievement, and stays blue or neutral.

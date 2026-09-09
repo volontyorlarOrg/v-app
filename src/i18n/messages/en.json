@@ -411,19 +411,31 @@
   },
   "profile": {
     "metaTitle": "Profile",
-    "title": "Your profile",
-    "description": "Fill this in once. Every application reuses it.",
+    "identity": {
+      "complete": "Profile complete",
+      "joined": "Joined {date}",
+      "bioEmpty": "No bio yet. A few sentences are what an organiser reads first.",
+      "edit": "Edit profile",
+      "record": "My record"
+    },
+    "stats": {
+      "events": "Events",
+      "reliability": "Reliability",
+      "hours": "Hours"
+    },
+    "form": {
+      "title": "Edit your profile",
+      "description": "Fill this in once. Every application reuses it."
+    },
     "sections": {
-      "identity": "About you",
       "education": "Education",
       "location": "Where you are",
-      "skills": "Languages and skills",
       "contact": "How organisers reach you",
       "links": "Links"
     },
     "fields": {
       "fullName": "Full name",
-      "bio": "Short introduction",
+      "bio": "Bio",
       "bioHelp": "A few sentences an organiser reads first. Not an essay.",
       "school": "School, college, or university",
       "gradeYear": "Year or grade",
@@ -432,28 +444,34 @@
       "city": "City or district",
       "languages": "Languages you speak",
       "languagesHelp": "Separate with commas.",
-      "skills": "Skills and interests",
-      "skillsHelp": "Separate with commas.",
       "phone": "Phone number",
       "phoneHelp": "Shared with an organiser only after you apply.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @.",
       "links": "Portfolio, CV, or social link",
-      "linksHelp": "Optional. Does not count toward completeness.",
+      "linksHelp": "Separate with commas. Up to three.",
       "contact": "A way to reach you"
     },
+    "completionFields": {
+      "fullName": "Full name",
+      "bio": "Bio",
+      "region": "Region",
+      "school": "School",
+      "languages": "Languages"
+    },
+    "optional": "Optional",
     "save": "Save profile",
+    "saving": "Saving…",
     "saved": "Profile saved.",
+    "saveError": "Couldn't save your profile. Check the marked fields.",
+    "fieldInvalid": "Check this field.",
     "completion": {
       "label": "Profile completeness",
       "value": "{percent}% complete",
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
-      "why": "A complete profile means an organiser can evaluate and contact you."
-    },
-    "saving": "Saving…",
-    "saveError": "Couldn't save your profile. Check the marked fields.",
-    "fieldInvalid": "Check this field."
+      "why": "A complete profile means an organiser can evaluate you at a glance."
+    }
   },
   "settings": {
     "metaTitle": "Settings",

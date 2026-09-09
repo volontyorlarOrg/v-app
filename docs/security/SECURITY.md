@@ -51,8 +51,10 @@ HTTP (the Playwright suite) still receives its own cookie.
 refresh token, the user id, roles and display name, encrypted as a JWE
 (`dir` + `A256GCM`, the key being SHA-256 of `VOLONTYORLAR_SESSION_SECRET`).
 It is `httpOnly`, `sameSite=lax`, `path=/`, `secure` in production, and lives
-30 days. No token is readable by JavaScript, appears in a URL, or reaches
-browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
+90 days — but the backend's `JWT_REFRESH_TTL_SECONDS` is the real ceiling: once
+the refresh token behind the cookie expires, rotation fails and the volunteer
+signs in again however long the cookie itself had left. No token is readable by
+JavaScript, appears in a URL, or reaches browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
 treated as signed out rather than trusted.
 
 `src/proxy.ts` reads it on every app request and enforces the `guard` each
@@ -137,12 +139,20 @@ same-origin `?next=` path checked by `safeReturnPath`, and the account page only
 `?connect=<status>`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
+The portfolio links a volunteer puts on their own profile are untrusted input:
+`src/lib/profile/links.ts` renders one only when it parses as `http:` or
+`https:`, drops anything else rather than guessing, shows the host instead of
+the raw string, and the anchor carries `rel="noopener noreferrer nofollow"`.
 
 ## Not implemented
 
 - Google sign-in; the button renders disabled with a note
 - email/password sign-in; the backend has none, so the app shows no form
-- account linking, settings, and "sign out everywhere"
+- notification, privacy and appearance preferences; the application no longer
+  reads or writes `/me/preferences`, and no screen offers those switches
+- unlinking, unmerging, export and account deletion; `/settings` connects and
+  merges only
+- "sign out everywhere"
 - analytics, monitoring, or error reporting
 
 They are designed in

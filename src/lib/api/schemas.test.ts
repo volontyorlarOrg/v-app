@@ -14,7 +14,6 @@ import {
   notificationListSchema,
   opportunityDetailSchema,
   opportunityListSchema,
-  preferencesSchema,
   profileSchema,
   recordSchema,
   savedListSchema,
@@ -157,7 +156,6 @@ describe("account schemas", () => {
       region: null,
       city: "",
       languages: ["uz"],
-      skills: [],
       phone: "",
       phoneVerified: false,
       telegram: "dilnoza",
@@ -178,10 +176,6 @@ describe("account schemas", () => {
     });
     expect(parsed.displayName).toBeUndefined();
     expect(parsed.telegramIdentity?.username).toBeUndefined();
-  });
-
-  it("requires every preference switch", () => {
-    expect(preferencesSchema.safeParse({ notifyTelegram: true }).success).toBe(false);
   });
 });
 

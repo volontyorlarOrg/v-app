@@ -69,8 +69,8 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   schema in `src/lib/api/schemas.ts`. A response the schema rejects is an
   error, never a guess. The frontend type is the schema's output;
 - every write — apply, save or submit a draft, withdraw, save an opportunity,
-  save the profile, a preference switch, mark notifications read, sign out —
-  is a Server Action in `src/lib/<domain>/actions.ts` returning the
+  save the profile, mark notifications read, sign out — is a Server Action in
+  `src/lib/<domain>/actions.ts` returning the
   `ActionResult` envelope from `src/lib/api/action-result.ts`. Errors are
   backend codes the catalog translates, never sentences from a server;
 - a section that fails to load renders `LoadErrorPanel` with a retry inside
@@ -92,11 +92,22 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 Do not invent a contract or claim a behaviour works because the code was
 written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 
+**The profile is the volunteer's own page, not a settings screen.** `/profile`
+opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
+band of three figures read from the record, the bio, the facts and the links —
+and the editor is the one `Panel` below it. It carries nothing else: the
+account lives on `/settings`, the theme, the interface language and sign-out
+live in the top bar and the sidebar, and there is no notification, privacy or
+appearance group anywhere in the app. Nothing reads or writes
+`/me/preferences`; the strings under `settings.{preferences,notifications,
+privacy,appearance}` are unused and are kept only because that decision is
+reversible.
+
 ## Repository boundary
 
 This repository owns the product application: sign-in surfaces, the volunteer
-dashboard, and later the profile, applications, saved items, record, and
-settings. It does not own marketing pages, SEO, structured data, or legal pages
+dashboard, the profile, applications, saved items, and the record. It does not
+own marketing pages, SEO, structured data, or legal pages
 (`../v-web`), nor the API, database, Telegram bot, identity verification, or
 authorisation (`../v-backend`). Hidden frontend controls are never
 authorisation.
@@ -166,12 +177,12 @@ src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynami
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
-src/lib/{record,opportunities,applications,profile,notifications,account}/
+src/lib/{record,opportunities,applications,profile,notifications}/
                                 -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
-src/components/{ui,brand,motion,app,auth,dashboard,opportunities,applications,record,profile,settings}/
+src/components/{ui,brand,motion,app,auth,dashboard,opportunities,applications,record,profile}/
 e2e/                            -> Playwright smoke suite
 docs/                           -> stable project documentation and the plan
 .agent-memory/                  -> durable decisions, discoveries, gotchas
