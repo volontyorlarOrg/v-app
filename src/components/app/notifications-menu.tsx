@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Link } from "@/i18n/navigation";
 import { useServerAction } from "@/hooks/use-server-action";
 import { markAllReadAction } from "@/lib/notifications/actions";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ export type NotificationItem = {
   body: string;
   time: string;
   unread: boolean;
+  href?: string;
 };
 
 export function NotificationsMenu({
@@ -85,7 +87,16 @@ export function NotificationsMenu({
                 />
                 <div className="min-w-0">
                   <p className="text-sm leading-snug font-semibold text-ink">
-                    {item.title}
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {item.title}
+                      </Link>
+                    ) : (
+                      item.title
+                    )}
                   </p>
                   {item.body ? (
                     <p className="mt-0.5 text-sm leading-snug text-ink-muted">

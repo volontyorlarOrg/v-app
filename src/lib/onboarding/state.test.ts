@@ -65,11 +65,11 @@ describe("onboarding state cookie", () => {
   });
 
   it("reads back what it wrote to the document", () => {
-    writeOnboardingStateToDocument({ status: "skipped", step: "preferences" });
-    expect(document.cookie).toContain(`${ONBOARDING_COOKIE_NAME}=skipped:preferences`);
+    writeOnboardingStateToDocument({ status: "skipped", step: "contact" });
+    expect(document.cookie).toContain(`${ONBOARDING_COOKIE_NAME}=skipped:contact`);
     expect(readOnboardingStateFromDocument()).toEqual({
       status: "skipped",
-      step: "preferences",
+      step: "contact",
     });
     writeOnboardingStateToDocument({ status: "done" });
     expect(readOnboardingStateFromDocument()).toEqual({ status: "done" });

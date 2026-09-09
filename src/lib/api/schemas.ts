@@ -1,6 +1,12 @@
 import { z } from "zod";
 
+import {
+  CONNECTION_PROVIDERS,
+  MERGE_REQUEST_DIRECTIONS,
+  MERGE_REQUEST_STATUSES,
+} from "@/lib/account/types";
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
+import { issuedSessionSchema } from "@/lib/auth/session";
 import {
   OPPORTUNITY_FORMATS,
   OPPORTUNITY_STATUSES,
@@ -44,7 +50,10 @@ export const opportunitySummarySchema = z.object({
 
 const questionOptionSchema = z
   .object({ value: z.string(), label: z.string().optional() })
-  .transform((option) => ({ value: option.value, label: option.label ?? option.value }));
+  .transform((option) => ({
+    value: option.value,
+    label: option.label ?? option.value,
+  }));
 
 export const applicationQuestionSchema = z.object({
   id: z.string().min(1),
@@ -139,7 +148,6 @@ export const profileSchema = z.object({
   region: z.enum(REGIONS).nullable().default(null),
   city: z.string().default(""),
   languages: z.array(z.string()).default([]),
-  skills: z.array(z.string()).default([]),
   phone: z.string().default(""),
   phoneVerified: z.boolean().default(false),
   telegram: z.string().default(""),
@@ -195,33 +203,93 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
-export const preferencesSchema = z.object({
-  notifyTelegram: z.boolean(),
-  notifyEmail: z.boolean(),
-  remindDeadlines: z.boolean(),
-  notifyDecisions: z.boolean(),
-  profileToOrganisers: z.boolean(),
-  levelPublic: z.boolean(),
+export const authMethodsSchema = z.object({
+  telegram: z.boolean(),
+  google: z.boolean(),
+  password: z.boolean(),
 });
 
-export const meSchema = z.object({
-  id: z.string().min(1),
-  displayName: optional(z.string()),
-  roles: z.array(z.string()).default([]),
-  createdAt: isoDate,
-  telegramIdentity: optional(
-    z.object({
-      username: optional(z.string()),
-      linkedAt: optional(z.string()),
-    }),
-  ),
+export type AuthMethods = z.infer<typeof authMethodsSchema>;
+
+const telegramIdentitySchema = z.object({
+  username: optional(z.string()),
+  linkedAt: optional(z.string()),
 });
+
+export const meSchema = z
+  .object({
+    id: z.string().min(1),
+    displayName: optional(z.string()),
+    roles: z.array(z.string()).default([]),
+    createdAt: isoDate,
+    email: optional(z.string()),
+    emailVerified: z.boolean().default(false),
+    telegramIdentity: optional(telegramIdentitySchema),
+    authMethods: optional(authMethodsSchema),
+  })
+  .transform((me) => ({
+    ...me,
+    authMethods: me.authMethods ?? {
+      telegram: me.telegramIdentity !== undefined,
+      google: false,
+      password: false,
+    },
+  }));
+
+export const connectedAccountSchema = z.object({
+  id: z.string().min(1),
+  authMethods: authMethodsSchema,
+});
+
+export const mergeCounterpartySchema = z.object({
+  displayName: optional(z.string()),
+  authMethods: authMethodsSchema,
+});
+
+export const mergeRequestSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(MERGE_REQUEST_STATUSES),
+  direction: z.enum(MERGE_REQUEST_DIRECTIONS),
+  requestedVia: z.enum(CONNECTION_PROVIDERS),
+  createdAt: isoDate,
+  expiresAt: isoDate,
+  decidedAt: optional(isoDate),
+  completedAt: optional(isoDate),
+  counterparty: mergeCounterpartySchema,
+});
+
+export const connectionOutcomeSchema = z.discriminatedUnion("outcome", [
+  z.object({ outcome: z.literal("linked"), account: connectedAccountSchema }),
+  z.object({ outcome: z.literal("alreadyLinked"), account: connectedAccountSchema }),
+  z.object({
+    outcome: z.literal("approvalRequired"),
+    mergeRequest: mergeRequestSchema,
+  }),
+]);
+
+export const mergeRequestListSchema = z.object({
+  incoming: z.array(mergeRequestSchema),
+  outgoing: z.array(mergeRequestSchema),
+});
+
+export const mergeApprovalSchema = z.object({
+  outcome: z.literal("merged"),
+  request: mergeRequestSchema,
+  session: issuedSessionSchema,
+});
+
+export const mergeResolutionSchema = z.object({ request: mergeRequestSchema });
 
 export const acknowledgementSchema = z.looseObject({});
 
 export type Me = z.infer<typeof meSchema>;
+export type ConnectedAccount = z.infer<typeof connectedAccountSchema>;
+export type MergeRequest = z.infer<typeof mergeRequestSchema>;
+export type MergeRequestList = z.infer<typeof mergeRequestListSchema>;
+export type ConnectionOutcome = z.infer<typeof connectionOutcomeSchema>;
+export type MergeApproval = z.infer<typeof mergeApprovalSchema>;
+export type MergeCounterparty = z.infer<typeof mergeCounterpartySchema>;
 export type Profile = z.infer<typeof profileSchema>;
-export type Preferences = z.infer<typeof preferencesSchema>;
 export type OpportunityList = z.infer<typeof opportunityListSchema>;
 export type ApplicationList = z.infer<typeof applicationListSchema>;
 export type SavedList = z.infer<typeof savedListSchema>;

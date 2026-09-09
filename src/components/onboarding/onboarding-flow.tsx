@@ -6,10 +6,6 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { SplitWords } from "@/components/motion/scene";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { PassStage } from "@/components/onboarding/pass-stage";
-import {
-  PreferencesStep,
-  type OnboardingPreferences,
-} from "@/components/onboarding/preferences-step";
 import { ProfileStepForm } from "@/components/onboarding/profile-step-form";
 import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
 import { Button, buttonClass } from "@/components/ui/button";
@@ -51,7 +47,6 @@ export function OnboardingFlow({
   initialStep,
   initialValues,
   profileSaved,
-  initialPreferences,
   next,
   regions,
   labels,
@@ -63,7 +58,6 @@ export function OnboardingFlow({
   initialStep: OnboardingStep;
   initialValues: VolunteerProfile;
   profileSaved: boolean;
-  initialPreferences: OnboardingPreferences;
   next: string | null;
   regions: readonly { value: string; label: string }[];
   labels: OnboardingLabels;
@@ -75,7 +69,6 @@ export function OnboardingFlow({
   const [saved, setSaved] = useState<VolunteerProfile>(
     profileSaved ? initialValues : EMPTY_PROFILE,
   );
-  const [preferences, setPreferences] = useState(initialPreferences);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -193,22 +186,6 @@ export function OnboardingFlow({
                 onSaved={(profile) => {
                   setValues(profile);
                   setSaved(profile);
-                  advance();
-                }}
-                onSkip={advance}
-                onBack={retreat}
-              />
-            </>
-          ) : null}
-
-          {step === "preferences" ? (
-            <>
-              <StepLead>{labels.steps.preferences.lead}</StepLead>
-              <PreferencesStep
-                values={preferences}
-                labels={labels}
-                onSaved={(saved) => {
-                  setPreferences(saved);
                   advance();
                 }}
                 onSkip={advance}

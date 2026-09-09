@@ -1,19 +1,6 @@
-import type { Preferences } from "@/lib/account/types";
 import type { FormStep } from "@/lib/onboarding/steps";
 import type { ProfileFormValues } from "@/lib/profile/input";
 import type { RailState } from "@/components/onboarding/step-rail";
-
-export type OnboardingPreferenceKey = Extract<
-  keyof Preferences,
-  "remindDeadlines" | "notifyDecisions" | "notifyTelegram" | "profileToOrganisers"
->;
-
-export const ONBOARDING_PREFERENCE_KEYS = [
-  "remindDeadlines",
-  "notifyDecisions",
-  "notifyTelegram",
-  "profileToOrganisers",
-] as const satisfies readonly OnboardingPreferenceKey[];
 
 export type OnboardingLabels = {
   stepCount: string;
@@ -34,7 +21,7 @@ export type OnboardingLabels = {
     items: Record<FormStep, string>;
   };
   fields: Record<
-    | Exclude<keyof ProfileFormValues, "gradeYear" | "city" | "skills" | "links">
+    | Exclude<keyof ProfileFormValues, "gradeYear" | "city" | "links">
     | "bioHelp"
     | "languagesHelp"
     | "phoneHelp"
@@ -42,7 +29,6 @@ export type OnboardingLabels = {
     | "regionAny",
     string
   >;
-  preferences: Record<OnboardingPreferenceKey, { label: string; description: string }>;
   done: {
     title: string;
     complete: string;

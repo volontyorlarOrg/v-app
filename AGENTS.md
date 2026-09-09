@@ -62,10 +62,10 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   reset and no email verification — the backend has neither — so nothing on
   screen offers one and `/forgot-password` is a 404. A **new** account (the
   email sign-up, or Telegram and Google when the backend says `isNewUser`)
-  lands on `/welcome`, the four-step welcome flow described in
+  lands on `/welcome`, the three-step welcome flow described in
   [`docs/product/ONBOARDING.md`](docs/product/ONBOARDING.md); its only state
   is a readable, app-only progress cookie, and every step saves through the
-  existing profile and preferences actions;
+  existing profile action;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
   Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
   or not they are set; unset, no session can exist and the Telegram handoff
@@ -74,15 +74,22 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   schema in `src/lib/api/schemas.ts`. A response the schema rejects is an
   error, never a guess. The frontend type is the schema's output;
 - every write — apply, save or submit a draft, withdraw, save an opportunity,
-  save the profile, a preference switch, mark notifications read, sign out —
-  is a Server Action in `src/lib/<domain>/actions.ts` returning the
+  save the profile, mark notifications read, sign out — is a Server Action in
+  `src/lib/<domain>/actions.ts` returning the
   `ActionResult` envelope from `src/lib/api/action-result.ts`. Errors are
   backend codes the catalog translates, never sentences from a server;
 - a section that fails to load renders `LoadErrorPanel` with a retry inside
   `PanelErrorBoundary`. The palette still defines no red: error states use
   the sunk surface and ink;
-- the plan that got here, and the phases still open (account linking,
-  hardening), is
+- **one account, two ways in.** `/settings` is the account page: it reads
+  `/me` and `/me/account-merge-requests` on the server and shows Telegram,
+  Google and the email password as connections. Connecting an identity nobody
+  owns completes at once; connecting one another account owns raises a merge
+  request that the other account must approve after signing in again, and the
+  requesting account is the one that survives. Approval returns the canonical
+  session, which the Server Action writes into the same encrypted cookie.
+  Nothing is unlinked, unmerged, exported or deleted here;
+- the plan that got here, and the phase still open (hardening), is
   [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
   the keys and the bot are set up from
   [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
@@ -90,11 +97,22 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 Do not invent a contract or claim a behaviour works because the code was
 written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 
+**The profile is the volunteer's own page, not a settings screen.** `/profile`
+opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
+band of three figures read from the record, the bio, the facts and the links —
+and the editor is the one `Panel` below it. It carries nothing else: the
+account lives on `/settings`, the theme, the interface language and sign-out
+live in the top bar and the sidebar, and there is no notification, privacy or
+appearance group anywhere in the app. Nothing reads or writes
+`/me/preferences`; the strings under `settings.{preferences,notifications,
+privacy,appearance}` are unused and are kept only because that decision is
+reversible.
+
 ## Repository boundary
 
 This repository owns the product application: sign-in surfaces, the volunteer
-dashboard, and later the profile, applications, saved items, record, and
-settings. It does not own marketing pages, SEO, structured data, or legal pages
+dashboard, the profile, applications, saved items, and the record. It does not
+own marketing pages, SEO, structured data, or legal pages
 (`../v-web`), nor the API, database, Telegram bot, identity verification, or
 authorisation (`../v-backend`). Hidden frontend controls are never
 authorisation.
@@ -151,20 +169,22 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 src/app/[locale]/(auth)/        -> login and signup; providers, a rule, and the email form
 src/app/api/auth/telegram/      -> start and callback: the two hops of Telegram sign-in
 src/app/api/auth/google/        -> start and callback: the challenge, then Google's posted ID token
+src/app/api/auth/connect/       -> the same two hops for a signed-in account joining a second
+                                   identity, on connection cookies of their own, plus reauthenticate
 src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
 src/lib/api/                    -> the server-only client on openapi-fetch, the generated API types,
                                    per-domain reads, the Zod schemas, error codes, ActionResult
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
                                    around the Server Actions
-src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
+src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
                                    applications[/id], saved, record, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
-src/lib/{record,opportunities,applications,profile,notifications,account}/
+src/lib/{record,opportunities,applications,profile,notifications}/
                                 -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
 src/lib/onboarding/             -> the welcome flow's steps, pass parts, and progress cookie
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
@@ -210,7 +230,8 @@ docs/                           -> stable project documentation and the plan
   an indexable route without the per-route policy in the plan.
 - No personal data in URLs (sign-in carries only
   `?telegram=expired|unavailable|cancelled|phoneRequired`,
-  `?google=expired|unavailable|cancelled|disabled|tooMany`, `?session=expired`
+  `?google=expired|unavailable|cancelled|disabled|tooMany`, `?session=expired`,
+  the account page only `?connect=<one of eleven statuses>`,
   and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
   `state`, and Google posts its one-time `id_token` in a form body, never a
   query string), no credentials in a URL — the email forms are gated by client

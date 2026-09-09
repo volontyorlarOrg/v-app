@@ -11,7 +11,7 @@ import { UserMenu } from "@/components/app/user-menu";
 import { BrandMark } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
-import { navHref } from "@/lib/routing/routes";
+import { accountRoutes, navHref } from "@/lib/routing/routes";
 
 export function TopBar({
   user,
@@ -49,7 +49,10 @@ export function TopBar({
             label={t("userMenu.label")}
             name={user.name}
             initials={user.initials}
-            items={[{ href: navHref("profile"), label: t("profile") }]}
+            items={accountRoutes.map((route) => ({
+              href: navHref(route.key),
+              label: t(route.key),
+            }))}
             signOutLabel={t("signOut")}
             signOutLocale={signOutLocale}
             loginHref={navHref("login")}

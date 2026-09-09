@@ -37,7 +37,6 @@ const ALL_FIELDS = [
   "region",
   "city",
   "languages",
-  "skills",
   "phone",
   "telegram",
   "links",
