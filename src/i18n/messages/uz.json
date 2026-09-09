@@ -48,9 +48,11 @@
     "providers": {
       "google": "Google orqali davom etish",
       "telegram": "Telegram orqali davom etish",
+      "handoff": "Keyingi qadamda Telegram yoki Google ochiladi va siz tizimga kirgan holda qaytasiz.",
       "googleUnavailable": "Hozircha mavjud emas."
     },
     "telegram": {
+      "handoff": "Keyingi qadamda Telegram ochiladi va siz tizimga kirgan holda qaytasiz.",
       "expired": "Bu kirish muddati tugagan yoki u allaqachon ishlatilgan. Telegram orqali qaytadan boshlang.",
       "unavailable": "Hozir Telegram orqali kirish mavjud emas. Bir ozdan keyin qayta urinib koʻring.",
       "cancelled": "Kirish Telegramda bekor qilindi. Tayyor boʻlganingizda qaytadan boshlang.",
@@ -69,6 +71,7 @@
       "fullName": "Toʻliq ism",
       "email": "Email",
       "password": "Parol",
+      "passwordHint": "Kamida {min} ta belgi. Bir-biriga bogʻliq boʻlmagan bir necha soʻz — eslash oson, topish qiyin.",
       "reveal": "Parolni koʻrsatish",
       "conceal": "Parolni yashirish"
     },
@@ -96,6 +99,7 @@
     "login": {
       "metaTitle": "Kirish",
       "title": "Xush kelibsiz.",
+      "lead": "Arizalaringiz, tarixingiz va yaqin tadbirlarni koʻring.",
       "noAccount": "Volontyorlarda yangimisiz?",
       "createAccount": "Hisob yaratish",
       "submit": "Kirish",
@@ -104,8 +108,9 @@
     "signup": {
       "metaTitle": "Hisob yaratish",
       "title": "Hisobingizni yarating.",
-      "legal": "Davom etish orqali <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozisiz.",
-      "legalPlain": "Davom etish orqali Shartlar va Maxfiylik siyosatiga rozisiz.",
+      "lead": "Hisobingiz birinchi kirishda yaratiladi.",
+      "legal": "Davom etish orqali siz <terms>Shartlar</terms> va <privacy>Maxfiylik siyosati</privacy>ga rozilik bildirasiz.",
+      "legalPlain": "Davom etish orqali siz Shartlar va Maxfiylik siyosatiga rozilik bildirasiz.",
       "haveAccount": "Hisobingiz bormi?",
       "logIn": "Kirish",
       "submit": "Hisob yaratish",
