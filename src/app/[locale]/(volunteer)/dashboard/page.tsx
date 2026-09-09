@@ -6,13 +6,23 @@ import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
 import { ApplicationRows } from "@/components/dashboard/application-rows";
+import {
+  ConnectTelegram,
+  type ConnectTelegramLabels,
+} from "@/components/dashboard/connect-telegram";
 import { ImpactOrbit } from "@/components/dashboard/impact-orbit";
 import { NextUp } from "@/components/dashboard/next-up";
-import { OnboardingResume } from "@/components/onboarding/onboarding-resume";
+import {
+  OnboardingResume,
+  type OnboardingResumeLabels,
+} from "@/components/onboarding/onboarding-resume";
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { connectStartHref } from "@/lib/account/connections";
+import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { getRecord } from "@/lib/api/record.server";
@@ -21,13 +31,9 @@ import {
   isUpcomingCommitment,
   type ApplicationSummary,
 } from "@/lib/applications/status";
-import { isOnboardingOpen, resumeStep } from "@/lib/onboarding/state";
+import { serializeOnboardingState } from "@/lib/onboarding/state";
 import { readOnboardingState } from "@/lib/onboarding/state.server";
-import {
-  FORM_STEPS,
-  FORM_STEP_COUNT,
-  completedFormSteps,
-} from "@/lib/onboarding/steps";
+import { FORM_STEPS, FORM_STEP_COUNT, type FormStep } from "@/lib/onboarding/steps";
 import {
   EMPTY_PROFILE,
   profileCompletion,
@@ -61,40 +67,55 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, volunteerRecord, applications, onboarding] =
+  const [session, profile, volunteerRecord, applications, onboarding, telegram] =
     await Promise.all([
       requireSession(),
       getProfile(),
       getRecord(),
       listApplications(),
       readOnboardingState(),
+      readTelegramConnection(),
     ]);
 
   return (
     <Dashboard
+      locale={locale as Locale}
       displayName={profile?.fullName.trim() || session.displayName?.trim() || ""}
       profile={profile ?? EMPTY_PROFILE}
       record={volunteerRecord}
       applications={applications.items}
-      onboardingStepsDone={
-        isOnboardingOpen(onboarding) ? completedFormSteps(resumeStep(onboarding)) : null
-      }
+      onboardingState={onboarding && serializeOnboardingState(onboarding)}
+      telegramConnected={telegram}
     />
   );
 }
 
+// The dashboard is worth rendering even when the account service is not
+// answering; an unknown connection simply hides the invitation.
+async function readTelegramConnection(): Promise<boolean | null> {
+  try {
+    return (await getMe()).authMethods.telegram;
+  } catch {
+    return null;
+  }
+}
+
 function Dashboard({
+  locale,
   displayName,
   profile,
   record: volunteerRecord,
   applications: all,
-  onboardingStepsDone,
+  onboardingState,
+  telegramConnected,
 }: {
+  locale: Locale;
   displayName: string;
   profile: VolunteerProfile;
   record: VolunteerRecord;
   applications: readonly ApplicationSummary[];
-  onboardingStepsDone: number | null;
+  onboardingState: string | null;
+  telegramConnected: boolean | null;
 }) {
   const t = useTranslations("dashboard");
   const onboarding = useTranslations("onboarding");
@@ -165,6 +186,33 @@ function Dashboard({
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, APPLICATIONS_SHOWN);
 
+  // The catalogue stays on the server, so the resume card is handed one
+  // sentence per step count and picks its own once it has read localStorage.
+  const resumeLabels: OnboardingResumeLabels = {
+    title: onboarding("resume.title"),
+    bodyByDone: Array.from({ length: FORM_STEP_COUNT + 1 }, (_, done) =>
+      onboarding("resume.body", { done, total: FORM_STEP_COUNT }),
+    ),
+    continue: onboarding("resume.continue"),
+    dismiss: onboarding("resume.dismiss"),
+    rail: onboarding("rail.label"),
+    steps: Object.fromEntries(
+      FORM_STEPS.map((key) => [key, onboarding(`rail.${key}`)]),
+    ) as Record<FormStep, string>,
+    states: {
+      done: onboarding("railState.done"),
+      current: onboarding("railState.current"),
+      upcoming: onboarding("railState.upcoming"),
+    },
+  };
+
+  const telegramLabels: ConnectTelegramLabels = {
+    title: t("connectTelegram.title"),
+    body: t("connectTelegram.body"),
+    connect: t("connectTelegram.connect"),
+    handoff: t("connectTelegram.handoff"),
+  };
+
   return (
     <>
       <section className="dashboard-hero">
@@ -187,34 +235,12 @@ function Dashboard({
         <ImpactOrbit />
       </section>
 
-      {onboardingStepsDone !== null ? (
-        <OnboardingResume
-          steps={FORM_STEPS.map((key, index) => ({
-            key,
-            number: index + 1,
-            label: onboarding(`rail.${key}`),
-            state:
-              index < onboardingStepsDone
-                ? "done"
-                : index === onboardingStepsDone
-                  ? "current"
-                  : "upcoming",
-          }))}
-          labels={{
-            title: onboarding("resume.title"),
-            body: onboarding("resume.body", {
-              done: onboardingStepsDone,
-              total: FORM_STEP_COUNT,
-            }),
-            continue: onboarding("resume.continue"),
-            dismiss: onboarding("resume.dismiss"),
-            rail: onboarding("rail.label"),
-            states: {
-              done: onboarding("railState.done"),
-              current: onboarding("railState.current"),
-              upcoming: onboarding("railState.upcoming"),
-            },
-          }}
+      <OnboardingResume serverState={onboardingState} labels={resumeLabels} />
+
+      {telegramConnected === false ? (
+        <ConnectTelegram
+          href={connectStartHref("telegram", locale)}
+          labels={telegramLabels}
         />
       ) : null}
 

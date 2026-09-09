@@ -121,6 +121,12 @@
     }
   },
   "dashboard": {
+    "connectTelegram": {
+      "title": "Добавьте вход через Telegram",
+      "body": "Подключите Telegram — и в следующий раз сможете войти через него.",
+      "connect": "Подключить Telegram",
+      "handoff": "Дальше откроется Telegram, а результат покажут ваши настройки."
+    },
     "metaTitle": "Главная",
     "greeting": "Привет, {name}.",
     "browse": "Смотреть возможности",

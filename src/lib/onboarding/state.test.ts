@@ -1,16 +1,22 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   INITIAL_ONBOARDING_STATE,
   ONBOARDING_COOKIE_NAME,
+  ONBOARDING_STORAGE_KEY,
+  furthestOnboardingState,
   isOnboardingOpen,
   onboardingCookieAttributes,
   onboardingPath,
   parseOnboardingState,
+  readOnboardingStateFromClient,
   readOnboardingStateFromDocument,
+  readOnboardingStateFromStorage,
   resumeStep,
   serializeOnboardingState,
+  writeOnboardingStateToClient,
   writeOnboardingStateToDocument,
+  writeOnboardingStateToStorage,
 } from "@/lib/onboarding/state";
 
 describe("onboarding state cookie", () => {
@@ -73,5 +79,84 @@ describe("onboarding state cookie", () => {
     });
     writeOnboardingStateToDocument({ status: "done" });
     expect(readOnboardingStateFromDocument()).toEqual({ status: "done" });
+  });
+});
+
+describe("onboarding state on the client", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.cookie = `${ONBOARDING_COOKIE_NAME}=; path=/; max-age=0`;
+  });
+
+  it("round-trips every state through localStorage", () => {
+    for (const state of [
+      INITIAL_ONBOARDING_STATE,
+      { status: "skipped" as const, step: "place" as const },
+      { status: "done" as const },
+    ]) {
+      writeOnboardingStateToStorage(state);
+      expect(readOnboardingStateFromStorage()).toEqual(state);
+    }
+  });
+
+  it("ignores a stored value it did not write", () => {
+    localStorage.setItem(ONBOARDING_STORAGE_KEY, "paused:about");
+    expect(readOnboardingStateFromStorage()).toBeNull();
+  });
+
+  it("keeps whichever record got the furthest", () => {
+    const pending = { status: "pending" as const, step: "about" as const };
+    const later = { status: "pending" as const, step: "contact" as const };
+
+    expect(furthestOnboardingState(null, null)).toBeNull();
+    expect(furthestOnboardingState(pending, null)).toEqual(pending);
+    expect(furthestOnboardingState(null, pending)).toEqual(pending);
+    expect(furthestOnboardingState(pending, later)).toEqual(later);
+    expect(furthestOnboardingState(later, pending)).toEqual(later);
+    expect(furthestOnboardingState({ status: "done" }, pending)).toEqual({
+      status: "done",
+    });
+    expect(furthestOnboardingState(pending, { status: "done" })).toEqual({
+      status: "done",
+    });
+  });
+
+  it("writes both stores at once, so the server and the browser agree", () => {
+    writeOnboardingStateToClient({ status: "pending", step: "place" });
+    expect(document.cookie).toContain(`${ONBOARDING_COOKIE_NAME}=pending:place`);
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBe("pending:place");
+  });
+
+  it("copies a cookie-only state into localStorage", () => {
+    writeOnboardingStateToDocument({ status: "pending", step: "contact" });
+
+    expect(readOnboardingStateFromClient()).toEqual({
+      status: "pending",
+      step: "contact",
+    });
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBe("pending:contact");
+  });
+
+  it("puts the cookie back from localStorage once the cookie is gone", () => {
+    writeOnboardingStateToStorage({ status: "pending", step: "place" });
+
+    expect(readOnboardingStateFromClient()).toEqual({
+      status: "pending",
+      step: "place",
+    });
+    expect(document.cookie).toContain(`${ONBOARDING_COOKIE_NAME}=pending:place`);
+  });
+
+  it("does not reopen onboarding for someone localStorage says has finished", () => {
+    writeOnboardingStateToStorage({ status: "done" });
+    writeOnboardingStateToDocument({ status: "pending", step: "about" });
+
+    expect(readOnboardingStateFromClient()).toEqual({ status: "done" });
+    expect(isOnboardingOpen(readOnboardingStateFromClient())).toBe(false);
+    expect(document.cookie).toContain(`${ONBOARDING_COOKIE_NAME}=done`);
+  });
+
+  it("reports nothing at all when neither store has a record", () => {
+    expect(readOnboardingStateFromClient()).toBeNull();
   });
 });

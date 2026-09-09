@@ -2,7 +2,7 @@
 
 import { IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import {
   StepRail,
@@ -11,33 +11,67 @@ import {
 } from "@/components/onboarding/step-rail";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { writeOnboardingStateToDocument } from "@/lib/onboarding/state";
+import {
+  onboardingStateSnapshot,
+  publishOnboardingState,
+  subscribeToOnboardingState,
+} from "@/lib/onboarding/client-store";
+import {
+  isOnboardingOpen,
+  parseOnboardingState,
+  readOnboardingStateFromClient,
+  resumeStep,
+} from "@/lib/onboarding/state";
+import { FORM_STEPS, completedFormSteps, type FormStep } from "@/lib/onboarding/steps";
 import { navHref } from "@/lib/routing/routes";
 
+export type OnboardingResumeLabels = {
+  title: string;
+  /** One sentence per number of finished steps, indexed by that number. */
+  bodyByDone: readonly string[];
+  continue: string;
+  dismiss: string;
+  rail: string;
+  steps: Record<FormStep, string>;
+  states: Record<RailState, string>;
+};
+
 export function OnboardingResume({
-  steps,
+  serverState,
   labels,
 }: {
-  steps: readonly RailItem[];
-  labels: {
-    title: string;
-    body: string;
-    continue: string;
-    dismiss: string;
-    rail: string;
-    states: Record<RailState, string>;
-  };
+  serverState: string | null;
+  labels: OnboardingResumeLabels;
 }) {
   const router = useRouter();
-  const [dismissed, setDismissed] = useState(false);
+  const serialized = useSyncExternalStore(
+    subscribeToOnboardingState,
+    onboardingStateSnapshot,
+    () => serverState,
+  );
+
+  // The cookie is what the server could see; localStorage is the record that
+  // outlives it. Whichever lagged gets the settled answer written back.
+  useEffect(() => {
+    readOnboardingStateFromClient();
+  }, [serialized]);
+
+  const state = parseOnboardingState(serialized);
 
   function dismiss() {
-    writeOnboardingStateToDocument({ status: "done" });
-    setDismissed(true);
+    publishOnboardingState({ status: "done" });
     router.refresh();
   }
 
-  if (dismissed) return null;
+  if (!isOnboardingOpen(state)) return null;
+
+  const done = completedFormSteps(resumeStep(state));
+  const items: RailItem[] = FORM_STEPS.map((key, index) => ({
+    key,
+    number: index + 1,
+    label: labels.steps[key],
+    state: index < done ? "done" : index === done ? "current" : "upcoming",
+  }));
 
   return (
     <section
@@ -57,9 +91,11 @@ export function OnboardingResume({
         >
           {labels.title}
         </h2>
-        <p className="mt-0.5 text-sm text-ink-muted">{labels.body}</p>
+        <p className="mt-0.5 text-sm text-ink-muted">
+          {labels.bodyByDone[done] ?? labels.bodyByDone[0]}
+        </p>
         <StepRail
-          items={steps}
+          items={items}
           label={labels.rail}
           stateLabels={labels.states}
           layout="strip"
