@@ -121,6 +121,12 @@
     }
   },
   "dashboard": {
+    "connectTelegram": {
+      "title": "Telegram orqali kirishni qoʻshing",
+      "body": "Telegramni ulang va keyingi safar u orqali kirasiz.",
+      "connect": "Telegramni ulash",
+      "handoff": "Keyin Telegram ochiladi, natijani esa sozlamalaringiz koʻrsatadi."
+    },
     "metaTitle": "Bosh panel",
     "greeting": "Salom, {name}.",
     "browse": "Imkoniyatlarni koʻrish",

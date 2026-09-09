@@ -121,6 +121,12 @@
     }
   },
   "dashboard": {
+    "connectTelegram": {
+      "title": "Add Telegram as a way in",
+      "body": "Connect Telegram and you can sign in with it next time.",
+      "connect": "Connect Telegram",
+      "handoff": "Telegram opens next, then your settings show how it went."
+    },
     "metaTitle": "Dashboard",
     "greeting": "Hi, {name}.",
     "browse": "Browse opportunities",
