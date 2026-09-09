@@ -5,7 +5,6 @@ import { redirect, unstable_rethrow } from "next/navigation";
 
 import { defaultLocale, isLocale, type Locale } from "@/i18n/routing";
 import { isStaleMergeCode } from "@/lib/account/connections";
-import { PREFERENCE_KEYS, type PreferenceKey } from "@/lib/account/types";
 import {
   failedResult,
   okResult,
@@ -16,7 +15,6 @@ import {
   approveMergeRequest,
   cancelMergeRequest,
   rejectMergeRequest,
-  updatePreferences,
   verifyPasswordConnection,
 } from "@/lib/api/account.server";
 import {
@@ -51,23 +49,6 @@ function resultForMergeFailure(error: unknown, locale: Locale): ActionResult {
     revalidateAccount(locale);
   }
   return result;
-}
-
-export async function updatePreferenceAction(
-  key: PreferenceKey,
-  value: boolean,
-): Promise<ActionResult> {
-  if (!PREFERENCE_KEYS.includes(key)) return resultFromError(null);
-
-  try {
-    await updatePreferences({ [key]: value });
-  } catch (error) {
-    unstable_rethrow(error);
-    return resultFromError(error);
-  }
-
-  revalidatePath("/", "layout");
-  return okResult;
 }
 
 export async function connectPasswordAction(

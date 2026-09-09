@@ -701,35 +701,61 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
-  test("the profile form saves to the backend", async ({ page }) => {
+  test("the profile opens on the volunteer's own record, then edits below it", async ({
+    page,
+  }) => {
     await page.goto("/en/profile");
-    await page.getByLabel("Short introduction").fill("Second-year student.");
-    await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page.getByRole("status").last()).toContainText("Profile saved.");
-
-    await page.reload();
-    await expect(page.getByLabel("Short introduction")).toHaveValue(
-      "Second-year student.",
-    );
     await expect(
-      page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "100");
+      page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
+    ).toBeVisible();
+    await expect(page.getByText("Events")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit profile" })).toHaveAttribute(
+      "href",
+      "#edit",
+    );
+    await expect(page.locator("#edit")).toBeVisible();
   });
 
-  test("the profile keeps the preferences, which persist", async ({ page }) => {
+  test("the profile form saves to the backend and completes the profile", async ({
+    page,
+  }) => {
     await page.goto("/en/profile");
-    const telegram = page.getByRole("switch", { name: "Telegram messages" });
-    await expect(telegram).toHaveAttribute("aria-checked", "true");
-    await telegram.click();
-    await expect(telegram).toHaveAttribute("aria-checked", "false");
-    await expect(telegram).toBeEnabled();
+    await expect(
+      page.getByRole("progressbar", { name: "Profile completeness" }),
+    ).toHaveAttribute("aria-valuenow", "80");
+
+    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("button", { name: "Save profile" }).click();
 
     await page.reload();
+    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page.getByText("Profile complete", { exact: true })).toBeVisible();
     await expect(
-      page.getByRole("switch", { name: "Telegram messages" }),
-    ).toHaveAttribute("aria-checked", "false");
+      page.getByRole("progressbar", { name: "Profile completeness" }),
+    ).toHaveCount(0);
+  });
 
-    const dark = page.getByRole("switch", { name: "Dark theme" }).last();
+  test("contact details are optional and never block completeness", async ({
+    page,
+  }) => {
+    await page.goto("/en/profile");
+    await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
+    await expect(page.getByLabel("Phone number")).toHaveValue("");
+    await expect(page.getByLabel("Bio")).toBeVisible();
+    await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
+  });
+
+  test("the profile carries no settings of its own", async ({ page }) => {
+    await page.goto("/en/profile");
+    await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("region", { name: "Ways to sign in" })).toHaveCount(0);
+  });
+
+  test("the theme is switched from the top bar", async ({ page }) => {
+    await page.goto("/en/profile");
+    const dark = page.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await dark.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");

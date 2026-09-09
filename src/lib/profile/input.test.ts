@@ -19,7 +19,6 @@ describe("profileInputFromFormData", () => {
         fullName: "  Dilnoza Karimova ",
         bio: "Hi",
         languages: "uz, ru,,en",
-        skills: "translation",
         telegram: "@dilnoza_k",
         region: "samarkand",
         links:
@@ -51,7 +50,6 @@ describe("profileFormSchema", () => {
     region: "",
     city: "",
     languages: "",
-    skills: "",
     phone: "",
     telegram: "",
     links: "",
@@ -85,7 +83,6 @@ describe("profileFormSchema", () => {
       region: null,
       city: "",
       languages: ["uz", "ru"],
-      skills: [],
       phone: "",
       telegram: "dilnoza_k",
       links: [],

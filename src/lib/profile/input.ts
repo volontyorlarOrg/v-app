@@ -10,13 +10,12 @@ export type ProfileInput = {
   region: Region | null;
   city: string;
   languages: string[];
-  skills: string[];
   phone: string;
   telegram: string;
   links: string[];
 };
 
-const LIST_LIMITS = { languages: 10, skills: 20, links: 3 } as const;
+const LIST_LIMITS = { languages: 10, links: 3 } as const;
 
 export const PROFILE_TEXT_LIMITS = {
   fullName: 120,
@@ -43,7 +42,6 @@ export const profileFormSchema = z.object({
   region: z.union([z.literal(""), z.enum(REGIONS)]),
   city: boundedText(PROFILE_TEXT_LIMITS.city),
   languages: z.string(),
-  skills: z.string(),
   phone: z.string().trim(),
   telegram: z.string().trim(),
   links: z.string(),
@@ -59,7 +57,6 @@ export function profileFormValues(profile: {
   region: Region | null;
   city: string;
   languages: readonly string[];
-  skills: readonly string[];
   phone: string;
   telegram: string;
   links: readonly string[];
@@ -72,7 +69,6 @@ export function profileFormValues(profile: {
     region: profile.region ?? "",
     city: profile.city,
     languages: profile.languages.join(", "),
-    skills: profile.skills.join(", "),
     phone: profile.phone,
     telegram: profile.telegram,
     links: profile.links.join(", "),
@@ -106,7 +102,6 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     region: region(formData),
     city: text(formData, "city"),
     languages: list(formData, "languages"),
-    skills: list(formData, "skills"),
     phone: text(formData, "phone"),
     telegram: text(formData, "telegram").replace(/^@+/, ""),
     links: list(formData, "links"),
