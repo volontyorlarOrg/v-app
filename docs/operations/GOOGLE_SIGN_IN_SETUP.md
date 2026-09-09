@@ -70,7 +70,14 @@ Two consequences worth knowing before you start:
 ```text
 http://localhost:3001/api/auth/google/callback
 https://<the application origin>/api/auth/google/callback
+http://localhost:3001/api/auth/connect/google/callback
+https://<the application origin>/api/auth/connect/google/callback
 ```
+
+The second pair is the connection flow: a volunteer who is already signed in
+joining a Google account to theirs from `/settings`. It is the same client id
+and the same `form_post` exchange, but a different callback path, so Google
+refuses it until the path is registered too.
 
 Rules Google enforces on that list, each of which has cost someone an
 afternoon:
@@ -115,8 +122,9 @@ match `NNN-xxx.apps.googleusercontent.com` as unset and hides the button
 rather than sending the browser somewhere that will fail.
 
 `NEXT_PUBLIC_SITE_URL` decides the redirect URI in production: when it is set,
-the start route builds `${NEXT_PUBLIC_SITE_URL}/api/auth/google/callback`,
-which must be one of the URIs registered above. When it is blank the origin of
+the start route builds `${NEXT_PUBLIC_SITE_URL}/api/auth/google/callback` and
+the connection route `${NEXT_PUBLIC_SITE_URL}/api/auth/connect/google/callback`,
+both of which must be registered above. When it is blank the origin of
 the incoming request is used, which is what makes `localhost` work with no
 extra configuration.
 

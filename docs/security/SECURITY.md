@@ -101,13 +101,40 @@ without a session. Telegram's own `error=access_denied` becomes
 `?telegram=cancelled`, and a sign-in without a shared phone number
 `?telegram=phoneRequired`.
 
+### Joining a second account
+
+A signed-in volunteer connecting a second identity never touches the sign-in
+cookies. The handoff is carried by `volontyorlar_connect_state`,
+`volontyorlar_connect_google_state` and `volontyorlar_connect_locale`, three
+`httpOnly` cookies of their own: the Telegram pair is `SameSite=Lax` like the
+sign-in handoff, and the Google pair is `SameSite=None; Secure` because Google
+posts its ID token cross-site to `/api/auth/connect/google/callback`. Both
+callbacks refuse to call the backend until the returned `state` equals the
+cookie this browser holds, and both clear the cookies on the way out, so a
+replayed callback is refused.
+
+A completion returns to `/{locale}/settings?connect=<status>` where the status
+is one of eleven words the catalog translates. No email address, account id,
+provider name, merge-request id, token or provider state ever reaches a query
+string, a Client Component, browser storage or a log line; the page reads the
+outcome by fetching `/me` and the pending requests again on the server.
+
+Approving a merge is the one place a Server Action replaces the session: the
+backend returns the canonical account's session inside the approval, the action
+parses it with the same schema sign-in uses and writes the same encrypted
+`httpOnly` cookie. When the backend answers `recentAuthenticationRequired`
+instead, `/api/auth/connect/reauthenticate` ends the session on the backend,
+clears the cookie and returns the browser to sign-in with a same-origin
+`next=/{locale}/settings`.
+
 The only stored values remain the light/dark theme choice and the interface
 language, both in readable cookies shared with the marketing site so a choice
 made on either origin holds on the other. Neither identifies a visitor, neither
 is `httpOnly` because the theme is applied by a script before paint, and the
 privacy page names both. Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
-same-origin `?next=` path checked by `safeReturnPath`.
+same-origin `?next=` path checked by `safeReturnPath`, and the account page only
+`?connect=<status>`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
 

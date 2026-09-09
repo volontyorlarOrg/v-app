@@ -44,7 +44,7 @@ describe("app route registry", () => {
   });
 
   it("keeps utility routes out of primary and account navigation", () => {
-    expect(accountRoutes.map((route) => route.key)).toEqual(["profile"]);
+    expect(accountRoutes.map((route) => route.key)).toEqual(["profile", "settings"]);
     expect([...navRoutes, ...accountRoutes].map((route) => route.key)).not.toContain(
       "saved",
     );
@@ -64,8 +64,11 @@ describe("app route registry", () => {
     expect(getRoute(HOME_ROUTE).area).toBe("volunteer");
   });
 
-  it("keeps legacy settings registered without exposing another account layer", () => {
-    expect(getRoute("settings").inAccountMenu).toBe(false);
+  it("reaches account connections from the account menu alone", () => {
+    const settings = getRoute("settings");
+    expect(settings.inAccountMenu).toBe(true);
+    expect(settings.inNav).toBe(false);
+    expect(settings.inTabBar).toBe(false);
     expect(navHref("settings")).toBe("/settings");
   });
 
