@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3211;
-const STUB_PORT = 3212;
+const PORT = Number(process.env.E2E_PORT ?? 3211);
+const STUB_PORT = Number(process.env.E2E_STUB_PORT ?? 3212);
 const baseURL = `http://127.0.0.1:${PORT}`;
 const stubURL = `http://127.0.0.1:${STUB_PORT}`;
 
@@ -39,7 +39,8 @@ export default defineConfig({
         NEXT_PUBLIC_SITE_URL: baseURL,
         NEXT_PUBLIC_MARKETING_URL: "",
         VOLONTYORLAR_API_URL: stubURL,
-        VOLONTYORLAR_SESSION_SECRET: "e2e-only-session-secret-that-is-long-enough-0123456789",
+        VOLONTYORLAR_SESSION_SECRET:
+          "e2e-only-session-secret-that-is-long-enough-0123456789",
         VOLONTYORLAR_GOOGLE_CLIENT_ID:
           "123456789012-e2eclientidforthelocalsuite.apps.googleusercontent.com",
       },
