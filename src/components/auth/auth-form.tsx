@@ -4,13 +4,7 @@ import { useId } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/auth/password-input";
 import { useActionForm } from "@/hooks/use-action-form";
@@ -29,7 +23,6 @@ export type AuthFormLabels = {
   fullName: string;
   email: string;
   password: string;
-  passwordHint: string;
   reveal: string;
   conceal: string;
   submit: string;
@@ -81,9 +74,9 @@ function SubmitRow({
   labels: AuthFormLabels;
 }) {
   return (
-    <div className="mt-7 flex flex-col gap-4">
+    <div className="mt-4 flex flex-col gap-4">
       {error ? <ActionStatus tone="error">{error}</ActionStatus> : null}
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" size="sm" disabled={pending} className="w-full">
         {pending ? labels.pending : labels.submit}
       </Button>
     </div>
@@ -118,7 +111,7 @@ export function LogInForm({ locale, next, labels }: FormContext) {
   return (
     <form {...formProps}>
       <Hidden locale={locale} next={next} />
-      <FieldGroup>
+      <FieldGroup className="gap-4">
         <Field invalid={Boolean(emailError)}>
           <FieldLabel htmlFor={`${id}-email`}>{labels.email}</FieldLabel>
           <Input
@@ -179,7 +172,7 @@ export function SignUpForm({ locale, next, labels }: FormContext) {
   return (
     <form {...formProps}>
       <Hidden locale={locale} next={next} />
-      <FieldGroup>
+      <FieldGroup className="gap-4">
         <Field invalid={Boolean(nameError)}>
           <FieldLabel htmlFor={`${id}-name`}>{labels.fullName}</FieldLabel>
           <Input
@@ -214,14 +207,8 @@ export function SignUpForm({ locale, next, labels }: FormContext) {
             required
             reveal={labels.reveal}
             conceal={labels.conceal}
-            aria-describedby={passwordError ? undefined : `${id}-password-hint`}
             aria-invalid={Boolean(passwordError) || undefined}
           />
-          {passwordError ? null : (
-            <FieldDescription id={`${id}-password-hint`}>
-              {labels.passwordHint}
-            </FieldDescription>
-          )}
           <FieldError>{passwordError}</FieldError>
         </Field>
       </FieldGroup>
