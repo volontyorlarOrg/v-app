@@ -76,8 +76,15 @@ statistics, testimonials, awards, offices, addresses, or integrations.
 - a section that fails to load renders `LoadErrorPanel` with a retry inside
   `PanelErrorBoundary`. The palette still defines no red: error states use
   the sunk surface and ink;
-- the plan that got here, and the phases still open (account linking,
-  hardening), is
+- **one account, two ways in.** `/settings` is the account page: it reads
+  `/me` and `/me/account-merge-requests` on the server and shows Telegram,
+  Google and the email password as connections. Connecting an identity nobody
+  owns completes at once; connecting one another account owns raises a merge
+  request that the other account must approve after signing in again, and the
+  requesting account is the one that survives. Approval returns the canonical
+  session, which the Server Action writes into the same encrypted cookie.
+  Nothing is unlinked, unmerged, exported or deleted here;
+- the plan that got here, and the phase still open (hardening), is
   [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
   the keys and the bot are set up from
   [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
@@ -88,10 +95,13 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
 band of three figures read from the record, the bio, the facts and the links —
-and the editor is the one `Panel` below it. There is no notification, privacy,
-appearance or account group anywhere in the app: the theme, the interface
-language and sign-out live in the top bar and the sidebar, and `/settings`
-only redirects to `/profile`. Nothing reads or writes `/me/preferences`.
+and the editor is the one `Panel` below it. It carries nothing else: the
+account lives on `/settings`, the theme, the interface language and sign-out
+live in the top bar and the sidebar, and there is no notification, privacy or
+appearance group anywhere in the app. Nothing reads or writes
+`/me/preferences`; the strings under `settings.{preferences,notifications,
+privacy,appearance}` are unused and are kept only because that decision is
+reversible.
 
 ## Repository boundary
 
@@ -153,6 +163,8 @@ older Next.js knowledge. Middleware is called Proxy in Next.js 16
 src/app/[locale]/(auth)/        -> login and signup; providers, a rule, and the email form
 src/app/api/auth/telegram/      -> start and callback: the two hops of Telegram sign-in
 src/app/api/auth/google/        -> start and callback: the challenge, then Google's posted ID token
+src/app/api/auth/connect/       -> the same two hops for a signed-in account joining a second
+                                   identity, on connection cookies of their own, plus reauthenticate
 src/app/api/auth/session/       -> expired: clears the cookie and returns to sign-in
 src/lib/auth/                   -> config, session cookie, refresh, sign-out action
 src/lib/api/                    -> the server-only client on openapi-fetch, the generated API types,
@@ -210,7 +222,8 @@ docs/                           -> stable project documentation and the plan
   an indexable route without the per-route policy in the plan.
 - No personal data in URLs (sign-in carries only
   `?telegram=expired|unavailable|cancelled|phoneRequired`,
-  `?google=expired|unavailable|cancelled|disabled|tooMany`, `?session=expired`
+  `?google=expired|unavailable|cancelled|disabled|tooMany`, `?session=expired`,
+  the account page only `?connect=<one of eleven statuses>`,
   and a same-origin `?next=`; Telegram's callback adds a one-time `code` and
   `state`, and Google posts its one-time `id_token` in a form body, never a
   query string), no credentials in a URL — the email forms are gated by client
