@@ -22,7 +22,7 @@ describe("onboarding steps", () => {
     expect(ONBOARDING_STEPS[0]).toBe("welcome");
     expect(ONBOARDING_STEPS.at(-1)).toBe("done");
     expect(nextStep("welcome")).toBe("about");
-    expect(nextStep("preferences")).toBe("done");
+    expect(nextStep("contact")).toBe("done");
     expect(nextStep("done")).toBe("done");
   });
 
@@ -34,33 +34,30 @@ describe("onboarding steps", () => {
   });
 
   it("numbers the form steps from one and counts the completed ones", () => {
-    expect(FORM_STEP_COUNT).toBe(4);
-    expect(FORM_STEPS.map(formStepNumber)).toEqual([1, 2, 3, 4]);
+    expect(FORM_STEP_COUNT).toBe(3);
+    expect(FORM_STEPS.map(formStepNumber)).toEqual([1, 2, 3]);
     expect(completedFormSteps("welcome")).toBe(0);
     expect(completedFormSteps("about")).toBe(0);
     expect(completedFormSteps("contact")).toBe(2);
-    expect(completedFormSteps("done")).toBe(4);
+    expect(completedFormSteps("done")).toBe(3);
   });
 
   it("recognises the step kinds", () => {
     expect(isOnboardingStep("place")).toBe(true);
     expect(isOnboardingStep("finish")).toBe(false);
-    expect(isFormStep("preferences")).toBe(true);
+    expect(isFormStep("contact")).toBe(true);
     expect(isFormStep("welcome")).toBe(false);
     expect(isProfileStep("contact")).toBe(true);
-    expect(isProfileStep("preferences")).toBe(false);
+    expect(isProfileStep("done")).toBe(false);
     expect(stepIndex("done")).toBe(ONBOARDING_STEPS.length - 1);
   });
 
   it("covers every field that counts toward profile completeness", () => {
     const covered = new Set<string>(Object.values(PROFILE_STEP_FIELDS).flat());
     for (const field of COMPLETION_FIELDS) {
-      if (field === "contact") {
-        expect(covered.has("phone") && covered.has("telegram")).toBe(true);
-      } else {
-        expect(covered.has(field), field).toBe(true);
-      }
+      expect(covered.has(field), field).toBe(true);
     }
+    expect(covered.has("phone") && covered.has("telegram")).toBe(true);
   });
 
   it("derives the pass parts from saved data, not from the step alone", () => {
@@ -69,7 +66,6 @@ describe("onboarding steps", () => {
       place: false,
       languages: false,
       contact: false,
-      preferences: false,
       sealed: false,
     });
 
@@ -85,13 +81,9 @@ describe("onboarding steps", () => {
       place: true,
       languages: true,
       contact: true,
-      preferences: false,
       sealed: false,
     });
-    expect(passParts(filled, "done")).toMatchObject({
-      preferences: true,
-      sealed: true,
-    });
+    expect(passParts(filled, "done")).toMatchObject({ sealed: true });
   });
 
   it("treats a one-letter name as not yet printed", () => {

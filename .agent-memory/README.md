@@ -20,6 +20,10 @@ folder. Never store secrets or unverified external claims.
 - `decisions/every-screen-reads-the-backend.md` — why the sample and the
   email forms were removed, why the proxy guards unconditionally, and the
   cookie and refresh rules that came with real data
+- `decisions/account-connections-are-a-forward-contract.md` — why the Zod
+  schemas, not the backend's OpenAPI, define every connection and merge
+  _response_, the five shapes that surprise a reader who only saw the sketch,
+  and the two tolerances that keep `/settings` honest against an older backend
 - `decisions/google-sign-in-is-an-id-token-redirect.md` — why Google sign-in
   is a redirect that returns an ID token rather than Google Identity Services,
   and why its handoff cookies are `SameSite=None`

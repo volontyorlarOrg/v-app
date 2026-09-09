@@ -7,7 +7,7 @@ import type { paths } from "@/lib/api/generated/schema";
 import { apiBaseUrl } from "@/lib/auth/config";
 import { ApiError, classifyApiError, codeForStatus } from "@/lib/api/errors";
 
-const DEFAULT_TIMEOUT_MS = 12_000;
+const DEFAULT_TIMEOUT_MS = 30_000;
 const REQUEST_ID_HEADER = "X-Request-Id";
 
 type QueryValue = string | number | boolean | null | undefined;

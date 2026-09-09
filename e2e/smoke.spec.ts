@@ -52,6 +52,69 @@ async function startedState(page: Page) {
   return new URL(location).searchParams.get("state") ?? "";
 }
 
+async function submitPasswordLogin(page: Page, destination: RegExp) {
+  await page.getByRole("button", { name: "Show password" }).click();
+  await page.getByRole("button", { name: "Hide password" }).click();
+
+  await page.getByLabel("Email").fill("dilnoza@example.org");
+  await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page).toHaveURL(destination);
+}
+
+async function signInWithPassword(page: Page, locale = "en") {
+  await page.goto(`/${locale}/login`);
+  await submitPasswordLogin(page, new RegExp(`/${locale}/dashboard$`));
+}
+
+async function connectState(
+  page: Page,
+  provider: "telegram" | "google",
+  locale = "en",
+) {
+  const response = await page.request.get(
+    `/api/auth/connect/${provider}/start?locale=${locale}`,
+    { maxRedirects: 0 },
+  );
+  const location = response.headers()["location"] ?? "";
+  return new URL(location).searchParams.get("state") ?? "";
+}
+
+async function completeTelegramConnection(page: Page, code: string, state?: string) {
+  const bound = state ?? (await connectState(page, "telegram"));
+  await page.goto(
+    `/api/auth/connect/telegram/callback?code=${code}&state=${encodeURIComponent(bound)}`,
+  );
+}
+
+async function postGoogleConnection(page: Page, state: string, credential: string) {
+  await page.goto("/en/settings");
+  await page.evaluate(
+    (posted) => {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/api/auth/connect/google/callback";
+      for (const [name, value] of Object.entries(posted)) {
+        const field = document.createElement("input");
+        field.type = "hidden";
+        field.name = name;
+        field.value = value;
+        form.append(field);
+      }
+      document.body.append(form);
+      form.submit();
+    },
+    { id_token: credential, state },
+  );
+}
+
+function requestRow(page: Page, panel: string, provider: string) {
+  return page
+    .getByRole("region", { name: panel })
+    .getByRole("listitem")
+    .filter({ hasText: `Through ${provider}` });
+}
+
 async function createAccount(page: Page, email: string) {
   await page.goto("/en/signup");
   await page.getByLabel("Full name").fill("Malika Karimova");
@@ -73,9 +136,7 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await expect(page.getByLabel("Full name")).toHaveValue("Malika Karimova");
-    await page
-      .getByLabel("Short introduction")
-      .fill("I read to younger pupils on Saturdays.");
+    await page.getByLabel("Bio").fill("I read to younger pupils on Saturdays.");
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
@@ -95,11 +156,6 @@ test.describe("welcome flow", () => {
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
-      page.getByRole("heading", { level: 2, name: "What we may send you" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Continue", exact: true }).click();
-
-    await expect(
       page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
     ).toBeVisible();
     await expect(
@@ -113,7 +169,7 @@ test.describe("welcome flow", () => {
       "Academic lyceum No. 1",
     );
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
-    await expect(page.getByLabel("Short introduction")).toHaveValue(
+    await expect(page.getByLabel("Bio")).toHaveValue(
       "I read to younger pupils on Saturdays.",
     );
 
@@ -140,7 +196,7 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Where you study" }),
     ).toBeVisible();
-    await expect(page.getByText("Step 2 of 4")).toBeVisible();
+    await expect(page.getByText("Step 2 of 3")).toBeVisible();
 
     await page.reload();
     await expect(
@@ -148,7 +204,7 @@ test.describe("welcome flow", () => {
     ).toBeVisible();
 
     await page.goto("/en/dashboard");
-    await expect(page.getByText("1 of 4 steps done", { exact: false })).toBeVisible();
+    await expect(page.getByText("1 of 3 steps done", { exact: false })).toBeVisible();
     await page.getByRole("button", { name: "Not now" }).click();
     await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
     await page.reload();
@@ -500,6 +556,12 @@ test.describe("the panel", () => {
     await expect(
       page.getByText("You were accepted to Riverbank clean-up"),
     ).toBeVisible();
+    await expect(page.getByText("An account asked to join yours")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "An account asked to join yours" }),
+    ).toHaveAttribute("href", "/en/settings");
+    await expect(page.getByText("bekzod@example.org")).toHaveCount(0);
+    await expect(page.getByText("merge-incoming")).toHaveCount(0);
     await page.getByRole("button", { name: "Mark all as read" }).click();
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),
@@ -511,13 +573,16 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the account menu keeps one profile destination and really signs out", async ({
+  test("the account menu reaches the profile and the account, and really signs out", async ({
     page,
   }) => {
     await page.getByRole("button", { name: /Account menu/ }).click();
     const menu = page.getByRole("navigation", { name: "Account menu" });
     await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
-    await expect(menu.getByRole("link", { name: "Settings" })).toHaveCount(0);
+    await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/en/settings",
+    );
     await menu.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/en\/login$/);
 
@@ -538,6 +603,7 @@ test.describe("the panel", () => {
       "/en/opportunities",
       "/en/record",
       "/en/profile",
+      "/en/settings",
       "/en/applications/app-book-drive",
     ]) {
       await page.goto(path);
@@ -739,41 +805,379 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
-  test("the profile form saves to the backend", async ({ page }) => {
-    await page.goto("/en/profile");
-    await page.getByLabel("Short introduction").fill("Second-year student.");
-    await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page.getByRole("status").last()).toContainText("Profile saved.");
-
-    await page.reload();
-    await expect(page.getByLabel("Short introduction")).toHaveValue(
-      "Second-year student.",
-    );
-    await expect(
-      page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "100");
-  });
-
-  test("legacy settings redirects to profile where preferences persist", async ({
+  test("the profile opens on the volunteer's own record, then edits below it", async ({
     page,
   }) => {
-    await page.goto("/en/settings");
-    await expect(page).toHaveURL(/\/en\/profile$/);
-    const telegram = page.getByRole("switch", { name: "Telegram messages" });
-    await expect(telegram).toHaveAttribute("aria-checked", "true");
-    await telegram.click();
-    await expect(telegram).toHaveAttribute("aria-checked", "false");
-    await expect(telegram).toBeEnabled();
+    await page.goto("/en/profile");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
+    ).toBeVisible();
+    await expect(page.getByText("Events")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit profile" })).toHaveAttribute(
+      "href",
+      "#edit",
+    );
+    await expect(page.locator("#edit")).toBeVisible();
+  });
+
+  test("the profile form saves to the backend and completes the profile", async ({
+    page,
+  }) => {
+    await page.goto("/en/profile");
+    await expect(
+      page.getByRole("progressbar", { name: "Profile completeness" }),
+    ).toHaveAttribute("aria-valuenow", "80");
+
+    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("button", { name: "Save profile" }).click();
 
     await page.reload();
+    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page.getByText("Profile complete", { exact: true })).toBeVisible();
     await expect(
-      page.getByRole("switch", { name: "Telegram messages" }),
-    ).toHaveAttribute("aria-checked", "false");
+      page.getByRole("progressbar", { name: "Profile completeness" }),
+    ).toHaveCount(0);
+  });
 
-    const dark = page.getByRole("switch", { name: "Dark theme" }).last();
+  test("contact details are optional and never block completeness", async ({
+    page,
+  }) => {
+    await page.goto("/en/profile");
+    await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
+    await expect(page.getByLabel("Phone number")).toHaveValue("");
+    await expect(page.getByLabel("Bio")).toBeVisible();
+    await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
+  });
+
+  test("the profile carries no settings of its own", async ({ page }) => {
+    await page.goto("/en/profile");
+    await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("region", { name: "Ways to sign in" })).toHaveCount(0);
+  });
+
+  test("the theme is switched from the top bar", async ({ page }) => {
+    await page.goto("/en/profile");
+    const dark = page.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await dark.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
+  });
+});
+
+test.describe("account connections and merges", () => {
+  test.beforeEach(async ({ page }) => {
+    await signInWithPassword(page);
+    await page.goto("/en/settings");
+  });
+
+  test("shows every way in and offers to connect what is missing", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Settings" }),
+    ).toBeVisible();
+
+    const connections = page.getByRole("region", { name: "Ways to sign in" });
+    await expect(
+      connections.getByRole("listitem").filter({ hasText: "Email and password" }),
+    ).toContainText("dilnoza@example.org");
+    await expect(
+      connections.getByRole("link", { name: "Connect Telegram" }),
+    ).toHaveAttribute("href", "/api/auth/connect/telegram/start?locale=en");
+    await expect(
+      connections.getByRole("link", { name: "Connect Google" }),
+    ).toBeVisible();
+    await expect(page.getByText("Connect an email account")).toHaveCount(0);
+  });
+
+  test("connecting Telegram links it directly and the page shows the new state", async ({
+    page,
+  }) => {
+    await page.getByRole("link", { name: "Connect Telegram" }).click();
+
+    await expect(page).toHaveURL("/en/settings?connect=linked");
+    await expect(
+      page.getByText("Connected. Both ways in now open this account."),
+    ).toBeVisible();
+
+    const connections = page.getByRole("region", { name: "Ways to sign in" });
+    await expect(
+      connections.getByRole("listitem").filter({ hasText: "Telegram" }),
+    ).toContainText("@dilnoza_k");
+    await expect(
+      connections.getByRole("link", { name: "Connect Telegram" }),
+    ).toHaveCount(0);
+  });
+
+  test("an identity already on this account says so and changes nothing", async ({
+    page,
+  }) => {
+    await completeTelegramConnection(page, "connect-already");
+
+    await expect(page).toHaveURL("/en/settings?connect=alreadyLinked");
+    await expect(
+      page.getByText("That was already connected to this account."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
+        name: "Connect Telegram",
+      }),
+    ).toBeVisible();
+  });
+
+  test("an identity owned by another account waits for that account to approve", async ({
+    page,
+  }) => {
+    await completeTelegramConnection(page, "connect-approval");
+
+    await expect(page).toHaveURL("/en/settings?connect=approvalRequired");
+    await expect(
+      page.getByText(
+        "That account belongs to someone else, so it was asked to approve joining yours.",
+      ),
+    ).toBeVisible();
+    await expect(
+      requestRow(page, "Waiting for the other account", "Telegram"),
+    ).toHaveCount(1);
+  });
+
+  test("an outgoing request can be cancelled from the page that raised it", async ({
+    page,
+  }) => {
+    await completeTelegramConnection(page, "connect-approval");
+    const row = requestRow(page, "Waiting for the other account", "Telegram");
+    await expect(row).toHaveCount(1);
+
+    await row.getByRole("button", { name: "Cancel the request" }).click();
+
+    await expect(row).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Waiting for the other account" }),
+    ).toContainText("Nothing is waiting.");
+  });
+
+  test("a callback whose state is not the one this browser started is refused", async ({
+    page,
+  }) => {
+    await connectState(page, "telegram");
+    await page.goto(
+      "/api/auth/connect/telegram/callback?code=connect-link&state=not-the-state-this-browser-started",
+    );
+
+    await expect(page).toHaveURL("/en/settings?connect=expired");
+    await expect(
+      page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
+        name: "Connect Telegram",
+      }),
+    ).toBeVisible();
+  });
+
+  test("a Google connection posted with another browser's state is refused", async ({
+    page,
+  }) => {
+    await connectState(page, "google");
+    await postGoogleConnection(page, "e2e-connect-google-9999-minted-by-the-stub", "x");
+
+    await expect(page).toHaveURL(/\/(uz|en)\/settings\?connect=expired$/);
+
+    await page.goto("/en/settings");
+    await expect(
+      page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
+        name: "Connect Google",
+      }),
+    ).toBeVisible();
+  });
+
+  test("a connection state cannot be redeemed twice", async ({ page }) => {
+    const state = await connectState(page, "telegram");
+    await completeTelegramConnection(page, "connect-link", state);
+    await expect(page).toHaveURL("/en/settings?connect=linked");
+
+    await completeTelegramConnection(page, "connect-link", state);
+    await expect(page).toHaveURL(/\/(uz|en)\/settings\?connect=expired$/);
+  });
+
+  test("a replayed callback returns in the language the reader was reading", async ({
+    page,
+  }) => {
+    await page.goto("/ru/settings");
+    const state = await connectState(page, "telegram", "ru");
+
+    await completeTelegramConnection(page, "connect-link", state);
+    await expect(page).toHaveURL("/ru/settings?connect=linked");
+
+    await completeTelegramConnection(page, "connect-link", state);
+    await expect(page).toHaveURL("/ru/settings?connect=expired");
+  });
+
+  test("the handoff carries a bounded status and nothing about the account", async ({
+    page,
+  }) => {
+    const statuses = [
+      "linked",
+      "alreadyLinked",
+      "approvalRequired",
+      "alreadyPending",
+      "conflict",
+      "expired",
+      "cancelled",
+      "phoneRequired",
+      "disabled",
+      "tooMany",
+      "unavailable",
+    ];
+
+    for (const code of ["connect-link", "connect-conflict", "connect-pending"]) {
+      await completeTelegramConnection(page, code);
+      const url = new URL(page.url());
+      expect([...url.searchParams.keys()]).toEqual(["connect"]);
+      expect(statuses).toContain(url.searchParams.get("connect"));
+      expect(url.href).not.toMatch(/token|state|code|@|merge-/i);
+    }
+
+    const stored = await page.evaluate(() => ({
+      local: Object.keys(localStorage),
+      session: Object.keys(sessionStorage),
+      cookie: document.cookie,
+    }));
+    expect(stored.local).toEqual([]);
+    expect(stored.session).toEqual([]);
+    expect(stored.cookie).not.toMatch(/volontyorlar_session|volontyorlar_connect/);
+  });
+
+  test("connecting an email account that belongs to someone else asks them to approve", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await page.goto("/en/settings");
+
+    await page.getByLabel("Email").fill("dilnoza@example.org");
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Check and connect" }).click();
+
+    await expect(
+      requestRow(page, "Waiting for the other account", "Email and password"),
+    ).toHaveCount(1);
+  });
+
+  test("a wrong password joins nothing and is refused in words", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/settings");
+
+    await page.getByLabel("Email").fill("dilnoza@example.org");
+    await page.getByLabel("Password", { exact: true }).fill("not the passphrase");
+    await page.getByRole("button", { name: "Check and connect" }).click();
+
+    await expect(
+      page.getByText("That email and password do not match an account."),
+    ).toBeVisible();
+    expect(page.url()).toBe(new URL("/en/settings", page.url()).href);
+    await expect(
+      page.getByRole("region", { name: "Waiting for the other account" }),
+    ).toContainText("Nothing is waiting.");
+  });
+
+  test("an incoming request can be rejected and leaves the list", async ({ page }) => {
+    const row = requestRow(page, "Waiting for your approval", "Google");
+    await expect(row).toHaveCount(1);
+
+    await row.getByRole("button", { name: "Reject" }).click();
+
+    await expect(row).toHaveCount(0);
+    await expect(requestRow(page, "Waiting for your approval", "Telegram")).toHaveCount(
+      1,
+    );
+  });
+
+  test("approving replaces this browser with the account that asked", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole("button", { name: /Account menu: Dilnoza Karimova/ }),
+    ).toBeVisible();
+
+    await requestRow(page, "Waiting for your approval", "Google")
+      .getByRole("button", { name: "Approve" })
+      .click();
+
+    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(
+      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
+    ).toBeVisible();
+    await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Waiting for your approval" }),
+    ).toContainText("Nothing is waiting.");
+  });
+
+  test("an expired request recovers by refetching the list", async ({ page }) => {
+    const row = requestRow(page, "Waiting for your approval", "Email and password");
+    await expect(row).toHaveCount(1);
+
+    await row.getByRole("button", { name: "Approve" }).click();
+
+    await expect(row).toHaveCount(0);
+    await expect(page).toHaveURL(/\/en\/settings$/);
+    await page.reload();
+    await expect(
+      requestRow(page, "Waiting for your approval", "Email and password"),
+    ).toHaveCount(0);
+  });
+
+  test("an approval that needs a fresh sign-in returns to the account page", async ({
+    page,
+  }) => {
+    const row = requestRow(page, "Waiting for your approval", "Telegram");
+    await row.getByRole("button", { name: "Approve" }).click();
+
+    const alert = page
+      .getByRole("alert")
+      .filter({ hasText: "Sign in again to approve" });
+    await expect(alert).toBeVisible();
+
+    await alert.getByRole("button", { name: "Sign in again" }).click();
+    await expect(page).toHaveURL("/en/login?next=%2Fen%2Fsettings");
+
+    await submitPasswordLogin(page, /\/en\/settings$/);
+    await expect(requestRow(page, "Waiting for your approval", "Telegram")).toHaveCount(
+      1,
+    );
+  });
+
+  test("two clicks on approve cannot resolve the same request twice", async ({
+    page,
+  }) => {
+    const row = requestRow(page, "Waiting for your approval", "Google");
+    const approve = row.getByRole("button", { name: "Approve" });
+    const reject = row.getByRole("button", { name: "Reject" });
+
+    await approve.click();
+    await expect(reject).toBeDisabled();
+
+    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(
+      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
+    ).toBeVisible();
+  });
+
+  test("works from the keyboard, at both themes, and with reduced motion", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/en/settings");
+
+    const approve = requestRow(page, "Waiting for your approval", "Google").getByRole(
+      "button",
+      { name: "Approve" },
+    );
+    await approve.focus();
+    await expect(approve).toBeFocused();
+
+    const before = await page.locator("html").getAttribute("data-theme");
+    await page.getByRole("switch", { name: "Dark theme" }).first().click();
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
+    await expect(approve).toBeVisible();
+    expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
   });
 });
 

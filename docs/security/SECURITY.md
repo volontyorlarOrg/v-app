@@ -51,8 +51,10 @@ HTTP (the Playwright suite) still receives its own cookie.
 refresh token, the user id, roles and display name, encrypted as a JWE
 (`dir` + `A256GCM`, the key being SHA-256 of `VOLONTYORLAR_SESSION_SECRET`).
 It is `httpOnly`, `sameSite=lax`, `path=/`, `secure` in production, and lives
-30 days. No token is readable by JavaScript, appears in a URL, or reaches
-browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
+90 days — but the backend's `JWT_REFRESH_TTL_SECONDS` is the real ceiling: once
+the refresh token behind the cookie expires, rotation fails and the volunteer
+signs in again however long the cookie itself had left. No token is readable by
+JavaScript, appears in a URL, or reaches browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
 treated as signed out rather than trusted.
 
 `src/proxy.ts` reads it on every app request and enforces the `guard` each
@@ -101,6 +103,32 @@ without a session. Telegram's own `error=access_denied` becomes
 `?telegram=cancelled`, and a sign-in without a shared phone number
 `?telegram=phoneRequired`.
 
+### Joining a second account
+
+A signed-in volunteer connecting a second identity never touches the sign-in
+cookies. The handoff is carried by `volontyorlar_connect_state`,
+`volontyorlar_connect_google_state` and `volontyorlar_connect_locale`, three
+`httpOnly` cookies of their own: the Telegram pair is `SameSite=Lax` like the
+sign-in handoff, and the Google pair is `SameSite=None; Secure` because Google
+posts its ID token cross-site to `/api/auth/connect/google/callback`. Both
+callbacks refuse to call the backend until the returned `state` equals the
+cookie this browser holds, and both clear the cookies on the way out, so a
+replayed callback is refused.
+
+A completion returns to `/{locale}/settings?connect=<status>` where the status
+is one of eleven words the catalog translates. No email address, account id,
+provider name, merge-request id, token or provider state ever reaches a query
+string, a Client Component, browser storage or a log line; the page reads the
+outcome by fetching `/me` and the pending requests again on the server.
+
+Approving a merge is the one place a Server Action replaces the session: the
+backend returns the canonical account's session inside the approval, the action
+parses it with the same schema sign-in uses and writes the same encrypted
+`httpOnly` cookie. When the backend answers `recentAuthenticationRequired`
+instead, `/api/auth/connect/reauthenticate` ends the session on the backend,
+clears the cookie and returns the browser to sign-in with a same-origin
+`next=/{locale}/settings`.
+
 The only stored values remain the light/dark theme choice and the interface
 language, both in readable cookies shared with the marketing site so a choice
 made on either origin holds on the other, and the welcome flow's progress
@@ -113,15 +141,24 @@ progress, and the privacy page names the first two. The answers given in the
 flow are saved to the backend at each step and never enter browser storage.
 Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
-same-origin `?next=` path checked by `safeReturnPath`.
+same-origin `?next=` path checked by `safeReturnPath`, and the account page only
+`?connect=<status>`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
+The portfolio links a volunteer puts on their own profile are untrusted input:
+`src/lib/profile/links.ts` renders one only when it parses as `http:` or
+`https:`, drops anything else rather than guessing, shows the host instead of
+the raw string, and the anchor carries `rel="noopener noreferrer nofollow"`.
 
 ## Not implemented
 
 - Google sign-in; the button renders disabled with a note
 - email/password sign-in; the backend has none, so the app shows no form
-- account linking, settings, and "sign out everywhere"
+- notification, privacy and appearance preferences; the application no longer
+  reads or writes `/me/preferences`, and no screen offers those switches
+- unlinking, unmerging, export and account deletion; `/settings` connects and
+  merges only
+- "sign out everywhere"
 - analytics, monitoring, or error reporting
 
 They are designed in

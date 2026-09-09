@@ -2,14 +2,10 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import {
-  ONBOARDING_PREFERENCE_KEYS,
-  type OnboardingLabels,
-} from "@/components/onboarding/labels";
+import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
-import type { OnboardingPreferences } from "@/components/onboarding/preferences-step";
 import type { Locale } from "@/i18n/routing";
-import { getMe, getPreferences } from "@/lib/api/account.server";
+import { getMe } from "@/lib/api/account.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
 import { safeReturnPath } from "@/lib/auth/session";
@@ -42,11 +38,10 @@ export default async function WelcomePage({
   setRequestLocale(locale);
 
   const { next } = await searchParams;
-  const [session, profile, me, preferences, state] = await Promise.all([
+  const [session, profile, me, state] = await Promise.all([
     requireSession(),
     getProfile(),
     getMe(),
-    getPreferences(),
     readOnboardingState(),
   ]);
 
@@ -60,38 +55,27 @@ export default async function WelcomePage({
       locale={locale as Locale}
       values={values}
       profileSaved={profile !== null}
-      preferences={preferences}
       next={safeReturnPath(typeof next === "string" ? next : null)}
       initialStep={resumeStep(state)}
     />
   );
 }
 
-const PREFERENCE_COPY = {
-  remindDeadlines: "notifications.deadlines",
-  notifyDecisions: "notifications.decisions",
-  notifyTelegram: "notifications.telegram",
-  profileToOrganisers: "privacy.profileToOrganisers",
-} as const;
-
 function Welcome({
   locale,
   values,
   profileSaved,
-  preferences,
   next,
   initialStep,
 }: {
   locale: Locale;
   values: VolunteerProfile;
   profileSaved: boolean;
-  preferences: OnboardingPreferences;
   next: string | null;
   initialStep: OnboardingStep;
 }) {
   const t = useTranslations("onboarding");
   const profile = useTranslations("profile");
-  const settings = useTranslations("settings");
   const opportunities = useTranslations("opportunities");
 
   const firstName = values.fullName.trim().split(/\s+/)[0] ?? "";
@@ -142,15 +126,6 @@ function Welcome({
     fields: Object.fromEntries(
       fieldKeys.map((key) => [key, profile(`fields.${key}`)]),
     ) as OnboardingLabels["fields"],
-    preferences: Object.fromEntries(
-      ONBOARDING_PREFERENCE_KEYS.map((key) => [
-        key,
-        {
-          label: settings(PREFERENCE_COPY[key]),
-          description: settings(`${PREFERENCE_COPY[key]}Help`),
-        },
-      ]),
-    ) as OnboardingLabels["preferences"],
     done: {
       title: t("done.title"),
       complete: t("done.complete"),
@@ -168,7 +143,7 @@ function Welcome({
   };
 
   const completionFields = Object.fromEntries(
-    COMPLETION_FIELDS.map((field) => [field, profile(`fields.${field}`)]),
+    COMPLETION_FIELDS.map((field) => [field, profile(`completionFields.${field}`)]),
   ) as Record<CompletionField, string>;
 
   return (
@@ -179,11 +154,6 @@ function Welcome({
       initialStep={initialStep}
       initialValues={values}
       profileSaved={profileSaved}
-      initialPreferences={
-        Object.fromEntries(
-          ONBOARDING_PREFERENCE_KEYS.map((key) => [key, preferences[key]]),
-        ) as OnboardingPreferences
-      }
       next={next}
       regions={REGIONS.map((region) => ({
         value: region,

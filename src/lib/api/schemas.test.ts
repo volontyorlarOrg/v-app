@@ -3,12 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   applicationDetailSchema,
   applicationListSchema,
+  authMethodsSchema,
+  connectionOutcomeSchema,
   historySchema,
   meSchema,
+  mergeApprovalSchema,
+  mergeRequestListSchema,
+  mergeRequestSchema,
+  mergeResolutionSchema,
   notificationListSchema,
   opportunityDetailSchema,
   opportunityListSchema,
-  preferencesSchema,
   profileSchema,
   recordSchema,
   savedListSchema,
@@ -82,7 +87,12 @@ describe("opportunity schemas", () => {
   });
 
   it("rejects a region the interface does not know", () => {
-    expect(opportunityListSchema.safeParse({ items: [{ ...summary, region: "atlantis" }], total: 1 }).success).toBe(false);
+    expect(
+      opportunityListSchema.safeParse({
+        items: [{ ...summary, region: "atlantis" }],
+        total: 1,
+      }).success,
+    ).toBe(false);
   });
 });
 
@@ -100,11 +110,21 @@ describe("application schemas", () => {
         { questionId: "q2", value: ["a", "b"], prompt: "Pick", type: "multi_select" },
         { questionId: null, value: 5 },
       ],
-      profileSnapshot: { fullName: "Dilnoza", region: "tashkent-city", school: "", phone: "", telegram: "d" },
+      profileSnapshot: {
+        fullName: "Dilnoza",
+        region: "tashkent-city",
+        school: "",
+        phone: "",
+        telegram: "d",
+      },
       reviewerNote: undefined,
     });
     expect(parsed.reviewedAt).toBeUndefined();
-    expect(parsed.answers.map((answer) => answer.value)).toEqual(["text", ["a", "b"], ""]);
+    expect(parsed.answers.map((answer) => answer.value)).toEqual([
+      "text",
+      ["a", "b"],
+      "",
+    ]);
     expect(parsed.answers[1]?.prompt).toBe("Pick");
     expect(parsed.profileSnapshot?.fullName).toBe("Dilnoza");
   });
@@ -136,7 +156,6 @@ describe("account schemas", () => {
       region: null,
       city: "",
       languages: ["uz"],
-      skills: [],
       phone: "",
       phoneVerified: false,
       telegram: "dilnoza",
@@ -158,17 +177,18 @@ describe("account schemas", () => {
     expect(parsed.displayName).toBeUndefined();
     expect(parsed.telegramIdentity?.username).toBeUndefined();
   });
-
-  it("requires every preference switch", () => {
-    expect(preferencesSchema.safeParse({ notifyTelegram: true }).success).toBe(false);
-  });
 });
 
 describe("record and notification schemas", () => {
   it("reads the record, the history and the saved list", () => {
     expect(
       recordSchema.parse({
-        counts: { attended: 5, acceptedResolved: 6, acceptedUnconfirmed: 1, standoutReviews: false },
+        counts: {
+          attended: 5,
+          acceptedResolved: 6,
+          acceptedUnconfirmed: 1,
+          standoutReviews: false,
+        },
         hours: undefined,
         hoursVerified: true,
       }).hours,
@@ -217,5 +237,196 @@ describe("record and notification schemas", () => {
     });
     expect(parsed.items.map((item) => item.unread)).toEqual([true, false]);
     expect(parsed.items[0]?.at).toBe("2026-09-01T10:00:00.000Z");
+  });
+});
+
+const account = {
+  id: "40000000-0000-4000-8000-000000000001",
+  authMethods: { telegram: true, google: true, password: true },
+};
+
+const pendingRequest = {
+  id: "50000000-0000-4000-8000-000000000001",
+  status: "pending",
+  direction: "incoming",
+  requestedVia: "google",
+  createdAt: "2026-09-09T08:00:00.000Z",
+  expiresAt: "2026-09-10T08:00:00.000Z",
+  counterparty: {
+    displayName: "Bekzod Rustamov",
+    authMethods: { telegram: true, google: false, password: false },
+  },
+};
+
+describe("the account schema", () => {
+  it("reads the email and every sign-in method the backend reports", () => {
+    const parsed = meSchema.parse({
+      id: "u1",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      email: "dilnoza@example.org",
+      emailVerified: true,
+      telegramIdentity: { username: "dilnoza_k" },
+      authMethods: { telegram: true, google: false, password: true },
+    });
+
+    expect(parsed.email).toBe("dilnoza@example.org");
+    expect(parsed.emailVerified).toBe(true);
+    expect(parsed.authMethods).toEqual({
+      telegram: true,
+      google: false,
+      password: true,
+    });
+    expect(parsed.telegramIdentity?.username).toBe("dilnoza_k");
+  });
+
+  it("refuses an auth-methods object that leaves a provider out", () => {
+    expect(authMethodsSchema.safeParse({ google: true }).success).toBe(false);
+    expect(
+      authMethodsSchema.safeParse({ telegram: true, google: false, password: false })
+        .success,
+    ).toBe(true);
+  });
+
+  it("reads the older identity shape as a connected Telegram method", () => {
+    const parsed = meSchema.parse({
+      id: "u1",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      telegramIdentity: { username: "dilnoza_k" },
+    });
+
+    expect(parsed.authMethods).toEqual({
+      telegram: true,
+      google: false,
+      password: false,
+    });
+  });
+
+  it("refuses an account with no id", () => {
+    expect(meSchema.safeParse({ createdAt: "2026-01-01T00:00:00.000Z" }).success).toBe(
+      false,
+    );
+  });
+});
+
+describe("connection outcomes", () => {
+  it("accepts a direct link", () => {
+    const parsed = connectionOutcomeSchema.parse({ outcome: "linked", account });
+    expect(parsed.outcome).toBe("linked");
+    expect(parsed.outcome === "linked" && parsed.account.id).toBe(account.id);
+  });
+
+  it("accepts an identity that was already linked", () => {
+    const parsed = connectionOutcomeSchema.parse({ outcome: "alreadyLinked", account });
+    expect(parsed.outcome).toBe("alreadyLinked");
+  });
+
+  it("accepts an outcome that needs the other account to approve", () => {
+    const parsed = connectionOutcomeSchema.parse({
+      outcome: "approvalRequired",
+      mergeRequest: { ...pendingRequest, direction: "outgoing" },
+    });
+    expect(parsed.outcome === "approvalRequired" && parsed.mergeRequest.status).toBe(
+      "pending",
+    );
+  });
+
+  it("refuses an unknown outcome, a linked outcome with no account, and an approval with no request", () => {
+    expect(connectionOutcomeSchema.safeParse({ outcome: "merged" }).success).toBe(
+      false,
+    );
+    expect(connectionOutcomeSchema.safeParse({ outcome: "linked" }).success).toBe(
+      false,
+    );
+    expect(
+      connectionOutcomeSchema.safeParse({ outcome: "approvalRequired", account })
+        .success,
+    ).toBe(false);
+  });
+});
+
+describe("merge requests", () => {
+  it("reads a request in both directions, with the account on the other side", () => {
+    for (const direction of ["incoming", "outgoing"] as const) {
+      const parsed = mergeRequestSchema.parse({ ...pendingRequest, direction });
+      expect(parsed.direction).toBe(direction);
+      expect(parsed.expiresAt).toBe(pendingRequest.expiresAt);
+      expect(parsed.requestedVia).toBe("google");
+      expect(parsed.counterparty.displayName).toBe("Bekzod Rustamov");
+      expect(parsed.counterparty.authMethods.telegram).toBe(true);
+    }
+  });
+
+  it("reads the list as the two sides the backend separates", () => {
+    const parsed = mergeRequestListSchema.parse({
+      incoming: [pendingRequest],
+      outgoing: [{ ...pendingRequest, id: "out-1", direction: "outgoing" }],
+    });
+    expect(parsed.incoming.map((item) => item.id)).toEqual([pendingRequest.id]);
+    expect(parsed.outgoing.map((item) => item.id)).toEqual(["out-1"]);
+  });
+
+  it("refuses a list that is missing a side", () => {
+    expect(mergeRequestListSchema.safeParse({ incoming: [] }).success).toBe(false);
+    expect(mergeRequestListSchema.safeParse({ items: [] }).success).toBe(false);
+  });
+
+  it("refuses an unknown status, direction, provider or missing counterparty", () => {
+    expect(
+      mergeRequestSchema.safeParse({ ...pendingRequest, status: "merged" }).success,
+    ).toBe(false);
+    expect(
+      mergeRequestSchema.safeParse({ ...pendingRequest, direction: "sideways" })
+        .success,
+    ).toBe(false);
+    expect(
+      mergeRequestSchema.safeParse({ ...pendingRequest, requestedVia: "apple" })
+        .success,
+    ).toBe(false);
+    const withoutCounterparty = { ...pendingRequest, counterparty: undefined };
+    expect(mergeRequestSchema.safeParse(withoutCounterparty).success).toBe(false);
+  });
+
+  it("reads what a rejection and a cancellation return", () => {
+    const parsed = mergeResolutionSchema.parse({
+      request: {
+        ...pendingRequest,
+        status: "rejected",
+        decidedAt: "2026-09-09T09:00:00.000Z",
+      },
+    });
+    expect(parsed.request.status).toBe("rejected");
+    expect(mergeResolutionSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("reads an approval with the session the backend issued", () => {
+    const parsed = mergeApprovalSchema.parse({
+      outcome: "merged",
+      request: { ...pendingRequest, status: "completed" },
+      session: {
+        userId: "u1",
+        accessToken: "access",
+        refreshToken: "refresh",
+        accessTokenExpiresAt: 1_800_000_000,
+      },
+    });
+
+    expect(parsed.session.accessToken).toBe("access");
+    expect(parsed.request.status).toBe("completed");
+  });
+
+  it("refuses an approval that carries no session to write", () => {
+    expect(
+      mergeApprovalSchema.safeParse({
+        outcome: "merged",
+        request: { ...pendingRequest, status: "completed" },
+      }).success,
+    ).toBe(false);
+    expect(
+      mergeApprovalSchema.safeParse({
+        outcome: "merged",
+        request: { ...pendingRequest, status: "completed" },
+        session: { userId: "u1" },
+      }).success,
+    ).toBe(false);
   });
 });

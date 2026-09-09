@@ -373,17 +373,6 @@ export function PassStage({
         group.add(mesh(bar(1.12, 0.09), muted, -0.66, -0.86, 0.06));
       }
       {
-        const { group, surface } = part("preferences", "pop");
-        const track = surface("primary", 0.5);
-        const knob = surface("knockout", 0.6);
-        group.add(
-          mesh(plate(roundedRect(0.4, 0.2, 0.1), 0.03), track, 0.72, 0.6, 0.06),
-        );
-        group.add(
-          mesh(keep(new THREE.SphereGeometry(0.072, 16, 16)), knob, 0.8, 0.6, 0.09),
-        );
-      }
-      {
         const { group, surface } = part("sealed", "stamp");
         const seal = surface("accent", 0.45);
         const knockout = surface("knockout", 0.6);
@@ -773,17 +762,6 @@ function PassFallback({ parts }: { parts: PassParts }) {
             rx="4"
             className="fill-ink-muted"
           />
-        </g>
-        <g className="onboarding-pass-part" data-on={on("preferences")}>
-          <rect
-            x="170"
-            y="204"
-            width="36"
-            height="18"
-            rx="9"
-            className="fill-primary"
-          />
-          <circle cx="197" cy="213" r="6.5" className="fill-knockout" />
         </g>
         <g className="onboarding-pass-part" data-on={on("sealed")}>
           <circle cx="184" cy="286" r="26" className="fill-accent" />

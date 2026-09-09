@@ -1,4 +1,4 @@
-import type { ProfileFields } from "@/lib/profile/completion";
+import type { VolunteerProfile } from "@/lib/profile/completion";
 import type { ProfileFormValues } from "@/lib/profile/input";
 
 export const ONBOARDING_STEPS = [
@@ -6,7 +6,6 @@ export const ONBOARDING_STEPS = [
   "about",
   "place",
   "contact",
-  "preferences",
   "done",
 ] as const;
 
@@ -15,7 +14,7 @@ export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 export const PROFILE_STEPS = ["about", "place", "contact"] as const;
 export type ProfileStep = (typeof PROFILE_STEPS)[number];
 
-export const FORM_STEPS = ["about", "place", "contact", "preferences"] as const;
+export const FORM_STEPS = ["about", "place", "contact"] as const;
 export type FormStep = (typeof FORM_STEPS)[number];
 export const FORM_STEP_COUNT = FORM_STEPS.length;
 
@@ -71,7 +70,6 @@ export type PassParts = {
   place: boolean;
   languages: boolean;
   contact: boolean;
-  preferences: boolean;
   sealed: boolean;
 };
 
@@ -80,17 +78,15 @@ export const PASS_PART_KEYS = [
   "place",
   "languages",
   "contact",
-  "preferences",
   "sealed",
 ] as const satisfies readonly (keyof PassParts)[];
 
-export function passParts(profile: ProfileFields, step: OnboardingStep): PassParts {
+export function passParts(profile: VolunteerProfile, step: OnboardingStep): PassParts {
   return {
     name: profile.fullName.trim().length >= 2,
     place: profile.school.trim().length > 0 || profile.region !== null,
     languages: profile.languages.length > 0,
     contact: profile.phone.trim().length > 0 || profile.telegram.trim().length > 0,
-    preferences: stepIndex(step) > stepIndex("preferences"),
     sealed: step === "done",
   };
 }

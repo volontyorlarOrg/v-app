@@ -236,14 +236,35 @@ function applicable(item) {
   return item.status === "open" && new Date(item.applicationDeadline) > new Date();
 }
 
+function freshAccount() {
+  return {
+    email: null,
+    emailVerified: false,
+    telegramIdentity: null,
+    authMethods: { telegram: false, google: false, password: false },
+  };
+}
+
+function counterparty(displayName, authMethods) {
+  return { displayName, authMethods };
+}
+
+function seededMergeRequests() {
+  const asking = counterparty("Bekzod Rustamov", { telegram: true, google: true, password: false });
+  return [
+    { id: "merge-incoming", status: "pending", direction: "incoming", requestedVia: "google", createdAt: at(0, 9), expiresAt: at(1, 9), counterparty: asking },
+    { id: "merge-reauth", status: "pending", direction: "incoming", requestedVia: "telegram", createdAt: at(0, 8), expiresAt: at(1, 8), counterparty: asking },
+    { id: "merge-expired", status: "pending", direction: "incoming", requestedVia: "password", createdAt: at(-1, 8), expiresAt: at(1, 7), counterparty: asking },
+  ];
+}
+
 function freshState() {
   return {
-    user: {
-      id: "user-dilnoza",
-      displayName: "Dilnoza Karimova",
-      roles: ["volunteer"],
-      createdAt: at(-40),
-    },
+    account: freshAccount(),
+    mergeRequests: seededMergeRequests(),
+    connectStates: new Set(),
+    googleConnectStates: new Set(),
+    user: { id: "user-dilnoza", displayName: "Dilnoza Karimova", roles: ["volunteer"], createdAt: at(-40) },
     profile: {
       fullName: "Dilnoza Karimova",
       bio: "",
@@ -339,29 +360,14 @@ function freshState() {
       },
     ],
     notifications: [
-      {
-        id: "n-accepted",
-        kind: "application.accepted",
-        title: "You were accepted to Riverbank clean-up",
-        body: "See you on the day.",
-        data: null,
-        readAt: null,
-        createdAt: at(-4, 11),
-      },
-      {
-        id: "n-received",
-        kind: "application.submitted",
-        title: "Application received",
-        body: "",
-        data: null,
-        readAt: at(-6, 20),
-        createdAt: at(-6, 19),
-      },
+      { id: "n-accepted", kind: "application.accepted", title: "You were accepted to Riverbank clean-up", body: "See you on the day.", data: null, readAt: null, createdAt: at(-4, 11) },
+      { id: "n-received", kind: "application.submitted", title: "Application received", body: "", data: null, readAt: at(-6, 20), createdAt: at(-6, 19) },
+      { id: "n-merge", kind: "account.merge.requested", title: "bekzod@example.org asked to join dilnoza@example.org", body: "Merge request merge-incoming is waiting.", data: null, readAt: at(-1, 20), createdAt: at(-1, 19) },
     ],
   };
 }
 
-function newAccountState(fullName) {
+function newAccountState(email, fullName) {
   const state = freshState();
   state.user = {
     id: `user-new-${issued + 1}`,
@@ -369,16 +375,13 @@ function newAccountState(fullName) {
     roles: ["volunteer"],
     createdAt: new Date().toISOString(),
   };
+  state.account = { ...freshAccount(), email: email ?? null, authMethods: { telegram: false, google: false, password: true } };
+  state.mergeRequests = [];
   state.profile = null;
   state.applications = [];
   state.saved = [];
   state.record = {
-    counts: {
-      attended: 0,
-      acceptedResolved: 0,
-      acceptedUnconfirmed: 0,
-      standoutReviews: false,
-    },
+    counts: { attended: 0, acceptedResolved: 0, acceptedUnconfirmed: 0, standoutReviews: false },
     hours: 0,
     hoursVerified: true,
   };
@@ -397,6 +400,9 @@ const passwordAccounts = new Map([[SEEDED_EMAIL, SEEDED_PASSWORD]]);
 let issued = 0;
 let started = 0;
 let challenged = 0;
+let connectStarted = 0;
+let connectChallenged = 0;
+let merged = 0;
 
 function issueSession(state) {
   issued += 1;
@@ -411,6 +417,107 @@ function issueSession(state) {
     accessTokenExpiresAt: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_TTL_SECONDS,
     displayName: state.user.displayName,
     roles: state.user.roles,
+  };
+}
+
+function passwordState(email) {
+  const state = freshState();
+  state.account.email = email;
+  state.account.authMethods.password = true;
+  return state;
+}
+
+function requesterState() {
+  const state = freshState();
+  state.user = { id: "user-bekzod", displayName: "Bekzod Rustamov", roles: ["volunteer"], createdAt: at(-60) };
+  state.profile = { ...state.profile, fullName: "Bekzod Rustamov", telegram: "bekzod_r" };
+  state.account = {
+    email: "bekzod@example.org",
+    emailVerified: true,
+    telegramIdentity: { username: "bekzod_r", linkedAt: at(-60) },
+    authMethods: { telegram: true, google: true, password: false },
+  };
+  state.mergeRequests = [];
+  return state;
+}
+
+function serializeAccount(state) {
+  return { id: state.user.id, authMethods: state.account.authMethods };
+}
+
+function connectionOutcome(state, provider, code) {
+  if (code === "connect-conflict") {
+    return { status: 409, body: { code: "accountConnectionConflict" } };
+  }
+  if (code === "connect-pending") {
+    return { status: 409, body: { code: "accountMergeAlreadyPending" } };
+  }
+  if (code === "connect-unavailable") {
+    return { status: 503, body: { code: "accountLinkingUnavailable" } };
+  }
+  if (code === "connect-already") {
+    return { status: 200, body: { outcome: "alreadyLinked", account: serializeAccount(state) } };
+  }
+  if (code === "connect-approval") {
+    merged += 1;
+    const request = {
+      id: `merge-outgoing-${merged}`,
+      status: "pending",
+      direction: "outgoing",
+      requestedVia: provider,
+      createdAt: new Date().toISOString(),
+      expiresAt: at(1, 12),
+      counterparty: counterparty("Bekzod Rustamov", { telegram: true, google: false, password: true }),
+    };
+    state.mergeRequests.push(request);
+    return { status: 200, body: { outcome: "approvalRequired", mergeRequest: request } };
+  }
+
+  if (provider === "telegram") {
+    state.account.authMethods.telegram = true;
+    state.account.telegramIdentity = { username: "dilnoza_k", linkedAt: new Date().toISOString() };
+  }
+  if (provider === "google") {
+    state.account.authMethods.google = true;
+    state.account.email = state.account.email ?? "dilnoza@example.org";
+  }
+  return { status: 200, body: { outcome: "linked", account: serializeAccount(state) } };
+}
+
+function findMergeRequest(state, id) {
+  return state.mergeRequests.find((candidate) => candidate.id === id);
+}
+
+function resolveMergeRequest(state, id, resolution) {
+  const request = findMergeRequest(state, id);
+  if (!request) return { status: 404, body: { code: "accountMergeRequestNotFound" } };
+  if (request.status !== "pending") {
+    return { status: 409, body: { code: "accountMergeRequestNotPending" } };
+  }
+  if (id === "merge-expired" || new Date(request.expiresAt) <= new Date()) {
+    request.status = "expired";
+    return { status: 409, body: { code: "accountMergeRequestExpired" } };
+  }
+  if (resolution === "cancel" && request.direction !== "outgoing") {
+    return { status: 409, body: { code: "accountMergeRequestNotPending" } };
+  }
+  if (resolution !== "cancel" && request.direction !== "incoming") {
+    return { status: 409, body: { code: "accountMergeRequestNotPending" } };
+  }
+  if (resolution === "approve" && id === "merge-reauth") {
+    return { status: 403, body: { code: "recentAuthenticationRequired" } };
+  }
+
+  request.status =
+    resolution === "approve" ? "completed" : resolution === "reject" ? "rejected" : "cancelled";
+  request.decidedAt = new Date().toISOString();
+  if (resolution === "approve") request.completedAt = request.decidedAt;
+
+  if (resolution !== "approve") return { status: 200, body: { request } };
+
+  return {
+    status: 200,
+    body: { outcome: "merged", request, session: issueSession(requesterState()) },
   };
 }
 
@@ -537,9 +644,18 @@ const server = createServer(async (request, response) => {
     if (!pendingStates.delete(body.state))
       return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
-    if (body.code !== "e2e-code")
-      return send(response, 401, { code: "invalidAuthorizationCode" });
-    return send(response, 201, issueSession(freshState()));
+    if (body.code !== "e2e-code") return send(response, 401, { code: "invalidAuthorizationCode" });
+    const opened = freshState();
+    opened.account.authMethods.telegram = true;
+    opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
+    return send(response, 201, issueSession(opened));
+  }
+  if (path === "/oauth/connect" && method === "GET") {
+    const callback = new URL("/api/auth/connect/telegram/callback", APP_URL);
+    callback.searchParams.set("code", url.searchParams.get("code") ?? "connect-link");
+    callback.searchParams.set("state", url.searchParams.get("state") ?? "");
+    response.writeHead(302, { location: callback.toString() });
+    return response.end();
   }
   if (path === "/auth/google/challenge" && method === "POST") {
     challenged += 1;
@@ -553,11 +669,13 @@ const server = createServer(async (request, response) => {
     });
   }
   if (path === "/auth/google/complete" && method === "POST") {
-    if (!googleChallenges.delete(body.state))
-      return send(response, 401, { code: "invalidGoogleState" });
-    if (body.credential !== "e2e-google-id-token")
-      return send(response, 401, { code: "invalidGoogleCredential" });
-    return send(response, 200, issueSession(freshState()));
+    if (!googleChallenges.delete(body.state)) return send(response, 401, { code: "invalidGoogleState" });
+    if (body.credential !== "e2e-google-id-token") return send(response, 401, { code: "invalidGoogleCredential" });
+    const opened = freshState();
+    opened.account.email = SEEDED_EMAIL;
+    opened.account.emailVerified = true;
+    opened.account.authMethods.google = true;
+    return send(response, 200, issueSession(opened));
   }
   if (path === "/auth/password/signup" && method === "POST") {
     if (body.email === SEEDED_EMAIL)
@@ -566,7 +684,7 @@ const server = createServer(async (request, response) => {
       return send(response, 422, { code: "weakPassword" });
     passwordAccounts.set(body.email, body.password);
     return send(response, 201, {
-      ...issueSession(newAccountState(body.fullName)),
+      ...issueSession(newAccountState(body.email, body.fullName)),
       isNewUser: true,
     });
   }
@@ -574,7 +692,7 @@ const server = createServer(async (request, response) => {
     if (passwordAccounts.get(body.email) !== body.password) {
       return send(response, 401, { code: "invalidCredentials" });
     }
-    return send(response, 200, issueSession(freshState()));
+    return send(response, 200, issueSession(passwordState(body.email)));
   }
   if (path === "/auth/refresh" && method === "POST") {
     const state = refreshTokens.get(body.refreshToken);
@@ -602,9 +720,90 @@ const server = createServer(async (request, response) => {
   if (path === "/me" && method === "GET") {
     return send(response, 200, {
       ...state.user,
-      telegramIdentity: { username: "dilnoza_k", linkedAt: at(-40) },
+      email: state.account.email ?? null,
+      emailVerified: state.account.emailVerified,
+      authMethods: state.account.authMethods,
+      telegramIdentity: state.account.telegramIdentity,
       preferences: state.preferences,
     });
+  }
+
+  if (path === "/me/account-connections/telegram/authorize" && method === "POST") {
+    connectStarted += 1;
+    const connectState = `e2e-connect-state-${String(connectStarted).padStart(4, "0")}-minted-by-the-stub`;
+    state.connectStates.add(connectState);
+    return send(response, 201, {
+      authorizationUrl: `http://127.0.0.1:${PORT}/oauth/connect?state=${encodeURIComponent(connectState)}`,
+      state: connectState,
+      expiresAt: at(0, 23),
+    });
+  }
+  if (path === "/me/account-connections/telegram/complete" && method === "POST") {
+    if (!state.connectStates.delete(body.state)) {
+      return send(response, 401, { code: "invalidLoginState" });
+    }
+    const outcome = connectionOutcome(state, "telegram", body.code);
+    return send(response, outcome.status, outcome.body);
+  }
+  if (path === "/me/account-connections/google/challenge" && method === "POST") {
+    connectChallenged += 1;
+    const suffix = String(connectChallenged).padStart(4, "0");
+    const connectState = `e2e-connect-google-${suffix}-minted-by-the-stub`;
+    state.googleConnectStates.add(connectState);
+    return send(response, 201, {
+      state: connectState,
+      nonce: `e2e-connect-nonce-${suffix}-minted`,
+      expiresAt: at(0, 23),
+    });
+  }
+  if (path === "/me/account-connections/google/complete" && method === "POST") {
+    if (!state.googleConnectStates.delete(body.state)) {
+      return send(response, 401, { code: "invalidGoogleState" });
+    }
+    const outcome = connectionOutcome(state, "google", body.credential);
+    return send(response, outcome.status, outcome.body);
+  }
+  if (path === "/me/account-connections/password/verify" && method === "POST") {
+    if (!body.email || !body.password) {
+      return send(response, 422, { code: "validationFailed" });
+    }
+    if (passwordAccounts.get(body.email) !== body.password) {
+      return send(response, 401, { code: "invalidCredentials" });
+    }
+    const outcome = connectionOutcome(
+      state,
+      "password",
+      body.email === SEEDED_EMAIL ? "connect-approval" : "connect-link",
+    );
+    if (outcome.body.outcome === "linked") {
+      state.account.email = body.email;
+      state.account.authMethods.password = true;
+      outcome.body.account = serializeAccount(state);
+    }
+    return send(response, outcome.status, outcome.body);
+  }
+  if (path === "/me/account-merge-requests" && method === "GET") {
+    const pending = state.mergeRequests.filter(
+      (request) => request.status === "pending" && new Date(request.expiresAt) > new Date(),
+    );
+    return send(response, 200, {
+      incoming: pending.filter((request) => request.direction === "incoming"),
+      outgoing: pending.filter((request) => request.direction === "outgoing"),
+    });
+  }
+  const mergeMatch = /^\/me\/account-merge-requests\/([^/]+)(?:\/(approve|reject|cancel))?$/.exec(path);
+  if (mergeMatch) {
+    const [, id, resolution] = mergeMatch;
+    if (!resolution && method === "GET") {
+      const request = findMergeRequest(state, id);
+      return request
+        ? send(response, 200, request)
+        : send(response, 404, { code: "accountMergeRequestNotFound" });
+    }
+    if (resolution && method === "POST") {
+      const outcome = resolveMergeRequest(state, id, resolution);
+      return send(response, outcome.status, outcome.body);
+    }
   }
   if (path === "/me/preferences" && method === "GET")
     return send(response, 200, state.preferences);

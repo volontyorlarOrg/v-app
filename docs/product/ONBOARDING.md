@@ -12,7 +12,7 @@ volunteering, not to fill in forms. The backend already has an empty profile
 for them; nothing about the product is usable until the reusable profile
 exists, because every application snapshots it.
 
-The flow gets them to the profile an organiser can evaluate in four short
+The flow gets them to the profile an organiser can evaluate in three short
 steps and then points them at the first opportunity. It is not a tour of the
 panel: the panel explains itself, and the dashboard's empty states say what
 fills them.
@@ -34,7 +34,7 @@ fills them.
 - **FIRST VIEWPORT** — desktop: greeting and lead on the left with the pass
   hanging beneath them and the step rail under that; the step panel on the
   right, the primary action at its foot. Phone: greeting, a compact pass,
-  the rail as a strip of four nodes, then the panel.
+  the rail as a strip of three nodes, then the panel.
 - **FORM** — a split stage. No concept roll was run and there is no seed
   key: the brief pinned the structure ("this onboarding must go through the
   profile completion phase and at the end there must be reference to call
@@ -48,14 +48,13 @@ fills them.
 
 ## The steps
 
-| Step            | Saves                                                                                                           | Counts toward completeness |
-| --------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Welcome         | Nothing                                                                                                         |                            |
-| About you       | `fullName`, `bio` through `updateProfileAction`                                                                 | name, introduction         |
-| Where you study | `school`, `region`, `languages` through `updateProfileAction`                                                   | school, region, languages  |
-| Contact         | `phone`, `telegram` through `updateProfileAction`                                                               | a way to reach you         |
-| Notifications   | `remindDeadlines`, `notifyDecisions`, `notifyTelegram`, `profileToOrganisers` through `updatePreferencesAction` |                            |
-| Ready           | Nothing; shows completeness, what happens next, and the call to action                                          |                            |
+| Step            | Saves                                                                  | Counts toward completeness |
+| --------------- | ---------------------------------------------------------------------- | -------------------------- |
+| Welcome         | Nothing                                                                |                            |
+| About you       | `fullName`, `bio` through `updateProfileAction`                        | name, bio                  |
+| Where you study | `school`, `region`, `languages` through `updateProfileAction`          | school, region, languages  |
+| Contact         | `phone`, `telegram` through `updateProfileAction`                      | neither, by design         |
+| Ready           | Nothing; shows completeness, what happens next, and the call to action |                            |
 
 Every profile step posts the whole profile: the fields the step does not show
 travel as hidden inputs, because `PUT /profile` replaces the record. A step
@@ -63,8 +62,10 @@ that fails validation stays on screen with the field named; the pass only
 gains a part once the backend has accepted the save, so the object never
 claims more than the profile holds.
 
-The fields that do not count toward completeness (`gradeYear`, `city`,
-`skills`, `links`) are left to the profile page. The name is the one field
+Contact is asked for even though it stopped counting toward completeness when
+the profile redesign landed, because an organiser who cannot reach a
+volunteer cannot accept one. The fields the flow leaves to the profile page
+are `gradeYear`, `city` and `links`. The name is the one field
 that cannot be skipped while it is empty, because the backend refuses a
 profile without it.
 
@@ -102,10 +103,9 @@ fields each step owns, and which pass parts saved data earns) and `state.ts`
 ## The pass
 
 `PassStage` renders a lanyard badge with Three.js: two straps, a clip, a card
-with the brand band and mark, an avatar tile, and six parts that appear as
+with the brand band and mark, an avatar tile, and five parts that appear as
 they are earned: the printed name lines, the place row, three language
-chips, the contact row, a small "on" switch for notifications, and the
-orange seal at the end. Parts are derived from the saved profile, so a
+chips, the contact row, and the orange seal at the end. Parts are derived from the saved profile, so a
 returning volunteer sees what is already there. A saved step nudges the
 badge on its lanyard; the seal stamps down and swings it.
 
@@ -115,6 +115,17 @@ its colours from the CSS tokens and follows the theme, and disposes
 everything on unmount. Reduced motion keeps the object but removes the swing,
 the parallax and the part animations. Without WebGL or JavaScript an inline
 SVG of the same badge, with the same parts, is what the page shows.
+
+## What was dropped, and why
+
+The flow was built with a fourth step, "What we may send you", holding the
+notification and privacy switches. It was removed when this branch merged
+`main`, because `main` had removed every preferences surface from the
+application: `/me/preferences` is no longer read or written, and the read,
+the Server Action, the types, the schema and the switch component were all
+deleted. A step whose backing was deliberately deleted does not come back
+through onboarding. If that decision is reversed, the step is a rail entry,
+three strings, a switches component and a batch action away.
 
 ## Open decisions
 
