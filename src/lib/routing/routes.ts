@@ -105,7 +105,7 @@ export const appRoutes: readonly AppRoute[] = [
     guard: "session",
     inNav: false,
     inTabBar: false,
-    inAccountMenu: false,
+    inAccountMenu: true,
   },
 ] as const;
 
