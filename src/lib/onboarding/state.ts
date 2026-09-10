@@ -1,8 +1,13 @@
 import type { Locale } from "@/i18n/routing";
-import { isOnboardingStep, type OnboardingStep } from "@/lib/onboarding/steps";
+import {
+  isOnboardingStep,
+  stepIndex,
+  type OnboardingStep,
+} from "@/lib/onboarding/steps";
 import { localePath } from "@/lib/routing/routes";
 
 export const ONBOARDING_COOKIE_NAME = "volontyorlar_onboarding";
+export const ONBOARDING_STORAGE_KEY = "volontyorlar_onboarding";
 export const ONBOARDING_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
 
 export type OnboardingState =
@@ -78,4 +83,49 @@ export function writeOnboardingStateToDocument(state: OnboardingState) {
     if (window.location.protocol === "https:") parts.push("secure");
     document.cookie = parts.join("; ");
   } catch {}
+}
+
+export function readOnboardingStateFromStorage(): OnboardingState | null {
+  try {
+    return parseOnboardingState(window.localStorage.getItem(ONBOARDING_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+export function writeOnboardingStateToStorage(state: OnboardingState) {
+  try {
+    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, serializeOnboardingState(state));
+  } catch {}
+}
+
+export function furthestOnboardingState(
+  a: OnboardingState | null,
+  b: OnboardingState | null,
+): OnboardingState | null {
+  if (a === null) return b;
+  if (b === null) return a;
+  if (a.status === "done" || b.status === "done") return { status: "done" };
+  return stepIndex(a.step) >= stepIndex(b.step) ? a : b;
+}
+
+export function readOnboardingStateFromClient(): OnboardingState | null {
+  const cookie = readOnboardingStateFromDocument();
+  const stored = readOnboardingStateFromStorage();
+  const state = furthestOnboardingState(cookie, stored);
+  if (state === null) return null;
+
+  // Whichever store lagged behind gets the settled answer, so the next render
+  // on the server starts from the same place the browser is already at.
+  const settled = serializeOnboardingState(state);
+  const behind = [cookie, stored].some(
+    (side) => side === null || serializeOnboardingState(side) !== settled,
+  );
+  if (behind) writeOnboardingStateToClient(state);
+  return state;
+}
+
+export function writeOnboardingStateToClient(state: OnboardingState) {
+  writeOnboardingStateToDocument(state);
+  writeOnboardingStateToStorage(state);
 }
