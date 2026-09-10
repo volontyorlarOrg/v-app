@@ -23,7 +23,6 @@ export function CredentialsSection({
     fullName: t("form.fullName"),
     email: t("form.email"),
     password: t("form.password"),
-    passwordHint: t("form.passwordHint", { min: PASSWORD_MIN_LENGTH }),
     reveal: t("form.reveal"),
     conceal: t("form.conceal"),
     submit: mode === "login" ? t("login.submit") : t("signup.submit"),
