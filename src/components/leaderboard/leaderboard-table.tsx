@@ -18,10 +18,8 @@ const CELL = "px-4 sm:px-5";
 
 export function LeaderboardTable({
   entries,
-  viewerUsername,
 }: {
   entries: readonly LeaderboardEntry[];
-  viewerUsername: string | null;
 }) {
   const t = useTranslations("leaderboard");
   const format = useFormatter();
@@ -43,7 +41,7 @@ export function LeaderboardTable({
       </TableHeader>
       <TableBody>
         {entries.map((entry) => {
-          const isViewer = viewerUsername !== null && entry.username === viewerUsername;
+          const isViewer = entry.isCurrentUser;
           return (
             <TableRow
               key={entry.username}
@@ -66,9 +64,6 @@ export function LeaderboardTable({
                   </span>
                   {isViewer ? <Badge variant="structure">{t("you")}</Badge> : null}
                 </p>
-                {entry.displayName ? (
-                  <p className="mt-0.5 text-xs text-ink-muted">{entry.displayName}</p>
-                ) : null}
               </TableCell>
               <TableCell
                 className={cn(

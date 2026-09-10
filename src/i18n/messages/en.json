@@ -311,9 +311,7 @@
       "xp": "Experience",
       "xpHelp": "Earned from confirmed attendance.",
       "appearAs": "You appear as",
-      "changeHandle": "Change your handle",
-      "unrankedTitle": "You are not on the board yet.",
-      "unrankedBody": "Attend an event and let the organiser confirm it. Your place appears here after that."
+      "changeHandle": "Change your handle"
     },
     "table": {
       "title": "Standings",
@@ -745,7 +743,6 @@
       "unknown": "Something went wrong. Try again in a moment.",
       "usernameUnavailable": "That handle is taken. Try another one.",
       "usernameManagedByTelegram": "This handle comes from Telegram and cannot be changed here.",
-      "usernameInvalid": "That handle cannot be used. Try another one.",
       "usernameRequired": "Choose a handle.",
       "usernameShort": "A handle needs at least 5 characters.",
       "usernameLong": "A handle can be 32 characters at most.",

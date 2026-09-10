@@ -59,7 +59,7 @@ export function UsernameForm({
   const message = typeof client === "string" ? client : server;
   const messageKey = message ? FIELD_MESSAGE_KEYS[message] : undefined;
   const fieldError = message
-    ? (labels.errors[messageKey ?? "usernameInvalid"] ?? labels.errors.unknown)
+    ? (labels.errors[messageKey ?? "validationFailed"] ?? labels.errors.unknown)
     : undefined;
 
   const failure =

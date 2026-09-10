@@ -63,7 +63,7 @@ export function OnboardingFlow({
   profileSaved: boolean;
   next: string | null;
   regions: readonly { value: string; label: string }[];
-  username: UsernameIdentity | null;
+  username: UsernameIdentity;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
 }) {
@@ -262,7 +262,7 @@ function DoneBody({
   complete: boolean;
   percent: number;
   missing: readonly string[];
-  username: UsernameIdentity | null;
+  username: UsernameIdentity;
   ctaHref: string;
 }) {
   return (
@@ -284,11 +284,9 @@ function DoneBody({
         </p>
       )}
 
-      {username ? (
-        <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
-          <UsernameSection locale={locale} identity={username} labels={labels.username} />
-        </div>
-      ) : null}
+      <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
+        <UsernameSection locale={locale} identity={username} labels={labels.username} />
+      </div>
 
       <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
         {labels.done.nextTitle}

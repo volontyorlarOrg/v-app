@@ -64,7 +64,6 @@ export const ACCOUNT_ERROR_CODES = [
   "weakPassword",
   "usernameUnavailable",
   "usernameManagedByTelegram",
-  "usernameInvalid",
   "validationFailed",
   "phoneRequired",
   "accountDisabled",

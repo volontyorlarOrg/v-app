@@ -311,9 +311,7 @@
       "xp": "Tajriba",
       "xpHelp": "Tasdiqlangan ishtirok uchun beriladi.",
       "appearAs": "Siz shunday koʻrinasiz",
-      "changeHandle": "Nomni oʻzgartirish",
-      "unrankedTitle": "Siz hali reytingda emassiz.",
-      "unrankedBody": "Tadbirda qatnashing va tashkilotchi buni tasdiqlasin. Shundan soʻng oʻrningiz shu yerda koʻrinadi."
+      "changeHandle": "Nomni oʻzgartirish"
     },
     "table": {
       "title": "Reyting jadvali",
@@ -745,7 +743,6 @@
       "unknown": "Nimadir notoʻgʻri ketdi. Birozdan soʻng urinib koʻring.",
       "usernameUnavailable": "Bu nom band. Boshqasini tanlang.",
       "usernameManagedByTelegram": "Bu nom Telegramdan olinadi, uni bu yerda oʻzgartirib boʻlmaydi.",
-      "usernameInvalid": "Bu nomdan foydalanib boʻlmaydi. Boshqasini tanlang.",
       "usernameRequired": "Nom tanlang.",
       "usernameShort": "Nomda kamida 5 ta belgi boʻlishi kerak.",
       "usernameLong": "Nomda koʻpi bilan 32 ta belgi boʻladi.",

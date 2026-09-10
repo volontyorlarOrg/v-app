@@ -243,6 +243,7 @@ function freshAccount() {
     telegramIdentity: null,
     username: "dilnoza_k",
     usernameSource: "generated",
+    usernameEditable: true,
     authMethods: { telegram: false, google: false, password: false },
   };
 }
@@ -439,6 +440,7 @@ function requesterState() {
     telegramIdentity: { username: "bekzod_r", linkedAt: at(-60) },
     username: "bekzod_r",
     usernameSource: "telegram",
+    usernameEditable: false,
     authMethods: { telegram: true, google: true, password: false },
   };
   state.mergeRequests = [];
@@ -574,7 +576,6 @@ function validateAnswers(opportunity, answers, requireComplete) {
 
 const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
   username: `volunteer_${String(index + 1).padStart(2, "0")}`,
-  displayName: null,
   xp: 3000 - index * 90,
 }));
 
@@ -585,12 +586,15 @@ function leaderboard(state, query) {
     ...leaderboardRoster,
     {
       username: state.account.username,
-      displayName: state.user.displayName ?? null,
       xp: VIEWER_XP,
     },
   ]
     .sort((a, b) => b.xp - a.xp || a.username.localeCompare(b.username))
-    .map((row, index) => ({ rank: index + 1, ...row }));
+    .map((row, index) => ({
+      rank: index + 1,
+      ...row,
+      isCurrentUser: row.username === state.account.username,
+    }));
 
   const page = Math.max(1, Number(query.get("page") ?? 1));
   const pageSize = Math.max(1, Number(query.get("pageSize") ?? 25));
@@ -601,7 +605,15 @@ function leaderboard(state, query) {
     page,
     pageSize,
     total: rows.length,
-    viewer: rows.find((row) => row.username === state.account.username) ?? null,
+    viewer: (() => {
+      const row = rows.find((candidate) => candidate.isCurrentUser);
+      return row ? { rank: row.rank, username: row.username, xp: row.xp } : null;
+    })(),
+    scoring: {
+      attendedEventXp: 50,
+      confirmedHourXp: 10,
+      rounding: "nearest-total",
+    },
   };
 }
 
@@ -686,6 +698,7 @@ const server = createServer(async (request, response) => {
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
     opened.account.usernameSource = "telegram";
+    opened.account.usernameEditable = false;
     return send(response, 201, issueSession(opened));
   }
   if (path === "/oauth/connect" && method === "GET") {
@@ -788,7 +801,12 @@ const server = createServer(async (request, response) => {
     }
     state.account.username = requested;
     state.account.usernameSource = "custom";
-    return send(response, 200, { username: requested, usernameSource: "custom" });
+    state.account.usernameEditable = true;
+    return send(response, 200, {
+      username: requested,
+      usernameSource: "custom",
+      usernameEditable: true,
+    });
   }
   if (path === "/me" && method === "GET") {
     return send(response, 200, {
@@ -797,6 +815,7 @@ const server = createServer(async (request, response) => {
       emailVerified: state.account.emailVerified,
       username: state.account.username,
       usernameSource: state.account.usernameSource,
+      usernameEditable: state.account.usernameEditable,
       authMethods: state.account.authMethods,
       telegramIdentity: state.account.telegramIdentity,
       preferences: state.preferences,

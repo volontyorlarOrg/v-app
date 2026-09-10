@@ -127,7 +127,7 @@ function Settings({
 }: {
   locale: Locale;
   states: readonly ConnectionState[];
-  username: UsernameIdentity | null;
+  username: UsernameIdentity;
   email: string | null;
   hasPassword: boolean;
   googleConfigured: boolean;
@@ -235,21 +235,19 @@ function Settings({
           </div>
         </Panel>
 
-        {username ? (
-          <Panel
-            id="username"
-            title={t("username.title")}
-            description={t("username.description")}
-            className="xl:col-span-2"
-          >
-            <UsernameSection
-              locale={locale}
-              identity={username}
-              labels={usernameLabels}
-              headed={false}
-            />
-          </Panel>
-        ) : null}
+        <Panel
+          id="username"
+          title={t("username.title")}
+          description={t("username.description")}
+          className="xl:col-span-2"
+        >
+          <UsernameSection
+            locale={locale}
+            identity={username}
+            labels={usernameLabels}
+            headed={false}
+          />
+        </Panel>
 
         <Panel
           id="incoming-requests"

@@ -13,7 +13,6 @@ import {
 } from "@/lib/account/username";
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
 import { issuedSessionSchema } from "@/lib/auth/session";
-import { LEADERBOARD_PAGE_SIZE } from "@/lib/leaderboard/pagination";
 import {
   OPPORTUNITY_FORMATS,
   OPPORTUNITY_STATUSES,
@@ -216,20 +215,49 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
-export const leaderboardEntrySchema = z.object({
-  rank: z.number().int().positive(),
-  username: usernameField,
-  displayName: optional(z.string()),
-  xp: z.number().int().nonnegative(),
-});
+export const leaderboardEntrySchema = z
+  .object({
+    rank: z.number().int().positive(),
+    username: usernameField,
+    xp: z.number().int().nonnegative(),
+    isCurrentUser: z.boolean(),
+  })
+  .strict();
 
-export const leaderboardSchema = z.object({
-  items: z.array(leaderboardEntrySchema),
-  page: z.number().int().positive().default(1),
-  pageSize: z.number().int().positive().default(LEADERBOARD_PAGE_SIZE),
-  total: z.number().int().nonnegative(),
-  viewer: optional(leaderboardEntrySchema),
-});
+const leaderboardViewerSchema = z
+  .object({
+    rank: z.number().int().positive(),
+    username: usernameField,
+    xp: z.number().int().nonnegative(),
+  })
+  .strict();
+
+const leaderboardScoringSchema = z
+  .object({
+    attendedEventXp: z.number().int().nonnegative(),
+    confirmedHourXp: z.number().int().nonnegative(),
+    rounding: z.literal("nearest-total"),
+  })
+  .strict();
+
+export const leaderboardSchema = z
+  .object({
+    items: z.array(leaderboardEntrySchema),
+    viewer: leaderboardViewerSchema,
+    page: z.number().int().positive(),
+    pageSize: z.number().int().min(1).max(100),
+    total: z.number().int().nonnegative(),
+    scoring: leaderboardScoringSchema,
+  })
+  .strict();
+
+export const usernameSummarySchema = z
+  .object({
+    username: usernameField,
+    usernameSource: z.enum(USERNAME_SOURCES),
+    usernameEditable: z.boolean(),
+  })
+  .strict();
 
 export const authMethodsSchema = z.object({
   telegram: z.boolean(),
@@ -248,8 +276,9 @@ export const meSchema = z
   .object({
     id: z.string().min(1),
     displayName: optional(z.string()),
-    username: optional(usernameField),
-    usernameSource: optional(z.enum(USERNAME_SOURCES)),
+    username: usernameField,
+    usernameSource: z.enum(USERNAME_SOURCES),
+    usernameEditable: z.boolean(),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),

@@ -40,17 +40,14 @@ export function usernameFromFormData(formData: FormData): UsernameFormValues {
   return { username: typeof value === "string" ? value : "" };
 }
 
-export function isUsernameEditable(source: UsernameSource): boolean {
-  return source !== "telegram";
-}
-
 export function usernameIdentity(account: {
-  username?: string;
-  usernameSource?: UsernameSource;
-}): UsernameIdentity | null {
-  const username = account.username?.trim();
-  if (!username) return null;
-
-  const source = account.usernameSource ?? "generated";
-  return { username, source, editable: isUsernameEditable(source) };
+  username: string;
+  usernameSource: UsernameSource;
+  usernameEditable: boolean;
+}): UsernameIdentity {
+  return {
+    username: account.username,
+    source: account.usernameSource,
+    editable: account.usernameEditable,
+  };
 }
