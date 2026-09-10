@@ -54,13 +54,23 @@ fills them.
 | About you       | `fullName`, `bio` through `updateProfileAction`                        | name, bio                  |
 | Where you study | `school`, `region`, `languages` through `updateProfileAction`          | school, region, languages  |
 | Contact         | `phone`, `telegram` through `updateProfileAction`                      | neither, by design         |
-| Ready           | Nothing; shows completeness, what happens next, and the call to action |                            |
+| Ready           | The leaderboard handle, if the account may rename it                   |                            |
 
 Every profile step posts the whole profile: the fields the step does not show
 travel as hidden inputs, because `PUT /profile` replaces the record. A step
 that fails validation stays on screen with the field named; the pass only
 gains a part once the backend has accepted the save, so the object never
 claims more than the profile holds.
+
+The Ready step shows completeness, what happens next, and the call to action.
+It also carries the handle the volunteer appears under on the leaderboard:
+a `generated` or `custom` handle gets the rename form from
+`src/components/account/`, the same one the account page uses, and a
+Telegram-managed handle is shown read-only with the reason. An account whose
+backend does not send a handle sees no card at all. It is the fourth step's
+only write, it goes to `PUT /me/username` rather than to the profile, and it is
+optional: nothing blocks the call to action. →
+[`LEADERBOARD.md`](LEADERBOARD.md)
 
 Contact is asked for even though it stopped counting toward completeness when
 the profile redesign landed, because an organiser who cannot reach a

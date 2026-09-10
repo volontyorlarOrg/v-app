@@ -24,6 +24,10 @@ folder. Never store secrets or unverified external claims.
   schemas, not the backend's OpenAPI, define every connection and merge
   _response_, the five shapes that surprise a reader who only saw the sketch,
   and the two tolerances that keep `/settings` honest against an older backend
+- `decisions/leaderboard-contract-is-built-blind.md` — the leaderboard and
+  handle routes were written before `v-backend` served them, which rules were
+  copied from its migration rather than guessed, and what to re-check when the
+  two routes ship
 - `decisions/google-sign-in-is-an-id-token-redirect.md` — why Google sign-in
   is a redirect that returns an ID token rather than Google Identity Services,
   and why its handoff cookies are `SameSite=None`

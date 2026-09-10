@@ -18,6 +18,7 @@
     "applications": "Arizalar",
     "saved": "Saqlanganlar",
     "record": "Mening tarixim",
+    "leaderboard": "Reyting",
     "profile": "Profil",
     "settings": "Sozlamalar",
     "signOut": "Chiqish",
@@ -197,6 +198,10 @@
       "title": "Uchta qisqa qadam, taxminan bir daqiqa.",
       "body": "Siz kimsiz, qayerda oʻqiysiz va tashkilotchilar siz bilan qanday bogʻlanadi. Hammasini keyin profilingizda oʻzgartirish mumkin."
     },
+    "username": {
+      "title": "Reytingdagi nomingiz",
+      "description": "Reytingda shu nom bilan koʻrinasiz. Uni istalgan vaqtda hisob sozlamalarida oʻzgartirish mumkin."
+    },
     "steps": {
       "about": {
         "title": "Siz haqingizda",
@@ -293,6 +298,38 @@
       "excused": "Uzrli sabab",
       "cancelled": "Bekor qilingan",
       "awaiting_confirmation": "Tasdiq kutilmoqda"
+    }
+  },
+  "leaderboard": {
+    "metaTitle": "Reyting",
+    "title": "Reyting",
+    "description": "Barcha koʻngillilar tasdiqlangan ishtirok uchun toʻplangan tajriba boʻyicha saralangan.",
+    "you": "Siz",
+    "standing": {
+      "rank": "Sizning oʻrningiz",
+      "of": "{total} koʻngillidan",
+      "xp": "Tajriba",
+      "xpHelp": "Tasdiqlangan ishtirok uchun beriladi.",
+      "appearAs": "Siz shunday koʻrinasiz",
+      "changeHandle": "Nomni oʻzgartirish",
+      "unrankedTitle": "Siz hali reytingda emassiz.",
+      "unrankedBody": "Tadbirda qatnashing va tashkilotchi buni tasdiqlasin. Shundan soʻng oʻrningiz shu yerda koʻrinadi."
+    },
+    "table": {
+      "title": "Reyting jadvali",
+      "description": "Tajriba boʻyicha, koʻpdan kamga.",
+      "rank": "Oʻrin",
+      "volunteer": "Koʻngilli",
+      "xp": "Tajriba",
+      "empty": "Reytingda hali hech kim yoʻq.",
+      "showing": "{total} tadan {first}–{last} koʻrsatilmoqda"
+    },
+    "pagination": {
+      "label": "Reyting sahifalari",
+      "previous": "Orqaga",
+      "next": "Keyingi",
+      "page": "{page}-sahifa",
+      "current": "{page}-sahifa, joriy sahifa"
     }
   },
   "applications": {
@@ -626,6 +663,18 @@
       "setPasswordDone": "Parol oʻrnatildi. Endi email va parol bilan kirishingiz mumkin.",
       "changePasswordDone": "Parol almashtirildi. Boshqa qurilmalardagi seanslar yopildi."
     },
+    "username": {
+      "title": "Sizning nomingiz",
+      "description": "Reytingda shu nom bilan koʻrinasiz. Uni tizimga kirgan har bir koʻngilli koʻradi.",
+      "current": "Siz shunday koʻrinasiz",
+      "field": "Yangi nom",
+      "hint": "{min} tadan {max} tagacha belgi: kichik lotin harflari, raqamlar va pastki chiziq.",
+      "generated": "Bu nomni hisob yaratilganda biz oʻylab topdik. Oʻzingizga maʼqul nomni tanlang.",
+      "managed": "Bu nom Telegram hisobingizdan olinadi va u bilan birga oʻzgaradi.",
+      "save": "Nomni saqlash",
+      "saving": "Saqlanmoqda…",
+      "saved": "Nomingiz saqlandi."
+    },
     "connectStatus": {
       "linked": "Ulandi. Endi ikkala usul ham shu hisobni ochadi.",
       "alreadyLinked": "Bu allaqachon shu hisobga ulangan edi.",
@@ -693,7 +742,14 @@
       "googleUnavailable": "Google hozir mavjud emas. Birozdan soʻng urinib koʻring.",
       "validationFailed": "Yuqoridagi maydonlarni tekshirib, qayta urinib koʻring.",
       "network": "Serverga ulana olmadik. Aloqani tekshirib, qayta urinib koʻring.",
-      "unknown": "Nimadir notoʻgʻri ketdi. Birozdan soʻng urinib koʻring."
+      "unknown": "Nimadir notoʻgʻri ketdi. Birozdan soʻng urinib koʻring.",
+      "usernameUnavailable": "Bu nom band. Boshqasini tanlang.",
+      "usernameManagedByTelegram": "Bu nom Telegramdan olinadi, uni bu yerda oʻzgartirib boʻlmaydi.",
+      "usernameInvalid": "Bu nomdan foydalanib boʻlmaydi. Boshqasini tanlang.",
+      "usernameRequired": "Nom tanlang.",
+      "usernameShort": "Nomda kamida 5 ta belgi boʻlishi kerak.",
+      "usernameLong": "Nomda koʻpi bilan 32 ta belgi boʻladi.",
+      "usernameCharacters": "Faqat kichik lotin harflari, raqamlar va pastki chiziq."
     },
     "mergeNotifications": {
       "requested": "Bir hisob sizning hisobingizga qoʻshilishni soʻradi",

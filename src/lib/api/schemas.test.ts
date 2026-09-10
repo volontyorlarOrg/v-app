@@ -6,6 +6,7 @@ import {
   authMethodsSchema,
   connectionOutcomeSchema,
   historySchema,
+  leaderboardSchema,
   meSchema,
   mergeApprovalSchema,
   mergeRequestListSchema,
@@ -301,10 +302,104 @@ describe("the account schema", () => {
     });
   });
 
+  it("reads the leaderboard handle and where it came from", () => {
+    const parsed = meSchema.parse({
+      id: "u1",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      username: "dilnoza_k",
+      usernameSource: "telegram",
+    });
+
+    expect(parsed.username).toBe("dilnoza_k");
+    expect(parsed.usernameSource).toBe("telegram");
+  });
+
+  it("leaves the handle undefined while the backend does not send one", () => {
+    const parsed = meSchema.parse({
+      id: "u1",
+      createdAt: "2026-01-01T00:00:00.000Z",
+    });
+
+    expect(parsed.username).toBeUndefined();
+    expect(parsed.usernameSource).toBeUndefined();
+  });
+
+  it("refuses a handle the backend should never have stored", () => {
+    for (const username of ["Dilnoza", "no", "with space", "dash-ed"]) {
+      expect(
+        meSchema.safeParse({
+          id: "u1",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          username,
+        }).success,
+        username,
+      ).toBe(false);
+    }
+  });
+
+  it("refuses a source outside the three the backend defines", () => {
+    expect(
+      meSchema.safeParse({
+        id: "u1",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        username: "dilnoza_k",
+        usernameSource: "imported",
+      }).success,
+    ).toBe(false);
+  });
+
   it("refuses an account with no id", () => {
     expect(meSchema.safeParse({ createdAt: "2026-01-01T00:00:00.000Z" }).success).toBe(
       false,
     );
+  });
+});
+
+describe("the leaderboard schema", () => {
+  const entry = { rank: 1, username: "dilnoza_k", displayName: "Dilnoza", xp: 1200 };
+
+  it("reads a page exactly as the backend serialises it", () => {
+    const parsed = leaderboardSchema.parse({
+      items: [entry, { rank: 2, username: "bekzod_r", displayName: null, xp: 900 }],
+      page: 2,
+      pageSize: 25,
+      total: 143,
+      viewer: { rank: 57, username: "dilnoza_k", xp: 120 },
+    });
+
+    expect(parsed.items).toHaveLength(2);
+    expect(parsed.items[1]?.displayName).toBeUndefined();
+    expect(parsed.page).toBe(2);
+    expect(parsed.pageSize).toBe(25);
+    expect(parsed.total).toBe(143);
+    expect(parsed.viewer?.rank).toBe(57);
+  });
+
+  it("reads an empty board without a viewer", () => {
+    const parsed = leaderboardSchema.parse({ items: [], total: 0, viewer: null });
+
+    expect(parsed.items).toEqual([]);
+    expect(parsed.viewer).toBeUndefined();
+    expect(parsed.page).toBe(1);
+    expect(parsed.pageSize).toBe(25);
+  });
+
+  it("refuses a rank or an experience total that cannot be true", () => {
+    for (const broken of [
+      { ...entry, rank: 0 },
+      { ...entry, rank: 1.5 },
+      { ...entry, xp: -1 },
+      { ...entry, xp: 12.5 },
+    ]) {
+      expect(
+        leaderboardSchema.safeParse({ items: [broken], total: 1 }).success,
+        JSON.stringify(broken),
+      ).toBe(false);
+    }
+  });
+
+  it("refuses a page whose total is missing", () => {
+    expect(leaderboardSchema.safeParse({ items: [entry] }).success).toBe(false);
   });
 });
 

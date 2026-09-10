@@ -5,8 +5,15 @@ import {
   MERGE_REQUEST_DIRECTIONS,
   MERGE_REQUEST_STATUSES,
 } from "@/lib/account/types";
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_PATTERN,
+  USERNAME_SOURCES,
+} from "@/lib/account/username";
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
 import { issuedSessionSchema } from "@/lib/auth/session";
+import { LEADERBOARD_PAGE_SIZE } from "@/lib/leaderboard/pagination";
 import {
   OPPORTUNITY_FORMATS,
   OPPORTUNITY_STATUSES,
@@ -20,6 +27,12 @@ function optional<T extends z.ZodTypeAny>(schema: T) {
 }
 
 const isoDate = z.string().min(1);
+
+const usernameField = z
+  .string()
+  .min(USERNAME_MIN_LENGTH)
+  .max(USERNAME_MAX_LENGTH)
+  .regex(USERNAME_PATTERN);
 
 export const organizationSchema = z.object({
   id: z.string().min(1),
@@ -203,6 +216,21 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
+export const leaderboardEntrySchema = z.object({
+  rank: z.number().int().positive(),
+  username: usernameField,
+  displayName: optional(z.string()),
+  xp: z.number().int().nonnegative(),
+});
+
+export const leaderboardSchema = z.object({
+  items: z.array(leaderboardEntrySchema),
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(LEADERBOARD_PAGE_SIZE),
+  total: z.number().int().nonnegative(),
+  viewer: optional(leaderboardEntrySchema),
+});
+
 export const authMethodsSchema = z.object({
   telegram: z.boolean(),
   google: z.boolean(),
@@ -220,6 +248,8 @@ export const meSchema = z
   .object({
     id: z.string().min(1),
     displayName: optional(z.string()),
+    username: optional(usernameField),
+    usernameSource: optional(z.enum(USERNAME_SOURCES)),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),
@@ -283,6 +313,8 @@ export const mergeResolutionSchema = z.object({ request: mergeRequestSchema });
 export const acknowledgementSchema = z.looseObject({});
 
 export type Me = z.infer<typeof meSchema>;
+export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
+export type Leaderboard = z.infer<typeof leaderboardSchema>;
 export type ConnectedAccount = z.infer<typeof connectedAccountSchema>;
 export type MergeRequest = z.infer<typeof mergeRequestSchema>;
 export type MergeRequestList = z.infer<typeof mergeRequestListSchema>;

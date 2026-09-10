@@ -18,6 +18,7 @@
     "applications": "Applications",
     "saved": "Saved",
     "record": "My record",
+    "leaderboard": "Leaderboard",
     "profile": "Profile",
     "settings": "Settings",
     "signOut": "Sign out",
@@ -197,6 +198,10 @@
       "title": "Three short steps, about a minute.",
       "body": "Who you are, where you study, and how organisers reach you. Everything can be changed later on your profile."
     },
+    "username": {
+      "title": "Your leaderboard handle",
+      "description": "This is how you appear on the leaderboard. You can change it any time from your account."
+    },
     "steps": {
       "about": {
         "title": "About you",
@@ -293,6 +298,38 @@
       "excused": "Excused",
       "cancelled": "Cancelled",
       "awaiting_confirmation": "Awaiting confirmation"
+    }
+  },
+  "leaderboard": {
+    "metaTitle": "Leaderboard",
+    "title": "Leaderboard",
+    "description": "Every volunteer, ordered by the experience their confirmed attendance has earned.",
+    "you": "You",
+    "standing": {
+      "rank": "Your place",
+      "of": "of {total} volunteers",
+      "xp": "Experience",
+      "xpHelp": "Earned from confirmed attendance.",
+      "appearAs": "You appear as",
+      "changeHandle": "Change your handle",
+      "unrankedTitle": "You are not on the board yet.",
+      "unrankedBody": "Attend an event and let the organiser confirm it. Your place appears here after that."
+    },
+    "table": {
+      "title": "Standings",
+      "description": "Ranked by experience, highest first.",
+      "rank": "Place",
+      "volunteer": "Volunteer",
+      "xp": "Experience",
+      "empty": "No one is on the board yet.",
+      "showing": "Showing {first}–{last} of {total}"
+    },
+    "pagination": {
+      "label": "Leaderboard pages",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page}",
+      "current": "Page {page}, current page"
     }
   },
   "applications": {
@@ -626,6 +663,18 @@
       "setPasswordDone": "Password set. You can now sign in with email and password.",
       "changePasswordDone": "Password changed. Your other sessions were signed out."
     },
+    "username": {
+      "title": "Your handle",
+      "description": "The name you appear under on the leaderboard. Every signed-in volunteer can see it.",
+      "current": "You appear as",
+      "field": "New handle",
+      "hint": "{min} to {max} characters: lowercase letters, numbers and underscores.",
+      "generated": "We made this one up when your account was created. Choose one you would rather be known by.",
+      "managed": "This handle comes from your Telegram account and changes with it.",
+      "save": "Save handle",
+      "saving": "Saving…",
+      "saved": "Your handle is saved."
+    },
     "connectStatus": {
       "linked": "Connected. Both ways in now open this account.",
       "alreadyLinked": "That was already connected to this account.",
@@ -693,7 +742,14 @@
       "googleUnavailable": "Google is unavailable right now. Try again in a moment.",
       "validationFailed": "Check the fields above and try again.",
       "network": "We could not reach the server. Check your connection and try again.",
-      "unknown": "Something went wrong. Try again in a moment."
+      "unknown": "Something went wrong. Try again in a moment.",
+      "usernameUnavailable": "That handle is taken. Try another one.",
+      "usernameManagedByTelegram": "This handle comes from Telegram and cannot be changed here.",
+      "usernameInvalid": "That handle cannot be used. Try another one.",
+      "usernameRequired": "Choose a handle.",
+      "usernameShort": "A handle needs at least 5 characters.",
+      "usernameLong": "A handle can be 32 characters at most.",
+      "usernameCharacters": "Use lowercase letters, numbers and underscores only."
     },
     "mergeNotifications": {
       "requested": "An account asked to join yours",

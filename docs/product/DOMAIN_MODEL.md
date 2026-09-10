@@ -56,6 +56,19 @@ so exactly one formula exists. Attendance has four outcomes (`attended`,
 from reliability entirely. Hours are shown as recorded, not verified, until the
 backend says otherwise. → `src/lib/record/levels.ts`
 
+## Username and experience
+
+Every account carries a public `username` — lowercase letters, digits and
+underscores, 5 to 32 characters, unique — and the `source` that says where it
+came from: `generated` by the backend, `custom` by the volunteer, or
+`telegram`, imported from the connected identity and therefore read-only here.
+It is the only name the leaderboard shows. → `src/lib/account/username.ts`
+
+`xp` is the experience a confirmed attendance earns. Its formula belongs to the
+backend and appears nowhere on the frontend; so does a rank. Both are read from
+`GET /leaderboard`, along with the reader's own standing, and rendered as they
+arrive. → [`LEADERBOARD.md`](LEADERBOARD.md)
+
 ## SavedOpportunity
 
 A bookmark. Opportunities includes a Saved view; the toggle arrives with the

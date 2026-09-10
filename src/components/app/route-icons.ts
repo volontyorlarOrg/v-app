@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Medal,
   Settings,
+  Trophy,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -17,6 +18,7 @@ export const ROUTE_ICONS: Partial<Record<RouteKey, LucideIcon>> = {
   applications: FileText,
   saved: Bookmark,
   record: Medal,
+  leaderboard: Trophy,
   profile: UserRound,
   settings: Settings,
 };
