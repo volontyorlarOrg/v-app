@@ -5,6 +5,7 @@ import { redirect, unstable_rethrow } from "next/navigation";
 
 import { defaultLocale, isLocale, type Locale } from "@/i18n/routing";
 import { isStaleMergeCode } from "@/lib/account/connections";
+import { usernameFormSchema, usernameFromFormData } from "@/lib/account/username";
 import {
   failedResult,
   okResult,
@@ -16,6 +17,7 @@ import {
   cancelMergeRequest,
   rejectMergeRequest,
   updatePassword,
+  updateUsername,
 } from "@/lib/api/account.server";
 import {
   fieldErrorsOf,
@@ -49,6 +51,28 @@ function resultForMergeFailure(error: unknown, locale: Locale): ActionResult {
     revalidateAccount(locale);
   }
   return result;
+}
+
+export async function updateUsernameAction(
+  _previous: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const locale = localeOf(formData);
+  const parsed = usernameFormSchema.safeParse(usernameFromFormData(formData));
+
+  if (!parsed.success) {
+    return failedResult("validationFailed", fieldErrorsOf(parsed.error));
+  }
+
+  try {
+    await updateUsername(parsed.data.username);
+  } catch (error) {
+    unstable_rethrow(error);
+    return resultFromError(error);
+  }
+
+  revalidateAccount(locale);
+  return okResult;
 }
 
 export async function managePasswordAction(

@@ -5,6 +5,13 @@ import type { Metadata } from "next";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import type { Locale } from "@/i18n/routing";
+import { ACCOUNT_ERROR_KEYS } from "@/lib/account/types";
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  usernameIdentity,
+  type UsernameIdentity,
+} from "@/lib/account/username";
 import { getMe } from "@/lib/api/account.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
@@ -57,6 +64,7 @@ export default async function WelcomePage({
       profileSaved={profile !== null}
       next={safeReturnPath(typeof next === "string" ? next : null)}
       initialStep={resumeStep(state)}
+      username={usernameIdentity(me)}
     />
   );
 }
@@ -67,16 +75,19 @@ function Welcome({
   profileSaved,
   next,
   initialStep,
+  username,
 }: {
   locale: Locale;
   values: VolunteerProfile;
   profileSaved: boolean;
   next: string | null;
   initialStep: OnboardingStep;
+  username: UsernameIdentity;
 }) {
   const t = useTranslations("onboarding");
   const profile = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
+  const settings = useTranslations("settings");
 
   const firstName = values.fullName.trim().split(/\s+/)[0] ?? "";
   const fieldKeys = [
@@ -126,6 +137,24 @@ function Welcome({
     fields: Object.fromEntries(
       fieldKeys.map((key) => [key, profile(`fields.${key}`)]),
     ) as OnboardingLabels["fields"],
+    username: {
+      legend: t("username.title"),
+      description: t("username.description"),
+      field: settings("username.field"),
+      hint: settings("username.hint", {
+        min: USERNAME_MIN_LENGTH,
+        max: USERNAME_MAX_LENGTH,
+      }),
+      current: settings("username.current"),
+      generated: settings("username.generated"),
+      managed: settings("username.managed"),
+      save: settings("username.save"),
+      saving: settings("username.saving"),
+      saved: settings("username.saved"),
+      errors: Object.fromEntries(
+        ACCOUNT_ERROR_KEYS.map((key) => [key, settings(`errors.${key}`)]),
+      ),
+    },
     done: {
       title: t("done.title"),
       complete: t("done.complete"),
@@ -159,6 +188,7 @@ function Welcome({
         value: region,
         label: opportunities(`regions.${region}`),
       }))}
+      username={username}
       labels={labels}
       completionFields={completionFields}
     />

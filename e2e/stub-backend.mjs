@@ -241,6 +241,9 @@ function freshAccount() {
     email: null,
     emailVerified: false,
     telegramIdentity: null,
+    username: "dilnoza_k",
+    usernameSource: "generated",
+    usernameEditable: true,
     authMethods: { telegram: false, google: false, password: false },
   };
 }
@@ -375,7 +378,7 @@ function newAccountState(email, fullName) {
     roles: ["volunteer"],
     createdAt: new Date().toISOString(),
   };
-  state.account = { ...freshAccount(), email: email ?? null, authMethods: { telegram: false, google: false, password: true } };
+  state.account = { ...freshAccount(), email: email ?? null, username: `user_new_${issued + 1}`, usernameSource: "generated", authMethods: { telegram: false, google: false, password: true } };
   state.mergeRequests = [];
   state.profile = null;
   state.applications = [];
@@ -435,6 +438,9 @@ function requesterState() {
     email: "bekzod@example.org",
     emailVerified: true,
     telegramIdentity: { username: "bekzod_r", linkedAt: at(-60) },
+    username: "bekzod_r",
+    usernameSource: "telegram",
+    usernameEditable: false,
     authMethods: { telegram: true, google: true, password: false },
   };
   state.mergeRequests = [];
@@ -568,6 +574,49 @@ function validateAnswers(opportunity, answers, requireComplete) {
   return Object.keys(errors).length > 0 ? errors : null;
 }
 
+const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
+  username: `volunteer_${String(index + 1).padStart(2, "0")}`,
+  xp: 3000 - index * 90,
+}));
+
+const VIEWER_XP = 320;
+
+function leaderboard(state, query) {
+  const rows = [
+    ...leaderboardRoster,
+    {
+      username: state.account.username,
+      xp: VIEWER_XP,
+    },
+  ]
+    .sort((a, b) => b.xp - a.xp || a.username.localeCompare(b.username))
+    .map((row, index) => ({
+      rank: index + 1,
+      ...row,
+      isCurrentUser: row.username === state.account.username,
+    }));
+
+  const page = Math.max(1, Number(query.get("page") ?? 1));
+  const pageSize = Math.max(1, Number(query.get("pageSize") ?? 25));
+  const offset = (page - 1) * pageSize;
+
+  return {
+    items: rows.slice(offset, offset + pageSize),
+    page,
+    pageSize,
+    total: rows.length,
+    viewer: (() => {
+      const row = rows.find((candidate) => candidate.isCurrentUser);
+      return row ? { rank: row.rank, username: row.username, xp: row.xp } : null;
+    })(),
+    scoring: {
+      attendedEventXp: 50,
+      confirmedHourXp: 10,
+      rounding: "nearest-total",
+    },
+  };
+}
+
 function send(response, status, body) {
   response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
   response.end(body === undefined ? "" : JSON.stringify(body));
@@ -648,6 +697,8 @@ const server = createServer(async (request, response) => {
     const opened = freshState();
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
+    opened.account.usernameSource = "telegram";
+    opened.account.usernameEditable = false;
     return send(response, 201, issueSession(opened));
   }
   if (path === "/oauth/connect" && method === "GET") {
@@ -731,11 +782,40 @@ const server = createServer(async (request, response) => {
     passwordAccounts.set(state.account.email, body.newPassword);
     return send(response, 200, issueSession(state));
   }
+  if (path === "/leaderboard" && method === "GET") {
+    return send(response, 200, leaderboard(state, url.searchParams));
+  }
+  if (path === "/me/username" && method === "PUT") {
+    if (state.account.usernameSource === "telegram") {
+      return send(response, 409, { code: "usernameManagedByTelegram" });
+    }
+    const requested = String(body.username ?? "");
+    if (!/^[a-z0-9_]{5,32}$/.test(requested)) {
+      return send(response, 422, {
+        code: "validationFailed",
+        errors: { username: ["usernameCharacters"] },
+      });
+    }
+    if (leaderboardRoster.some((row) => row.username === requested)) {
+      return send(response, 409, { code: "usernameUnavailable" });
+    }
+    state.account.username = requested;
+    state.account.usernameSource = "custom";
+    state.account.usernameEditable = true;
+    return send(response, 200, {
+      username: requested,
+      usernameSource: "custom",
+      usernameEditable: true,
+    });
+  }
   if (path === "/me" && method === "GET") {
     return send(response, 200, {
       ...state.user,
       email: state.account.email ?? null,
       emailVerified: state.account.emailVerified,
+      username: state.account.username,
+      usernameSource: state.account.usernameSource,
+      usernameEditable: state.account.usernameEditable,
       authMethods: state.account.authMethods,
       telegramIdentity: state.account.telegramIdentity,
       preferences: state.preferences,

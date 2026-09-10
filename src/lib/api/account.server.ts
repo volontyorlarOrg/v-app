@@ -12,6 +12,7 @@ import {
   mergeRequestListSchema,
   mergeRequestSchema,
   mergeResolutionSchema,
+  usernameSummarySchema,
   type ConnectionOutcome,
   type MergeApproval,
   type MergeRequest,
@@ -26,6 +27,7 @@ import {
 } from "@/lib/auth/telegram";
 
 const CONNECTIONS_PATH = "/me/account-connections";
+const USERNAME_PATH = "/me/username";
 const MERGE_REQUESTS_PATH = "/me/account-merge-requests";
 
 export const getMe = cache(function getMe() {
@@ -80,6 +82,14 @@ export function completeGoogleConnection(
     schema: connectionOutcomeSchema,
     cache: "no-store",
     timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
+  });
+}
+
+export function updateUsername(username: string) {
+  return authed(USERNAME_PATH, {
+    method: "PUT",
+    body: { username },
+    schema: usernameSummarySchema,
   });
 }
 

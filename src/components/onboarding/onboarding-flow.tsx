@@ -3,6 +3,7 @@
 import { ArrowRight, BadgeCheck, CalendarCheck, CircleCheck, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+import { UsernameSection } from "@/components/account/username-section";
 import { SplitWords } from "@/components/motion/scene";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { PassStage } from "@/components/onboarding/pass-stage";
@@ -11,6 +12,7 @@ import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import type { UsernameIdentity } from "@/lib/account/username";
 import { writeOnboardingStateToClient } from "@/lib/onboarding/state";
 import {
   FORM_STEPS,
@@ -49,6 +51,7 @@ export function OnboardingFlow({
   profileSaved,
   next,
   regions,
+  username,
   labels,
   completionFields,
 }: {
@@ -60,6 +63,7 @@ export function OnboardingFlow({
   profileSaved: boolean;
   next: string | null;
   regions: readonly { value: string; label: string }[];
+  username: UsernameIdentity;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
 }) {
@@ -196,10 +200,12 @@ export function OnboardingFlow({
 
           {step === "done" ? (
             <DoneBody
+              locale={locale}
               labels={labels}
               complete={completion.complete}
               percent={completion.percent}
               missing={completion.missing.map((field) => completionFields[field])}
+              username={username}
               ctaHref={ctaHref}
             />
           ) : null}
@@ -243,16 +249,20 @@ const NEXT_STEPS = [
 ] as const;
 
 function DoneBody({
+  locale,
   labels,
   complete,
   percent,
   missing,
+  username,
   ctaHref,
 }: {
+  locale: Locale;
   labels: OnboardingLabels;
   complete: boolean;
   percent: number;
   missing: readonly string[];
+  username: UsernameIdentity;
   ctaHref: string;
 }) {
   return (
@@ -273,6 +283,10 @@ function DoneBody({
           </Link>
         </p>
       )}
+
+      <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
+        <UsernameSection locale={locale} identity={username} labels={labels.username} />
+      </div>
 
       <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
         {labels.done.nextTitle}

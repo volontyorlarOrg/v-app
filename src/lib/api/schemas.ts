@@ -5,6 +5,12 @@ import {
   MERGE_REQUEST_DIRECTIONS,
   MERGE_REQUEST_STATUSES,
 } from "@/lib/account/types";
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_PATTERN,
+  USERNAME_SOURCES,
+} from "@/lib/account/username";
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
 import { issuedSessionSchema } from "@/lib/auth/session";
 import {
@@ -20,6 +26,12 @@ function optional<T extends z.ZodTypeAny>(schema: T) {
 }
 
 const isoDate = z.string().min(1);
+
+const usernameField = z
+  .string()
+  .min(USERNAME_MIN_LENGTH)
+  .max(USERNAME_MAX_LENGTH)
+  .regex(USERNAME_PATTERN);
 
 export const organizationSchema = z.object({
   id: z.string().min(1),
@@ -203,6 +215,50 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
+export const leaderboardEntrySchema = z
+  .object({
+    rank: z.number().int().positive(),
+    username: usernameField,
+    xp: z.number().int().nonnegative(),
+    isCurrentUser: z.boolean(),
+  })
+  .strict();
+
+const leaderboardViewerSchema = z
+  .object({
+    rank: z.number().int().positive(),
+    username: usernameField,
+    xp: z.number().int().nonnegative(),
+  })
+  .strict();
+
+const leaderboardScoringSchema = z
+  .object({
+    attendedEventXp: z.number().int().nonnegative(),
+    confirmedHourXp: z.number().int().nonnegative(),
+    rounding: z.literal("nearest-total"),
+  })
+  .strict();
+
+export const leaderboardSchema = z
+  .object({
+    items: z.array(leaderboardEntrySchema),
+    viewer: leaderboardViewerSchema,
+    page: z.number().int().positive(),
+    pageSize: z.number().int().min(1).max(100),
+    total: z.number().int().nonnegative(),
+    scoring: leaderboardScoringSchema,
+  })
+  .strict();
+
+export const usernameSummarySchema = z
+  .object({
+    username: usernameField,
+    usernameSource: z.enum(USERNAME_SOURCES),
+    usernameEditable: z.boolean(),
+  })
+  .strict();
+
 export const authMethodsSchema = z.object({
   telegram: z.boolean(),
   google: z.boolean(),
@@ -220,6 +276,9 @@ export const meSchema = z
   .object({
     id: z.string().min(1),
     displayName: optional(z.string()),
+    username: usernameField,
+    usernameSource: z.enum(USERNAME_SOURCES),
+    usernameEditable: z.boolean(),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),
@@ -283,6 +342,8 @@ export const mergeResolutionSchema = z.object({ request: mergeRequestSchema });
 export const acknowledgementSchema = z.looseObject({});
 
 export type Me = z.infer<typeof meSchema>;
+export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
+export type Leaderboard = z.infer<typeof leaderboardSchema>;
 export type ConnectedAccount = z.infer<typeof connectedAccountSchema>;
 export type MergeRequest = z.infer<typeof mergeRequestSchema>;
 export type MergeRequestList = z.infer<typeof mergeRequestListSchema>;
