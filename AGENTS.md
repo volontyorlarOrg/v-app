@@ -78,7 +78,10 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   the sunk surface and ink;
 - **one account, two ways in.** `/settings` is the account page: it reads
   `/me` and `/me/account-merge-requests` on the server and shows Telegram,
-  Google and the email password as connections. Connecting an identity nobody
+  Google and email as separate connection states. A Google-owned address is
+  already an email connection even before a password exists. The password
+  section sets the first password for a Google- or Telegram-only account and
+  changes it when one exists. Connecting an identity nobody
   owns completes at once; connecting one another account owns raises a merge
   request that the other account must approve after signing in again, and the
   requesting account is the one that survives. Approval returns the canonical
