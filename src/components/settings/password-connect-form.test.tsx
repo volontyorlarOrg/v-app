@@ -3,98 +3,168 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  PasswordConnectForm,
-  type PasswordConnectLabels,
+  PasswordForm,
+  type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
 import en from "@/i18n/messages/en.json";
 import { okResult, type ActionResult } from "@/lib/api/action-result";
 
-const actions = vi.hoisted(() => ({ connect: vi.fn() }));
+const actions = vi.hoisted(() => ({ manage: vi.fn() }));
 
 vi.mock("@/lib/account/actions", () => ({
-  connectPasswordAction: actions.connect,
+  managePasswordAction: actions.manage,
 }));
 
 const catalog = en.settings;
 
-const labels: PasswordConnectLabels = {
-  title: catalog.connections.passwordTitle,
-  description: catalog.connections.passwordDescription,
+const labels: PasswordFormLabels = {
+  title: catalog.connections.setPasswordTitle,
+  description: catalog.connections.setPasswordDescription,
   email: catalog.connections.passwordEmail,
-  password: catalog.connections.passwordPassword,
+  currentPassword: catalog.connections.currentPassword,
+  newPassword: catalog.connections.newPassword,
+  confirmPassword: catalog.connections.confirmPassword,
+  passwordHint: catalog.connections.passwordHint.replace("{min}", "8"),
   reveal: catalog.connections.passwordReveal,
   conceal: catalog.connections.passwordConceal,
-  submit: catalog.connections.passwordSubmit,
+  submit: catalog.connections.setPassword,
   pending: catalog.connections.passwordPending,
-  done: catalog.connections.passwordDone,
+  done: catalog.connections.setPasswordDone,
   fieldInvalid: catalog.errors.validationFailed,
   errors: catalog.errors,
 };
 
 function submitted() {
-  return actions.connect.mock.calls.at(-1)?.[1] as FormData;
+  return actions.manage.mock.calls.at(-1)?.[1] as FormData;
 }
 
-async function fill(user: ReturnType<typeof userEvent.setup>, password: string) {
-  await user.type(screen.getByLabelText(labels.email), "dilnoza@example.org");
-  await user.type(screen.getByLabelText(labels.password), password);
+async function fillNewPassword(
+  user: ReturnType<typeof userEvent.setup>,
+  password: string,
+) {
+  await user.type(screen.getByLabelText(labels.newPassword), password);
+  await user.type(screen.getByLabelText(labels.confirmPassword), password);
 }
 
-describe("PasswordConnectForm", () => {
+describe("PasswordForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    actions.connect.mockResolvedValue(okResult);
+    actions.manage.mockResolvedValue(okResult);
   });
 
-  it("sends the typed password to the server action exactly as typed", async () => {
+  it("sets the first password and keeps it exactly as typed", async () => {
     const user = userEvent.setup();
-    render(<PasswordConnectForm locale="uz" labels={labels} />);
+    render(<PasswordForm locale="uz" mode="set" email={null} labels={labels} />);
 
-    await fill(user, "  seven purple lanterns  ");
+    await user.type(screen.getByLabelText(labels.email), "dilnoza@example.org");
+    await fillNewPassword(user, "  seven purple lanterns  ");
     await user.click(screen.getByRole("button", { name: labels.submit }));
 
-    await waitFor(() => expect(actions.connect).toHaveBeenCalledTimes(1));
-    expect(submitted().get("password")).toBe("  seven purple lanterns  ");
+    await waitFor(() => expect(actions.manage).toHaveBeenCalledTimes(1));
+    expect(submitted().get("newPassword")).toBe("  seven purple lanterns  ");
+    expect(submitted().get("confirmPassword")).toBe("  seven purple lanterns  ");
     expect(submitted().get("email")).toBe("dilnoza@example.org");
+    expect(submitted().get("mode")).toBe("set");
     expect(submitted().get("locale")).toBe("uz");
   });
 
-  it("keeps the password out of the document and out of the URL", async () => {
-    const user = userEvent.setup();
-    render(<PasswordConnectForm locale="en" labels={labels} />);
+  it("uses the connected Google email without another visible email field", () => {
+    render(
+      <PasswordForm
+        locale="en"
+        mode="set"
+        email="dilnoza@example.org"
+        labels={labels}
+      />,
+    );
 
-    await fill(user, "seven purple lanterns");
-    const field = screen.getByLabelText(labels.password);
+    expect(screen.queryByLabelText(labels.email)).not.toBeInTheDocument();
+    expect(document.querySelector('input[name="email"]')).toHaveValue(
+      "dilnoza@example.org",
+    );
+  });
+
+  it("shows current password only when changing an existing password", () => {
+    render(
+      <PasswordForm
+        locale="en"
+        mode="change"
+        email="dilnoza@example.org"
+        labels={{
+          ...labels,
+          title: catalog.connections.changePasswordTitle,
+          description: catalog.connections.changePasswordDescription,
+          submit: catalog.connections.changePassword,
+          done: catalog.connections.changePasswordDone,
+        }}
+      />,
+    );
+
+    expect(screen.getByLabelText(labels.currentPassword)).toHaveAttribute(
+      "autocomplete",
+      "current-password",
+    );
+  });
+
+  it("keeps passwords out of the document and URL", async () => {
+    const user = userEvent.setup();
+    render(
+      <PasswordForm
+        locale="en"
+        mode="set"
+        email="dilnoza@example.org"
+        labels={labels}
+      />,
+    );
+
+    await fillNewPassword(user, "seven purple lanterns");
+    const field = screen.getByLabelText(labels.newPassword);
     expect(field).toHaveAttribute("type", "password");
     expect(field.getAttribute("value")).toBeNull();
     expect(document.body.innerHTML).not.toContain("seven purple lanterns");
     expect(window.location.search).toBe("");
   });
 
-  it("names a malformed address before the server action is reached", async () => {
+  it("rejects mismatched confirmation before the server action", async () => {
     const user = userEvent.setup();
-    render(<PasswordConnectForm locale="en" labels={labels} />);
+    render(
+      <PasswordForm
+        locale="en"
+        mode="set"
+        email="dilnoza@example.org"
+        labels={labels}
+      />,
+    );
 
-    await user.type(screen.getByLabelText(labels.email), "not-an-address");
-    await user.type(screen.getByLabelText(labels.password), "seven purple lanterns");
+    await user.type(screen.getByLabelText(labels.newPassword), "seven purple lanterns");
+    await user.type(screen.getByLabelText(labels.confirmPassword), "different words");
     await user.click(screen.getByRole("button", { name: labels.submit }));
 
-    expect(await screen.findByText(labels.fieldInvalid)).toBeInTheDocument();
-    expect(actions.connect).not.toHaveBeenCalled();
+    expect(
+      await screen.findByText(catalog.errors.passwordMismatch),
+    ).toBeInTheDocument();
+    expect(actions.manage).not.toHaveBeenCalled();
   });
 
-  it("cannot be submitted twice while the first submission is in flight", async () => {
+  it("cannot submit twice while saving", async () => {
     const user = userEvent.setup();
     let settle: ((result: ActionResult) => void) | undefined;
-    actions.connect.mockImplementation(
+    actions.manage.mockImplementation(
       () =>
         new Promise<ActionResult>((resolve) => {
           settle = resolve;
         }),
     );
-    render(<PasswordConnectForm locale="en" labels={labels} />);
+    render(
+      <PasswordForm
+        locale="en"
+        mode="set"
+        email="dilnoza@example.org"
+        labels={labels}
+      />,
+    );
 
-    await fill(user, "seven purple lanterns");
+    await fillNewPassword(user, "seven purple lanterns");
     await user.click(screen.getByRole("button", { name: labels.submit }));
 
     const pending = await screen.findByRole("button", { name: labels.pending });
@@ -102,33 +172,30 @@ describe("PasswordConnectForm", () => {
     await user.click(pending);
     settle?.(okResult);
 
-    await waitFor(() => expect(actions.connect).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(actions.manage).toHaveBeenCalledTimes(1));
   });
 
   it("translates a backend refusal instead of showing its code", async () => {
     const user = userEvent.setup();
-    actions.connect.mockResolvedValue({
+    actions.manage.mockResolvedValue({
       status: "error",
-      code: "invalidCredentials",
+      code: "weakPassword",
       fields: {},
     } satisfies ActionResult);
-    render(<PasswordConnectForm locale="en" labels={labels} />);
+    render(
+      <PasswordForm
+        locale="en"
+        mode="set"
+        email="dilnoza@example.org"
+        labels={labels}
+      />,
+    );
 
-    await fill(user, "seven purple lanterns");
+    await fillNewPassword(user, "seven purple lanterns");
     await user.click(screen.getByRole("button", { name: labels.submit }));
 
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent(catalog.errors.invalidCredentials);
-    expect(alert).not.toHaveTextContent("invalidCredentials");
-  });
-
-  it("confirms in words when the check succeeds", async () => {
-    const user = userEvent.setup();
-    render(<PasswordConnectForm locale="en" labels={labels} />);
-
-    await fill(user, "seven purple lanterns");
-    await user.click(screen.getByRole("button", { name: labels.submit }));
-
-    expect(await screen.findByText(labels.done)).toBeInTheDocument();
+    expect(alert).toHaveTextContent(catalog.errors.weakPassword);
+    expect(alert).not.toHaveTextContent("weakPassword");
   });
 });

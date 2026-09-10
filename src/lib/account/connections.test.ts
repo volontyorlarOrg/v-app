@@ -201,16 +201,21 @@ describe("connection state", () => {
     expect(isConnected(connectionStates(unverified), "password")).toBe(true);
   });
 
-  it("names no address beside a way in that is not connected", () => {
-    const telegramOnly = meSchema.parse({
+  it("shows an email connection even when the account has no password yet", () => {
+    const passwordless = meSchema.parse({
       id: "u1",
       createdAt: "2026-01-01T00:00:00.000Z",
       email: "dilnoza@example.org",
-      authMethods: { telegram: true, google: false, password: false },
+      emailVerified: true,
+      authMethods: { telegram: false, google: true, password: false },
     });
-    const states = connectionStates(telegramOnly);
-    expect(states[1]?.detail).toBeNull();
-    expect(states[2]?.detail).toBeNull();
+    const states = connectionStates(passwordless);
+    expect(states[1]?.detail).toBe("dilnoza@example.org");
+    expect(states[2]).toMatchObject({
+      connected: true,
+      detail: "dilnoza@example.org",
+      verified: true,
+    });
   });
 });
 

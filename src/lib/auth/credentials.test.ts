@@ -6,6 +6,8 @@ import {
   credentialsFromFormData,
   fieldErrorsOf,
   logInSchema,
+  passwordManagementFromFormData,
+  passwordManagementSchema,
   signUpSchema,
 } from "@/lib/auth/credentials";
 
@@ -82,6 +84,63 @@ describe("credentialsFromFormData", () => {
       fullName: "",
       email: "",
       password: "",
+    });
+  });
+});
+
+describe("passwordManagementSchema", () => {
+  it("sets a first password without asking for a current password", () => {
+    expect(
+      passwordManagementSchema.safeParse({
+        mode: "set",
+        email: "malika@example.org",
+        currentPassword: "",
+        newPassword: strong,
+        confirmPassword: strong,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("requires the current password when changing one", () => {
+    const result = passwordManagementSchema.safeParse({
+      mode: "change",
+      email: "malika@example.org",
+      currentPassword: "",
+      newPassword: strong,
+      confirmPassword: strong,
+    });
+    expect(messages(result)).toEqual({ currentPassword: ["required"] });
+  });
+
+  it("points a mismatch at the confirmation field", () => {
+    const result = passwordManagementSchema.safeParse({
+      mode: "set",
+      email: "malika@example.org",
+      currentPassword: "",
+      newPassword: strong,
+      confirmPassword: "different password",
+    });
+    expect(messages(result)).toEqual({
+      confirmPassword: ["passwordMismatch"],
+    });
+  });
+});
+
+describe("passwordManagementFromFormData", () => {
+  it("trims the email but preserves every password exactly", () => {
+    const formData = new FormData();
+    formData.set("mode", "change");
+    formData.set("email", " malika@example.org ");
+    formData.set("currentPassword", ` ${strong} `);
+    formData.set("newPassword", ` ${strong} newer `);
+    formData.set("confirmPassword", ` ${strong} newer `);
+
+    expect(passwordManagementFromFormData(formData)).toEqual({
+      mode: "change",
+      email: "malika@example.org",
+      currentPassword: ` ${strong} `,
+      newPassword: ` ${strong} newer `,
+      confirmPassword: ` ${strong} newer `,
     });
   });
 });

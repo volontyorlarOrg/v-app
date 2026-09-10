@@ -111,7 +111,7 @@ export type ConnectionState = {
 };
 
 export function connectionStates(me: Me): readonly ConnectionState[] {
-  const { telegram, google, password } = me.authMethods;
+  const { telegram, google } = me.authMethods;
   const address = me.email ?? null;
 
   return [
@@ -129,9 +129,9 @@ export function connectionStates(me: Me): readonly ConnectionState[] {
     },
     {
       provider: "password",
-      connected: password,
-      detail: password ? address : null,
-      verified: password && me.emailVerified,
+      connected: address !== null,
+      detail: address,
+      verified: address !== null && me.emailVerified,
     },
   ];
 }

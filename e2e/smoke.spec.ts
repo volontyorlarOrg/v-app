@@ -879,7 +879,7 @@ test.describe("account connections and merges", () => {
 
     const connections = page.getByRole("region", { name: "Ways to sign in" });
     await expect(
-      connections.getByRole("listitem").filter({ hasText: "Email and password" }),
+      connections.getByRole("listitem").filter({ hasText: "Email" }),
     ).toContainText("dilnoza@example.org");
     await expect(
       connections.getByRole("link", { name: "Connect Telegram" }),
@@ -887,7 +887,7 @@ test.describe("account connections and merges", () => {
     await expect(
       connections.getByRole("link", { name: "Connect Google" }),
     ).toBeVisible();
-    await expect(page.getByText("Connect an email account")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Change password" })).toBeVisible();
   });
 
   test("connecting Telegram links it directly and the page shows the new state", async ({
@@ -1045,36 +1045,50 @@ test.describe("account connections and merges", () => {
     expect(stored.cookie).not.toMatch(/volontyorlar_session|volontyorlar_connect/);
   });
 
-  test("connecting an email account that belongs to someone else asks them to approve", async ({
+  test("a Google account shows its email as connected and can set its first password", async ({
     page,
   }) => {
-    await signIn(page);
-    await page.goto("/en/settings");
+    await requestRow(page, "Waiting for your approval", "Google")
+      .getByRole("button", { name: "Approve" })
+      .click();
+    await expect(page).toHaveURL(/\/en\/settings$/);
 
-    await page.getByLabel("Email").fill("dilnoza@example.org");
-    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
-    await page.getByRole("button", { name: "Check and connect" }).click();
+    const connections = page.getByRole("region", { name: "Ways to sign in" });
+    await expect(
+      connections.getByRole("listitem").filter({ hasText: "Email" }),
+    ).toContainText("bekzod@example.org");
+    await expect(page.getByRole("heading", { name: "Set a password" })).toBeVisible();
+    await expect(page.getByLabel("Email")).toHaveCount(0);
+
+    await page
+      .getByLabel("New password", { exact: true })
+      .fill("a newer purple lantern phrase");
+    await page.getByLabel("Confirm new password").fill("a newer purple lantern phrase");
+    await page.getByRole("button", { name: "Set password" }).click();
 
     await expect(
-      requestRow(page, "Waiting for the other account", "Email and password"),
-    ).toHaveCount(1);
+      page.getByText("Password set. You can now sign in with email and password."),
+    ).toBeVisible();
   });
 
-  test("a wrong password joins nothing and is refused in words", async ({ page }) => {
+  test("a Telegram-only account can add an email and set its first password", async ({
+    page,
+  }, testInfo) => {
     await signIn(page);
     await page.goto("/en/settings");
 
-    await page.getByLabel("Email").fill("dilnoza@example.org");
-    await page.getByLabel("Password", { exact: true }).fill("not the passphrase");
-    await page.getByRole("button", { name: "Check and connect" }).click();
+    await page
+      .getByLabel("Email")
+      .fill(`telegram.${testInfo.project.name}@example.org`);
+    await page
+      .getByLabel("New password", { exact: true })
+      .fill("a secure telegram password");
+    await page.getByLabel("Confirm new password").fill("a secure telegram password");
+    await page.getByRole("button", { name: "Set password" }).click();
 
     await expect(
-      page.getByText("That email and password do not match an account."),
+      page.getByText("Password set. You can now sign in with email and password."),
     ).toBeVisible();
-    expect(page.url()).toBe(new URL("/en/settings", page.url()).href);
-    await expect(
-      page.getByRole("region", { name: "Waiting for the other account" }),
-    ).toContainText("Nothing is waiting.");
   });
 
   test("an incoming request can be rejected and leaves the list", async ({ page }) => {
@@ -1111,7 +1125,7 @@ test.describe("account connections and merges", () => {
   });
 
   test("an expired request recovers by refetching the list", async ({ page }) => {
-    const row = requestRow(page, "Waiting for your approval", "Email and password");
+    const row = requestRow(page, "Waiting for your approval", "Email");
     await expect(row).toHaveCount(1);
 
     await row.getByRole("button", { name: "Approve" }).click();
@@ -1119,9 +1133,7 @@ test.describe("account connections and merges", () => {
     await expect(row).toHaveCount(0);
     await expect(page).toHaveURL(/\/en\/settings$/);
     await page.reload();
-    await expect(
-      requestRow(page, "Waiting for your approval", "Email and password"),
-    ).toHaveCount(0);
+    await expect(requestRow(page, "Waiting for your approval", "Email")).toHaveCount(0);
   });
 
   test("an approval that needs a fresh sign-in returns to the account page", async ({

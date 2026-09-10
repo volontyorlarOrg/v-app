@@ -35,7 +35,7 @@ describe("ConnectionList", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
     expect(rowFor("Telegram").getByText("@dilnoza_k")).toBeInTheDocument();
     expect(rowFor("Google").getByText("Not connected")).toBeInTheDocument();
-    expect(rowFor("Email and password").getByText("Verified")).toBeInTheDocument();
+    expect(rowFor("Email").getByText("Verified")).toBeInTheDocument();
   });
 
   it("offers a connection handoff only for what is missing", () => {
