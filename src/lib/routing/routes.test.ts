@@ -52,6 +52,22 @@ describe("app route registry", () => {
     );
   });
 
+  it("puts the leaderboard in the desktop sidebar and out of the phone tab bar", () => {
+    const leaderboard = getRoute("leaderboard");
+    expect(leaderboard.area).toBe("volunteer");
+    expect(leaderboard.guard).toBe("session");
+    expect(leaderboard.inNav).toBe(true);
+    expect(leaderboard.inTabBar).toBe(false);
+    expect(leaderboard.inAccountMenu).toBe(false);
+    expect(navRoutes).toContain(leaderboard);
+    expect(tabBarRoutes).not.toContain(leaderboard);
+    expect(accountRoutes).not.toContain(leaderboard);
+    expect(navHref("leaderboard")).toBe("/leaderboard");
+    for (const locale of locales) {
+      expect(guardFor(`/${locale}/leaderboard`)).toBe("session");
+    }
+  });
+
   it("keeps the mobile tab bar to four essential destinations", () => {
     expect(tabBarRoutes.map((route) => route.key)).toEqual([
       "dashboard",

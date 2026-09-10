@@ -92,6 +92,18 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   requesting account is the one that survives. Approval returns the canonical
   session, which the Server Action writes into the same encrypted cookie.
   Nothing is unlinked, unmerged, exported or deleted here;
+- **the leaderboard is the backend's arithmetic, shown.** `/leaderboard` is a
+  sidebar section (never the phone tab bar) reading `GET /leaderboard`; every
+  rank and every experience total arrives from the backend and none is ever
+  computed here, pagination is rendered from the response's own `page`,
+  `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
+  place even from a page they are not on. Each account has a public `username`
+  with a `source`: a `generated` or `custom` one is renamed through
+  `PUT /me/username` from `/settings` and from the end of the welcome flow,
+  and a `telegram` one is read-only because Telegram owns it. It is all
+  described in [`docs/product/LEADERBOARD.md`](docs/product/LEADERBOARD.md),
+  and what was known about the contract when it was written is in
+  `.agent-memory/decisions/leaderboard-contract-is-built-blind.md`;
 - the plan that got here, and the phase still open (hardening), is
   [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
   the keys and the bot are set up from
@@ -182,18 +194,19 @@ src/hooks/                      -> useServerAction and useActionForm: TanStack Q
                                    around the Server Actions
 src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
-                                   applications[/id], saved, record, profile, settings
+                                   applications[/id], saved, record, leaderboard,
+                                   profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
-src/lib/{record,opportunities,applications,profile,notifications}/
+src/lib/{record,leaderboard,opportunities,applications,profile,notifications}/
                                 -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
 src/lib/onboarding/             -> the welcome flow's steps, pass parts, and progress cookie
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
-src/components/{ui,brand,motion,app,auth,onboarding,dashboard,opportunities,applications,record,profile,settings}/
+src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,opportunities,applications,record,leaderboard,profile,settings}/
 e2e/                            -> Playwright smoke suite
 docs/                           -> stable project documentation and the plan
 .agent-memory/                  -> durable decisions, discoveries, gotchas

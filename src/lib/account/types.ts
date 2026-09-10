@@ -62,6 +62,9 @@ export const ACCOUNT_ERROR_CODES = [
   "emailAlreadyRegistered",
   "passwordUnchanged",
   "weakPassword",
+  "usernameUnavailable",
+  "usernameManagedByTelegram",
+  "usernameInvalid",
   "validationFailed",
   "phoneRequired",
   "accountDisabled",
@@ -79,6 +82,10 @@ export type AccountErrorCode = (typeof ACCOUNT_ERROR_CODES)[number];
 export const ACCOUNT_ERROR_KEYS = [
   ...ACCOUNT_ERROR_CODES,
   "passwordMismatch",
+  "usernameRequired",
+  "usernameShort",
+  "usernameLong",
+  "usernameCharacters",
   "network",
   "unknown",
 ] as const;
