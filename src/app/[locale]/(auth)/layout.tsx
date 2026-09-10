@@ -28,7 +28,7 @@ export default async function AuthLayout({
       >
         {t("skipToContent")}
       </a>
-      <header className="container-page flex min-h-16 items-center justify-between gap-4 lg:min-h-20">
+      <header className="container-page flex min-h-16 items-center justify-between gap-4">
         {site ? (
           <a href={site} className="-m-1 rounded-lg p-1" aria-label={ORGANIZATION_NAME}>
             {lockup}
@@ -49,23 +49,10 @@ export default async function AuthLayout({
       </header>
       <main
         id="main"
-        className="container-page flex flex-1 flex-col justify-center py-8 sm:py-14"
+        className="container-page flex flex-1 flex-col justify-center py-6"
       >
         <div className="mx-auto w-full max-w-md">{children}</div>
       </main>
-      <footer className="container-page flex flex-col gap-2 py-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>
-          © {new Date().getFullYear()} {ORGANIZATION_NAME}
-        </p>
-        {site ? (
-          <a
-            href={site}
-            className="font-semibold text-primary-ink underline-offset-4 hover:underline"
-          >
-            {t("marketingSite")}
-          </a>
-        ) : null}
-      </footer>
     </>
   );
 }
