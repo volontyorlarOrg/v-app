@@ -12,12 +12,10 @@ import {
   mergeRequestListSchema,
   mergeRequestSchema,
   mergeResolutionSchema,
-  preferencesSchema,
   type ConnectionOutcome,
   type MergeApproval,
   type MergeRequest,
   type MergeRequestList,
-  type Preferences,
 } from "@/lib/api/schemas";
 import { AUTH_REQUEST_TIMEOUT_MS } from "@/lib/auth/config";
 import { googleChallengeSchema, type GoogleChallenge } from "@/lib/auth/google";
@@ -33,18 +31,6 @@ const MERGE_REQUESTS_PATH = "/me/account-merge-requests";
 export const getMe = cache(function getMe() {
   return authed("/me", { schema: meSchema });
 });
-
-export const getPreferences = cache(function getPreferences() {
-  return authed("/me/preferences", { schema: preferencesSchema });
-});
-
-export function updatePreferences(input: Partial<Preferences>) {
-  return authed("/me/preferences", {
-    method: "PUT",
-    body: input,
-    schema: preferencesSchema,
-  });
-}
 
 export function authorizeTelegramConnection(
   accessToken: string,

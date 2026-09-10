@@ -173,6 +173,75 @@
     },
     "greetingAnonymous": "Hello."
   },
+  "onboarding": {
+    "metaTitle": "Welcome",
+    "title": "Hi, {name}. Let’s make your volunteer pass.",
+    "titleAnonymous": "Let’s make your volunteer pass.",
+    "lead": "Fill it in once. Every application you send reuses it, and an organiser sees a volunteer who is ready.",
+    "stepCount": "Step {step} of {total}",
+    "skipForNow": "Skip for now",
+    "skipStep": "Skip this step",
+    "back": "Back",
+    "continue": "Continue",
+    "saving": "Saving…",
+    "start": "Start",
+    "saveError": "That didn’t save. Check the marked fields and try again.",
+    "nameNeeded": "Your name is the one thing an organiser needs.",
+    "welcome": {
+      "title": "Three short steps, about a minute.",
+      "body": "Who you are, where you study, and how organisers reach you. Everything can be changed later on your profile."
+    },
+    "steps": {
+      "about": {
+        "title": "About you",
+        "lead": "The first thing an organiser reads."
+      },
+      "place": {
+        "title": "Where you study",
+        "lead": "Organisers pick volunteers close to the event."
+      },
+      "contact": {
+        "title": "How organisers reach you",
+        "lead": "Shared with an organiser only after you apply. One of the two is enough."
+      }
+    },
+    "rail": {
+      "label": "Setup steps",
+      "welcome": "Welcome",
+      "about": "About you",
+      "place": "Where you study",
+      "contact": "Contact",
+      "done": "Ready"
+    },
+    "railState": {
+      "done": "done",
+      "current": "current step",
+      "upcoming": "not yet"
+    },
+    "done": {
+      "title": "Your pass is ready.",
+      "complete": "Your profile is complete. Applying takes under a minute.",
+      "incomplete": "Your profile is {percent}% complete. Still missing: {fields}.",
+      "finishOnProfile": "Add it on your profile",
+      "nextTitle": "What happens next",
+      "next": {
+        "apply": "Apply with your pass. Nothing to fill in twice.",
+        "attend": "Attend. Arrive on time and do the work.",
+        "confirm": "The organiser confirms you were there. Your record grows, and so does your level."
+      },
+      "cta": "Find your first opportunity",
+      "dashboard": "Go to the dashboard"
+    },
+    "resume": {
+      "title": "Finish your pass",
+      "body": "{done} of {total} steps done. About a minute to finish.",
+      "continue": "Continue setup",
+      "dismiss": "Not now"
+    },
+    "pass": {
+      "label": "Your volunteer pass, assembling as you go"
+    }
+  },
   "record": {
     "metaTitle": "My record",
     "title": "Your record",
@@ -411,19 +480,31 @@
   },
   "profile": {
     "metaTitle": "Profile",
-    "title": "Your profile",
-    "description": "Fill this in once. Every application reuses it.",
+    "identity": {
+      "complete": "Profile complete",
+      "joined": "Joined {date}",
+      "bioEmpty": "No bio yet. A few sentences are what an organiser reads first.",
+      "edit": "Edit profile",
+      "record": "My record"
+    },
+    "stats": {
+      "events": "Events",
+      "reliability": "Reliability",
+      "hours": "Hours"
+    },
+    "form": {
+      "title": "Edit your profile",
+      "description": "Fill this in once. Every application reuses it."
+    },
     "sections": {
-      "identity": "About you",
       "education": "Education",
       "location": "Where you are",
-      "skills": "Languages and skills",
       "contact": "How organisers reach you",
       "links": "Links"
     },
     "fields": {
       "fullName": "Full name",
-      "bio": "Short introduction",
+      "bio": "Bio",
       "bioHelp": "A few sentences an organiser reads first. Not an essay.",
       "school": "School, college, or university",
       "gradeYear": "Year or grade",
@@ -432,28 +513,34 @@
       "city": "City or district",
       "languages": "Languages you speak",
       "languagesHelp": "Separate with commas.",
-      "skills": "Skills and interests",
-      "skillsHelp": "Separate with commas.",
       "phone": "Phone number",
       "phoneHelp": "Shared with an organiser only after you apply.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @.",
       "links": "Portfolio, CV, or social link",
-      "linksHelp": "Optional. Does not count toward completeness.",
+      "linksHelp": "Separate with commas. Up to three.",
       "contact": "A way to reach you"
     },
+    "completionFields": {
+      "fullName": "Full name",
+      "bio": "Bio",
+      "region": "Region",
+      "school": "School",
+      "languages": "Languages"
+    },
+    "optional": "Optional",
     "save": "Save profile",
+    "saving": "Saving…",
     "saved": "Profile saved.",
+    "saveError": "Couldn't save your profile. Check the marked fields.",
+    "fieldInvalid": "Check this field.",
     "completion": {
       "label": "Profile completeness",
       "value": "{percent}% complete",
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
-      "why": "A complete profile means an organiser can evaluate and contact you."
-    },
-    "saving": "Saving…",
-    "saveError": "Couldn't save your profile. Check the marked fields.",
-    "fieldInvalid": "Check this field."
+      "why": "A complete profile means an organiser can evaluate you at a glance."
+    }
   },
   "settings": {
     "metaTitle": "Settings",

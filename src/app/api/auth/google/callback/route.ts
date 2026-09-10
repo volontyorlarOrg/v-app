@@ -20,6 +20,8 @@ import {
   sessionCookieOptions,
   toSessionPayload,
 } from "@/lib/auth/session";
+import { onboardingPath } from "@/lib/onboarding/state";
+import { onboardingStartCookie } from "@/lib/onboarding/state.server";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
 const GOOGLE_POST_ORIGIN = "https://accounts.google.com";
@@ -102,8 +104,13 @@ export async function POST(request: NextRequest) {
   if (!cookieValue) return backToLogin("unavailable");
 
   const returnTo = safeReturnPath(request.cookies.get(RETURN_TO_COOKIE_NAME)?.value);
-  const response = relativeRedirect(returnTo ?? localePath(locale, HOME_ROUTE));
+  const response = relativeRedirect(
+    session.isNewUser
+      ? onboardingPath(locale, returnTo)
+      : (returnTo ?? localePath(locale, HOME_ROUTE)),
+  );
   response.cookies.set(SESSION_COOKIE_NAME, cookieValue, sessionCookieOptions());
+  if (session.isNewUser) response.cookies.set(onboardingStartCookie());
   return clearHandoff(response);
 }
 

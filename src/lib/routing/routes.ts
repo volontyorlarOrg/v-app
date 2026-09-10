@@ -9,9 +9,10 @@ export type RouteKey =
   | "saved"
   | "record"
   | "profile"
-  | "settings";
+  | "settings"
+  | "welcome";
 
-export type RouteArea = "auth" | "volunteer";
+export type RouteArea = "auth" | "volunteer" | "onboarding";
 
 export type RouteGuard = "guest" | "session";
 
@@ -107,13 +108,26 @@ export const appRoutes: readonly AppRoute[] = [
     inTabBar: false,
     inAccountMenu: true,
   },
+  {
+    key: "welcome",
+    path: "/welcome",
+    area: "onboarding",
+    guard: "session",
+    inNav: false,
+    inTabBar: false,
+    inAccountMenu: false,
+  },
 ] as const;
 
 export const ENTRY_ROUTE: RouteKey = "login";
 export const HOME_ROUTE: RouteKey = "dashboard";
+export const ONBOARDING_ROUTE: RouteKey = "welcome";
 
 export const authRoutes = appRoutes.filter((route) => route.area === "auth");
 export const volunteerRoutes = appRoutes.filter((route) => route.area === "volunteer");
+export const onboardingRoutes = appRoutes.filter(
+  (route) => route.area === "onboarding",
+);
 export const navRoutes = appRoutes.filter((route) => route.inNav);
 export const accountRoutes = volunteerRoutes.filter((route) => route.inAccountMenu);
 export const tabBarRoutes = appRoutes.filter((route) => route.inTabBar);

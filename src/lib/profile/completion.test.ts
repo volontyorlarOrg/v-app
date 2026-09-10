@@ -12,8 +12,6 @@ const EMPTY: ProfileFields = {
   region: null,
   school: "",
   languages: [],
-  phone: "",
-  telegram: "",
 };
 
 function profile(overrides: Partial<ProfileFields> = {}): ProfileFields {
@@ -28,20 +26,11 @@ describe("profileCompletion", () => {
     expect(completion.missing).toEqual([...COMPLETION_FIELDS]);
   });
 
-  it("counts either contact channel, not both", () => {
-    expect(
-      profileCompletion(profile({ phone: "+998901234567" })).missing,
-    ).not.toContain("contact");
-    expect(profileCompletion(profile({ telegram: "aziza_v" })).missing).not.toContain(
-      "contact",
-    );
-  });
-
   it("ignores a one-letter name", () => {
     expect(profileCompletion(profile({ fullName: "A" })).missing).toContain("fullName");
   });
 
-  it("reaches 100% once every counted field is filled", () => {
+  it("reaches 100% without a phone number or a Telegram username", () => {
     const completion = profileCompletion(
       profile({
         fullName: "Aziza Karimova",
@@ -49,7 +38,6 @@ describe("profileCompletion", () => {
         region: "samarkand",
         school: "School 14",
         languages: ["uz", "en"],
-        telegram: "aziza_v",
       }),
     );
     expect(completion.percent).toBe(100);

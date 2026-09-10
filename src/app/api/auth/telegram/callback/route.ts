@@ -2,10 +2,7 @@ import type { NextRequest, NextResponse } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
-import {
-  AUTH_REQUEST_TIMEOUT_MS,
-  isAuthConfigured,
-} from "@/lib/auth/config";
+import { AUTH_REQUEST_TIMEOUT_MS, isAuthConfigured } from "@/lib/auth/config";
 import {
   LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
@@ -23,6 +20,8 @@ import {
   type TelegramStatus,
 } from "@/lib/auth/telegram";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
+import { onboardingPath } from "@/lib/onboarding/state";
+import { onboardingStartCookie } from "@/lib/onboarding/state.server";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -82,7 +81,12 @@ export async function GET(request: NextRequest) {
   if (!cookieValue) return backToLogin("unavailable");
 
   const returnTo = safeReturnPath(request.cookies.get(RETURN_TO_COOKIE_NAME)?.value);
-  const response = relativeRedirect(returnTo ?? localePath(locale, HOME_ROUTE));
+  const response = relativeRedirect(
+    session.isNewUser
+      ? onboardingPath(locale, returnTo)
+      : (returnTo ?? localePath(locale, HOME_ROUTE)),
+  );
   response.cookies.set(SESSION_COOKIE_NAME, cookieValue, sessionCookieOptions());
+  if (session.isNewUser) response.cookies.set(onboardingStartCookie());
   return clearHandoff(response);
 }
