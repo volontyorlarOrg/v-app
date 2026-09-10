@@ -12,6 +12,7 @@ import {
   mergeRequestListSchema,
   mergeRequestSchema,
   mergeResolutionSchema,
+  usernameSummarySchema,
   type ConnectionOutcome,
   type MergeApproval,
   type MergeRequest,
@@ -85,7 +86,11 @@ export function completeGoogleConnection(
 }
 
 export function updateUsername(username: string) {
-  return authed(USERNAME_PATH, { method: "PUT", body: { username } });
+  return authed(USERNAME_PATH, {
+    method: "PUT",
+    body: { username },
+    schema: usernameSummarySchema,
+  });
 }
 
 export function updatePassword(input: {

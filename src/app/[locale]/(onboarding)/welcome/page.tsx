@@ -82,7 +82,7 @@ function Welcome({
   profileSaved: boolean;
   next: string | null;
   initialStep: OnboardingStep;
-  username: UsernameIdentity | null;
+  username: UsernameIdentity;
 }) {
   const t = useTranslations("onboarding");
   const profile = useTranslations("profile");

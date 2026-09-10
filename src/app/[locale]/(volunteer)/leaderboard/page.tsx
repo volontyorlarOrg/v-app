@@ -59,52 +59,39 @@ function Leaderboard({ board, state }: { board: LeaderboardPage; state: PageStat
   const format = useFormatter();
 
   const viewer = board.viewer;
-  const stats: Stat[] = viewer
-    ? [
-        {
-          id: "rank",
-          label: t("standing.rank"),
-          value: format.number(viewer.rank),
-          note: t("standing.of", { total: board.total }),
-          achievement: true,
-        },
-        {
-          id: "xp",
-          label: t("standing.xp"),
-          value: format.number(viewer.xp),
-          note: t("standing.xpHelp"),
-          achievement: true,
-        },
-      ]
-    : [];
+  const stats: Stat[] = [
+    {
+      id: "rank",
+      label: t("standing.rank"),
+      value: format.number(viewer.rank),
+      note: t("standing.of", { total: board.total }),
+      achievement: true,
+    },
+    {
+      id: "xp",
+      label: t("standing.xp"),
+      value: format.number(viewer.xp),
+      note: t("standing.xpHelp"),
+      achievement: true,
+    },
+  ];
 
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
 
-      {viewer ? (
-        <>
-          <StatTiles stats={stats} className="mt-6 xl:grid-cols-2" />
-          <p className="enter-rise mt-3 text-sm text-ink-muted [--enter-delay:260ms]">
-            {t("standing.appearAs")}{" "}
-            <span className="font-semibold text-ink">@{viewer.username}</span>
-            <span aria-hidden="true"> · </span>
-            <Link
-              href={navHref("settings")}
-              className="font-semibold text-primary-ink underline-offset-4 hover:underline"
-            >
-              {t("standing.changeHandle")}
-            </Link>
-          </p>
-        </>
-      ) : (
-        <Panel className="mt-6">
-          <p className="font-semibold text-ink">{t("standing.unrankedTitle")}</p>
-          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-            {t("standing.unrankedBody")}
-          </p>
-        </Panel>
-      )}
+      <StatTiles stats={stats} className="mt-6 xl:grid-cols-2" />
+      <p className="enter-rise mt-3 text-sm text-ink-muted [--enter-delay:260ms]">
+        {t("standing.appearAs")}{" "}
+        <span className="font-semibold text-ink">@{viewer.username}</span>
+        <span aria-hidden="true"> · </span>
+        <Link
+          href={navHref("settings")}
+          className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+        >
+          {t("standing.changeHandle")}
+        </Link>
+      </p>
 
       <Panel
         id="standings"
@@ -116,10 +103,7 @@ function Leaderboard({ board, state }: { board: LeaderboardPage; state: PageStat
         {board.items.length === 0 ? (
           <p className="px-5 py-6 text-sm text-ink-muted">{t("table.empty")}</p>
         ) : (
-          <LeaderboardTable
-            entries={board.items}
-            viewerUsername={viewer?.username ?? null}
-          />
+          <LeaderboardTable entries={board.items} />
         )}
 
         {board.total > 0 ? (

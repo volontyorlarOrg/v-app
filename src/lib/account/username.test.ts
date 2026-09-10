@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  isUsernameEditable,
   normalizeUsername,
   usernameFormSchema,
   usernameFromFormData,
@@ -37,27 +36,23 @@ describe("username input", () => {
 });
 
 describe("username identity", () => {
-  it("is absent while the backend does not send one", () => {
-    expect(usernameIdentity({})).toBeNull();
-    expect(usernameIdentity({ username: "   " })).toBeNull();
-  });
-
   it("treats a Telegram-managed handle as read-only", () => {
     expect(
-      usernameIdentity({ username: "dilnoza_k", usernameSource: "telegram" }),
+      usernameIdentity({
+        username: "dilnoza_k",
+        usernameSource: "telegram",
+        usernameEditable: false,
+      }),
     ).toEqual({ username: "dilnoza_k", source: "telegram", editable: false });
-    expect(isUsernameEditable("telegram")).toBe(false);
   });
 
-  it("lets a generated or chosen handle be renamed", () => {
-    for (const source of ["generated", "custom"] as const) {
-      expect(
-        usernameIdentity({ username: "user_9f2", usernameSource: source }),
-      ).toEqual({ username: "user_9f2", source, editable: true });
-    }
-  });
-
-  it("reads a handle without a stated source as generated", () => {
-    expect(usernameIdentity({ username: "user_9f2" })?.source).toBe("generated");
+  it("uses the backend's editability decision", () => {
+    expect(
+      usernameIdentity({
+        username: "user_9f2",
+        usernameSource: "generated",
+        usernameEditable: true,
+      }),
+    ).toEqual({ username: "user_9f2", source: "generated", editable: true });
   });
 });

@@ -18,6 +18,7 @@ import {
   profileSchema,
   recordSchema,
   savedListSchema,
+  usernameSummarySchema,
 } from "@/lib/api/schemas";
 
 const organization = {
@@ -172,6 +173,9 @@ describe("account schemas", () => {
       displayName: null,
       roles: ["volunteer"],
       createdAt: "2026-09-01T10:00:00.000Z",
+      username: "dilnoza_k",
+      usernameSource: "generated",
+      usernameEditable: true,
       telegramIdentity: { username: null, linkedAt: "2026-09-01T10:00:00.000Z" },
       preferences: { userId: "u1", notifyTelegram: true, createdAt: "x" },
     });
@@ -246,6 +250,12 @@ const account = {
   authMethods: { telegram: true, google: true, password: true },
 };
 
+const username = {
+  username: "dilnoza_k",
+  usernameSource: "telegram" as const,
+  usernameEditable: false,
+};
+
 const pendingRequest = {
   id: "50000000-0000-4000-8000-000000000001",
   status: "pending",
@@ -264,6 +274,7 @@ describe("the account schema", () => {
     const parsed = meSchema.parse({
       id: "u1",
       createdAt: "2026-01-01T00:00:00.000Z",
+      ...username,
       email: "dilnoza@example.org",
       emailVerified: true,
       telegramIdentity: { username: "dilnoza_k" },
@@ -292,6 +303,7 @@ describe("the account schema", () => {
     const parsed = meSchema.parse({
       id: "u1",
       createdAt: "2026-01-01T00:00:00.000Z",
+      ...username,
       telegramIdentity: { username: "dilnoza_k" },
     });
 
@@ -308,20 +320,20 @@ describe("the account schema", () => {
       createdAt: "2026-01-01T00:00:00.000Z",
       username: "dilnoza_k",
       usernameSource: "telegram",
+      usernameEditable: false,
     });
 
     expect(parsed.username).toBe("dilnoza_k");
     expect(parsed.usernameSource).toBe("telegram");
   });
 
-  it("leaves the handle undefined while the backend does not send one", () => {
-    const parsed = meSchema.parse({
-      id: "u1",
-      createdAt: "2026-01-01T00:00:00.000Z",
-    });
-
-    expect(parsed.username).toBeUndefined();
-    expect(parsed.usernameSource).toBeUndefined();
+  it("requires every account to carry its username contract", () => {
+    expect(
+      meSchema.safeParse({
+        id: "u1",
+        createdAt: "2026-01-01T00:00:00.000Z",
+      }).success,
+    ).toBe(false);
   });
 
   it("refuses a handle the backend should never have stored", () => {
@@ -331,6 +343,8 @@ describe("the account schema", () => {
           id: "u1",
           createdAt: "2026-01-01T00:00:00.000Z",
           username,
+          usernameSource: "custom",
+          usernameEditable: true,
         }).success,
         username,
       ).toBe(false);
@@ -344,6 +358,7 @@ describe("the account schema", () => {
         createdAt: "2026-01-01T00:00:00.000Z",
         username: "dilnoza_k",
         usernameSource: "imported",
+        usernameEditable: true,
       }).success,
     ).toBe(false);
   });
@@ -356,32 +371,56 @@ describe("the account schema", () => {
 });
 
 describe("the leaderboard schema", () => {
-  const entry = { rank: 1, username: "dilnoza_k", displayName: "Dilnoza", xp: 1200 };
+  const entry = {
+    rank: 1,
+    username: "dilnoza_k",
+    xp: 1200,
+    isCurrentUser: true,
+  };
+  const scoring = {
+    attendedEventXp: 50,
+    confirmedHourXp: 10,
+    rounding: "nearest-total" as const,
+  };
+  const board = {
+    items: [entry],
+    viewer: { rank: 1, username: "dilnoza_k", xp: 1200 },
+    page: 1,
+    pageSize: 25,
+    total: 1,
+    scoring,
+  };
 
   it("reads a page exactly as the backend serialises it", () => {
     const parsed = leaderboardSchema.parse({
-      items: [entry, { rank: 2, username: "bekzod_r", displayName: null, xp: 900 }],
+      items: [
+        { ...entry, isCurrentUser: false },
+        { rank: 2, username: "bekzod_r", xp: 0, isCurrentUser: true },
+      ],
       page: 2,
       pageSize: 25,
       total: 143,
-      viewer: { rank: 57, username: "dilnoza_k", xp: 120 },
+      viewer: { rank: 57, username: "bekzod_r", xp: 0 },
+      scoring,
     });
 
     expect(parsed.items).toHaveLength(2);
-    expect(parsed.items[1]?.displayName).toBeUndefined();
+    expect(parsed.items[1]?.isCurrentUser).toBe(true);
+    expect(parsed.items[1]?.xp).toBe(0);
     expect(parsed.page).toBe(2);
     expect(parsed.pageSize).toBe(25);
     expect(parsed.total).toBe(143);
-    expect(parsed.viewer?.rank).toBe(57);
+    expect(parsed.viewer.rank).toBe(57);
+    expect(parsed.scoring).toEqual(scoring);
   });
 
-  it("reads an empty board without a viewer", () => {
-    const parsed = leaderboardSchema.parse({ items: [], total: 0, viewer: null });
-
-    expect(parsed.items).toEqual([]);
-    expect(parsed.viewer).toBeUndefined();
-    expect(parsed.page).toBe(1);
-    expect(parsed.pageSize).toBe(25);
+  it("refuses private or undocumented row fields", () => {
+    expect(
+      leaderboardSchema.safeParse({
+        ...board,
+        items: [{ ...entry, displayName: "Dilnoza" }],
+      }).success,
+    ).toBe(false);
   });
 
   it("refuses a rank or an experience total that cannot be true", () => {
@@ -392,7 +431,7 @@ describe("the leaderboard schema", () => {
       { ...entry, xp: 12.5 },
     ]) {
       expect(
-        leaderboardSchema.safeParse({ items: [broken], total: 1 }).success,
+        leaderboardSchema.safeParse({ ...board, items: [broken] }).success,
         JSON.stringify(broken),
       ).toBe(false);
     }
@@ -400,6 +439,18 @@ describe("the leaderboard schema", () => {
 
   it("refuses a page whose total is missing", () => {
     expect(leaderboardSchema.safeParse({ items: [entry] }).success).toBe(false);
+  });
+});
+
+describe("the username mutation schema", () => {
+  it("requires the backend username summary", () => {
+    expect(usernameSummarySchema.parse(username)).toEqual(username);
+    expect(
+      usernameSummarySchema.safeParse({
+        username: "dilnoza_k",
+        usernameSource: "telegram",
+      }).success,
+    ).toBe(false);
   });
 });
 

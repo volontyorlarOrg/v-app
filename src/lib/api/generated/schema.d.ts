@@ -200,7 +200,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Change the current account password */
+        /** Set or change the current account password */
         post: operations["AuthController_changePassword"];
         delete?: never;
         options?: never;
@@ -439,6 +439,23 @@ export interface paths {
         /** Get the current account and linked identity */
         get: operations["UsersController_me"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/username": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change the current account username */
+        put: operations["UsersController_username"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1360,6 +1377,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active volunteers by experience points */
+        get: operations["LeaderboardController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1386,7 +1420,8 @@ export interface components {
             password: string;
         };
         ChangePasswordDto: {
-            currentPassword: string;
+            currentPassword?: string;
+            email?: string;
             newPassword: string;
         };
         RefreshAuthDto: {
@@ -1398,6 +1433,10 @@ export interface components {
         VerifyPasswordConnectionDto: {
             email: string;
             password: string;
+        };
+        UpdateUsernameDto: {
+            /** @example aziza_volunteer */
+            username: string;
         };
         UpdatePreferencesDto: {
             notifyTelegram?: boolean;
@@ -2196,6 +2235,27 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_username: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUsernameDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -3535,6 +3595,26 @@ export interface operations {
             query?: {
                 from?: string;
                 to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeaderboardController_list: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                pageSize?: components["schemas"]["Object"];
             };
             header?: never;
             path?: never;

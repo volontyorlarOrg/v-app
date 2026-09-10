@@ -1,10 +1,7 @@
-# The leaderboard contract was written before the backend served it
+# The leaderboard contract is verified against the backend
 
-Checked on 10 September 2026 against `../v-backend`: neither `GET /leaderboard`
-nor `PUT /me/username` exists yet. `docs/api/openapi.json` has 80 paths and
-none of them is either route, so `npm run api:types` types neither, and
-`ApiPath` accepts both only through its `(string & {})` escape hatch. This
-section was built to a contract the backend had not published.
+Re-checked on 10 September 2026 against `../v-backend` after both routes were
+implemented. The frontend parser now follows the backend response exactly.
 
 What was **not** guessed: the backend's migration
 `prisma/migrations/20260910000000_leaderboard_usernames/` was already on disk
@@ -27,33 +24,19 @@ rather than invented.
 - the board is indexed `(isActive, mergedIntoUserId, xp DESC, username ASC)`,
   which is the order the page renders and the reason ties are stable.
 
-What **was** assumed, and is the first thing to re-check when the routes ship:
+The verified route contract is:
 
-- the read is `GET /leaderboard?page&pageSize` answering
-  `{ items: [{ rank, username, displayName?, xp }], page, pageSize, total,
-viewer? }`, following `/opportunities`, the only other paged list, for the
-  envelope. `viewer` is the addition: it is how the signed-in volunteer's place
-  is shown while they are on another page.
-- the write is `PUT /me/username` with `{ username }`. Its **response is not
-  parsed at all** — `updateUsername` passes no schema — because the action
-  revalidates and the page re-reads `/me`, which is authoritative. That is
-  deliberate: a schema for an unknown body would be a guess, and an empty `204`
-  would fail one.
-- the failure codes are `usernameUnavailable` (taken),
-  `usernameManagedByTelegram` (Telegram owns it) and `usernameInvalid`, plus
-  the usual `validationFailed` with `errors.username`. They are listed in
-  `ACCOUNT_ERROR_CODES` and translated in all three catalogs. A code outside
-  that list already degrades to `errors.unknown` through `accountErrorKey`.
+- `GET /leaderboard?page&pageSize` answers `{ items, viewer, page, pageSize,
+total, scoring }`. Items are `{ rank, username, xp, isCurrentUser }` and the
+  required viewer is `{ rank, username, xp }`. No display name or private ID is
+  returned.
+- `PUT /me/username` accepts `{ username }` and answers `{ username,
+usernameSource, usernameEditable }`; that response is parsed before the
+  action succeeds.
+- `GET /me` requires the same three username fields.
+- the mutation failure codes are `usernameUnavailable`,
+  `usernameManagedByTelegram` and `validationFailed`.
 
-Both `username` and `usernameSource` are **optional** on `meSchema` on purpose:
-a deployment without them is not an error, it is an account with no handle, and
-`usernameIdentity()` answers `null` so the account page drops its panel and the
-welcome flow drops its card. Nothing invents a name. The leaderboard entry's
-`username`, by contrast, is required and strict — a board row without a handle
-is a broken response, not a missing feature.
-
-When the backend publishes the two routes, re-run `npm run api:types`, then
-check this file against the generated paths and
-`docs/api/FRONTEND_CONTRACT.md` rather than assuming they still agree. See
-[`account-connections-are-a-forward-contract.md`](account-connections-are-a-forward-contract.md),
-which is the same situation one feature earlier.
+The leaderboard schemas are strict so an accidental display name, ID or other
+undocumented field fails closed. XP, ranks, viewer identity and editability are
+all backend decisions and are not reconstructed in frontend code.

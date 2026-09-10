@@ -17,18 +17,16 @@ The page has three parts:
    the place and the experience, with the total volunteers as the place's note.
    Beneath them, the handle the volunteer appears under and a link to the
    account page, which is where a handle is changed.
-2. **Standings** — one page of the board: place, handle with the display name
-   under it, and experience. The first three places and the volunteer's own row
-   are in orange, the colour that belongs to the person; every other experience
-   figure is plain ink so the orange keeps meaning something. The reader's own
-   row is on the soft surface, carries `aria-current`, and is marked with a
-   chip.
+2. **Standings** — one page of the board: place, public handle and experience.
+   The first three places and the volunteer's own row are in orange, the colour
+   that belongs to the person; every other experience figure is plain ink so
+   the orange keeps meaning something. The reader's own row is on the soft
+   surface, carries `aria-current`, and is marked with a chip.
 3. **Pagination** — rendered from the response's own `page`, `pageSize` and
    `total`, never from a count of the rows on screen.
 
-An account with no standing yet sees a short panel saying so instead of the
-figures. A page number past the end redirects to the last page, so the
-"showing 26–30 of 30" line never contradicts an empty table.
+A page number past the end redirects to the last page, so the "showing 26–30
+of 30" line never contradicts an empty table.
 
 ## Nothing is calculated here
 
@@ -42,8 +40,8 @@ The one thing the frontend does compute is which page is which — page count,
 the clamped current page, the window of page numbers, and the "showing
 first–last of total" range. → `src/lib/leaderboard/pagination.ts`
 
-Marking the reader's own row is identity matching, not ranking: the row's
-`username` is compared with `viewer.username`.
+The backend marks the reader's row with `isCurrentUser`; the frontend does not
+infer identity from another field.
 
 ## The handle
 
@@ -73,29 +71,21 @@ Placement and treatment are frontend decisions; what a source means is not.
 
 ## The contract
 
-Read: `GET /leaderboard?page&pageSize` → `{ items, page, pageSize, total,
-viewer }`. Write: `PUT /me/username` with `{ username }`. The handle and its
-source also arrive on `GET /me`.
+Read: `GET /leaderboard?page&pageSize` → `{ items, viewer, page, pageSize,
+total, scoring }`. Each item is `{ rank, username, xp, isCurrentUser }`; the
+viewer is `{ rank, username, xp }`. Write: `PUT /me/username` with `{ username
+}` → `{ username, usernameSource, usernameEditable }`. Those same username
+fields are required on `GET /me`.
 
 Both are parsed by `src/lib/api/schemas.ts` and read through
 `src/lib/api/leaderboard.server.ts` and `src/lib/api/account.server.ts`. The
 rename is a Server Action in `src/lib/account/actions.ts` returning the usual
 `ActionResult`; its backend codes are `usernameUnavailable`,
-`usernameManagedByTelegram` and `usernameInvalid`, translated in all three
+`usernameManagedByTelegram` and `validationFailed`, translated in all three
 catalogs under `settings.errors`, alongside the four field messages the shared
 Zod rules produce.
 
 The frontend rules mirror the backend's own constraint rather than inventing
 one — see
 [`../../.agent-memory/decisions/leaderboard-contract-is-built-blind.md`](../../.agent-memory/decisions/leaderboard-contract-is-built-blind.md)
-for what was known when this was written and what must be re-checked once the
-backend publishes the two routes.
-
-## Degrading honestly
-
-While a deployment has not shipped the handle, `/me` carries no `username`,
-`usernameIdentity()` answers `null`, and the account page simply has no handle
-panel and the welcome flow no handle card. Nothing invents a name. The
-leaderboard section is still registered and still reachable; until the backend
-serves `/leaderboard` the section renders the panel's load error with a retry,
-like any other section whose read fails.
+for the original assumptions and the verified replacement contract.
