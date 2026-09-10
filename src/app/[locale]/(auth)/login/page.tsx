@@ -79,7 +79,7 @@ function Login({
 
   return (
     <>
-      <AuthIntro title={t("login.title")} lead={t("login.lead")} />
+      <AuthIntro title={t("login.title")} />
 
       {telegramStatus ? (
         <AuthStatus>{t(`telegram.${telegramStatus}`)}</AuthStatus>
@@ -95,14 +95,11 @@ function Login({
           google={t("providers.google")}
           googleUnavailable={t("providers.googleUnavailable")}
         />
-        <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-          {googleHref ? t("providers.handoff") : t("telegram.handoff")}
-        </p>
 
         <CredentialsSection mode="login" locale={locale} next={next} />
       </AuthPanel>
 
-      <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">
+      <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">
         {t("login.noAccount")}{" "}
         <Link
           href={signupHref}

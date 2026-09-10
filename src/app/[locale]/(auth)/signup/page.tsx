@@ -70,7 +70,7 @@ function Signup({
 
   return (
     <>
-      <AuthIntro title={t("signup.title")} lead={t("signup.lead")} />
+      <AuthIntro title={t("signup.title")} />
 
       <AuthPanel>
         <ProviderButtons
@@ -80,13 +80,10 @@ function Signup({
           google={t("providers.google")}
           googleUnavailable={t("providers.googleUnavailable")}
         />
-        <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-          {googleHref ? t("providers.handoff") : t("telegram.handoff")}
-        </p>
 
         <CredentialsSection mode="signup" locale={locale} next={next} />
 
-        <p className="mt-5 text-xs leading-relaxed text-ink-muted">
+        <p className="mt-4 text-xs leading-5 text-ink-muted">
           {terms && privacy
             ? t.rich("signup.legal", {
                 terms: (chunks) => (
@@ -104,7 +101,7 @@ function Signup({
         </p>
       </AuthPanel>
 
-      <p className="enter-rise mt-6 text-center text-sm text-ink-muted [--enter-delay:820ms]">
+      <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">
         {t("signup.haveAccount")}{" "}
         <Link href={loginHref} className={legalLinkClass}>
           {t("signup.logIn")}
