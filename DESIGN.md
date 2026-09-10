@@ -132,7 +132,10 @@ volunteer coming from the marketing site should recognise the ink; a volunteer
 coming from any other product should recognise a panel.
 
 Only the sign-in pages keep the marketing site's dot-grid ground: they are the
-doorway between the two.
+doorway between the two. The welcome flow a new account meets on `/welcome`
+stands on the same ground as the threshold: a greeting, a lanyard pass that
+gains a part per saved step, and one step panel, ending by handing the
+volunteer into the room.
 
 **Key characteristics**
 
@@ -159,7 +162,8 @@ doorway between the two.
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, applications, profile |
 
 The dashboard is the decision screen: a progress orbit, three stat tiles, then
-three panels for the next commitment, applications, and progress. Every other
+three panels for the next commitment, applications, and progress. The profile
+is the volunteer's own page: an identity card, then the editor. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 
@@ -200,7 +204,14 @@ disabled, not a red one.
 
 - **Panel** — `surface`, `border`, 20px radius, a header row with an `h2` and
   an optional action link, then content. Lists inside use `padding="none"` and
-  rows separated by hairlines with their own 20px padding.
+  rows separated by hairlines with their own 20px padding. The `id` a panel is
+  given is a real DOM id, so a panel can be an anchor target.
+- **Identity card** — the profile only. The same box, divided into ruled bands
+  instead of a header: the avatar disc beside the name, then the level and the
+  handle; a band of three serif figures from the record; then the bio, the
+  facts and the links, and the two actions. A profile that is not complete
+  gains a last band with the meter and what is still missing; a complete one
+  drops that band and gains a tick beside the level.
 - **Stat tile** — the same box carrying one label, one figure and one note.
 - **Card** — the opportunity card in a grid: chips, title, organiser, meta,
   then save and view actions along the bottom edge.
@@ -209,8 +220,9 @@ disabled, not a red one.
 - **Table** — the participation history only, scrolling inside its panel below
   40rem so the page never scrolls sideways.
 
-The sign-in panel (`AuthPanel`, 28px radius on the dot grid) is the one surface
-that is not a `Panel`.
+The sign-in panel (`AuthPanel`, 28px radius on the dot grid) and the welcome
+flow's step panel, the same 28px surface holding one step at a time, are the
+two surfaces that are not a `Panel`.
 
 ## Controls
 
@@ -227,14 +239,19 @@ that is not a `Panel`.
 
 The page header and stat tiles use the `enter-*` keyframes because they are
 above the fold. Panels are always visible and never depend on JavaScript to
-enter the page. The dashboard orbit is the one authored loop: it pauses when
-offscreen or hidden, while reduced motion and missing WebGL keep a static orbit.
-Menus open and close without transition. No JavaScript and print see the full
-page.
+enter the page. The dashboard orbit and the welcome pass are the two authored loops:
+each pauses when offscreen or hidden, reads its colours from the tokens, and
+keeps a static composition under reduced motion or without WebGL. The pass is
+the flow's one authored moment: a saved step prints a line on the badge and
+nudges it on its lanyard, the last screen stamps it with the orange seal, and
+each step panel slides in the direction the volunteer moved. Menus open and
+close without transition. No JavaScript and print see the full page.
 
 ## Do's and don'ts
 
-- **Do** open every section with `PageHeader` and compose it from `Panel`s.
+- **Do** open every section with `PageHeader` and compose it from `Panel`s. The
+  profile is the one exception: the volunteer's own name is the `h1`, carried
+  by the identity card, because the page is a person rather than a section.
 - **Do** carry a state with an icon and a word before a colour.
 - **Do** keep orange for a person's own action; a deadline is urgent, not an
   achievement, and stays blue or neutral.
@@ -242,6 +259,7 @@ page.
   and disable an action that cannot happen yet.
 - **Do** keep a filter in the URL, so a screen can be shared and reloaded.
 - **Don't** nest a box inside a panel; rows and hairlines carry structure.
-- **Don't** bring the dot grid into the workspace; it belongs to the doorway.
+- **Don't** bring the dot grid into the workspace; it belongs to the doorway
+  and the welcome flow.
 - **Don't** put a literal hex value in a component, or reach for a red.
 - **Don't** add a hover-only affordance; the audience is on a phone.

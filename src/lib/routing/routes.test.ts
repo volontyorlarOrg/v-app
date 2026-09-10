@@ -6,6 +6,7 @@ import { locales } from "@/i18n/routing";
 import {
   ENTRY_ROUTE,
   HOME_ROUTE,
+  ONBOARDING_ROUTE,
   accountRoutes,
   appRoutes,
   applicationHref,
@@ -16,6 +17,7 @@ import {
   localePath,
   navHref,
   navRoutes,
+  onboardingRoutes,
   opportunityHref,
   tabBarRoutes,
   volunteerRoutes,
@@ -62,6 +64,18 @@ describe("app route registry", () => {
   it("enters through sign-in and lands on the dashboard", () => {
     expect(getRoute(ENTRY_ROUTE).area).toBe("auth");
     expect(getRoute(HOME_ROUTE).area).toBe("volunteer");
+  });
+
+  it("keeps the welcome flow behind sign-in and out of every navigation surface", () => {
+    const welcome = getRoute(ONBOARDING_ROUTE);
+    expect(welcome.area).toBe("onboarding");
+    expect(welcome.guard).toBe("session");
+    expect(onboardingRoutes).toEqual([welcome]);
+    expect(volunteerRoutes).not.toContain(welcome);
+    for (const route of [...navRoutes, ...tabBarRoutes, ...accountRoutes]) {
+      expect(route).not.toBe(welcome);
+    }
+    expect(guardFor("/uz/welcome")).toBe("session");
   });
 
   it("reaches account connections from the account menu alone", () => {

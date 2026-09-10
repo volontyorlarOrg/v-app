@@ -13,10 +13,34 @@ function at(days, hour = 9) {
 }
 
 const organizations = {
-  reading: { id: "org-reading", name: "Chilonzor Reading Corners", slug: "reading", logoUrl: null, verified: true },
-  green: { id: "org-green", name: "Green Corridor Group", slug: "green", logoUrl: null, verified: false },
-  desk: { id: "org-desk", name: "Volunteer Support Desk", slug: "desk", logoUrl: null, verified: true },
-  sport: { id: "org-sport", name: "City Sports Day Team", slug: "sport", logoUrl: null, verified: true },
+  reading: {
+    id: "org-reading",
+    name: "Chilonzor Reading Corners",
+    slug: "reading",
+    logoUrl: null,
+    verified: true,
+  },
+  green: {
+    id: "org-green",
+    name: "Green Corridor Group",
+    slug: "green",
+    logoUrl: null,
+    verified: false,
+  },
+  desk: {
+    id: "org-desk",
+    name: "Volunteer Support Desk",
+    slug: "desk",
+    logoUrl: null,
+    verified: true,
+  },
+  sport: {
+    id: "org-sport",
+    name: "City Sports Day Team",
+    slug: "sport",
+    logoUrl: null,
+    verified: true,
+  },
 };
 
 const opportunities = [
@@ -25,7 +49,8 @@ const opportunities = [
     slug: "winter-book-drive",
     title: "Winter book drive",
     summary: "Collect and sort books for neighbourhood reading corners.",
-    description: "Sort donated books, label them and pack them for the reading corners.",
+    description:
+      "Sort donated books, label them and pack them for the reading corners.",
     requirements: ["Be 15 or older", "Free on the collection day"],
     organization: organizations.reading,
     region: "tashkent-city",
@@ -39,7 +64,15 @@ const opportunities = [
     capacity: 20,
     accepted: 4,
     questions: [
-      { id: "q-why", prompt: "Why does this matter to you?", helpText: "Two or three sentences.", type: "long_text", required: true, maxLength: 600, options: null },
+      {
+        id: "q-why",
+        prompt: "Why does this matter to you?",
+        helpText: "Two or three sentences.",
+        type: "long_text",
+        required: true,
+        maxLength: 600,
+        options: null,
+      },
     ],
     sourcedByYvc: true,
   },
@@ -156,7 +189,8 @@ const opportunities = [
 ];
 
 function serializeOpportunity(item, detail) {
-  const spotsRemaining = item.capacity === null ? undefined : Math.max(0, item.capacity - item.accepted);
+  const spotsRemaining =
+    item.capacity === null ? undefined : Math.max(0, item.capacity - item.accepted);
   const base = {
     id: item.id,
     slug: item.slug,
@@ -278,20 +312,52 @@ function freshState() {
         reviewedAt: at(-4, 11),
         withdrawnAt: null,
         answers: [],
-        profileSnapshot: { fullName: "Dilnoza Karimova", region: "tashkent-city", school: "Academic lyceum No. 2", phone: "", telegram: "dilnoza_k" },
+        profileSnapshot: {
+          fullName: "Dilnoza Karimova",
+          region: "tashkent-city",
+          school: "Academic lyceum No. 2",
+          phone: "",
+          telegram: "dilnoza_k",
+        },
         reviewerNote: null,
       },
     ],
     saved: ["opp-riverbank", "opp-translation"],
     record: {
-      counts: { attended: 5, acceptedResolved: 6, acceptedUnconfirmed: 1, standoutReviews: false },
+      counts: {
+        attended: 5,
+        acceptedResolved: 6,
+        acceptedUnconfirmed: 1,
+        standoutReviews: false,
+      },
       hours: 22,
       hoursVerified: true,
     },
     history: [
-      { id: "h-read-aloud", opportunityTitle: "Read-aloud day", organization: "Chilonzor Reading Corners", eventDate: at(-1, 9), outcome: "awaiting_confirmation", hours: undefined },
-      { id: "h-sorting", opportunityTitle: "Winter clothing sorting day", organization: "Volunteer Support Desk", eventDate: at(-12, 9), outcome: "attended", hours: 4 },
-      { id: "h-archive", opportunityTitle: "Photo archive digitisation", organization: "Chilonzor Reading Corners", eventDate: at(-20, 9), outcome: "attended", hours: 6 },
+      {
+        id: "h-read-aloud",
+        opportunityTitle: "Read-aloud day",
+        organization: "Chilonzor Reading Corners",
+        eventDate: at(-1, 9),
+        outcome: "awaiting_confirmation",
+        hours: undefined,
+      },
+      {
+        id: "h-sorting",
+        opportunityTitle: "Winter clothing sorting day",
+        organization: "Volunteer Support Desk",
+        eventDate: at(-12, 9),
+        outcome: "attended",
+        hours: 4,
+      },
+      {
+        id: "h-archive",
+        opportunityTitle: "Photo archive digitisation",
+        organization: "Chilonzor Reading Corners",
+        eventDate: at(-20, 9),
+        outcome: "attended",
+        hours: 6,
+      },
     ],
     notifications: [
       { id: "n-accepted", kind: "application.accepted", title: "You were accepted to Riverbank clean-up", body: "See you on the day.", data: null, readAt: null, createdAt: at(-4, 11) },
@@ -299,6 +365,29 @@ function freshState() {
       { id: "n-merge", kind: "account.merge.requested", title: "bekzod@example.org asked to join dilnoza@example.org", body: "Merge request merge-incoming is waiting.", data: null, readAt: at(-1, 20), createdAt: at(-1, 19) },
     ],
   };
+}
+
+function newAccountState(email, fullName) {
+  const state = freshState();
+  state.user = {
+    id: `user-new-${issued + 1}`,
+    displayName: String(fullName ?? "").trim(),
+    roles: ["volunteer"],
+    createdAt: new Date().toISOString(),
+  };
+  state.account = { ...freshAccount(), email: email ?? null, authMethods: { telegram: false, google: false, password: true } };
+  state.mergeRequests = [];
+  state.profile = null;
+  state.applications = [];
+  state.saved = [];
+  state.record = {
+    counts: { attended: 0, acceptedResolved: 0, acceptedUnconfirmed: 0, standoutReviews: false },
+    hours: 0,
+    hoursVerified: true,
+  };
+  state.history = [];
+  state.notifications = [];
+  return state;
 }
 
 const sessions = new Map();
@@ -433,7 +522,9 @@ function resolveMergeRequest(state, id, resolution) {
 }
 
 function serializeApplication(state, item, detail) {
-  const opportunity = opportunities.find((candidate) => candidate.id === item.opportunityId);
+  const opportunity = opportunities.find(
+    (candidate) => candidate.id === item.opportunityId,
+  );
   const summary = {
     id: item.id,
     status: item.status,
@@ -455,7 +546,9 @@ function serializeApplication(state, item, detail) {
 
 function validateAnswers(opportunity, answers, requireComplete) {
   const errors = {};
-  const byId = new Map(opportunity.questions.map((question) => [question.id, question]));
+  const byId = new Map(
+    opportunity.questions.map((question) => [question.id, question]),
+  );
   for (const key of Object.keys(answers)) {
     if (!byId.has(key)) errors[`answers.${key}`] = ["Unknown question"];
   }
@@ -498,7 +591,10 @@ function listOpportunities(query) {
 
   let items = opportunities.filter(
     (item) =>
-      (!q || `${item.title} ${item.summary} ${item.organization.name}`.toLowerCase().includes(q)) &&
+      (!q ||
+        `${item.title} ${item.summary} ${item.organization.name}`
+          .toLowerCase()
+          .includes(q)) &&
       (!region || item.region === region) &&
       (!format || item.format === format) &&
       (!openOnly || applicable(item)),
@@ -512,7 +608,9 @@ function listOpportunities(query) {
   });
   const offset = (page - 1) * pageSize;
   return {
-    items: items.slice(offset, offset + pageSize).map((item) => serializeOpportunity(item, false)),
+    items: items
+      .slice(offset, offset + pageSize)
+      .map((item) => serializeOpportunity(item, false)),
     page,
     pageSize,
     total: items.length,
@@ -525,7 +623,8 @@ const server = createServer(async (request, response) => {
   const path = url.pathname.replace(/\/+$/, "") || "/";
   const body = ["POST", "PUT", "PATCH"].includes(method) ? await readJson(request) : {};
 
-  if (path === "/" || path === "/health/live") return send(response, 200, { status: "ok" });
+  if (path === "/" || path === "/health/live")
+    return send(response, 200, { status: "ok" });
 
   if (path === "/auth/telegram/authorize" && method === "POST") {
     started += 1;
@@ -542,7 +641,8 @@ const server = createServer(async (request, response) => {
     return response.end();
   }
   if (path === "/auth/telegram/callback" && method === "POST") {
-    if (!pendingStates.delete(body.state)) return send(response, 401, { code: "invalidLoginState" });
+    if (!pendingStates.delete(body.state))
+      return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
     if (body.code !== "e2e-code") return send(response, 401, { code: "invalidAuthorizationCode" });
     const opened = freshState();
@@ -562,7 +662,11 @@ const server = createServer(async (request, response) => {
     const suffix = String(challenged).padStart(4, "0");
     const state = `e2e-google-state-${suffix}-minted-by-the-stub`;
     googleChallenges.add(state);
-    return send(response, 201, { state, nonce: `e2e-google-nonce-${suffix}-minted`, expiresAt: at(0, 23) });
+    return send(response, 201, {
+      state,
+      nonce: `e2e-google-nonce-${suffix}-minted`,
+      expiresAt: at(0, 23),
+    });
   }
   if (path === "/auth/google/complete" && method === "POST") {
     if (!googleChallenges.delete(body.state)) return send(response, 401, { code: "invalidGoogleState" });
@@ -574,10 +678,15 @@ const server = createServer(async (request, response) => {
     return send(response, 200, issueSession(opened));
   }
   if (path === "/auth/password/signup" && method === "POST") {
-    if (body.email === SEEDED_EMAIL) return send(response, 409, { code: "emailUnavailable" });
-    if (String(body.password ?? "").length < 15) return send(response, 422, { code: "weakPassword" });
+    if (body.email === SEEDED_EMAIL)
+      return send(response, 409, { code: "emailUnavailable" });
+    if (String(body.password ?? "").length < 15)
+      return send(response, 422, { code: "weakPassword" });
     passwordAccounts.set(body.email, body.password);
-    return send(response, 201, issueSession(passwordState(body.email)));
+    return send(response, 201, {
+      ...issueSession(newAccountState(body.email, body.fullName)),
+      isNewUser: true,
+    });
   }
   if (path === "/auth/password/login" && method === "POST") {
     if (passwordAccounts.get(body.email) !== body.password) {
@@ -591,10 +700,15 @@ const server = createServer(async (request, response) => {
     refreshTokens.delete(body.refreshToken);
     return send(response, 201, issueSession(state));
   }
-  if (path === "/opportunities" && method === "GET") return send(response, 200, listOpportunities(url.searchParams));
+  if (path === "/opportunities" && method === "GET")
+    return send(response, 200, listOpportunities(url.searchParams));
   if (path.startsWith("/opportunities/") && method === "GET") {
-    const item = opportunities.find((candidate) => candidate.slug === path.slice("/opportunities/".length));
-    return item ? send(response, 200, serializeOpportunity(item, true)) : send(response, 404, { code: "opportunityNotFound" });
+    const item = opportunities.find(
+      (candidate) => candidate.slug === path.slice("/opportunities/".length),
+    );
+    return item
+      ? send(response, 200, serializeOpportunity(item, true))
+      : send(response, 404, { code: "opportunityNotFound" });
   }
 
   const token = (request.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
@@ -705,40 +819,70 @@ const server = createServer(async (request, response) => {
       return send(response, outcome.status, outcome.body);
     }
   }
-  if (path === "/me/preferences" && method === "GET") return send(response, 200, state.preferences);
+  if (path === "/me/preferences" && method === "GET")
+    return send(response, 200, state.preferences);
   if (path === "/me/preferences" && method === "PUT") {
     Object.assign(state.preferences, body);
     return send(response, 200, state.preferences);
   }
   if (path === "/profile" && method === "GET") {
-    return state.profile ? send(response, 200, state.profile) : send(response, 404, { code: "profileNotFound" });
+    return state.profile
+      ? send(response, 200, state.profile)
+      : send(response, 404, { code: "profileNotFound" });
   }
   if (path === "/profile" && method === "PUT") {
     if (typeof body.fullName !== "string" || body.fullName.trim().length < 2) {
-      return send(response, 422, { code: "validationFailed", errors: { fullName: ["fullName must be longer than or equal to 2 characters"] } });
+      return send(response, 422, {
+        code: "validationFailed",
+        errors: { fullName: ["fullName must be longer than or equal to 2 characters"] },
+      });
     }
-    state.profile = { ...(state.profile ?? {}), ...body, fullName: body.fullName.trim(), phoneVerified: false, updatedAt: new Date().toISOString() };
+    state.profile = {
+      ...(state.profile ?? {}),
+      ...body,
+      fullName: body.fullName.trim(),
+      phoneVerified: false,
+      updatedAt: new Date().toISOString(),
+    };
     state.user.displayName = state.profile.fullName;
     return send(response, 200, state.profile);
   }
   if (path === "/record" && method === "GET") return send(response, 200, state.record);
-  if (path === "/record/history" && method === "GET") return send(response, 200, { items: state.history, total: state.history.length });
+  if (path === "/record/history" && method === "GET")
+    return send(response, 200, { items: state.history, total: state.history.length });
   if (path === "/notifications" && method === "GET") {
-    return send(response, 200, { items: state.notifications, unread: state.notifications.filter((item) => item.readAt === null).length });
+    return send(response, 200, {
+      items: state.notifications,
+      unread: state.notifications.filter((item) => item.readAt === null).length,
+    });
   }
   if (path === "/notifications/read-all" && method === "POST") {
     let updated = 0;
-    for (const item of state.notifications) if (item.readAt === null) { item.readAt = new Date().toISOString(); updated += 1; }
+    for (const item of state.notifications)
+      if (item.readAt === null) {
+        item.readAt = new Date().toISOString();
+        updated += 1;
+      }
     return send(response, 201, { updated });
   }
   if (path === "/saved" && method === "GET") {
-    const items = state.saved.map((id) => serializeOpportunity(opportunities.find((item) => item.id === id), false));
+    const items = state.saved.map((id) =>
+      serializeOpportunity(
+        opportunities.find((item) => item.id === id),
+        false,
+      ),
+    );
     return send(response, 200, { items, total: items.length });
   }
   if (path === "/saved" && method === "POST") {
-    if (!opportunities.some((item) => item.id === body.opportunityId)) return send(response, 404, { code: "opportunityNotFound" });
-    if (!state.saved.includes(body.opportunityId)) state.saved.unshift(body.opportunityId);
-    return send(response, 201, { opportunityId: body.opportunityId, savedAt: new Date().toISOString() });
+    if (!opportunities.some((item) => item.id === body.opportunityId))
+      return send(response, 404, { code: "opportunityNotFound" });
+    if (!state.saved.includes(body.opportunityId))
+      state.saved.unshift(body.opportunityId);
+    return send(response, 201, {
+      opportunityId: body.opportunityId,
+      savedAt: new Date().toISOString(),
+    });
   }
   if (path.startsWith("/saved/") && method === "DELETE") {
     const id = path.slice("/saved/".length);
@@ -752,15 +896,25 @@ const server = createServer(async (request, response) => {
     return send(response, 200, { items, total: items.length });
   }
   if (path === "/applications/by-opportunity" && method === "GET") {
-    const item = state.applications.find((candidate) => candidate.opportunityId === url.searchParams.get("opportunityId"));
-    return item ? send(response, 200, serializeApplication(state, item, true)) : send(response, 404, { code: "applicationNotFound" });
+    const item = state.applications.find(
+      (candidate) => candidate.opportunityId === url.searchParams.get("opportunityId"),
+    );
+    return item
+      ? send(response, 200, serializeApplication(state, item, true))
+      : send(response, 404, { code: "applicationNotFound" });
   }
   if (path === "/applications" && method === "POST") {
-    const existing = state.applications.find((candidate) => candidate.opportunityId === body.opportunityId);
-    if (existing) return send(response, 201, serializeApplication(state, existing, true));
-    const opportunity = opportunities.find((candidate) => candidate.id === body.opportunityId);
+    const existing = state.applications.find(
+      (candidate) => candidate.opportunityId === body.opportunityId,
+    );
+    if (existing)
+      return send(response, 201, serializeApplication(state, existing, true));
+    const opportunity = opportunities.find(
+      (candidate) => candidate.id === body.opportunityId,
+    );
     if (!opportunity) return send(response, 404, { code: "opportunityNotFound" });
-    if (!applicable(opportunity)) return send(response, 409, { code: "opportunityUnavailable" });
+    if (!applicable(opportunity))
+      return send(response, 409, { code: "opportunityUnavailable" });
     const item = {
       id: `app-${opportunity.slug}`,
       status: "draft",
@@ -777,21 +931,32 @@ const server = createServer(async (request, response) => {
     state.applications.push(item);
     return send(response, 201, serializeApplication(state, item, true));
   }
-  const applicationMatch = /^\/applications\/([^/]+)(?:\/(draft|submit|withdraw))?$/.exec(path);
+  const applicationMatch =
+    /^\/applications\/([^/]+)(?:\/(draft|submit|withdraw))?$/.exec(path);
   if (applicationMatch) {
     const [, id, action] = applicationMatch;
     const item = state.applications.find((candidate) => candidate.id === id);
     if (!item) return send(response, 404, { code: "applicationNotFound" });
-    const opportunity = opportunities.find((candidate) => candidate.id === item.opportunityId);
-    if (!action && method === "GET") return send(response, 200, serializeApplication(state, item, true));
-    if ((action === "draft" && method === "PATCH") || (action === "submit" && method === "POST")) {
-      if (item.status !== "draft") return send(response, 409, { code: "applicationNotEditable" });
+    const opportunity = opportunities.find(
+      (candidate) => candidate.id === item.opportunityId,
+    );
+    if (!action && method === "GET")
+      return send(response, 200, serializeApplication(state, item, true));
+    if (
+      (action === "draft" && method === "PATCH") ||
+      (action === "submit" && method === "POST")
+    ) {
+      if (item.status !== "draft")
+        return send(response, 409, { code: "applicationNotEditable" });
       const answers = body.answers ?? {};
       const errors = validateAnswers(opportunity, answers, action === "submit");
       if (errors) return send(response, 400, { code: "invalidAnswers", errors });
-      if (action === "submit" && !state.profile) return send(response, 409, { code: "profileRequired" });
+      if (action === "submit" && !state.profile)
+        return send(response, 409, { code: "profileRequired" });
       item.answers = Object.entries(answers).map(([questionId, value]) => {
-        const question = opportunity.questions.find((candidate) => candidate.id === questionId);
+        const question = opportunity.questions.find(
+          (candidate) => candidate.id === questionId,
+        );
         return { questionId, prompt: question?.prompt, type: question?.type, value };
       });
       item.updatedAt = new Date().toISOString();

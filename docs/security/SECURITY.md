@@ -51,8 +51,10 @@ HTTP (the Playwright suite) still receives its own cookie.
 refresh token, the user id, roles and display name, encrypted as a JWE
 (`dir` + `A256GCM`, the key being SHA-256 of `VOLONTYORLAR_SESSION_SECRET`).
 It is `httpOnly`, `sameSite=lax`, `path=/`, `secure` in production, and lives
-30 days. No token is readable by JavaScript, appears in a URL, or reaches
-browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
+90 days — but the backend's `JWT_REFRESH_TTL_SECONDS` is the real ceiling: once
+the refresh token behind the cookie expires, rotation fails and the volunteer
+signs in again however long the cookie itself had left. No token is readable by
+JavaScript, appears in a URL, or reaches browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
 treated as signed out rather than trusted.
 
 `src/proxy.ts` reads it on every app request and enforces the `guard` each
@@ -136,19 +138,33 @@ server-to-server API request.
 
 The only stored values remain the light/dark theme choice and the interface
 language, both in readable cookies shared with the marketing site so a choice
-made on either origin holds on the other. Neither identifies a visitor, neither
-is `httpOnly` because the theme is applied by a script before paint, and the
-privacy page names both. Nothing personal appears in a URL;
+made on either origin holds on the other, and the welcome flow's progress
+(`volontyorlar_onboarding`): a status and a step name such as `pending:about`
+or `done`, app-only, ninety days, written by the sign-up action or an OAuth
+callback for a new account and advanced by the browser as the volunteer moves
+through the steps. None identifies a visitor, none is `httpOnly` because the
+theme is applied by a script before paint and the flow updates its own
+progress, and the privacy page names the first two. The answers given in the
+flow are saved to the backend at each step and never enter browser storage.
+Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
 same-origin `?next=` path checked by `safeReturnPath`, and the account page only
 `?connect=<status>` or `?password=set|changed`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
+The portfolio links a volunteer puts on their own profile are untrusted input:
+`src/lib/profile/links.ts` renders one only when it parses as `http:` or
+`https:`, drops anything else rather than guessing, shows the host instead of
+the raw string, and the anchor carries `rel="noopener noreferrer nofollow"`.
 
 ## Not implemented
 
 - password reset and email verification
-- unlinking, deleting, or exporting an account
+- notification, privacy and appearance preference controls; no screen offers
+  these switches
+- unlinking, unmerging, export and account deletion; `/settings` connects and
+  merges only
+- "sign out everywhere"
 - analytics, monitoring, or error reporting
 
 They are designed in

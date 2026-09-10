@@ -173,6 +173,75 @@
     },
     "greetingAnonymous": "Salom."
   },
+  "onboarding": {
+    "metaTitle": "Xush kelibsiz",
+    "title": "Salom, {name}. Volontyor kartangizni yarataylik.",
+    "titleAnonymous": "Volontyor kartangizni yarataylik.",
+    "lead": "Bir marta toʻldiring. Har bir arizangiz undan foydalanadi, tashkilotchi esa tayyor volontyorni koʻradi.",
+    "stepCount": "{total} qadamdan {step}-qadam",
+    "skipForNow": "Hozircha oʻtkazib yuborish",
+    "skipStep": "Bu qadamni oʻtkazib yuborish",
+    "back": "Orqaga",
+    "continue": "Davom etish",
+    "saving": "Saqlanmoqda…",
+    "start": "Boshlash",
+    "saveError": "Saqlab boʻlmadi. Belgilangan maydonlarni tekshirib, qayta urinib koʻring.",
+    "nameNeeded": "Tashkilotchiga kerak boʻladigan yagona narsa — ismingiz.",
+    "welcome": {
+      "title": "Uchta qisqa qadam, taxminan bir daqiqa.",
+      "body": "Siz kimsiz, qayerda oʻqiysiz va tashkilotchilar siz bilan qanday bogʻlanadi. Hammasini keyin profilingizda oʻzgartirish mumkin."
+    },
+    "steps": {
+      "about": {
+        "title": "Siz haqingizda",
+        "lead": "Tashkilotchi birinchi oʻqiydigan narsa."
+      },
+      "place": {
+        "title": "Qayerda oʻqiysiz",
+        "lead": "Tashkilotchilar tadbirga yaqin volontyorlarni tanlaydi."
+      },
+      "contact": {
+        "title": "Tashkilotchilar siz bilan qanday bogʻlanadi",
+        "lead": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi. Ikkitadan bittasi yetarli."
+      }
+    },
+    "rail": {
+      "label": "Sozlash qadamlari",
+      "welcome": "Xush kelibsiz",
+      "about": "Siz haqingizda",
+      "place": "Qayerda oʻqiysiz",
+      "contact": "Aloqa",
+      "done": "Tayyor"
+    },
+    "railState": {
+      "done": "bajarildi",
+      "current": "joriy qadam",
+      "upcoming": "hali emas"
+    },
+    "done": {
+      "title": "Kartangiz tayyor.",
+      "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
+      "incomplete": "Profilingiz {percent}% toʻldirilgan. Hali yetishmayapti: {fields}.",
+      "finishOnProfile": "Profilda toʻldirish",
+      "nextTitle": "Keyin nima boʻladi",
+      "next": {
+        "apply": "Kartangiz bilan ariza bering. Hech narsani ikki marta toʻldirmaysiz.",
+        "attend": "Qatnashing. Oʻz vaqtida keling va ishni oxirigacha bajaring.",
+        "confirm": "Tashkilotchi qatnashganingizni tasdiqlaydi. Tarixingiz oʻsadi, darajangiz ham."
+      },
+      "cta": "Birinchi imkoniyatni topish",
+      "dashboard": "Bosh panelga oʻtish"
+    },
+    "resume": {
+      "title": "Kartangizni yakunlang",
+      "body": "{total} qadamdan {done} tasi bajarildi. Yakunlash taxminan bir daqiqa oladi.",
+      "continue": "Davom ettirish",
+      "dismiss": "Hozir emas"
+    },
+    "pass": {
+      "label": "Volontyor kartangiz — qadam sayin shakllanadi"
+    }
+  },
   "record": {
     "metaTitle": "Mening tarixim",
     "title": "Tarixingiz",
@@ -411,19 +480,31 @@
   },
   "profile": {
     "metaTitle": "Profil",
-    "title": "Profilingiz",
-    "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi.",
+    "identity": {
+      "complete": "Profil toʻliq",
+      "joined": "Qoʻshilgan: {date}",
+      "bioEmpty": "Hozircha bio yoʻq. Tashkilotchi birinchi navbatda bir necha jumlani oʻqiydi.",
+      "edit": "Profilni tahrirlash",
+      "record": "Mening tarixim"
+    },
+    "stats": {
+      "events": "Tadbirlar",
+      "reliability": "Ishonchlilik",
+      "hours": "Soatlar"
+    },
+    "form": {
+      "title": "Profilingizni tahrirlang",
+      "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi."
+    },
     "sections": {
-      "identity": "Siz haqingizda",
       "education": "Taʼlim",
       "location": "Qayerdasiz",
-      "skills": "Tillar va koʻnikmalar",
       "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
       "links": "Havolalar"
     },
     "fields": {
       "fullName": "Toʻliq ism",
-      "bio": "Qisqacha tanishuv",
+      "bio": "Bio",
       "bioHelp": "Tashkilotchi birinchi oʻqiydigan bir necha jumla. Insho emas.",
       "school": "Maktab, kollej yoki universitet",
       "gradeYear": "Sinf yoki kurs",
@@ -432,28 +513,34 @@
       "city": "Shahar yoki tuman",
       "languages": "Biladigan tillaringiz",
       "languagesHelp": "Vergul bilan ajrating.",
-      "skills": "Koʻnikma va qiziqishlar",
-      "skillsHelp": "Vergul bilan ajrating.",
       "phone": "Telefon raqami",
       "phoneHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
       "telegram": "Telegram foydalanuvchi nomi",
       "telegramHelp": "@ belgisisiz.",
       "links": "Portfolio, CV yoki ijtimoiy tarmoq havolasi",
-      "linksHelp": "Ixtiyoriy. Toʻliqlikka hisoblanmaydi.",
+      "linksHelp": "Vergul bilan ajrating. Uchtagacha.",
       "contact": "Siz bilan bogʻlanish usuli"
     },
+    "completionFields": {
+      "fullName": "Toʻliq ism",
+      "bio": "Bio",
+      "region": "Hudud",
+      "school": "Maktab",
+      "languages": "Tillar"
+    },
+    "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",
+    "saving": "Saqlanmoqda…",
     "saved": "Profil saqlandi.",
+    "saveError": "Profilni saqlab boʻlmadi. Belgilangan maydonlarni tekshiring.",
+    "fieldInvalid": "Bu maydonni tekshiring.",
     "completion": {
       "label": "Profil toʻliqligi",
       "value": "{percent}% toʻldirilgan",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
-      "why": "Toʻliq profil — tashkilotchi sizni baholay oladi va siz bilan bogʻlana oladi."
-    },
-    "saving": "Saqlanmoqda…",
-    "saveError": "Profilni saqlab boʻlmadi. Belgilangan maydonlarni tekshiring.",
-    "fieldInvalid": "Bu maydonni tekshiring."
+      "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi."
+    }
   },
   "settings": {
     "metaTitle": "Sozlamalar",

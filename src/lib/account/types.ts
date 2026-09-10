@@ -1,16 +1,3 @@
-export const PREFERENCE_KEYS = [
-  "notifyTelegram",
-  "notifyEmail",
-  "remindDeadlines",
-  "notifyDecisions",
-  "profileToOrganisers",
-  "levelPublic",
-] as const;
-
-export type PreferenceKey = (typeof PREFERENCE_KEYS)[number];
-
-export type Preferences = Record<PreferenceKey, boolean>;
-
 export const CONNECTION_PROVIDERS = ["telegram", "google", "password"] as const;
 
 export type ConnectionProvider = (typeof CONNECTION_PROVIDERS)[number];
