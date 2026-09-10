@@ -32,6 +32,13 @@ inside the source. Compiler and linter directives are not comments and stay.
 5. **Run the checks.** The tab bar is intentionally limited to four essential
    destinations; `routes.test.ts` says so.
 
+A list too long for one screen pages through `Pagination` from
+`src/components/app/pagination.tsx`, driven by `paginate()` in
+`src/lib/leaderboard/pagination.ts` and a `nuqs` serializer beside it. Read
+`page`, `pageSize` and `total` from the backend's own response rather than
+counting the rows you were given, and build each page's href from the
+registry's path so the locale prefix is added once.
+
 A detail page under a section gets a dynamic segment (`[slug]`, `[id]`), an
 href helper in the registry, `notFound()` for an unknown key, and is reached
 only through that helper.

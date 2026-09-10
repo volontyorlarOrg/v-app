@@ -1,3 +1,4 @@
+import type { UsernameLabels } from "@/components/account/username-section";
 import type { FormStep } from "@/lib/onboarding/steps";
 import type { ProfileFormValues } from "@/lib/profile/input";
 import type { RailState } from "@/components/onboarding/step-rail";
@@ -29,6 +30,7 @@ export type OnboardingLabels = {
     | "regionAny",
     string
   >;
+  username: UsernameLabels;
   done: {
     title: string;
     complete: string;

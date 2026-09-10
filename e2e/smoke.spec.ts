@@ -481,6 +481,7 @@ test.describe("sign-in", () => {
       "/en/opportunities",
       "/en/profile",
       "/en/record",
+      "/en/leaderboard",
     ]) {
       await page.goto(path);
       await expect(page, path).toHaveURL(/\/en\/login\?next=/);
@@ -540,6 +541,17 @@ test.describe("the panel", () => {
     await expect(page).toHaveURL(/\/en\/opportunities$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
+    ).toBeVisible();
+
+    if (mobile) {
+      await expect(navigation.getByRole("link", { name: "Leaderboard" })).toHaveCount(0);
+      await page.goto("/en/leaderboard");
+    } else {
+      await navigation.getByRole("link", { name: "Leaderboard" }).click();
+    }
+    await expect(page).toHaveURL(/\/en\/leaderboard$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Leaderboard" }),
     ).toBeVisible();
 
     for (const path of ["/en/record", "/en/profile", "/en/settings"]) {
@@ -1190,6 +1202,133 @@ test.describe("account connections and merges", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
     await expect(approve).toBeVisible();
     expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
+  });
+});
+
+
+test.describe("the leaderboard", () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/leaderboard");
+  });
+
+  test("ranks volunteers on the backend's own numbers", async ({ page }) => {
+    await expect(page.getByRole("heading", { level: 1, name: "Leaderboard" })).toBeVisible();
+
+    const first = page.getByRole("row").nth(1);
+    await expect(first).toContainText("@volunteer_01");
+    await expect(first).toContainText("3,000");
+    await expect(page.getByRole("row")).toHaveCount(26);
+  });
+
+  test("shows the signed-in volunteer even from a page they are not on", async ({
+    page,
+  }) => {
+    const standing = page.getByRole("definition").first();
+    await expect(standing).toHaveText("30");
+    await expect(page.getByText("of 30 volunteers")).toBeVisible();
+    await expect(page.getByText("@dilnoza_k").first()).toBeVisible();
+    await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
+  });
+
+  test("pages through the standings from page, size and total", async ({ page }) => {
+    await expect(page.getByRole("status")).toContainText("Showing 1\u201325 of 30");
+
+    const pages = page.getByRole("navigation", { name: "Leaderboard pages" });
+    await expect(pages.getByRole("link", { name: "Page 1, current page" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
+    await pages.getByRole("link", { name: "Next" }).click();
+    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
+    await expect(page.getByRole("status")).toContainText("Showing 26\u201330 of 30");
+    await expect(page.getByRole("row").filter({ hasText: "@dilnoza_k" })).toContainText(
+      "You",
+    );
+  });
+
+  test("a page beyond the last one returns to the last page", async ({ page }) => {
+    await page.goto("/en/leaderboard?page=9");
+    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
+    await expect(page.getByRole("status")).toContainText("Showing 26\u201330 of 30");
+  });
+
+  test("nothing overflows horizontally", async ({ page }) => {
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe("the leaderboard handle", () => {
+  test("a Telegram account is told its handle is managed there", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/settings");
+
+    const panel = page.getByRole("region", { name: "Your handle" });
+    await expect(panel).toContainText("@dilnoza_k");
+    await expect(panel).toContainText("comes from your Telegram account");
+    await expect(panel.getByRole("button", { name: "Save handle" })).toHaveCount(0);
+  });
+
+  test("an email account renames itself and the leaderboard follows", async ({
+    page,
+  }) => {
+    await signInWithPassword(page);
+    await page.goto("/en/settings");
+
+    const panel = page.getByRole("region", { name: "Your handle" });
+    await panel.getByLabel("New handle").fill("Chilonzor_Reader");
+    await panel.getByRole("button", { name: "Save handle" }).click();
+    await expect(panel.getByRole("status")).toContainText("Your handle is saved.");
+    await expect(panel).toContainText("@chilonzor_reader");
+
+    await page.goto("/en/leaderboard?page=2");
+    await expect(page.getByRole("row").filter({ hasText: "@chilonzor_reader" })).toContainText(
+      "You",
+    );
+  });
+
+  test("a handle another volunteer holds is refused by name", async ({ page }) => {
+    await signInWithPassword(page);
+    await page.goto("/en/settings");
+
+    const panel = page.getByRole("region", { name: "Your handle" });
+    await panel.getByLabel("New handle").fill("volunteer_01");
+    await panel.getByRole("button", { name: "Save handle" }).click();
+    await expect(panel.getByRole("alert")).toContainText("That handle is taken.");
+  });
+
+  test("a handle that breaks the rule is named before it is sent", async ({ page }) => {
+    await signInWithPassword(page);
+    await page.goto("/en/settings");
+
+    const panel = page.getByRole("region", { name: "Your handle" });
+    const field = panel.getByLabel("New handle");
+    await field.fill("no");
+    await panel.getByRole("button", { name: "Save handle" }).click();
+    await expect(panel.getByText("A handle needs at least 5 characters.")).toBeVisible();
+    await expect(field).toHaveAttribute("aria-invalid", "true");
+  });
+
+  test("a new account is offered a handle at the end of the welcome flow", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `handle-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Skip this step" }).click();
+    await page.getByRole("button", { name: "Skip this step" }).click();
+    await page.getByRole("button", { name: "Skip this step" }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 3, name: "Your leaderboard handle" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save handle" })).toBeVisible();
   });
 });
 

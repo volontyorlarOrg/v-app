@@ -166,6 +166,9 @@ describe("connection state", () => {
   const me = meSchema.parse({
     id: "u1",
     createdAt: "2026-01-01T00:00:00.000Z",
+    username: "dilnoza_k",
+    usernameSource: "telegram",
+    usernameEditable: false,
     email: "dilnoza@example.org",
     emailVerified: true,
     telegramIdentity: { username: "dilnoza_k" },
@@ -193,6 +196,9 @@ describe("connection state", () => {
     const unverified = meSchema.parse({
       id: "u1",
       createdAt: "2026-01-01T00:00:00.000Z",
+      username: "user_12345",
+      usernameSource: "generated",
+      usernameEditable: true,
       email: "dilnoza@example.org",
       authMethods: { telegram: false, google: false, password: true },
     });
@@ -205,6 +211,9 @@ describe("connection state", () => {
     const passwordless = meSchema.parse({
       id: "u1",
       createdAt: "2026-01-01T00:00:00.000Z",
+      username: "user_12345",
+      usernameSource: "generated",
+      usernameEditable: true,
       email: "dilnoza@example.org",
       emailVerified: true,
       authMethods: { telegram: false, google: true, password: false },

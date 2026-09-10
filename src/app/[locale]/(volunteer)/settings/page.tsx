@@ -2,6 +2,10 @@ import { useTranslations } from "next-intl";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import {
+  UsernameSection,
+  type UsernameLabels,
+} from "@/components/account/username-section";
 import { ActionStatus, type ActionTone } from "@/components/app/action-status";
 import { PageHeader } from "@/components/app/page-header";
 import { Panel } from "@/components/app/panel";
@@ -24,6 +28,12 @@ import {
   type ConnectionState,
 } from "@/lib/account/connections";
 import { ACCOUNT_ERROR_KEYS, type ConnectStatus } from "@/lib/account/types";
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  usernameIdentity,
+  type UsernameIdentity,
+} from "@/lib/account/username";
 import { getMe, listMergeRequests } from "@/lib/api/account.server";
 import type { MergeRequest } from "@/lib/api/schemas";
 import { isGoogleConfigured } from "@/lib/auth/config";
@@ -85,6 +95,7 @@ export default async function SettingsPage({
     <Settings
       locale={locale as Locale}
       states={connectionStates(me)}
+      username={usernameIdentity(me)}
       email={me.email ?? null}
       hasPassword={me.authMethods.password}
       googleConfigured={isGoogleConfigured()}
@@ -105,6 +116,7 @@ function toneFor(status: ConnectStatus): ActionTone {
 function Settings({
   locale,
   states,
+  username,
   email,
   hasPassword,
   googleConfigured,
@@ -115,6 +127,7 @@ function Settings({
 }: {
   locale: Locale;
   states: readonly ConnectionState[];
+  username: UsernameIdentity;
   email: string | null;
   hasPassword: boolean;
   googleConfigured: boolean;
@@ -144,6 +157,23 @@ function Settings({
     pending: t("connections.passwordPending"),
     done: t(`connections.${hasPassword ? "changePasswordDone" : "setPasswordDone"}`),
     fieldInvalid: t("errors.validationFailed"),
+    errors,
+  };
+
+  const usernameLabels: UsernameLabels = {
+    legend: t("username.title"),
+    description: t("username.description"),
+    field: t("username.field"),
+    hint: t("username.hint", {
+      min: USERNAME_MIN_LENGTH,
+      max: USERNAME_MAX_LENGTH,
+    }),
+    current: t("username.current"),
+    generated: t("username.generated"),
+    managed: t("username.managed"),
+    save: t("username.save"),
+    saving: t("username.saving"),
+    saved: t("username.saved"),
     errors,
   };
 
@@ -203,6 +233,20 @@ function Settings({
               labels={passwordLabels}
             />
           </div>
+        </Panel>
+
+        <Panel
+          id="username"
+          title={t("username.title")}
+          description={t("username.description")}
+          className="xl:col-span-2"
+        >
+          <UsernameSection
+            locale={locale}
+            identity={username}
+            labels={usernameLabels}
+            headed={false}
+          />
         </Panel>
 
         <Panel
