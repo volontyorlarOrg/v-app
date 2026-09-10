@@ -602,6 +602,21 @@ const server = createServer(async (request, response) => {
   if (!state) return send(response, 401, { code: "unauthenticated" });
 
   if (path === "/auth/logout" && method === "POST") return send(response, 201, { loggedOut: true });
+  if (path === "/auth/password/change" && method === "POST") {
+    const currentEmail = state.account.email;
+    if (state.account.authMethods.password) {
+      if (!currentEmail || passwordAccounts.get(currentEmail) !== body.currentPassword) return send(response, 401, { code: "invalidCredentials" });
+      if (body.newPassword === body.currentPassword) return send(response, 422, { code: "passwordUnchanged" });
+    } else {
+      const requestedEmail = currentEmail ?? body.email;
+      if (!requestedEmail) return send(response, 422, { code: "emailRequired" });
+      if (passwordAccounts.has(requestedEmail) && requestedEmail !== currentEmail) return send(response, 409, { code: "emailAlreadyRegistered" });
+      state.account.email = requestedEmail;
+      state.account.authMethods.password = true;
+    }
+    passwordAccounts.set(state.account.email, body.newPassword);
+    return send(response, 200, issueSession(state));
+  }
   if (path === "/me" && method === "GET") {
     return send(response, 200, {
       ...state.user,

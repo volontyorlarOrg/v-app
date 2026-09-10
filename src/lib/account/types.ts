@@ -70,6 +70,11 @@ export const ACCOUNT_ERROR_CODES = [
   "invalidGoogleState",
   "invalidGoogleCredential",
   "invalidCredentials",
+  "emailRequired",
+  "emailConflict",
+  "emailAlreadyRegistered",
+  "passwordUnchanged",
+  "weakPassword",
   "validationFailed",
   "phoneRequired",
   "accountDisabled",
@@ -86,6 +91,7 @@ export type AccountErrorCode = (typeof ACCOUNT_ERROR_CODES)[number];
 
 export const ACCOUNT_ERROR_KEYS = [
   ...ACCOUNT_ERROR_CODES,
+  "passwordMismatch",
   "network",
   "unknown",
 ] as const;

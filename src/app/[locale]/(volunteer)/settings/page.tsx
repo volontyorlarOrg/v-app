@@ -13,15 +13,14 @@ import {
   type MergeRequestLabels,
 } from "@/components/settings/merge-requests";
 import {
-  PasswordConnectForm,
-  type PasswordConnectLabels,
+  PasswordForm,
+  type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
 import { buttonClass } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
 import {
   connectionStates,
   isConnectStatus,
-  isConnected,
   type ConnectionState,
 } from "@/lib/account/connections";
 import { ACCOUNT_ERROR_KEYS, type ConnectStatus } from "@/lib/account/types";
@@ -33,6 +32,16 @@ export const dynamic = "force-dynamic";
 
 const DONE_STATUSES: readonly ConnectStatus[] = ["linked", "alreadyLinked"];
 const INFO_STATUSES: readonly ConnectStatus[] = ["approvalRequired", "alreadyPending"];
+const PASSWORD_STATUSES = ["set", "changed"] as const;
+
+type PasswordStatus = (typeof PASSWORD_STATUSES)[number];
+
+function isPasswordStatus(value: unknown): value is PasswordStatus {
+  return (
+    typeof value === "string" &&
+    (PASSWORD_STATUSES as readonly string[]).includes(value)
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -49,7 +58,7 @@ export default async function SettingsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const { connect } = await searchParams;
+  const { connect, password } = await searchParams;
   const [me, requests, format, t] = await Promise.all([
     getMe(),
     listMergeRequests(),
@@ -76,8 +85,11 @@ export default async function SettingsPage({
     <Settings
       locale={locale as Locale}
       states={connectionStates(me)}
+      email={me.email ?? null}
+      hasPassword={me.authMethods.password}
       googleConfigured={isGoogleConfigured()}
       status={isConnectStatus(connect) ? connect : null}
+      passwordStatus={isPasswordStatus(password) ? password : null}
       incoming={requests.incoming.map(toItem)}
       outgoing={requests.outgoing.map(toItem)}
     />
@@ -93,15 +105,21 @@ function toneFor(status: ConnectStatus): ActionTone {
 function Settings({
   locale,
   states,
+  email,
+  hasPassword,
   googleConfigured,
   status,
+  passwordStatus,
   incoming,
   outgoing,
 }: {
   locale: Locale;
   states: readonly ConnectionState[];
+  email: string | null;
+  hasPassword: boolean;
   googleConfigured: boolean;
   status: ConnectStatus | null;
+  passwordStatus: PasswordStatus | null;
   incoming: readonly MergeRequestItem[];
   outgoing: readonly MergeRequestItem[];
 }) {
@@ -110,16 +128,21 @@ function Settings({
     ACCOUNT_ERROR_KEYS.map((key) => [key, t(`errors.${key}`)]),
   );
 
-  const passwordLabels: PasswordConnectLabels = {
-    title: t("connections.passwordTitle"),
-    description: t("connections.passwordDescription"),
+  const passwordLabels: PasswordFormLabels = {
+    title: t(`connections.${hasPassword ? "changePasswordTitle" : "setPasswordTitle"}`),
+    description: t(
+      `connections.${hasPassword ? "changePasswordDescription" : "setPasswordDescription"}`,
+    ),
     email: t("connections.passwordEmail"),
-    password: t("connections.passwordPassword"),
+    currentPassword: t("connections.currentPassword"),
+    newPassword: t("connections.newPassword"),
+    confirmPassword: t("connections.confirmPassword"),
+    passwordHint: t("connections.passwordHint", { min: 8 }),
     reveal: t("connections.passwordReveal"),
     conceal: t("connections.passwordConceal"),
-    submit: t("connections.passwordSubmit"),
+    submit: t(`connections.${hasPassword ? "changePassword" : "setPassword"}`),
     pending: t("connections.passwordPending"),
-    done: t("connections.passwordDone"),
+    done: t(`connections.${hasPassword ? "changePasswordDone" : "setPasswordDone"}`),
     fieldInvalid: t("errors.validationFailed"),
     errors,
   };
@@ -140,8 +163,6 @@ function Settings({
     errors,
   };
 
-  const passwordConnected = isConnected(states, "password");
-
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
@@ -149,6 +170,12 @@ function Settings({
       {status ? (
         <ActionStatus tone={toneFor(status)} className="mt-6">
           {t(`connectStatus.${status}`)}
+        </ActionStatus>
+      ) : null}
+
+      {passwordStatus ? (
+        <ActionStatus tone="done" className="mt-6">
+          {t(`passwordStatus.${passwordStatus}`)}
         </ActionStatus>
       ) : null}
 
@@ -167,11 +194,15 @@ function Settings({
           <p className="mt-4 text-xs leading-relaxed text-ink-muted">
             {t("connections.handoff")}
           </p>
-          {passwordConnected ? null : (
-            <div className="mt-6 border-t border-border pt-6">
-              <PasswordConnectForm locale={locale} labels={passwordLabels} />
-            </div>
-          )}
+          <div className="mt-6 border-t border-border pt-6">
+            <PasswordForm
+              key={hasPassword ? "change" : "set"}
+              locale={locale}
+              mode={hasPassword ? "change" : "set"}
+              email={email}
+              labels={passwordLabels}
+            />
+          </div>
         </Panel>
 
         <Panel
