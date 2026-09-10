@@ -15,12 +15,12 @@ import {
   approveMergeRequest,
   cancelMergeRequest,
   rejectMergeRequest,
-  verifyPasswordConnection,
+  updatePassword,
 } from "@/lib/api/account.server";
 import {
-  credentialsFromFormData,
   fieldErrorsOf,
-  logInSchema,
+  passwordManagementFromFormData,
+  passwordManagementSchema,
 } from "@/lib/auth/credentials";
 import { toSessionPayload } from "@/lib/auth/session";
 import { writeSession } from "@/lib/auth/session.server";
@@ -51,26 +51,39 @@ function resultForMergeFailure(error: unknown, locale: Locale): ActionResult {
   return result;
 }
 
-export async function connectPasswordAction(
+export async function managePasswordAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
   const locale = localeOf(formData);
-  const parsed = logInSchema.safeParse(credentialsFromFormData(formData));
+  const parsed = passwordManagementSchema.safeParse(
+    passwordManagementFromFormData(formData),
+  );
 
   if (!parsed.success) {
     return failedResult("validationFailed", fieldErrorsOf(parsed.error));
   }
 
   try {
-    await verifyPasswordConnection(parsed.data);
+    const issued = await updatePassword({
+      email: parsed.data.email,
+      newPassword: parsed.data.newPassword,
+      ...(parsed.data.currentPassword
+        ? { currentPassword: parsed.data.currentPassword }
+        : {}),
+    });
+    if (!(await writeSession(toSessionPayload(issued)))) {
+      return failedResult("passwordAuthUnavailable");
+    }
   } catch (error) {
     unstable_rethrow(error);
     return resultFromError(error);
   }
 
   revalidateAccount(locale);
-  return okResult;
+  redirect(
+    `${localePath(locale, "settings")}?password=${parsed.data.mode === "change" ? "changed" : "set"}`,
+  );
 }
 
 export async function approveMergeRequestAction(

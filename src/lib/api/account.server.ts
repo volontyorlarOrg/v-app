@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/schemas";
 import { AUTH_REQUEST_TIMEOUT_MS } from "@/lib/auth/config";
 import { googleChallengeSchema, type GoogleChallenge } from "@/lib/auth/google";
+import { issuedSessionSchema, type IssuedSession } from "@/lib/auth/session";
 import {
   telegramAuthorizationSchema,
   type TelegramAuthorization,
@@ -82,14 +83,15 @@ export function completeGoogleConnection(
   });
 }
 
-export function verifyPasswordConnection(input: {
+export function updatePassword(input: {
   email: string;
-  password: string;
-}): Promise<ConnectionOutcome> {
-  return authed(`${CONNECTIONS_PATH}/password/verify`, {
+  currentPassword?: string;
+  newPassword: string;
+}): Promise<IssuedSession> {
+  return authed("/auth/password/change", {
     method: "POST",
     body: input,
-    schema: connectionOutcomeSchema,
+    schema: issuedSessionSchema,
     timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
   });
 }

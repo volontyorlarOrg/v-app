@@ -121,13 +121,20 @@ provider name, merge-request id, token or provider state ever reaches a query
 string, a Client Component, browser storage or a log line; the page reads the
 outcome by fetching `/me` and the pending requests again on the server.
 
-Approving a merge is the one place a Server Action replaces the session: the
+Approving a merge is one of two places a Server Action replaces the session: the
 backend returns the canonical account's session inside the approval, the action
 parses it with the same schema sign-in uses and writes the same encrypted
 `httpOnly` cookie. When the backend answers `recentAuthenticationRequired`
 instead, `/api/auth/connect/reauthenticate` ends the session on the backend,
 clears the cookie and returns the browser to sign-in with a same-origin
 `next=/{locale}/settings`.
+
+Setting or changing a password also replaces the encrypted session. The
+backend decides from the authenticated account whether the current password is
+required, hashes the new password, revokes the lineage's existing refresh
+sessions and returns one replacement session. The browser never receives a
+password hash, and plaintext passwords stay inside the form POST and the
+server-to-server API request.
 
 The only stored values remain the light/dark theme choice and the interface
 language, both in readable cookies shared with the marketing site so a choice
@@ -142,7 +149,7 @@ flow are saved to the backend at each step and never enter browser storage.
 Nothing personal appears in a URL;
 sign-in carries only `?telegram=expired|unavailable`, `?session=expired` and a
 same-origin `?next=` path checked by `safeReturnPath`, and the account page only
-`?connect=<status>`.
+`?connect=<status>` or `?password=set|changed`.
 
 Outbound links to the marketing site open with `rel="noopener noreferrer"`.
 The portfolio links a volunteer puts on their own profile are untrusted input:
@@ -152,10 +159,9 @@ the raw string, and the anchor carries `rel="noopener noreferrer nofollow"`.
 
 ## Not implemented
 
-- Google sign-in; the button renders disabled with a note
-- email/password sign-in; the backend has none, so the app shows no form
-- notification, privacy and appearance preferences; the application no longer
-  reads or writes `/me/preferences`, and no screen offers those switches
+- password reset and email verification
+- notification, privacy and appearance preference controls; no screen offers
+  these switches
 - unlinking, unmerging, export and account deletion; `/settings` connects and
   merges only
 - "sign out everywhere"
