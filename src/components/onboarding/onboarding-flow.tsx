@@ -11,7 +11,7 @@ import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { writeOnboardingStateToDocument } from "@/lib/onboarding/state";
+import { writeOnboardingStateToClient } from "@/lib/onboarding/state";
 import {
   FORM_STEPS,
   FORM_STEP_COUNT,
@@ -89,7 +89,7 @@ export function OnboardingFlow({
   function go(to: OnboardingStep, dir: StepDirection) {
     setDirection(dir);
     setStep(to);
-    writeOnboardingStateToDocument(
+    writeOnboardingStateToClient(
       to === "done" ? { status: "done" } : { status: "pending", step: to },
     );
   }
@@ -99,7 +99,7 @@ export function OnboardingFlow({
     const previous = previousStep(step);
     if (previous) go(previous, "back");
   };
-  const skipForNow = () => writeOnboardingStateToDocument({ status: "skipped", step });
+  const skipForNow = () => writeOnboardingStateToClient({ status: "skipped", step });
 
   const railItems: RailItem[] = FORM_STEPS.map((key) => ({
     key,
