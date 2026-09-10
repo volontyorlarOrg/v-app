@@ -19,7 +19,7 @@ export function ProviderButtons({
       <a
         href={telegramHref}
         rel="nofollow"
-        className={buttonClass({ className: "w-full" })}
+        className={buttonClass({ size: "sm", className: "w-full" })}
       >
         <TelegramMark className="size-5" />
         {telegram}
@@ -28,7 +28,11 @@ export function ProviderButtons({
         <a
           href={googleHref}
           rel="nofollow"
-          className={buttonClass({ variant: "outline", className: "w-full" })}
+          className={buttonClass({
+            variant: "outline",
+            size: "sm",
+            className: "w-full",
+          })}
         >
           <GoogleMark className="size-5" />
           {google}
@@ -39,7 +43,11 @@ export function ProviderButtons({
             type="button"
             disabled
             aria-describedby="google-unavailable"
-            className={buttonClass({ variant: "outline", className: "w-full" })}
+            className={buttonClass({
+              variant: "outline",
+              size: "sm",
+              className: "w-full",
+            })}
           >
             <GoogleMark className="size-5" />
             {google}
