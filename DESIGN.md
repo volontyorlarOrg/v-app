@@ -81,7 +81,7 @@ rounded:
   2xl: "28px"
   full: "9999px"
 spacing:
-  sidebar: "17.5rem"
+  sidebar: "16.5rem"
   aside: "22rem"
   gutter-mobile: "16px"
   gutter-wide: "32px"

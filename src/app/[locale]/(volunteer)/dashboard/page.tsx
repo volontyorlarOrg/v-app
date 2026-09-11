@@ -10,6 +10,7 @@ import {
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
+import { ApplicationRows } from "@/components/dashboard/application-rows";
 import {
   ConnectTelegram,
   type ConnectTelegramLabels,
@@ -23,7 +24,6 @@ import {
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { HistoryTable } from "@/components/record/history-table";
-import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -298,37 +298,22 @@ function Dashboard({
             id="applications"
             title={t("applications.title")}
             action={{ href: navHref("applications"), label: t("applications.viewAll") }}
-            padding={loadedApplications.status === "failed" ? "none" : "md"}
+            padding="none"
           >
             {loadedApplications.status === "failed" ? (
               <LoadErrorRows
                 failure={loadedApplications.failure}
                 labels={errorLabels}
               />
-            ) : applications.length === 0 ? (
-              <div className="py-3 text-center">
-                <p className="font-semibold text-ink">{applicationsT("empty.title")}</p>
-                <p className="mt-1 text-sm text-ink-muted">
-                  {applicationsT("empty.body")}
-                </p>
-              </div>
             ) : (
-              <ul className="grid gap-4 lg:grid-cols-2">
-                {applications.map((application) => (
-                  <li key={application.id} className="flex">
-                    <OpportunityCard
-                      opportunity={application.opportunity}
-                      application={{
-                        id: application.id,
-                        status: application.status,
-                      }}
-                      saved={false}
-                      showSave={false}
-                      now={now}
-                    />
-                  </li>
-                ))}
-              </ul>
+              <ApplicationRows
+                applications={applications}
+                now={now}
+                empty={{
+                  title: applicationsT("empty.title"),
+                  body: applicationsT("empty.body"),
+                }}
+              />
             )}
           </Panel>
 
