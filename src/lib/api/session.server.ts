@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import type { z } from "zod";
 
 import { api, type ApiRequest } from "@/lib/api/client.server";
-import { isApiError } from "@/lib/api/errors";
+import { isApiError, isSessionOver } from "@/lib/api/errors";
 import { type SessionPayload } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 
@@ -48,7 +48,7 @@ export async function authed<TSchema extends z.ZodType | undefined = undefined>(
       cache: "no-store",
     })) as AuthedResult<TSchema>;
   } catch (error) {
-    if (!isApiError(error) || error.code !== "unauthenticated") throw error;
+    if (!isSessionOver(error)) throw error;
 
     return endSession();
   }
