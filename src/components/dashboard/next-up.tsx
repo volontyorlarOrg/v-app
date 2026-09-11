@@ -1,5 +1,6 @@
 import { useFormatter, useTranslations } from "next-intl";
 
+import { EmptyState } from "@/components/app/empty-state";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ApplicationSummary } from "@/lib/applications/status";
@@ -26,17 +27,17 @@ export function NextUp({
 
   if (commitments.length === 0) {
     return (
-      <div className="px-5 py-6">
-        <p className="max-w-prose text-sm leading-relaxed text-ink-muted">
-          {t("empty")}
-        </p>
-        <Link
-          href={navHref("opportunities")}
-          className={buttonClass({ variant: "outline", size: "sm", className: "mt-4" })}
-        >
-          {t("cta")}
-        </Link>
-      </div>
+      <EmptyState
+        body={t("empty")}
+        action={
+          <Link
+            href={navHref("opportunities")}
+            className={buttonClass({ variant: "outline", size: "sm" })}
+          >
+            {t("cta")}
+          </Link>
+        }
+      />
     );
   }
 
@@ -72,8 +73,7 @@ export function NextUp({
                 </Link>
               </h3>
               <p className="mt-1 text-sm text-ink-muted">
-                {opportunity.organization.name} ·{" "}
-                {placeOf(opportunity, opportunities)}
+                {opportunity.organization.name} · {placeOf(opportunity, opportunities)}
               </p>
               <p className="tabular mt-1 text-sm text-ink-muted">
                 {format.dateTime(starts, "weekday")}, {format.dateTime(starts, "time")}

@@ -43,7 +43,8 @@
     },
     "userMenu": {
       "label": "Account menu"
-    }
+    },
+    "menuLabel": "Menu"
   },
   "auth": {
     "providers": {
@@ -157,7 +158,8 @@
     },
     "progress": {
       "title": "Your progress",
-      "description": "Your confirmed record and profile readiness in one place."
+      "description": "Your confirmed record and profile readiness in one place.",
+      "leaderboard": "See where you rank"
     },
     "record": {
       "title": "Your record",
@@ -328,7 +330,14 @@
       "next": "Next",
       "page": "Page {page}",
       "current": "Page {page}, current page"
-    }
+    },
+    "count": "{count, plural, one {volunteer} other {volunteers}}",
+    "podium": {
+      "label": "Top three",
+      "place": "Place {rank}"
+    },
+    "xpValue": "{xp} XP",
+    "scoring": "{event} XP for every confirmed event, {hour} XP for every confirmed hour."
   },
   "applications": {
     "metaTitle": "Applications",
@@ -541,7 +550,8 @@
       "education": "Education",
       "location": "Where you are",
       "contact": "How organisers reach you",
-      "links": "Links"
+      "links": "Links",
+      "about": "About you"
     },
     "fields": {
       "fullName": "Full name",
@@ -581,6 +591,13 @@
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
       "why": "A complete profile means an organiser can evaluate you at a glance."
+    },
+    "sectionHelp": {
+      "about": "Your name and a few lines an organiser reads first.",
+      "education": "Where you study, so an organiser knows who is applying.",
+      "location": "Organisers pick volunteers close to the event.",
+      "contact": "Shared with an organiser only after you apply.",
+      "links": "Anything that shows your work. Optional."
     }
   },
   "settings": {
@@ -709,7 +726,9 @@
       "cancelled": "The request was cancelled.",
       "freshAuthTitle": "Sign in again to approve",
       "freshAuthDescription": "Approving joins two accounts, so this browser has to sign in to this account again first.",
-      "freshAuthAction": "Sign in again"
+      "freshAuthAction": "Sign in again",
+      "title": "Joining accounts",
+      "waitingCount": "{count, plural, =0 {Nothing waiting} one {# request waiting} other {# requests waiting}}"
     },
     "errors": {
       "accountLinkingUnavailable": "Connecting accounts is unavailable right now. Try again in a moment.",
@@ -756,6 +775,17 @@
       "expired": "A request to join expired",
       "other": "There is an update about joining accounts",
       "body": "Open settings to see where it stands."
+    },
+    "account": {
+      "title": "Your account",
+      "signsInWith": "Signs in with",
+      "nothingConnected": "No way in connected yet."
+    },
+    "password": {
+      "label": "Password"
+    },
+    "index": {
+      "label": "Settings sections"
     }
   },
   "notFound": {

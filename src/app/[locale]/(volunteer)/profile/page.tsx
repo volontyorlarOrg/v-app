@@ -18,6 +18,7 @@ import {
   profileCompletion,
   type VolunteerProfile,
 } from "@/lib/profile/completion";
+import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
 import {
   isReliabilityMeaningful,
@@ -134,7 +135,7 @@ function Profile({
     "links",
     "linksHelp",
   ] as const;
-  const sectionKeys = ["education", "location", "contact", "links"] as const;
+  const sectionKeys = ["about", "education", "location", "contact", "links"] as const;
 
   return (
     <div className="flex flex-col gap-6">
@@ -157,7 +158,7 @@ function Profile({
               }),
           bioEmpty: t("identity.bioEmpty"),
           edit: t("identity.edit"),
-          record: t("identity.record"),
+          record: recordLabels("history.title"),
           completion: {
             label: t("completion.label"),
             value: t("completion.value", { percent: completion.percent }),
@@ -182,6 +183,9 @@ function Profile({
           sections: Object.fromEntries(
             sectionKeys.map((key) => [key, t(`sections.${key}`)]),
           ) as Record<(typeof sectionKeys)[number], string>,
+          sectionHelp: Object.fromEntries(
+            sectionKeys.map((key) => [key, t(`sectionHelp.${key}`)]),
+          ) as Record<(typeof sectionKeys)[number], string>,
           fields: Object.fromEntries(
             fieldKeys.map((key) => [key, t(`fields.${key}`)]),
           ) as Record<(typeof fieldKeys)[number], string>,
@@ -202,12 +206,4 @@ function join(parts: readonly string[]): string {
     .map((part) => part.trim())
     .filter(Boolean)
     .join(", ");
-}
-
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
-  return parts
-    .map((part) => [...part][0] ?? "")
-    .join("")
-    .toLocaleUpperCase();
 }

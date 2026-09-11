@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a sidebar and top bar, panels on a flat workspace, blue for the institution, orange for what the volunteer did, and the same panel after dark.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar that carries every control, panels on a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, and a navy-tinted room after dark.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -21,6 +21,11 @@ colors:
   accent: "#E85D30"
   accent-ink: "#B34917"
   knockout: "#FFFFFF"
+  shell: "#0B2340"
+  shell-raised: "#14345A"
+  shell-line: "#1E3F66"
+  shell-ink: "#F1F6FB"
+  shell-muted: "#9DB4CC"
 typography:
   page:
     fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
@@ -66,7 +71,7 @@ rounded:
   2xl: "28px"
   full: "9999px"
 spacing:
-  sidebar: "16rem"
+  sidebar: "17.5rem"
   aside: "22rem"
   gutter-mobile: "16px"
   gutter-wide: "32px"
@@ -84,9 +89,15 @@ components:
     rounded: "{rounded.xl}"
     padding: "16px 20px"
   sidebar:
-    backgroundColor: "{colors.surface}"
-    borderColor: "{colors.border}"
+    backgroundColor: "{colors.shell}"
+    textColor: "{colors.shell-ink}"
+    borderColor: "{colors.shell-line}"
     width: "{spacing.sidebar}"
+  sidebar-active:
+    backgroundColor: "{colors.primary-muted}"
+    textColor: "{colors.primary-deep}"
+    rounded: "{rounded.md}"
+    height: "44px"
   workspace:
     backgroundColor: "{colors.surface-sunk}"
   switch-on:
@@ -124,12 +135,15 @@ components:
 
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
-a sidebar that names the sections, a top bar with notifications and account
-controls, and a flat workspace carrying panels of content. It shares every
+a navy sidebar that names the sections and holds every control — the user
+card, notifications, the theme switch, sign out — and a flat workspace
+carrying panels of content, with no top bar between them. It shares every
 token, both typefaces, the two brand colours and their rules, the theme and the
-motion system with `../v-web/DESIGN.md`, and nothing else about its layout. A
-volunteer coming from the marketing site should recognise the ink; a volunteer
-coming from any other product should recognise a panel.
+motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
+institution's blue is used as a field on the left, not only as an accent; the
+volunteer's own work stays orange on the right. A volunteer coming from the
+marketing site should recognise the ink; a volunteer coming from any other
+product should recognise a panel.
 
 Only the sign-in pages keep the marketing site's dot-grid ground: they are the
 doorway between the two. The welcome flow a new account meets on `/welcome`
@@ -139,8 +153,13 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 16rem sidebar and a 56px top bar on desktop; a top bar and a four-tab bar
-  on a phone. The workspace is `surface-sunk`, the panels are `surface`.
+- A 17.5rem navy sidebar (`shell`) and no top bar on desktop; a 56px header
+  and a four-tab bar on a phone. The workspace is `surface-sunk` under two
+  faint radial washes (blue top-right, orange bottom-left), the panels are
+  `surface`; the dark theme tints every neutral toward navy rather than grey.
+- Washes of the two hues where a surface is the volunteer's own: the dashboard
+  hero, the profile's identity cover, the leaderboard's standing card and the
+  podium stage. A wash never carries text contrast; the tokens beneath do.
 - Panels, stat tiles and cards with a `border` edge and a 20px radius. Content
   inside a panel is ruled rows, never nested boxes.
 - A serif page title at 30 to 36px, sans panel titles at 16px, and serif
@@ -156,14 +175,20 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `surface`, right hairline: lockup, main sections, account routes, the user card with level and sign out | Absent                                                                    |
-| Top bar   | Sticky, `surface`, bottom hairline: notifications, language, theme, account menu                                             | Same controls plus the brand mark                                         |
+| Sidebar   | Sticky, full height, `shell` navy: lockup, the user card (opens the account menu), MENU with the four sections, then notifications, the theme switch and sign out as rows | Absent                                                                    |
+| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, theme switch, bell, avatar (account menu) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, applications, profile |
 
-The dashboard is the decision screen: a progress orbit, three stat tiles, then
-three panels for the next commitment, applications, and progress. The profile
-is the volunteer's own page: an identity card, then the editor. Every other
+The dashboard is the decision screen and the record: a progress orbit, four
+stat tiles, then panels for the next commitment, applications and the
+participation history in the main column, and progress (the level rail, the
+next-level meter, profile completeness) in the aside, leading to the
+leaderboard. The leaderboard opens on the viewer's standing card, the top three
+on a podium stage, and the ranked table from fourth place. The profile is the
+volunteer's own page: an identity card under a washed cover, then the editor in
+titled sections. Settings opens on an account summary and an anchor index to
+its panels. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 

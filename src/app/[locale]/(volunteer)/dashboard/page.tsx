@@ -18,6 +18,7 @@ import {
 } from "@/components/onboarding/onboarding-resume";
 import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
+import { HistoryTable } from "@/components/record/history-table";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -25,7 +26,7 @@ import { connectStartHref } from "@/lib/account/connections";
 import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
 import { getProfile } from "@/lib/api/profile.server";
-import { getRecord } from "@/lib/api/record.server";
+import { getHistory, getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import {
   isUpcomingCommitment,
@@ -45,9 +46,10 @@ import {
   levelProgress,
   reliabilityPercent,
   type Level,
+  type ParticipationEntry,
   type VolunteerRecord,
 } from "@/lib/record/levels";
-import { navHref } from "@/lib/routing/routes";
+import { HISTORY_ANCHOR, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -67,15 +69,23 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, volunteerRecord, applications, onboarding, telegram] =
-    await Promise.all([
-      requireSession(),
-      getProfile(),
-      getRecord(),
-      listApplications(),
-      readOnboardingState(),
-      readTelegramConnection(),
-    ]);
+  const [
+    session,
+    profile,
+    volunteerRecord,
+    history,
+    applications,
+    onboarding,
+    telegram,
+  ] = await Promise.all([
+    requireSession(),
+    getProfile(),
+    getRecord(),
+    getHistory(),
+    listApplications(),
+    readOnboardingState(),
+    readTelegramConnection(),
+  ]);
 
   return (
     <Dashboard
@@ -83,6 +93,7 @@ export default async function DashboardPage({
       displayName={profile?.fullName.trim() || session.displayName?.trim() || ""}
       profile={profile ?? EMPTY_PROFILE}
       record={volunteerRecord}
+      history={history.items}
       applications={applications.items}
       onboardingState={onboarding && serializeOnboardingState(onboarding)}
       telegramConnected={telegram}
@@ -90,8 +101,6 @@ export default async function DashboardPage({
   );
 }
 
-// The dashboard is worth rendering even when the account service is not
-// answering; an unknown connection simply hides the invitation.
 async function readTelegramConnection(): Promise<boolean | null> {
   try {
     return (await getMe()).authMethods.telegram;
@@ -105,6 +114,7 @@ function Dashboard({
   displayName,
   profile,
   record: volunteerRecord,
+  history,
   applications: all,
   onboardingState,
   telegramConnected,
@@ -113,6 +123,7 @@ function Dashboard({
   displayName: string;
   profile: VolunteerProfile;
   record: VolunteerRecord;
+  history: readonly ParticipationEntry[];
   applications: readonly ApplicationSummary[];
   onboardingState: string | null;
   telegramConnected: boolean | null;
@@ -161,7 +172,10 @@ function Dashboard({
       id: "reliability",
       label: t("tiles.reliability"),
       value: meaningful && percent !== null ? `${percent}%` : "—",
-      note: meaningful ? undefined : t("tiles.reliabilityPending"),
+      note: meaningful
+        ? record("figures.reliabilityHelp")
+        : t("tiles.reliabilityPending"),
+      achievement: true,
     },
     {
       id: "hours",
@@ -171,6 +185,13 @@ function Dashboard({
           ? "—"
           : format.number(volunteerRecord.hours),
       note: volunteerRecord.hoursVerified ? undefined : t("tiles.hoursUnverified"),
+      achievement: true,
+    },
+    {
+      id: "awaiting",
+      label: record("figures.awaiting"),
+      value: format.number(volunteerRecord.counts.acceptedUnconfirmed),
+      note: record("figures.awaitingHelp"),
     },
   ];
 
@@ -186,8 +207,6 @@ function Dashboard({
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, APPLICATIONS_SHOWN);
 
-  // The catalogue stays on the server, so the resume card is handed one
-  // sentence per step count and picks its own once it has read localStorage.
   const resumeLabels: OnboardingResumeLabels = {
     title: onboarding("resume.title"),
     bodyByDone: Array.from({ length: FORM_STEP_COUNT + 1 }, (_, done) =>
@@ -272,14 +291,24 @@ function Dashboard({
               }}
             />
           </Panel>
+
+          <Panel
+            id={HISTORY_ANCHOR}
+            title={record("history.title")}
+            description={record("history.description")}
+            padding="none"
+            className="scroll-mt-20"
+          >
+            <HistoryTable entries={history} />
+          </Panel>
         </div>
 
         <div className="min-w-0">
           <Panel
             id="progress"
             title={t("progress.title")}
-            description={t("progress.description")}
-            action={{ href: navHref("record"), label: t("record.viewAll") }}
+            action={{ href: navHref("leaderboard"), label: t("progress.leaderboard") }}
+            className="xl:sticky xl:top-8"
           >
             <RecordProgress record={volunteerRecord} />
             <div className="mt-5 border-t border-border pt-5">
