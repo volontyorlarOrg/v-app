@@ -8,9 +8,16 @@
     "loading": "Loading…",
     "error": {
       "title": "Couldn't load this page",
-      "body": "We couldn't reach the server. Please try again in a moment.",
-      "retry": "Try again"
-    }
+      "body": "We couldn't reach the server. It may be waking up, which usually takes under a minute.",
+      "failedTitle": "Something went wrong",
+      "failedBody": "The server answered with an error. Try again in a moment; if it keeps happening, send us the reference below.",
+      "section": "Couldn't load this section",
+      "retry": "Try again",
+      "retrying": "Retrying in {seconds}s…",
+      "retryingNow": "Retrying…",
+      "reference": "Reference {id}"
+    },
+    "slowLoad": "Still loading. The server may be waking up, which can take up to a minute."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -44,7 +51,8 @@
     "userMenu": {
       "label": "Account menu"
     },
-    "menuLabel": "Menu"
+    "menuLabel": "Menu",
+    "profileEdit": "Edit profile"
   },
   "auth": {
     "providers": {
@@ -547,7 +555,13 @@
       "karakalpakstan": "Karakalpakstan"
     },
     "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest.",
-    "estimatedHours": "{hours, number} hours total"
+    "estimatedHours": "{hours, number} hours total",
+    "tabs": {
+      "label": "Opportunities sections",
+      "all": "All",
+      "saved": "Saved",
+      "applications": "Applications"
+    }
   },
   "saved": {
     "metaTitle": "Saved",
@@ -630,6 +644,15 @@
       "location": "Organisers pick volunteers close to the event.",
       "contact": "Shared with an organiser only after you apply.",
       "links": "Anything that shows your work. Optional."
+    },
+    "edit": {
+      "back": "Back to profile",
+      "cancel": "Cancel"
+    },
+    "overview": {
+      "contactTitle": "How organisers reach you",
+      "contactHelp": "Shared with an organiser only after you apply.",
+      "empty": "Not added yet"
     }
   },
   "settings": {

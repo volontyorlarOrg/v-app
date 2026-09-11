@@ -10,6 +10,7 @@ export type RouteKey =
   | "record"
   | "leaderboard"
   | "profile"
+  | "profileEdit"
   | "settings"
   | "welcome";
 
@@ -25,6 +26,7 @@ export type AppRoute = {
   inNav: boolean;
   inTabBar: boolean;
   inAccountMenu: boolean;
+  section: RouteKey | null;
 };
 
 export const appRoutes: readonly AppRoute[] = [
@@ -36,6 +38,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
+    section: null,
   },
   {
     key: "signup",
@@ -45,6 +48,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
+    section: null,
   },
   {
     key: "dashboard",
@@ -54,6 +58,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: true,
     inTabBar: true,
     inAccountMenu: false,
+    section: null,
   },
   {
     key: "opportunities",
@@ -63,15 +68,17 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: true,
     inTabBar: true,
     inAccountMenu: false,
+    section: null,
   },
   {
     key: "applications",
     path: "/applications",
     area: "volunteer",
     guard: "session",
-    inNav: true,
-    inTabBar: true,
+    inNav: false,
+    inTabBar: false,
     inAccountMenu: false,
+    section: "opportunities",
   },
   {
     key: "saved",
@@ -81,6 +88,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
+    section: "opportunities",
   },
   {
     key: "record",
@@ -90,6 +98,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
+    section: "dashboard",
   },
   {
     key: "leaderboard",
@@ -97,8 +106,9 @@ export const appRoutes: readonly AppRoute[] = [
     area: "volunteer",
     guard: "session",
     inNav: true,
-    inTabBar: false,
+    inTabBar: true,
     inAccountMenu: false,
+    section: null,
   },
   {
     key: "profile",
@@ -108,6 +118,17 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: true,
     inAccountMenu: true,
+    section: null,
+  },
+  {
+    key: "profileEdit",
+    path: "/profile/edit",
+    area: "volunteer",
+    guard: "session",
+    inNav: false,
+    inTabBar: false,
+    inAccountMenu: false,
+    section: "profile",
   },
   {
     key: "settings",
@@ -117,6 +138,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: true,
+    section: null,
   },
   {
     key: "welcome",
@@ -126,6 +148,7 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     inTabBar: false,
     inAccountMenu: false,
+    section: null,
   },
 ] as const;
 
@@ -174,9 +197,30 @@ export function isActivePath(pathname: string, path: string): boolean {
   return pathname === path || pathname.startsWith(`${path}/`);
 }
 
+function withoutLocale(pathname: string): string {
+  const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  return stripped === "" ? "/" : stripped;
+}
+
+export function routeFor(pathname: string): AppRoute | null {
+  const path = withoutLocale(pathname);
+  let match: AppRoute | null = null;
+  for (const route of appRoutes) {
+    if (!isActivePath(path, route.path)) continue;
+    if (!match || route.path.length > match.path.length) match = route;
+  }
+  return match;
+}
+
+export function sectionKeyFor(pathname: string): RouteKey | null {
+  const route = routeFor(pathname);
+  return route ? (route.section ?? route.key) : null;
+}
+
+export function isSectionActive(pathname: string, key: RouteKey): boolean {
+  return sectionKeyFor(pathname) === key;
+}
+
 export function guardFor(pathname: string): RouteGuard | null {
-  const withoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-  const path = withoutLocale === "" ? "/" : withoutLocale;
-  const match = appRoutes.find((route) => isActivePath(path, route.path));
-  return match?.guard ?? null;
+  return routeFor(pathname)?.guard ?? null;
 }

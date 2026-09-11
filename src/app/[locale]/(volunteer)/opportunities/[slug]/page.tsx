@@ -219,7 +219,7 @@ function Opportunity({
                     {t("detail.profileRequired")}
                   </p>
                   <Link
-                    href={navHref("profile")}
+                    href={navHref("profileEdit")}
                     className={buttonClass({
                       variant: "outline",
                       className: "mt-4 w-full",

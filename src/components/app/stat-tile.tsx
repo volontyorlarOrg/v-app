@@ -24,7 +24,7 @@ export function StatTiles({
       {stats.map((stat, index) => (
         <div
           key={stat.id}
-          className="enter-rise min-w-0 rounded-xl border border-border bg-surface px-4 py-3.5 sm:px-5 sm:py-4"
+          className="panel-surface enter-rise min-w-0 rounded-xl border border-border bg-surface px-4 py-3.5 sm:px-5 sm:py-4"
           style={{ "--enter-delay": `${120 + index * 70}ms` } as CSSProperties}
         >
           <dt className="min-h-[2lh] text-xs font-semibold tracking-[0.1em] text-ink-muted uppercase sm:tracking-[0.14em] xl:min-h-0">

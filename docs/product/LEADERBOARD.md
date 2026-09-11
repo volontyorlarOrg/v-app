@@ -5,11 +5,11 @@ they are ordered under.
 
 ## What the volunteer sees
 
-`/leaderboard` is a session-protected section in the desktop sidebar, between
-the record and the account list. It is deliberately **not** in the phone tab
-bar: the tab bar keeps its four essential destinations (dashboard,
-opportunities, applications, profile), and the leaderboard is reached from the
-sidebar on a wide screen and by URL on a phone.
+`/leaderboard` is a session-protected section: the third of the three in the
+desktop sidebar, and the third of the four thumbs in the phone tab bar
+(dashboard, opportunities, leaderboard, profile). It took the tab bar slot that
+applications used to hold once applications became a tab inside the
+opportunities section.
 
 The page has three parts:
 

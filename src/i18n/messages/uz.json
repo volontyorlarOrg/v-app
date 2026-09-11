@@ -8,9 +8,16 @@
     "loading": "Yuklanmoqda…",
     "error": {
       "title": "Sahifani yuklab boʻlmadi",
-      "body": "Server bilan bogʻlanib boʻlmadi. Bir ozdan keyin qayta urinib koʻring.",
-      "retry": "Qayta urinish"
-    }
+      "body": "Server bilan bogʻlanib boʻlmadi. U uygʻonayotgan boʻlishi mumkin — odatda bunga bir daqiqadan kam vaqt ketadi.",
+      "failedTitle": "Nimadir xato ketdi",
+      "failedBody": "Server xato bilan javob berdi. Bir ozdan keyin qayta urinib koʻring; takrorlansa, quyidagi raqamni bizga yuboring.",
+      "section": "Bu boʻlimni yuklab boʻlmadi",
+      "retry": "Qayta urinish",
+      "retrying": "{seconds} soniyadan keyin qayta urinamiz…",
+      "retryingNow": "Qayta urinilmoqda…",
+      "reference": "Raqam: {id}"
+    },
+    "slowLoad": "Hali yuklanmoqda. Server uygʻonayotgan boʻlishi mumkin — bunga bir daqiqagacha vaqt ketishi mumkin."
   },
   "nav": {
     "dashboard": "Bosh panel",
@@ -44,7 +51,8 @@
     "userMenu": {
       "label": "Hisob menyusi"
     },
-    "menuLabel": "Menyu"
+    "menuLabel": "Menyu",
+    "profileEdit": "Profilni tahrirlash"
   },
   "auth": {
     "providers": {
@@ -547,7 +555,13 @@
       "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
     },
     "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring.",
-    "estimatedHours": "Jami {hours, number} soat"
+    "estimatedHours": "Jami {hours, number} soat",
+    "tabs": {
+      "label": "Imkoniyatlar boʻlimlari",
+      "all": "Barchasi",
+      "saved": "Saqlanganlar",
+      "applications": "Arizalar"
+    }
   },
   "saved": {
     "metaTitle": "Saqlanganlar",
@@ -630,6 +644,15 @@
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
       "contact": "Faqat ariza berganingizdan soʻng tashkilotchiga koʻrsatiladi.",
       "links": "Ishingizni koʻrsatadigan har qanday havola. Ixtiyoriy."
+    },
+    "edit": {
+      "back": "Profilga qaytish",
+      "cancel": "Bekor qilish"
+    },
+    "overview": {
+      "contactTitle": "Tashkilotchilar siz bilan qanday bogʻlanadi",
+      "contactHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
+      "empty": "Hali kiritilmagan"
     }
   },
   "settings": {

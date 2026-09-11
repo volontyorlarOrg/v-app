@@ -17,7 +17,7 @@ vi.mock("@/i18n/navigation", () => ({
 
 const items = [
   { key: "dashboard", href: "/dashboard", label: "Dashboard" },
-  { key: "applications", href: "/applications", label: "Applications" },
+  { key: "opportunities", href: "/opportunities", label: "Opportunities" },
 ] as const;
 
 describe("TabBar", () => {
@@ -33,14 +33,23 @@ describe("TabBar", () => {
     expect(screen.getAllByRole("link")).toHaveLength(2);
   });
 
-  it("marks the section that owns the current path, including nested pages", () => {
+  it("marks the section that owns the current path, including pages folded into it", () => {
     render(<TabBar items={items} label="App sections" />);
-    expect(screen.getByRole("link", { name: "Applications" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Opportunities" })).toHaveAttribute(
       "aria-current",
       "page",
     );
     expect(screen.getByRole("link", { name: "Dashboard" })).not.toHaveAttribute(
       "aria-current",
+    );
+  });
+
+  it("marks the dashboard for the old record URL", () => {
+    usePathname.mockReturnValue("/record");
+    render(<TabBar items={items} label="App sections" />);
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      "aria-current",
+      "page",
     );
   });
 });

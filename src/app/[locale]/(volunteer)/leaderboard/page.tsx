@@ -5,6 +5,11 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/app/empty-state";
+import {
+  LoadErrorPanel,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
 import { PageHeader } from "@/components/app/page-header";
 import { Pagination } from "@/components/app/pagination";
 import { Panel } from "@/components/app/panel";
@@ -18,6 +23,7 @@ import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
 import { usernameIdentity } from "@/lib/account/username";
 import { getLeaderboard } from "@/lib/api/leaderboard.server";
+import { settle, type LoadFailure } from "@/lib/api/load.server";
 import type { Leaderboard as LeaderboardPage } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { paginate, type Pagination as PageState } from "@/lib/leaderboard/pagination";
@@ -47,11 +53,23 @@ export default async function LeaderboardRoute({
 
   const query = await searchParams;
   const requested = Math.max(1, leaderboardPageParser.parseServerSide(query.page));
-  const [session, me, board] = await Promise.all([
+  const [session, me, loaded, common] = await Promise.all([
     requireSession(),
     getMe(),
-    getLeaderboard(requested),
+    settle(() => getLeaderboard(requested)),
+    getTranslations({ locale, namespace: "common" }),
   ]);
+
+  if (loaded.status === "failed") {
+    return (
+      <LeaderboardUnavailable
+        failure={loaded.failure}
+        labels={loadErrorLabels(common)}
+      />
+    );
+  }
+
+  const board = loaded.data;
   const state = paginate({
     page: board.page,
     pageSize: board.pageSize,
@@ -73,6 +91,23 @@ export default async function LeaderboardRoute({
       name={name}
       handleEditable={usernameIdentity(me).editable}
     />
+  );
+}
+
+function LeaderboardUnavailable({
+  failure,
+  labels,
+}: {
+  failure: LoadFailure;
+  labels: LoadErrorLabels;
+}) {
+  const t = useTranslations("leaderboard");
+
+  return (
+    <>
+      <PageHeader title={t("title")} description={t("description")} />
+      <LoadErrorPanel failure={failure} labels={labels} />
+    </>
   );
 }
 

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Panel } from "@/components/app/panel";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
+import { Link, useRouter } from "@/i18n/navigation";
 import { updateProfileAction } from "@/lib/profile/actions";
 import type { VolunteerProfile } from "@/lib/profile/completion";
 import {
@@ -59,6 +60,7 @@ export type ProfileFormLabels = {
   saved: string;
   saveError: string;
   fieldInvalid: string;
+  cancel?: string;
 };
 
 function ProfileField({
@@ -118,17 +120,27 @@ export function ProfileForm({
   values,
   regions,
   labels,
+  headed = true,
+  doneHref,
+  cancelHref,
 }: {
   values: VolunteerProfile;
   regions: readonly { value: string; label: string }[];
   labels: ProfileFormLabels;
+  headed?: boolean;
+  doneHref?: string;
+  cancelHref?: string;
 }) {
   const id = useId();
+  const router = useRouter();
   const { form, result, pending, formProps } = useActionForm({
     schema: profileFormSchema,
     defaultValues: profileFormValues(values),
     action: updateProfileAction,
-    onSuccess: () => toast.success(labels.saved),
+    onSuccess: () => {
+      toast.success(labels.saved);
+      if (doneHref) router.push(doneHref);
+    },
   });
   const { register, formState } = form;
 
@@ -149,8 +161,8 @@ export function ProfileForm({
     <form {...formProps}>
       <Panel
         id="edit"
-        title={labels.title}
-        description={labels.description}
+        title={headed ? labels.title : undefined}
+        description={headed ? labels.description : undefined}
         className="scroll-mt-20"
       >
         <div className="flex flex-col gap-6 py-1">
@@ -312,6 +324,11 @@ export function ProfileForm({
           <Button type="submit" disabled={pending} className="disabled:opacity-70">
             {pending ? labels.saving : labels.save}
           </Button>
+          {cancelHref && labels.cancel ? (
+            <Link href={cancelHref} className={buttonClass({ variant: "outline" })}>
+              {labels.cancel}
+            </Link>
+          ) : null}
           {result.status === "error" ? (
             <ActionStatus tone="error">{labels.saveError}</ActionStatus>
           ) : null}

@@ -29,19 +29,11 @@ const FOOTER_ROW =
   "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-shell-muted transition-colors hover:bg-shell-raised hover:text-shell-ink";
 
 export function accountMenuItems(t: (key: string) => string): AccountMenuItem[] {
-  return [
-    ...accountRoutes.map((route) => ({
-      key: route.key,
-      href: navHref(route.key),
-      label: t(route.key),
-    })),
-    {
-      key: "leaderboard",
-      href: navHref("leaderboard"),
-      label: t("leaderboard"),
-      phoneOnly: true,
-    },
-  ];
+  return accountRoutes.map((route) => ({
+    key: route.key,
+    href: navHref(route.key),
+    label: t(route.key),
+  }));
 }
 
 export function accountMenuLabels(t: (key: string) => string): AccountMenuLabels {
@@ -70,7 +62,7 @@ export function Sidebar({
   }));
 
   return (
-    <div className="hidden lg:block lg:w-[17.5rem] lg:shrink-0 lg:border-r lg:border-shell-line lg:bg-shell">
+    <div className="hidden lg:block lg:w-[16.5rem] lg:shrink-0 lg:border-r lg:border-shell-line lg:bg-shell">
       <aside className="sticky top-0 flex h-dvh flex-col text-shell-ink">
         <div className="shell-glow flex flex-col gap-5 px-4 pt-5 pb-4">
           <Link
@@ -94,12 +86,8 @@ export function Sidebar({
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-3">
-          <SidebarNav
-            items={items}
-            label={t("primaryLabel")}
-            heading={t("menuLabel")}
-          />
+        <div className="flex-1 overflow-y-auto px-3 pt-1 pb-3">
+          <SidebarNav items={items} label={t("primaryLabel")} />
         </div>
 
         <div className="flex flex-col gap-0.5 border-t border-shell-line px-3 py-3">

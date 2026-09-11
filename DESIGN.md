@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a navy sidebar that carries every control, panels on a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, and a navy-tinted room after dark.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar with three sections that carries every control, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -26,6 +26,16 @@ colors:
   shell-line: "#1E3F66"
   shell-ink: "#F1F6FB"
   shell-muted: "#9DB4CC"
+  shell-active: "#BFDCEF"
+  shell-active-ink: "#004A73"
+  surface-raised: "#FFFFFF"
+  field: "#FFFFFF"
+  gold: "#D4A53A"
+  gold-ink: "#7A5A0E"
+  silver: "#B5BFCA"
+  silver-ink: "#5B6774"
+  bronze: "#C58256"
+  bronze-ink: "#7D4A24"
 typography:
   page:
     fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
@@ -94,8 +104,8 @@ components:
     borderColor: "{colors.shell-line}"
     width: "{spacing.sidebar}"
   sidebar-active:
-    backgroundColor: "{colors.primary-muted}"
-    textColor: "{colors.primary-deep}"
+    backgroundColor: "{colors.shell-active}"
+    textColor: "{colors.shell-active-ink}"
     rounded: "{rounded.md}"
     height: "44px"
   workspace:
@@ -135,9 +145,11 @@ components:
 
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
-a navy sidebar that names the sections and holds every control — the user
-card, notifications, the theme switch, sign out — and a flat workspace
-carrying panels of content, with no top bar between them. It shares every
+a navy sidebar that names three sections — dashboard, opportunities,
+leaderboard — and holds every control — the user card, notifications, the
+theme switch, sign out — and a flat workspace carrying panels of content, with
+no top bar between them. Anything that belongs to a section is a tab under
+that section's header, never a fourth sidebar entry. It shares every
 token, both typefaces, the two brand colours and their rules, the theme and the
 motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
 institution's blue is used as a field on the left, not only as an accent; the
@@ -153,10 +165,22 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 17.5rem navy sidebar (`shell`) and no top bar on desktop; a 56px header
-  and a four-tab bar on a phone. The workspace is `surface-sunk` under two
-  faint radial washes (blue top-right, orange bottom-left), the panels are
-  `surface`; the dark theme tints every neutral toward navy rather than grey.
+- A 16.5rem navy sidebar (`shell`) with three sections and no top bar on
+  desktop; a 56px header and a four-tab bar (dashboard, opportunities,
+  leaderboard, profile) on a phone. The active section sits on
+  `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
+  after dark. The workspace is `surface-sunk` under two faint radial washes
+  (blue top-right, orange bottom-left), the panels are `surface`.
+- The dark theme is an elevation model, not an inversion: the floor
+  (`surface-sunk`) is the darkest navy, every panel (`surface`) sits a step
+  above it with a one-pixel highlight along its top edge, popovers
+  (`surface-raised`) a step above that, and fields (`field`) sink below the
+  panel they sit in. Every neutral is tinted toward navy rather than grey, the
+  washes are halved so orange never muddies to brown, and the accent text
+  values are lifted so both hues keep their AA ratios.
+- Underlined section tabs under a page header, with a count on each, where a
+  section has more than one listing: All, Saved and Applications under
+  Opportunities.
 - Washes of the two hues where a surface is the volunteer's own: the dashboard
   hero, the profile's identity cover, the leaderboard's standing card and the
   podium stage. A wash never carries text contrast; the tokens beneath do.
@@ -175,20 +199,24 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup, the user card (opens the account menu), MENU with the four sections, then notifications, the theme switch and sign out as rows | Absent                                                                    |
+| Sidebar   | Sticky, full height, `shell` navy: lockup, the user card (opens the account menu), the three sections, then notifications, the theme switch and sign out as rows | Absent                                                                    |
 | Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, theme switch, bell, avatar (account menu) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
-| Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, applications, profile |
+| Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
 
 The dashboard is the decision screen and the record: a progress orbit, four
 stat tiles, then panels for the next commitment, applications and the
 participation history in the main column, and progress (the level rail, the
 next-level meter, profile completeness) in the aside, leading to the
-leaderboard. The leaderboard opens on the viewer's standing card, the top three
-on a podium stage, and the ranked table from fourth place. The profile is the
-volunteer's own page: an identity card under a washed cover, then the editor in
-titled sections. Settings opens on an account summary and an anchor index to
-its panels. Every other
+leaderboard. The opportunities section holds three tabs — All, Saved and
+Applications — under one header, and the applications tab keeps its pill
+filter inside its panel. The leaderboard opens on the viewer's standing card,
+the top three on a podium stage, and the ranked table from fourth place. The
+profile is the volunteer's own page: an identity card under a washed cover,
+then the contact details and the completeness meter, all read-only; editing is
+its own page, `/profile/edit`, a page header over the editor in titled sections
+with Save and Cancel, returning to the profile once saved. Settings opens on an
+account summary and an anchor index to its panels. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 
@@ -219,6 +247,14 @@ things the institution did.
 | A completed profile, and the preview "saved" status                   | `text-accent-ink`                  |
 | Activity dots for a confirmation, an acceptance, a level              | `bg-accent`                        |
 
+**Gold, silver and bronze** appear in exactly one place: the top three on the
+leaderboard. Each place owns a metal (`gold`, `silver`, `bronze`) for its
+avatar ring, its podium step and the step's crown, and a metal ink
+(`*-ink`) for the numeral badge and the viewer's own rank when it is a podium
+one; the badge label is `medal-label`, white by day and the page ground after
+dark. The metals never label a system state or a person's action elsewhere,
+and the experience figures stay orange even on the podium.
+
 Nothing orange sits on blue and nothing blue sits on orange. The level rail's
 reached nodes are orange on a `border-control` hairline. The palette still
 defines no red; a validation or destructive colour is a decision for the
@@ -237,6 +273,15 @@ disabled, not a red one.
   facts and the links, and the two actions. A profile that is not complete
   gains a last band with the meter and what is still missing; a complete one
   drops that band and gains a tick beside the level.
+- **Podium** — the leaderboard's top three: each place is an avatar in its
+  metal ring, the handle, the experience figure, and a podium step in that
+  metal, the three steps at three heights so the silhouette reads before a
+  number does. Second stands left, first centre under the crown, third right.
+- **Failed read** — where a listing or a panel's rows would be: a soft disc
+  with a cloud-off (unreachable) or a warning (the server answered with an
+  error) glyph, a title, one sentence, the retry button and a live countdown
+  beneath it, and the request reference in small tabular type. The rest of the
+  page stays up around it.
 - **Stat tile** — the same box carrying one label, one figure and one note.
 - **Card** — the opportunity card in a grid: chips, title, organiser, meta,
   then save and view actions along the bottom edge.
@@ -288,3 +333,6 @@ close without transition. No JavaScript and print see the full page.
   and the welcome flow.
 - **Don't** put a literal hex value in a component, or reach for a red.
 - **Don't** add a hover-only affordance; the audience is on a phone.
+- **Don't** let a failed read blank a page: settle the read and draw the failed
+  panel in its place, with the retry inside it.
+- **Don't** use a metal for anything but a podium place.

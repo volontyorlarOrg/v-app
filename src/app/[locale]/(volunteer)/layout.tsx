@@ -1,21 +1,22 @@
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AppShell } from "@/components/app/app-shell";
-import { LoadErrorPanel } from "@/components/app/load-error";
+import { LoadErrorPanel, loadErrorLabels } from "@/components/app/load-error";
 import type { NotificationItem } from "@/components/app/notifications-menu";
 import { PanelErrorBoundary } from "@/components/app/panel-error-boundary";
-import { buttonClass } from "@/components/ui/button";
-import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
+import { isApiError } from "@/lib/api/errors";
+import { failureOf, type LoadFailure } from "@/lib/api/load.server";
 import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import { mergeNotificationName } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
 import { levelFor } from "@/lib/record/levels";
-import { localePath, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export default async function VolunteerLayout({
   children,
@@ -31,32 +32,15 @@ export default async function VolunteerLayout({
     getTranslations({ locale, namespace: "settings" }),
     getFormatter({ locale }),
   ]);
-  const errorLabels = {
-    title: common("error.title"),
-    body: common("error.body"),
-    retry: common("error.retry"),
-  };
+  const errorLabels = loadErrorLabels(common);
 
   let shell: Awaited<ReturnType<typeof loadShell>>;
   try {
     shell = await loadShell();
   } catch (error) {
+    if (!isApiError(error)) throw error;
     console.error("[panel] the shell could not load", error);
-    return (
-      <main id="main" className="container-page flex flex-1 flex-col py-8">
-        <LoadErrorPanel
-          labels={errorLabels}
-          action={
-            <a
-              href={localePath(locale as Locale, "dashboard")}
-              className={buttonClass({ size: "sm" })}
-            >
-              {errorLabels.retry}
-            </a>
-          }
-        />
-      </main>
-    );
+    return <ShellError failure={failureOf(error)} labels={errorLabels} />;
   }
 
   const [me, volunteerRecord, notificationList] = shell;
@@ -88,6 +72,20 @@ export default async function VolunteerLayout({
     >
       <PanelErrorBoundary labels={errorLabels}>{children}</PanelErrorBoundary>
     </AppShell>
+  );
+}
+
+function ShellError({
+  failure,
+  labels,
+}: {
+  failure: LoadFailure;
+  labels: ReturnType<typeof loadErrorLabels>;
+}) {
+  return (
+    <main id="main" className="container-page flex flex-1 flex-col py-8">
+      <LoadErrorPanel failure={failure} labels={labels} />
+    </main>
   );
 }
 

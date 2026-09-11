@@ -184,16 +184,44 @@ describe("the shell", () => {
     }
   });
 
-  it("keeps the active section legible on the shell's pale pill", () => {
-    expect(
-      contrast(token("primary-deep"), token("primary-muted")),
-    ).toBeGreaterThanOrEqual(AA_TEXT);
-    expect(contrast(token("primary-muted"), token("shell"))).toBeGreaterThanOrEqual(
-      AA_LARGE,
+  it("keeps the active section legible on its own fill in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(
+        contrast(read("shell-active-ink"), read("shell-active")),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(contrast(read("shell-active"), read("shell"))).toBeGreaterThanOrEqual(1.5);
+    }
+  });
+});
+
+describe("the podium metals", () => {
+  const METALS = ["gold", "silver", "bronze"] as const;
+
+  it.each(METALS)("%s ink meets AA on the panel surface in both themes", (metal) => {
+    expect(contrast(token(`${metal}-ink`), token("surface"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
     );
     expect(
-      contrast(darkToken("primary-muted"), darkToken("shell")),
-    ).toBeGreaterThanOrEqual(AA_LARGE);
+      contrast(darkToken(`${metal}-ink`), darkToken("surface")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
+  it.each(METALS)(
+    "a %s badge label meets AA on the metal ink in both themes",
+    (metal) => {
+      expect(
+        contrast(token("medal-label"), token(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(
+        contrast(darkToken("medal-label"), darkToken(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  it("gives the three places three different hues in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(new Set(METALS.map((metal) => read(metal))).size).toBe(3);
+    }
   });
 });
 
@@ -206,6 +234,15 @@ describe("the dark theme", () => {
   it("turns the page ground near-black rather than blue", () => {
     expect(relativeLuminance(darkToken("paper"))).toBeLessThan(0.01);
     expect(relativeLuminance(darkToken("band"))).toBeLessThan(0.03);
+  });
+
+  it("raises panels above the workspace and sinks fields into panels", () => {
+    const workspace = relativeLuminance(darkToken("surface-sunk"));
+    const panel = relativeLuminance(darkToken("surface"));
+    expect(panel).toBeGreaterThan(workspace);
+    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(panel);
+    expect(relativeLuminance(darkToken("field"))).toBeLessThan(panel);
+    expect(contrast(darkToken("border"), darkToken("surface"))).toBeGreaterThan(1.2);
   });
 
   it.each(TEXT_TOKENS)("%s meets AA on every dark surface", (foreground) => {
