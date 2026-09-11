@@ -2,10 +2,10 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { AppFooter } from "@/components/app/app-footer";
+import { MobileHeader } from "@/components/app/mobile-header";
 import type { NotificationItem } from "@/components/app/notifications-menu";
 import { Sidebar, type ShellUser } from "@/components/app/sidebar";
 import { TabBar, type TabBarItem } from "@/components/app/tab-bar";
-import { TopBar } from "@/components/app/top-bar";
 import { navHref, tabBarRoutes } from "@/lib/routing/routes";
 
 export function AppShell({
@@ -35,20 +35,24 @@ export function AppShell({
       >
         {t("skipToContent")}
       </a>
-      <Sidebar user={user} signOutLocale={signOutLocale} />
+      <Sidebar
+        user={user}
+        notifications={notifications}
+        signOutLocale={signOutLocale}
+      />
       <div className="workspace-backdrop flex min-h-full min-w-0 flex-1 flex-col bg-surface-sunk">
-        <TopBar
+        <MobileHeader
           user={user}
           notifications={notifications}
           signOutLocale={signOutLocale}
         />
         <main
           id="main"
-          className="mx-auto w-full max-w-[80rem] flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8 lg:pb-10"
+          className="mx-auto w-full max-w-[80rem] flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-10 lg:py-9 lg:pb-12"
         >
           {children}
         </main>
-        <AppFooter signOutLocale={signOutLocale} />
+        <AppFooter />
       </div>
       <TabBar items={tabs} label={t("tabBarLabel")} />
     </div>

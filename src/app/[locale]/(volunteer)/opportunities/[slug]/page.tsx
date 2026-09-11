@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { StatusChip } from "@/components/app/section";
 import { OpportunityStatusChip } from "@/components/dashboard/opportunity-status";
+import { StateChip } from "@/components/dashboard/state-chip";
 import { ApplyForm } from "@/components/opportunities/apply-form";
 import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { SaveButton } from "@/components/opportunities/save-button";
@@ -47,7 +47,9 @@ export default async function OpportunityPage({
     <Opportunity
       opportunity={opportunity}
       saved={savedIds(saved).has(opportunity.id)}
-      application={application ? { id: application.id, status: application.status } : null}
+      application={
+        application ? { id: application.id, status: application.status } : null
+      }
       now={now}
     />
   );
@@ -80,13 +82,22 @@ function Opportunity({
 
       <PageHeader
         className="mt-3"
-        eyebrow={opportunity.organization.name}
         title={opportunity.title}
+        description={
+          <span className="inline-flex flex-wrap items-center gap-1.5">
+            {opportunity.organization.name}
+            {opportunity.organization.verified ? (
+              <BadgeCheck aria-label={t("verified")} className="size-4 text-primary" />
+            ) : null}
+          </span>
+        }
         actions={
           <>
             <OpportunityStatusChip opportunity={opportunity} now={now} />
             {opportunity.sourcedByTeam ? (
-              <StatusChip>{t("card.sourced")}</StatusChip>
+              <StateChip tone="structure" icon={<BadgeCheck aria-hidden="true" />}>
+                {t("card.sourced")}
+              </StateChip>
             ) : null}
           </>
         }
@@ -135,7 +146,9 @@ function Opportunity({
                     <div>
                       <p className="font-semibold text-ink">{question.prompt}</p>
                       {question.helpText ? (
-                        <p className="mt-1 text-sm text-ink-muted">{question.helpText}</p>
+                        <p className="mt-1 text-sm text-ink-muted">
+                          {question.helpText}
+                        </p>
                       ) : null}
                       <p className="mt-1.5 text-xs text-ink-muted">
                         {question.required
@@ -178,7 +191,9 @@ function Opportunity({
                   apply: t("detail.apply"),
                   applying: t("detail.applying"),
                   errors: {
-                    opportunityUnavailable: t("detail.applyErrors.opportunityUnavailable"),
+                    opportunityUnavailable: t(
+                      "detail.applyErrors.opportunityUnavailable",
+                    ),
                     opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
                   },
                   fallback: t("detail.applyErrors.fallback"),

@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-const TILES = [0, 1, 2] as const;
+const TILES = [0, 1, 2, 3] as const;
 const ROWS = [0, 1, 2, 3] as const;
 
 export default function Loading() {
@@ -12,13 +12,13 @@ export default function Loading() {
     <div role="status" aria-live="polite" aria-busy="true">
       <span className="sr-only">{t("loading")}</span>
       <div aria-hidden="true" className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-3 w-24" />
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface px-5 py-6">
+          <Skeleton className="h-6 w-20 rounded-full" />
           <Skeleton className="h-9 w-72 max-w-full" />
           <Skeleton className="h-4 w-96 max-w-full" />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {TILES.map((tile) => (
             <div
               key={tile}

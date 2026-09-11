@@ -2,6 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import { EmptyState } from "@/components/app/empty-state";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { Segmented, type SegmentedItem } from "@/components/app/segmented";
@@ -167,19 +168,19 @@ function Opportunities({
       </p>
 
       {list.length === 0 ? (
-        <Panel className="mt-4">
-          <p className="font-semibold text-ink">{t("empty.title")}</p>
-          <p className="mt-1 text-sm text-ink-muted">{t("empty.body")}</p>
-          <Link
-            href={navHref("opportunities")}
-            className={buttonClass({
-              variant: "outline",
-              size: "sm",
-              className: "mt-4",
-            })}
-          >
-            {t("filters.clear")}
-          </Link>
+        <Panel className="mt-4" padding="none">
+          <EmptyState
+            title={t("empty.title")}
+            body={t("empty.body")}
+            action={
+              <Link
+                href={navHref("opportunities")}
+                className={buttonClass({ variant: "outline", size: "sm" })}
+              >
+                {t("filters.clear")}
+              </Link>
+            }
+          />
         </Panel>
       ) : (
         <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">

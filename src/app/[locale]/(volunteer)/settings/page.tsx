@@ -9,7 +9,7 @@ import {
 import { ActionStatus, type ActionTone } from "@/components/app/action-status";
 import { PageHeader } from "@/components/app/page-header";
 import { Panel } from "@/components/app/panel";
-import { SignOutForm } from "@/components/auth/sign-out-form";
+import { AccountSummary } from "@/components/settings/account-summary";
 import { ConnectionList } from "@/components/settings/connection-list";
 import {
   MergeRequestList,
@@ -20,7 +20,7 @@ import {
   PasswordForm,
   type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
-import { buttonClass } from "@/components/ui/button";
+import { SettingsIndex } from "@/components/settings/settings-index";
 import type { Locale } from "@/i18n/routing";
 import {
   connectionStates,
@@ -35,8 +35,12 @@ import {
   type UsernameIdentity,
 } from "@/lib/account/username";
 import { getMe, listMergeRequests } from "@/lib/api/account.server";
+import { getRecord } from "@/lib/api/record.server";
 import type { MergeRequest } from "@/lib/api/schemas";
+import { requireSession } from "@/lib/api/session.server";
 import { isGoogleConfigured } from "@/lib/auth/config";
+import { initialsOf } from "@/lib/profile/initials";
+import { levelFor, type Level } from "@/lib/record/levels";
 
 export const dynamic = "force-dynamic";
 
@@ -69,9 +73,11 @@ export default async function SettingsPage({
   setRequestLocale(locale);
 
   const { connect, password } = await searchParams;
-  const [me, requests, format, t] = await Promise.all([
+  const [session, me, requests, volunteerRecord, format, t] = await Promise.all([
+    requireSession(),
     getMe(),
     listMergeRequests(),
+    getRecord(),
     getFormatter({ locale }),
     getTranslations({ locale, namespace: "settings" }),
   ]);
@@ -94,6 +100,8 @@ export default async function SettingsPage({
   return (
     <Settings
       locale={locale as Locale}
+      name={me.displayName?.trim() || session.displayName?.trim() || ""}
+      level={levelFor(volunteerRecord.counts)}
       states={connectionStates(me)}
       username={usernameIdentity(me)}
       email={me.email ?? null}
@@ -115,6 +123,8 @@ function toneFor(status: ConnectStatus): ActionTone {
 
 function Settings({
   locale,
+  name,
+  level,
   states,
   username,
   email,
@@ -126,6 +136,8 @@ function Settings({
   outgoing,
 }: {
   locale: Locale;
+  name: string;
+  level: Level;
   states: readonly ConnectionState[];
   username: UsernameIdentity;
   email: string | null;
@@ -137,12 +149,20 @@ function Settings({
   outgoing: readonly MergeRequestItem[];
 }) {
   const t = useTranslations("settings");
+  const common = useTranslations("common");
+  const record = useTranslations("record");
   const errors = Object.fromEntries(
     ACCOUNT_ERROR_KEYS.map((key) => [key, t(`errors.${key}`)]),
   );
 
+  const displayName = name || common("volunteer");
+  const passwordMode = hasPassword ? "change" : "set";
+  const passwordTitle = t(
+    `connections.${hasPassword ? "changePasswordTitle" : "setPasswordTitle"}`,
+  );
+
   const passwordLabels: PasswordFormLabels = {
-    title: t(`connections.${hasPassword ? "changePasswordTitle" : "setPasswordTitle"}`),
+    title: passwordTitle,
     description: t(
       `connections.${hasPassword ? "changePasswordDescription" : "setPasswordDescription"}`,
     ),
@@ -193,6 +213,16 @@ function Settings({
     errors,
   };
 
+  const index = [
+    { id: "account", label: t("account.title") },
+    { id: "connections", label: t("connections.title") },
+    { id: "password", label: t("password.label") },
+    { id: "username", label: t("username.title") },
+    { id: "requests", label: t("merge.title") },
+  ];
+
+  const waiting = incoming.length + outgoing.length;
+
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
@@ -209,85 +239,114 @@ function Settings({
         </ActionStatus>
       ) : null}
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <Panel
-          id="connections"
-          title={t("connections.title")}
-          description={t("connections.description")}
-          className="enter-rise xl:col-span-2"
-        >
-          <ConnectionList
-            states={states}
-            locale={locale}
-            googleConfigured={googleConfigured}
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[14rem_minmax(0,1fr)]">
+        <SettingsIndex label={t("index.label")} items={index} />
+
+        <div className="flex min-w-0 flex-col gap-6">
+          <AccountSummary
+            id="account"
+            name={displayName}
+            initials={initialsOf(displayName)}
+            email={email}
+            username={username.username}
+            connected={states
+              .filter((state) => state.connected)
+              .map((state) => ({
+                provider: state.provider,
+                label: t(`connections.${state.provider}`),
+              }))}
+            labels={{
+              title: t("account.title"),
+              signsInWith: t("account.signsInWith"),
+              nothingConnected: t("account.nothingConnected"),
+              level: record(`level.${level}`),
+            }}
           />
-          <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-            {t("connections.handoff")}
-          </p>
-          <div className="mt-6 border-t border-border pt-6">
-            <PasswordForm
-              key={hasPassword ? "change" : "set"}
+
+          <Panel
+            id="connections"
+            title={t("connections.title")}
+            description={t("connections.description")}
+            className="scroll-mt-20"
+          >
+            <ConnectionList
+              states={states}
               locale={locale}
-              mode={hasPassword ? "change" : "set"}
+              googleConfigured={googleConfigured}
+            />
+            <p className="mt-4 text-xs leading-relaxed text-ink-muted">
+              {t("connections.handoff")}
+            </p>
+          </Panel>
+
+          <Panel
+            id="password"
+            title={passwordTitle}
+            description={passwordLabels.description}
+            className="scroll-mt-20"
+          >
+            <PasswordForm
+              key={passwordMode}
+              locale={locale}
+              mode={passwordMode}
               email={email}
               labels={passwordLabels}
+              headed={false}
             />
+          </Panel>
+
+          <Panel
+            id="username"
+            title={t("username.title")}
+            description={t("username.description")}
+            className="scroll-mt-20"
+          >
+            <UsernameSection
+              locale={locale}
+              identity={username}
+              labels={usernameLabels}
+              headed={false}
+            />
+          </Panel>
+
+          <div id="requests" className="scroll-mt-20">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
+              <h2 className="font-sans text-base font-semibold text-ink">
+                {t("merge.title")}
+              </h2>
+              <p className="text-sm text-ink-muted">
+                {t("merge.waitingCount", { count: waiting })}
+              </p>
+            </div>
+            <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
+              <Panel
+                id="incoming-requests"
+                title={t("merge.incomingTitle")}
+                description={t("merge.incomingDescription")}
+              >
+                <MergeRequestList
+                  direction="incoming"
+                  items={incoming}
+                  locale={locale}
+                  labels={mergeLabels}
+                />
+              </Panel>
+
+              <Panel
+                id="outgoing-requests"
+                title={t("merge.outgoingTitle")}
+                description={t("merge.outgoingDescription")}
+              >
+                <MergeRequestList
+                  direction="outgoing"
+                  items={outgoing}
+                  locale={locale}
+                  labels={mergeLabels}
+                />
+              </Panel>
+            </div>
           </div>
-        </Panel>
-
-        <Panel
-          id="username"
-          title={t("username.title")}
-          description={t("username.description")}
-          className="xl:col-span-2"
-        >
-          <UsernameSection
-            locale={locale}
-            identity={username}
-            labels={usernameLabels}
-            headed={false}
-          />
-        </Panel>
-
-        <Panel
-          id="incoming-requests"
-          title={t("merge.incomingTitle")}
-          description={t("merge.incomingDescription")}
-        >
-          <MergeRequestList
-            direction="incoming"
-            items={incoming}
-            locale={locale}
-            labels={mergeLabels}
-          />
-        </Panel>
-
-        <Panel
-          id="outgoing-requests"
-          title={t("merge.outgoingTitle")}
-          description={t("merge.outgoingDescription")}
-        >
-          <MergeRequestList
-            direction="outgoing"
-            items={outgoing}
-            locale={locale}
-            labels={mergeLabels}
-          />
-        </Panel>
-
-        <Panel
-          id="session"
-          title={t("session.title")}
-          description={t("session.description")}
-          className="xl:col-span-2"
-        >
-          <SignOutForm
-            locale={locale}
-            label={t("session.signOut")}
-            showIcon={false}
-            className={buttonClass({ variant: "outline", size: "sm" })}
-          />
-        </Panel>
+        </div>
       </div>
     </>
   );

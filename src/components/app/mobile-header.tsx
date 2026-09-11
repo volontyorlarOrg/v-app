@@ -1,19 +1,22 @@
 import { useTranslations } from "next-intl";
 
-import { LocaleSwitcher } from "@/components/app/locale-switcher";
+import { AccountMenu } from "@/components/app/account-menu";
 import {
   NotificationsMenu,
   type NotificationItem,
 } from "@/components/app/notifications-menu";
-import type { ShellUser } from "@/components/app/sidebar";
+import {
+  accountMenuItems,
+  accountMenuLabels,
+  type ShellUser,
+} from "@/components/app/sidebar";
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { UserMenu } from "@/components/app/user-menu";
-import { BrandMark } from "@/components/brand/logo";
+import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
-import { accountRoutes, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
 
-export function TopBar({
+export function MobileHeader({
   user,
   notifications,
   signOutLocale,
@@ -25,17 +28,18 @@ export function TopBar({
   const t = useTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm">
-      <div className="flex min-h-14 items-center gap-2 px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm lg:hidden">
+      <div className="flex min-h-14 items-center gap-2 px-4 sm:px-6">
         <Link
           href={navHref("dashboard")}
-          className="-m-1 rounded-lg p-1 text-primary lg:hidden"
+          className="-m-1 rounded-lg p-1"
           aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
         >
-          <BrandMark className="size-8" />
+          <BrandLockup name={ORGANIZATION_NAME} />
         </Link>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle label={t("themeLabel")} />
           <NotificationsMenu
             label={t("notifications.label")}
             title={t("notifications.title")}
@@ -43,17 +47,14 @@ export function TopBar({
             markAllLabel={t("notifications.markAllRead")}
             items={notifications}
           />
-          <LocaleSwitcher label={t("languageLabel")} />
-          <ThemeToggle label={t("themeLabel")} />
-          <UserMenu
-            label={t("userMenu.label")}
+          <AccountMenu
+            variant="avatar"
+            labels={accountMenuLabels(t)}
             name={user.name}
             initials={user.initials}
-            items={accountRoutes.map((route) => ({
-              href: navHref(route.key),
-              label: t(route.key),
-            }))}
-            signOutLabel={t("signOut")}
+            handle={user.handle}
+            level={user.level}
+            items={accountMenuItems(t)}
             signOutLocale={signOutLocale}
             loginHref={navHref("login")}
           />

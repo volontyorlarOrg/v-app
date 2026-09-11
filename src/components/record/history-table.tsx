@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { EmptyState } from "@/components/app/empty-state";
 import { StateChip, type ChipTone } from "@/components/dashboard/state-chip";
 import {
   Table,
@@ -30,7 +31,7 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
   const format = useFormatter();
 
   if (entries.length === 0) {
-    return <p className="px-5 py-6 text-sm text-ink-muted">{t("history.empty")}</p>;
+    return <EmptyState body={t("history.empty")} />;
   }
 
   return (
