@@ -10,6 +10,7 @@ import { ActionStatus, type ActionTone } from "@/components/app/action-status";
 import { PageHeader } from "@/components/app/page-header";
 import { Panel } from "@/components/app/panel";
 import { AccountSummary } from "@/components/settings/account-summary";
+import { AppearanceSection } from "@/components/settings/appearance-section";
 import { ConnectionList } from "@/components/settings/connection-list";
 import {
   MergeRequestList,
@@ -215,6 +216,7 @@ function Settings({
 
   const index = [
     { id: "account", label: t("account.title") },
+    { id: "appearance", label: t("appearance.title") },
     { id: "connections", label: t("connections.title") },
     { id: "password", label: t("password.label") },
     { id: "username", label: t("username.title") },
@@ -262,6 +264,22 @@ function Settings({
               level: record(`level.${level}`),
             }}
           />
+
+          <Panel
+            id="appearance"
+            title={t("appearance.title")}
+            description={t("appearance.description")}
+            className="scroll-mt-20"
+          >
+            <AppearanceSection
+              labels={{
+                darkTheme: t("appearance.darkTheme"),
+                darkThemeHelp: t("appearance.darkThemeHelp"),
+                language: t("appearance.language"),
+                languageHelp: t("appearance.languageHelp"),
+              }}
+            />
+          </Panel>
 
           <Panel
             id="connections"

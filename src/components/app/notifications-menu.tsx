@@ -26,7 +26,7 @@ export function NotificationsMenu({
   markAllLabel,
   items,
 }: {
-  variant?: "icon" | "row";
+  variant?: "icon" | "shell";
   label: string;
   title: string;
   emptyLabel: string;
@@ -41,47 +41,33 @@ export function NotificationsMenu({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        {variant === "row" ? (
-          <button
-            type="button"
-            aria-label={name}
-            className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-shell-muted transition-colors hover:bg-shell-raised hover:text-shell-ink data-[state=open]:bg-shell-raised data-[state=open]:text-shell-ink"
-          >
-            <Bell aria-hidden="true" className="size-5 shrink-0" />
-            <span className="flex-1 text-left">{label}</span>
-            {unread > 0 ? (
-              <Badge
-                aria-hidden="true"
-                className="tabular min-w-6 px-1.5 py-0 leading-5"
-              >
-                {unread}
-              </Badge>
-            ) : null}
-          </button>
-        ) : (
-          <button
-            type="button"
-            aria-label={name}
-            className="relative inline-grid size-11 place-items-center rounded-full border border-border bg-surface text-ink transition-colors hover:border-primary hover:text-primary-ink data-[state=open]:border-primary"
-          >
-            <Bell aria-hidden="true" className="size-4" />
-            {unread > 0 ? (
-              <Badge
-                aria-hidden="true"
-                className="tabular absolute -top-1 -right-1 min-w-5 px-1.5 py-0 leading-5 font-bold"
-              >
-                {unread}
-              </Badge>
-            ) : null}
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label={name}
+          className={cn(
+            "relative inline-grid size-11 shrink-0 place-items-center rounded-full border transition-colors",
+            variant === "shell"
+              ? "border-shell-line bg-shell-raised/60 text-shell-muted hover:bg-shell-raised hover:text-shell-ink data-[state=open]:bg-shell-raised data-[state=open]:text-shell-ink"
+              : "border-border bg-surface text-ink hover:border-primary hover:text-primary-ink data-[state=open]:border-primary",
+          )}
+        >
+          <Bell aria-hidden="true" className="size-4" />
+          {unread > 0 ? (
+            <Badge
+              aria-hidden="true"
+              className="tabular absolute -top-1 -right-1 min-w-5 px-1.5 py-0 leading-5 font-bold"
+            >
+              {unread}
+            </Badge>
+          ) : null}
+        </button>
       </PopoverTrigger>
 
       <PopoverContent
         aria-label={title}
-        side={variant === "row" ? "right" : "bottom"}
-        align={variant === "row" ? "end" : "end"}
-        sideOffset={variant === "row" ? 12 : 8}
+        side="bottom"
+        align="end"
+        sideOffset={8}
         className="w-80 overflow-hidden p-0"
       >
         <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">

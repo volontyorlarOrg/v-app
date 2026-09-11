@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a navy sidebar with three sections that carries every control, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, three sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -146,9 +146,13 @@ components:
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
 a navy sidebar that names three sections — dashboard, opportunities,
-leaderboard — and holds every control — the user card, notifications, the
-theme switch, sign out — and a flat workspace carrying panels of content, with
-no top bar between them. Anything that belongs to a section is a tab under
+leaderboard — at the top and the account — who you are, profile, settings,
+sign out — at the foot, and a flat workspace carrying panels of content, with
+no top bar between them. Every entry in the sidebar is a plain link: nothing
+in it expands, and the only tray is the notification bell beside the lockup.
+What used to hide inside the user card now has a place — profile and settings
+are links at the foot, the theme switch and the interface language are a panel
+on `/settings`. Anything that belongs to a section is a tab under
 that section's header, never a fourth sidebar entry. It shares every
 token, both typefaces, the two brand colours and their rules, the theme and the
 motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
@@ -165,9 +169,10 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 16.5rem navy sidebar (`shell`) with three sections and no top bar on
+- A 16.5rem navy sidebar (`shell`) with three sections at the top, the
+  identity card and the account links at the foot, and no top bar on
   desktop; a 56px header and a four-tab bar (dashboard, opportunities,
-  leaderboard, profile) on a phone. The active section sits on
+  leaderboard, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
   `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
   after dark. The workspace is `surface-sunk` under two faint radial washes
   (blue top-right, orange bottom-left), the panels are `surface`.
@@ -199,8 +204,8 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup, the user card (opens the account menu), the three sections, then notifications, the theme switch and sign out as rows | Absent                                                                    |
-| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, theme switch, bell, avatar (account menu) |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card, profile, settings and sign out — all plain links | Absent                                                                    |
+| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: profile, settings, sign out) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
 
@@ -239,7 +244,7 @@ things the institution did.
 
 | Surface                                                               | Treatment                          |
 | --------------------------------------------------------------------- | ---------------------------------- |
-| The level in the sidebar user card, the dashboard tile and the record | `text-accent-ink`                  |
+| The level in the sidebar identity card, the dashboard tile and the record | `text-accent-ink`                  |
 | Events completed, hours, reliability on the record                    | `text-accent-ink` at figure size   |
 | Reached nodes and labels on the level rail                            | `bg-accent` / `text-accent-ink`    |
 | The "accepted" chip and the "attended" outcome                        | `border-accent/50 text-accent-ink` |

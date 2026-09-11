@@ -8,6 +8,12 @@ async function isMobile(page: Page) {
   return (page.viewportSize()?.width ?? 1280) < 1024;
 }
 
+async function shellIdentity(page: Page, name: string) {
+  return (await isMobile(page))
+    ? page.getByRole("button", { name: new RegExp(`Account menu: ${name}`) })
+    : page.getByRole("complementary").getByText(name, { exact: true });
+}
+
 async function signIn(page: Page, locale = "en") {
   await page.goto(`/api/auth/telegram/start?locale=${locale}`);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
@@ -569,19 +575,34 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the sidebar carries notifications, the theme and sign out; the phone header the same", async ({
+  test("the sidebar carries notifications, a flat account group and sign out; the phone header its menu", async ({
     page,
   }) => {
     const mobile = await isMobile(page);
     await expect(page.getByRole("button", { name: /^Notifications/ })).toBeVisible();
-    await expect(page.getByRole("switch", { name: "Dark theme" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Account menu/ })).toBeVisible();
-    if (!mobile) {
-      await expect(
-        page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-      ).toHaveCount(3);
-      await expect(page.getByRole("banner")).toHaveCount(0);
+    await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
+    if (mobile) {
+      await expect(page.getByRole("button", { name: /Account menu/ })).toBeVisible();
+      return;
     }
+
+    const sidebar = page.getByRole("complementary");
+    await expect(
+      page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
+    ).toHaveCount(3);
+    await expect(page.getByRole("banner")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
+
+    const account = page.getByRole("navigation", { name: "Account" });
+    await expect(account.getByRole("link", { name: "Profile" })).toHaveAttribute(
+      "href",
+      "/en/profile",
+    );
+    await expect(account.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/en/settings",
+    );
+    await expect(sidebar.getByRole("button", { name: "Sign out" })).toBeVisible();
   });
 
   test("the notifications menu shows the backend's messages and marks them read", async ({
@@ -609,22 +630,25 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the account menu reaches the profile and the account, and really signs out", async ({
+  test("the profile and the account are one click away, and sign out really signs out", async ({
     page,
   }) => {
     const mobile = await isMobile(page);
-    await page.getByRole("button", { name: /Account menu/ }).click();
-    const menu = page.getByRole("navigation", { name: "Account menu" });
-    await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
-    await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
-      "href",
-      "/en/settings",
-    );
     if (mobile) {
+      await page.getByRole("button", { name: /Account menu/ }).click();
+      const menu = page.getByRole("navigation", { name: "Account menu" });
+      await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
+      await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
+        "href",
+        "/en/settings",
+      );
       await menu.getByRole("button", { name: "Sign out" }).click();
     } else {
-      await expect(menu.getByRole("button", { name: "Sign out" })).toBeHidden();
-      await page.keyboard.press("Escape");
+      const account = page.getByRole("navigation", { name: "Account" });
+      await account.getByRole("link", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/\/en\/settings$/);
+      await account.getByRole("link", { name: "Profile" }).click();
+      await expect(page).toHaveURL(/\/en\/profile$/);
       await page.getByRole("button", { name: "Sign out" }).click();
     }
     await expect(page).toHaveURL(/\/en\/login$/);
@@ -633,11 +657,43 @@ test.describe("the panel", () => {
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
-  test("the theme switch flips the document theme", async ({ page }) => {
-    const toggle = page.getByRole("switch", { name: "Dark theme" });
+  test("the theme switch lives in settings and flips the document theme", async ({
+    page,
+  }) => {
+    await page.goto("/en/settings");
+    const appearance = page.getByRole("region", { name: "Appearance" });
+    const toggle = appearance.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await toggle.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
+  });
+
+  test.describe("on a browser that prefers dark", () => {
+    test.use({ colorScheme: "dark" });
+
+    test("the switch reads on before anyone has chosen a theme", async ({ page }) => {
+      await page.context().clearCookies({ name: "theme" });
+      await page.goto("/en/settings");
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      await expect(
+        page
+          .getByRole("region", { name: "Appearance" })
+          .getByRole("switch", { name: "Dark theme" }),
+      ).toHaveAttribute("aria-checked", "true");
+    });
+  });
+
+  test("settings carries the interface language, and switching it keeps the page", async ({
+    page,
+  }) => {
+    await page.goto("/en/settings");
+    const appearance = page.getByRole("region", { name: "Appearance" });
+    await expect(
+      appearance.getByRole("link", { name: "English", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    await appearance.getByRole("link", { name: "O‘zbekcha", exact: true }).click();
+    await expect(page).toHaveURL(/\/uz\/settings$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "uz");
   });
 
   test("nothing overflows horizontally", async ({ page }) => {
@@ -945,9 +1001,16 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("region", { name: "Ways to sign in" })).toHaveCount(0);
   });
 
-  test("the theme is switched from the top bar", async ({ page }) => {
+  test("the theme is switched from settings, not from the profile", async ({
+    page,
+  }) => {
     await page.goto("/en/profile");
-    const dark = page.getByRole("switch", { name: "Dark theme" });
+    await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
+
+    await page.goto("/en/settings");
+    const dark = page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await dark.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
@@ -1194,18 +1257,14 @@ test.describe("account connections and merges", () => {
   test("approving replaces this browser with the account that asked", async ({
     page,
   }) => {
-    await expect(
-      page.getByRole("button", { name: /Account menu: Dilnoza Karimova/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Dilnoza Karimova")).toBeVisible();
 
     await requestRow(page, "Waiting for your approval", "Google")
       .getByRole("button", { name: "Approve" })
       .click();
 
     await expect(page).toHaveURL(/\/en\/settings$/);
-    await expect(
-      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
     await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for your approval" }),
@@ -1255,9 +1314,7 @@ test.describe("account connections and merges", () => {
     await expect(reject).toBeDisabled();
 
     await expect(page).toHaveURL(/\/en\/settings$/);
-    await expect(
-      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
   });
 
   test("works from the keyboard, at both themes, and with reduced motion", async ({
@@ -1274,7 +1331,10 @@ test.describe("account connections and merges", () => {
     await expect(approve).toBeFocused();
 
     const before = await page.locator("html").getAttribute("data-theme");
-    await page.getByRole("switch", { name: "Dark theme" }).first().click();
+    await page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("switch", { name: "Dark theme" })
+      .click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
     await expect(approve).toBeVisible();
     expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
