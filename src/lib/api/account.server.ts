@@ -134,11 +134,10 @@ export function cancelMergeRequest(id: string) {
   });
 }
 
-export function endBackendSession(accessToken: string, refreshToken?: string) {
+export function endBackendSession(accessToken: string) {
   return api("/auth/logout", {
     method: "POST",
     accessToken,
-    body: refreshToken ? { refreshToken } : {},
     cache: "no-store",
     timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
   });
