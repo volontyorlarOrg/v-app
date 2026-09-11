@@ -14,12 +14,14 @@ export function ApplicationTimeline({
   const entries = applicationTimeline(application);
 
   return (
-    <ol className="grid gap-4 sm:grid-cols-3">
+    <ol className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {entries.map((entry) => {
         const decidedDone = entry.step === "decided" && entry.state === "done";
         const label = decidedDone
           ? t(`status.${application.status}`)
-          : t(`detail.steps.${entry.step}`);
+          : entry.step === "attendance" && entry.state === "done"
+            ? t(`attendance.outcome.${application.attendance?.outcome}`)
+            : t(`detail.steps.${entry.step}`);
         const achievement = decidedDone && application.status === "accepted";
 
         return (

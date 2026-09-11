@@ -630,8 +630,76 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Publish an opportunity */
+        /** Approve and publish a pending opportunity */
         post: operations["AdminOpportunitiesController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/opportunities/{id}/submit-for-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit an opportunity for approval */
+        post: operations["AdminOpportunitiesController_submitForApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/opportunities/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve and publish a pending opportunity */
+        post: operations["AdminOpportunitiesController_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/opportunities/{id}/request-changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Return a pending opportunity for changes */
+        post: operations["AdminOpportunitiesController_requestChanges"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/opportunities/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Permanently reject a pending opportunity */
+        post: operations["AdminOpportunitiesController_reject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -696,8 +764,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Publish an owned opportunity */
+        /** Submit an owned opportunity for approval */
         post: operations["StaffOpportunitiesController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/opportunities/{id}/submit-for-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit an owned opportunity for approval */
+        post: operations["StaffOpportunitiesController_submitForApproval"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1056,6 +1141,23 @@ export interface paths {
         get?: never;
         /** Resolve attendance for an owned vacancy */
         put: operations["StaffAttendanceController_resolve"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/opportunities/{id}/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Resolve attendance for an owned vacancy in bulk */
+        put: operations["StaffOpportunityAttendanceController_resolve"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1488,16 +1590,6 @@ export interface components {
             verified?: boolean;
         };
         Object: Record<string, never>;
-        ApplicationQuestionDto: {
-            prompt: string;
-            helpText?: string;
-            /** @enum {string} */
-            type: "short_text" | "long_text" | "single_select" | "multi_select";
-            /** @default true */
-            required: boolean;
-            maxLength?: number;
-            options?: Record<string, never>[];
-        };
         CreateOpportunityDto: {
             slug: string;
             title: string;
@@ -1520,10 +1612,10 @@ export interface components {
             locationName?: string;
             imageUrl?: string;
             capacity?: number;
+            estimatedTotalHours?: number;
             /** @default false */
             sourcedByYvc: boolean;
             organizationId: string;
-            questions?: components["schemas"]["ApplicationQuestionDto"][];
         };
         UpdateOpportunityDto: {
             slug?: string;
@@ -1547,10 +1639,13 @@ export interface components {
             locationName?: string;
             imageUrl?: string;
             capacity?: number;
+            estimatedTotalHours?: number;
             /** @default false */
             sourcedByYvc: boolean;
             organizationId?: string;
-            questions?: components["schemas"]["ApplicationQuestionDto"][];
+        };
+        OpportunityApprovalNoteDto: {
+            note: string;
         };
         StartApplicationDto: {
             opportunityId: string;
@@ -1578,6 +1673,15 @@ export interface components {
             /** @enum {string} */
             outcome: "attended" | "excused" | "cancelled" | "awaiting_confirmation";
             confirmedHours?: number;
+        };
+        AttendanceResolutionDto: {
+            /** @enum {string} */
+            outcome: "attended" | "excused" | "cancelled" | "awaiting_confirmation";
+            confirmedHours?: number;
+            applicationId: string;
+        };
+        ResolveVacancyAttendanceDto: {
+            records: components["schemas"]["AttendanceResolutionDto"][];
         };
         ReplacePasswordDto: {
             temporaryPassword: string;
@@ -2583,6 +2687,90 @@ export interface operations {
             };
         };
     };
+    AdminOpportunitiesController_submitForApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminOpportunitiesController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminOpportunitiesController_requestChanges: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpportunityApprovalNoteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminOpportunitiesController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpportunityApprovalNoteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AdminOpportunitiesController_archive: {
         parameters: {
             query?: never;
@@ -2683,6 +2871,25 @@ export interface operations {
         };
     };
     StaffOpportunitiesController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StaffOpportunitiesController_submitForApproval: {
         parameters: {
             query?: never;
             header?: never;
@@ -3193,6 +3400,29 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ResolveAttendanceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StaffOpportunityAttendanceController_resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveVacancyAttendanceDto"];
             };
         };
         responses: {

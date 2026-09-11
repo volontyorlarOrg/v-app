@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState, useId, useMemo, useRef, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
-import { useActionOutcome, useValidatedSubmit } from "@/hooks/use-action-form";
+import { useValidatedSubmit } from "@/hooks/use-action-form";
 import { idleResult, type ActionResult } from "@/lib/api/action-result";
 import { saveDraftAction, submitApplicationAction } from "@/lib/applications/actions";
 import {
@@ -81,10 +80,6 @@ export function AnswersForm({
   const submitWith = useValidatedSubmit(form, formRef);
   const busy = saving || submitting;
   const latest = submitResult.status !== "idle" ? submitResult : saveResult;
-
-  useActionOutcome(saving, saveResult, (settled) => {
-    if (settled.status === "ok") toast.success(labels.savedDraft);
-  });
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -229,10 +224,14 @@ export function AnswersForm({
         </Button>
       </div>
 
+      {saveResult.status === "ok" ? (
+        <ActionStatus tone="done">{labels.savedDraft}</ActionStatus>
+      ) : null}
+
       {latest.status === "error" ? (
         <ActionStatus tone="error">
           {labels.errors[latest.code] ?? labels.fallback}
-          {latest.code === "profileRequired" ? (
+          {latest.code === "profileRequired" || latest.code === "profileIncomplete" ? (
             <>
               {" "}
               <a
