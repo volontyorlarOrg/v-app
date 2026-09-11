@@ -47,15 +47,17 @@ HTTP (the Playwright suite) still receives its own cookie.
 
 ### The session cookie
 
-`volontyorlar_session` holds the backend's access token, its expiry, the
-refresh token, the user id, roles and display name, encrypted as a JWE
-(`dir` + `A256GCM`, the key being SHA-256 of `VOLONTYORLAR_SESSION_SECRET`).
-It is `httpOnly`, `sameSite=lax`, `path=/`, `secure` in production, and lives
-90 days — but the backend's `JWT_REFRESH_TTL_SECONDS` is the real ceiling: once
-the refresh token behind the cookie expires, rotation fails and the volunteer
-signs in again however long the cookie itself had left. No token is readable by
-JavaScript, appears in a URL, or reaches browser storage. A tampered or wrongly-keyed cookie decrypts to `null` and is
-treated as signed out rather than trusted.
+`volontyorlar_session` holds the backend's session token, its expiry, the user
+id, roles and display name, encrypted as a JWE (`dir` + `A256GCM`, the key being
+SHA-256 of `VOLONTYORLAR_SESSION_SECRET`). It is `httpOnly`, `sameSite=lax`,
+`path=/`, `secure` in production, and lives three days — the same three days as
+the token inside it, set from the backend's `SESSION_TTL_SECONDS`. The two
+lifetimes are deliberately equal: a cookie outliving its token would leave a
+volunteer looking signed in while every request came back 401. There is one
+token and nothing to renew, so a session ends exactly once, when it runs out.
+No token is readable by JavaScript, appears in a URL, or reaches browser
+storage. A tampered or wrongly-keyed cookie decrypts to `null` and is treated as
+signed out rather than trusted.
 
 `src/proxy.ts` reads it on every app request and enforces the `guard` each
 route declares in `src/lib/routing/routes.ts`: a signed-out visitor to a
@@ -65,16 +67,26 @@ to an auth route is redirected to the dashboard, and signed-in responses carry
 again as defence in depth. `next` is filtered through `safeReturnPath`, which
 rejects anything that could leave this origin.
 
-An access token inside its expiry skew is rotated in the proxy, on document
-navigations only, and the new cookie is written on that response. A refresh
-that fails clears the cookie and sends the volunteer to sign in again.
-Rotation is single-use at the backend, so two navigations racing across the
-skew window can spend the same refresh token and sign the volunteer out early;
-the window is narrow and the cost is one extra sign-in.
+A token past its expiry is the end of the session: the proxy clears the cookie
+and redirects to `/{locale}/login?next=…`, and `authed()` does the same through
+`/api/auth/session/expired` when the backend answers `unauthenticated` — which
+it also does for a session revoked by signing out elsewhere. Nothing is
+rotated and nothing is retried, so there is no race to lose and no way to be
+signed out early.
+
+The exception is a cookie written before this change, which still carries a
+refresh token. The proxy spends it once, on a document navigation, for a
+full-length session token and stores no replacement (`isLegacySession` and
+`upgradeLegacySession`). That is the only remaining caller of
+`POST /auth/refresh`, and it exists so the switch to one token did not sign
+out everyone at once. Once those cookies have aged out, it and `refresh.ts`
+can go.
 
 Sign-out is a Server Action, not a link, so it cannot be triggered by a
-prefetch or a cross-site request. It revokes the refresh token at the backend
-first, then clears the cookie, then redirects — and works without JavaScript.
+prefetch or a cross-site request. It calls `POST /auth/logout` with the session
+token, which revokes that session at the backend so the token stops working at
+once rather than staying valid for the rest of its three days; then it clears
+the cookie, then redirects — and works without JavaScript.
 
 Google's handoff is the same shape with one difference. `/api/auth/google/start`
 asks `v-backend` for a browser-bound challenge, keeps its `state` in
