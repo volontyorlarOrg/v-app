@@ -6,9 +6,8 @@ import type { z } from "zod";
 
 import { api, type ApiRequest } from "@/lib/api/client.server";
 import { isApiError } from "@/lib/api/errors";
-import { refreshSession } from "@/lib/auth/refresh";
-import { isAccessTokenExpiring, type SessionPayload } from "@/lib/auth/session";
-import { canWriteSession, getSession, writeSession } from "@/lib/auth/session.server";
+import { type SessionPayload } from "@/lib/auth/session";
+import { getSession } from "@/lib/auth/session.server";
 
 export const SESSION_EXPIRED_PATH = "/api/auth/session/expired";
 
@@ -27,16 +26,6 @@ export async function requireSession(): Promise<SessionPayload> {
   return session as SessionPayload;
 }
 
-async function rotate(session: SessionPayload): Promise<SessionPayload | null> {
-  if (!session.refreshToken) return null;
-  if (!(await canWriteSession())) return null;
-
-  const rotated = await refreshSession(session.refreshToken);
-  if (!rotated) return null;
-
-  return (await writeSession(rotated)) ? rotated : null;
-}
-
 type AuthedRequest<TSchema extends z.ZodType | undefined> = Omit<
   ApiRequest<TSchema>,
   "accessToken" | "cache"
@@ -50,11 +39,7 @@ export async function authed<TSchema extends z.ZodType | undefined = undefined>(
   path: string,
   init: AuthedRequest<TSchema> = {},
 ): Promise<AuthedResult<TSchema>> {
-  let session = await requireSession();
-
-  if (isAccessTokenExpiring(session)) {
-    session = (await rotate(session)) ?? session;
-  }
+  const session = await requireSession();
 
   try {
     return (await api(path, {
@@ -65,14 +50,7 @@ export async function authed<TSchema extends z.ZodType | undefined = undefined>(
   } catch (error) {
     if (!isApiError(error) || error.code !== "unauthenticated") throw error;
 
-    const rotated = await rotate(session);
-    if (!rotated) await endSession();
-
-    return (await api(path, {
-      ...init,
-      accessToken: (rotated as SessionPayload).accessToken,
-      cache: "no-store",
-    })) as AuthedResult<TSchema>;
+    return endSession();
   }
 }
 
