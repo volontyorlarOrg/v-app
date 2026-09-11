@@ -11,7 +11,7 @@ import { googleClientId, isAuthConfigured } from "@/lib/auth/config";
 import { googleAuthorizationUrl } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
-import { applyRotation, getSession, rotatedSession } from "@/lib/auth/session.server";
+import { getSession } from "@/lib/auth/session.server";
 import { hasVerifiedSiteOrigin, siteOrigin } from "@/lib/seo/origin";
 import { localePath } from "@/lib/routing/routes";
 
@@ -32,17 +32,13 @@ export async function GET(request: NextRequest) {
     return relativeRedirect(withQuery(settingsPath, { connect: "unavailable" }));
   }
 
-  const rotated = await rotatedSession(session);
   const unavailable = () =>
-    applyRotation(
-      relativeRedirect(withQuery(settingsPath, { connect: "unavailable" })),
-      rotated,
-    );
+    relativeRedirect(withQuery(settingsPath, { connect: "unavailable" }));
 
   let challenge;
 
   try {
-    challenge = await challengeGoogleConnection((rotated ?? session).accessToken);
+    challenge = await challengeGoogleConnection(session.accessToken);
   } catch (error) {
     console.error("[google-connect] challenge request failed:", error);
     return unavailable();
@@ -63,5 +59,5 @@ export async function GET(request: NextRequest) {
   const handoff = handoffCookieOptions({ crossSite: true });
   response.cookies.set(CONNECT_GOOGLE_STATE_COOKIE_NAME, challenge.state, handoff);
   response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, locale, handoff);
-  return applyRotation(response, rotated);
+  return response;
 }

@@ -106,10 +106,7 @@ export async function signOut(formData: FormData) {
 
   if (session) {
     try {
-      await authedApi("/auth/logout", session.accessToken, {
-        method: "POST",
-        body: session.refreshToken ? { refreshToken: session.refreshToken } : {},
-      });
+      await authedApi("/auth/logout", session.accessToken, { method: "POST" });
     } catch (error) {
       console.error(
         "[auth] backend logout failed; clearing the local session anyway",

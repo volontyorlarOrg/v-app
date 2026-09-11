@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  SESSION_MAX_AGE_SECONDS,
   decryptSession,
   encryptSession,
   isAccessTokenExpired,
@@ -131,6 +132,23 @@ describe("toSessionPayload", () => {
         roles: ["admin"],
       }).roles,
     ).toEqual(["admin"]);
+  });
+
+  it("stores no refresh token, even when a backend still sends one", () => {
+    expect(
+      toSessionPayload({
+        userId: "user-id",
+        accessToken: "access-token",
+        refreshToken: "refresh-token",
+      }),
+    ).not.toHaveProperty("refreshToken");
+  });
+});
+
+describe("sessionCookieOptions", () => {
+  it("expires the cookie with the token it carries, after three days", () => {
+    expect(SESSION_MAX_AGE_SECONDS).toBe(60 * 60 * 24 * 3);
+    expect(sessionCookieOptions().maxAge).toBe(SESSION_MAX_AGE_SECONDS);
   });
 });
 
