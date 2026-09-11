@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Link } from "@/i18n/navigation";
 import type { ProfileCompletion } from "@/lib/profile/completion";
 import type { ProfileLink } from "@/lib/profile/links";
-import { navHref } from "@/lib/routing/routes";
+import { historyHref } from "@/lib/routing/routes";
 
 export type IdentityStat = {
   id: string;
@@ -64,22 +64,41 @@ export function ProfileIdentity({
   return (
     <section
       aria-labelledby="identity-name"
-      className="enter-rise rounded-xl border border-border bg-surface"
+      className="enter-rise overflow-hidden rounded-xl border border-border bg-surface"
     >
-      <div className="px-5 pt-6 pb-5 sm:px-7 sm:pt-7">
-        <div className="flex items-center gap-4 sm:gap-6">
-          <Avatar
-            aria-hidden="true"
-            className="size-16 shrink-0 ring-1 ring-border sm:size-24"
-          >
-            <AvatarFallback className="text-xl sm:text-2xl">{initials}</AvatarFallback>
-          </Avatar>
-          <h1
-            id="identity-name"
-            className="min-w-0 flex-1 text-3xl tracking-[-0.025em] text-balance sm:text-4xl"
-          >
-            {name}
-          </h1>
+      <div aria-hidden="true" className="identity-cover h-24 sm:h-32" />
+
+      <div className="-mt-10 px-5 sm:-mt-12 sm:px-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex min-w-0 items-end gap-4">
+            <Avatar
+              aria-hidden="true"
+              className="size-20 shrink-0 ring-4 ring-surface sm:size-24"
+            >
+              <AvatarFallback className="text-2xl sm:text-3xl">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 pb-1">
+              <h1
+                id="identity-name"
+                className="text-3xl tracking-[-0.025em] text-balance sm:text-4xl"
+              >
+                {name}
+              </h1>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:shrink-0 sm:pb-1">
+            <a href="#edit" className={buttonClass({ size: "sm" })}>
+              {labels.edit}
+            </a>
+            <Link
+              href={historyHref()}
+              className={buttonClass({ variant: "outline", size: "sm" })}
+            >
+              {labels.record}
+            </Link>
+          </div>
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
@@ -92,7 +111,9 @@ export function ProfileIdentity({
           ) : null}
           {handle || labels.joined ? (
             <p className="text-ink-muted">
-              {handle ? <span className="font-semibold">@{handle}</span> : null}
+              {handle ? (
+                <span className="font-semibold text-ink">@{handle}</span>
+              ) : null}
               {handle && labels.joined ? <span aria-hidden="true"> · </span> : null}
               {labels.joined}
             </p>
@@ -100,7 +121,7 @@ export function ProfileIdentity({
         </div>
       </div>
 
-      <div className="border-y border-border px-5 py-4 sm:px-7">
+      <div className="mt-5 border-y border-border bg-surface-sunk/60 px-5 py-4 sm:px-7">
         <dl className="grid grid-cols-3 gap-x-4 sm:max-w-lg">
           {stats.map((stat) => (
             <div key={stat.id} className="grid min-w-0">
@@ -132,14 +153,14 @@ export function ProfileIdentity({
               const Icon = FACT_ICONS[fact.id];
               return (
                 <li key={fact.id} className="flex items-center gap-2">
-                  <Icon aria-hidden="true" className="size-4 shrink-0" />
+                  <Icon aria-hidden="true" className="size-4 shrink-0 text-primary" />
                   <span className="min-w-0 truncate">{fact.value}</span>
                 </li>
               );
             })}
             {links.map((link) => (
               <li key={link.href} className="flex items-center gap-2">
-                <Link2 aria-hidden="true" className="size-4 shrink-0" />
+                <Link2 aria-hidden="true" className="size-4 shrink-0 text-primary" />
                 <a
                   href={link.href}
                   target="_blank"
@@ -152,18 +173,6 @@ export function ProfileIdentity({
             ))}
           </ul>
         ) : null}
-
-        <div className="mt-1 flex flex-wrap gap-3">
-          <a href="#edit" className={buttonClass({ variant: "outline", size: "sm" })}>
-            {labels.edit}
-          </a>
-          <Link
-            href={navHref("record")}
-            className={buttonClass({ variant: "outline", size: "sm" })}
-          >
-            {labels.record}
-          </Link>
-        </div>
       </div>
 
       {completion.complete ? null : (

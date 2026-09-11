@@ -145,6 +145,58 @@ describe("structural tokens", () => {
   });
 });
 
+describe("the shell", () => {
+  const SHELL_SURFACES = ["shell", "shell-raised"];
+
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the light shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
+        expect(
+          contrast(token(foreground), token(surface)),
+          `${foreground} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    },
+  );
+
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the dark shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
+        expect(
+          contrast(darkToken(foreground), darkToken(surface)),
+          `${foreground} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    },
+  );
+
+  it("is the institution's blue as a field, never a neutral grey", () => {
+    for (const read of [token, darkToken]) {
+      const shell = read("shell");
+      const [r = 0, g = 0, b = 0] = [1, 3, 5].map((offset) =>
+        parseInt(shell.slice(offset, offset + 2), 16),
+      );
+      expect(b).toBeGreaterThan(r);
+      expect(b).toBeGreaterThan(g);
+      expect(relativeLuminance(shell)).toBeLessThan(0.03);
+    }
+  });
+
+  it("keeps the active section legible on the shell's pale pill", () => {
+    expect(
+      contrast(token("primary-deep"), token("primary-muted")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+    expect(contrast(token("primary-muted"), token("shell"))).toBeGreaterThanOrEqual(
+      AA_LARGE,
+    );
+    expect(
+      contrast(darkToken("primary-muted"), darkToken("shell")),
+    ).toBeGreaterThanOrEqual(AA_LARGE);
+  });
+});
+
 describe("the dark theme", () => {
   it("is switched by a data attribute, so the same tokens carry both themes", () => {
     expect(DARK_START).toBeGreaterThan(0);

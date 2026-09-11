@@ -11,14 +11,9 @@ import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import { mergeNotificationName } from "@/lib/notifications/types";
+import { initialsOf } from "@/lib/profile/initials";
 import { levelFor } from "@/lib/record/levels";
 import { localePath, navHref } from "@/lib/routing/routes";
-
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
-  const letters = parts.map((part) => [...part][0] ?? "").join("");
-  return letters ? letters.toLocaleUpperCase() : "";
-}
 
 export const dynamic = "force-dynamic";
 
@@ -86,6 +81,7 @@ export default async function VolunteerLayout({
         name,
         initials: initialsOf(name),
         level: record(`level.${levelFor(volunteerRecord.counts)}`),
+        handle: me.username,
       }}
       notifications={notifications}
       signOutLocale={locale}

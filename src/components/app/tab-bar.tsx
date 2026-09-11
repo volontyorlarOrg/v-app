@@ -19,7 +19,7 @@ export function TabBar({
   return (
     <nav
       aria-label={label}
-      className="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface lg:hidden"
+      className="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur-sm lg:hidden"
     >
       <ul
         className="grid"
@@ -34,11 +34,22 @@ export function TabBar({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-semibold transition-colors",
+                  "flex min-h-14 flex-col items-center justify-center gap-0.5 pt-1.5 pb-1 text-xs font-semibold transition-colors",
                   active ? "text-primary-ink" : "text-ink-muted hover:text-ink",
                 )}
               >
-                <Icon aria-hidden="true" className="size-5" />
+                <span
+                  className={cn(
+                    "inline-grid h-7 w-12 place-items-center rounded-full transition-colors",
+                    active && "bg-primary-muted text-primary-deep",
+                  )}
+                >
+                  <Icon
+                    aria-hidden="true"
+                    className="size-5"
+                    strokeWidth={active ? 2.25 : 2}
+                  />
+                </span>
                 <span className="max-w-full truncate px-1">{item.label}</span>
               </Link>
             </li>

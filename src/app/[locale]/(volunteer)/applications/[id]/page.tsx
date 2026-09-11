@@ -101,7 +101,9 @@ function Application({
   const opportunitiesT = useTranslations("opportunities");
   const locale = useLocale() as Locale;
 
-  const questionById = new Map((questions ?? []).map((question) => [question.id, question]));
+  const questionById = new Map(
+    (questions ?? []).map((question) => [question.id, question]),
+  );
   const draft = isEditable(application.status);
   const answers = Object.fromEntries(
     application.answers
@@ -115,7 +117,9 @@ function Application({
     ...question,
     help: [
       question.helpText,
-      question.required ? opportunitiesT("detail.required") : opportunitiesT("detail.optional"),
+      question.required
+        ? opportunitiesT("detail.required")
+        : opportunitiesT("detail.optional"),
       question.maxLength
         ? opportunitiesT("detail.maxLength", { count: question.maxLength })
         : null,
@@ -133,7 +137,9 @@ function Application({
     {
       key: "region",
       label: profileT("fields.region"),
-      value: isRegion(snapshot.region) ? opportunitiesT(`regions.${snapshot.region}`) : "—",
+      value: isRegion(snapshot.region)
+        ? opportunitiesT(`regions.${snapshot.region}`)
+        : "—",
     },
     {
       key: "school",
@@ -161,7 +167,6 @@ function Application({
 
       <PageHeader
         className="mt-3"
-        eyebrow={t("detail.eyebrow")}
         title={application.opportunity.title}
         description={application.opportunity.organization.name}
         actions={<ApplicationStatusChip status={application.status} />}

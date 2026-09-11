@@ -47,6 +47,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/no-essays-in-browser-storage.md` — why long answers never touch
   `localStorage`
 - `decisions/why-no-cache-components.md` — why PPR is not enabled
+- `decisions/the-sidebar-is-the-whole-shell.md` — why the desktop top bar
+  went, the record moved onto the dashboard, the leaderboard gained a podium,
+  and the palette gained a navy shell without changing its brand values
 - `decisions/onboarding-progress-is-a-readable-cookie.md` — why the welcome
   flow's only browser state is a step name in a cookie, and why every answer
   goes straight to the backend
@@ -64,3 +67,5 @@ folder. Never store secrets or unverified external claims.
 - `gotchas/next-typegen-before-typecheck.md` — why `typecheck` runs typegen
 - `gotchas/the-password-toggle-shares-its-label.md` — why Playwright must match
   the password field exactly
+- `gotchas/the-stub-backend-remembers-between-runs.md` — why a reused stub
+  makes the set-first-password smoke test fail on the second run

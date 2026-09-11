@@ -1,5 +1,6 @@
 import { useFormatter, useTranslations } from "next-intl";
 
+import { EmptyState } from "@/components/app/empty-state";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
 import { Link } from "@/i18n/navigation";
@@ -19,12 +20,7 @@ export function ApplicationRows({
   const format = useFormatter();
 
   if (applications.length === 0) {
-    return (
-      <div className="px-5 py-8 text-center">
-        <p className="font-semibold text-ink">{empty.title}</p>
-        <p className="mt-1 text-sm text-ink-muted">{empty.body}</p>
-      </div>
-    );
+    return <EmptyState title={empty.title} body={empty.body} />;
   }
 
   return (
