@@ -21,11 +21,13 @@ function useTheme(): Theme {
 
 export function ThemeToggle({
   label,
+  description,
   variant = "icon",
   className,
 }: {
   label: string;
-  variant?: "icon" | "row";
+  description?: string;
+  variant?: "icon" | "setting";
   className?: string;
 }) {
   const dark = useTheme() === "dark";
@@ -34,27 +36,29 @@ export function ThemeToggle({
     restorePreferences();
   }, []);
 
-  if (variant === "row") {
+  if (variant === "setting") {
     return (
       <SwitchControl
         variant="row"
         checked={dark}
         onCheckedChange={(next) => applyTheme(next ? "dark" : "light")}
         aria-label={label}
-        className={cn(
-          "theme-toggle rounded-lg px-3 text-sm font-semibold text-shell-muted transition-colors hover:bg-shell-raised hover:text-shell-ink",
-          className,
-        )}
+        className={cn("theme-toggle", className)}
       >
         <span className="flex min-w-0 items-center gap-3">
           <span
             aria-hidden="true"
-            className="inline-grid size-5 shrink-0 place-items-center"
+            className="inline-grid size-5 shrink-0 place-items-center text-primary"
           >
             <Sun className="theme-toggle-icon theme-toggle-sun size-5" />
             <Moon className="theme-toggle-icon theme-toggle-moon size-5" />
           </span>
-          <span className="truncate">{label}</span>
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-ink">{label}</span>
+            {description ? (
+              <span className="mt-0.5 block text-sm text-ink-muted">{description}</span>
+            ) : null}
+          </span>
         </span>
       </SwitchControl>
     );

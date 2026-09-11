@@ -18,13 +18,16 @@ two disagree, check whether `v-web` moved first; the design system is sourced
 from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
-navy sidebar that carries everything on desktop — the lockup, the user card
-that opens the account menu, three sections (dashboard, opportunities,
-leaderboard), notifications, the theme switch and sign out — with no top bar;
-a slim header and a four-destination tab bar on a phone; and panels of content
-on a flat workspace. Applications and saved items are tabs inside the
-opportunities section, not sections of their own. Only the sign-in pages keep
-the marketing site's whiteboard ground. See [`DESIGN.md`](DESIGN.md).
+navy sidebar that carries everything on desktop — the lockup and the
+notification bell, three sections (dashboard, opportunities, leaderboard), and
+at the foot the identity card with profile, settings and sign out — with no top
+bar; a slim header and a four-destination tab bar on a phone; and panels of
+content on a flat workspace. **Every sidebar entry is a plain link — nothing in
+it collapses**, and the bell is the only tray. The theme switch and the
+interface language are a panel on `/settings`, not shell controls.
+Applications and saved items are tabs inside the opportunities section, not
+sections of their own. Only the sign-in pages keep the marketing site's
+whiteboard ground. See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
 
@@ -128,16 +131,18 @@ followed by the contact details and the completeness meter, all read-only.
 Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
 and the welcome flow's "finish on your profile" all lead there, and a saved
 form returns to `/profile`. The profile carries nothing else: the
-account lives on `/settings`, the theme and sign-out live in the sidebar (the
-phone header on a phone), the interface language in the account menu, and
-there is no notification, privacy or appearance group anywhere in the app.
+account lives on `/settings`, sign-out at the foot of the sidebar (in the phone
+header's account menu on a phone), and the theme and the interface language in
+the **Appearance** panel on `/settings` — the one place either is changed
+inside the app.
 **The record lives on the dashboard.** `/record` redirects to
 `/dashboard#history`; the dashboard carries the four figures, the level rail
 and the participation history, and the leaderboard is where "Your progress"
 leads. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
-privacy,appearance}` are unused and are kept only because that decision is
-reversible.
+privacy}` are unused and are kept only because that decision is
+reversible. `settings.appearance` is live: it labels the theme switch and the
+language picker on `/settings`.
 
 ## Repository boundary
 
@@ -246,8 +251,10 @@ docs/                           -> stable project documentation and the plan
   comma `ʻ` (U+02BB), Russian uses Cyrillic, and a test enforces key and ICU
   argument parity.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
-  the tab bar, the account menu, the proxy's `guard` and the tests all read
-  from it. A route that belongs inside a section names it in `section`, which
+  the tab bar, the phone's account menu, the proxy's `guard` and the tests all
+  read from it. `navGroup` says where in the sidebar a route lands —
+  `"primary"` for the stack under the lockup, `"account"` for the stack at the
+  foot, `null` for a route no navigation surface names. A route that belongs inside a section names it in `section`, which
   is what keeps the sidebar and the tab bar lit on `/applications` and
   `/profile/edit`. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.

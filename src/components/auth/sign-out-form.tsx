@@ -8,17 +8,21 @@ export function SignOutForm({
   label,
   className,
   showIcon = true,
+  iconClassName = "size-4",
 }: {
   locale: string;
   label: string;
   className?: string;
   showIcon?: boolean;
+  iconClassName?: string;
 }) {
   return (
     <form action={signOut} className="contents">
       <input type="hidden" name="locale" value={locale} />
       <button type="submit" className={cn(className)}>
-        {showIcon ? <LogOut aria-hidden="true" className="size-4" /> : null}
+        {showIcon ? (
+          <LogOut aria-hidden="true" className={cn("shrink-0", iconClassName)} />
+        ) : null}
         {label}
       </button>
     </form>
