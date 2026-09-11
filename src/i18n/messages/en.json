@@ -364,7 +364,9 @@
       "steps": {
         "submitted": "Submitted",
         "under_review": "Under review",
-        "decided": "Decision"
+        "decided": "Decision",
+        "event": "Event",
+        "attendance": "Attendance"
       },
       "inProgress": "In progress",
       "pending": "Not yet",
@@ -384,7 +386,33 @@
         "fallback": "Couldn't withdraw. Please try again."
       },
       "reviewerNote": "Note from the organiser",
-      "question": "Question {number}"
+      "question": "Question {number}",
+      "review": {
+        "title": "Check your answers",
+        "description": "This is exactly what the organiser sees. Change anything before you send it.",
+        "change": "Change",
+        "confirm": "I confirm this is correct and the organiser may see it.",
+        "confirmRequired": "Tick the box to confirm before sending."
+      },
+      "receipt": {
+        "title": "Application sent",
+        "body": "The organiser has your profile. You will hear back on this page and in your notifications.",
+        "reference": "Reference {reference}"
+      },
+      "event": {
+        "title": "Where to be",
+        "description": "The public details of the event you were accepted for."
+      },
+      "attendance": {
+        "title": "Attendance",
+        "awaiting": "The organiser has not confirmed who turned up yet.",
+        "beforeEvent": "Attendance is confirmed after the event ends.",
+        "hours": "{hours} h confirmed",
+        "confirmedOn": "Confirmed {date}"
+      },
+      "skills": "Skills",
+      "withdrawClosedResolved": "Attendance has been confirmed, so this application can no longer be withdrawn.",
+      "withdrawClosedStarted": "The event has started, so this application can no longer be withdrawn."
     },
     "form": {
       "save": "Save draft",
@@ -401,7 +429,21 @@
         "opportunityUnavailable": "This opportunity is no longer taking applications.",
         "invalidAnswers": "Some answers need another look.",
         "applicationNotEditable": "This application can no longer be edited.",
-        "fallback": "That didn't save. Please try again."
+        "fallback": "That didn't save. Please try again.",
+        "profileIncomplete": "Your profile is missing something the organiser needs."
+      }
+    },
+    "gate": {
+      "title": "Complete your profile first",
+      "body": "Organisers read your profile instead of a form. Add: {fields}.",
+      "action": "Go to your profile",
+      "fields": {
+        "fullName": "your full name",
+        "bio": "a short bio",
+        "region": "your region",
+        "school": "your school",
+        "languages": "the languages you speak",
+        "contact": "a phone number or Telegram username"
       }
     }
   },
@@ -441,7 +483,13 @@
       "save": "Save",
       "saved": "Saved",
       "sourced": "Sourced by Volontyorlar",
-      "saveError": "Couldn't save"
+      "saveError": "Couldn't save",
+      "actions": {
+        "apply": "View and apply",
+        "continue": "Continue application",
+        "track": "Track application",
+        "view": "View vacancy"
+      }
     },
     "detail": {
       "back": "All opportunities",
@@ -507,7 +555,10 @@
       "tashkent-city": "Tashkent City",
       "karakalpakstan": "Karakalpakstan"
     },
-    "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest."
+    "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest.",
+    "estimatedHours": "{hours} h in total",
+    "noSpotsLeft": "No spots left",
+    "placesWanted": "{count, plural, one {# place} other {# places}}"
   },
   "saved": {
     "metaTitle": "Saved",

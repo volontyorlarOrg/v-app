@@ -57,6 +57,7 @@ export const opportunitySummarySchema = z.object({
   applicationDeadline: isoDate,
   imageUrl: optional(z.string()),
   capacity: optional(z.number().int()),
+  estimatedTotalHours: optional(z.number()),
   spotsRemaining: optional(z.number().int()),
 });
 
@@ -124,16 +125,31 @@ export const applicationAnswerSchema = z.object({
 
 export const profileSnapshotSchema = z.object({
   fullName: optional(z.string()),
+  bio: optional(z.string()),
   region: optional(z.string()),
+  city: optional(z.string()),
   school: optional(z.string()),
+  gradeYear: optional(z.string()),
+  languages: optional(z.array(z.string())),
+  skills: optional(z.array(z.string())),
+  links: optional(z.array(z.string())),
   phone: optional(z.string()),
   telegram: optional(z.string()),
+});
+
+export const applicationAttendanceSchema = z.object({
+  id: optional(z.string()),
+  outcome: z.enum(ATTENDANCE_OUTCOMES),
+  scheduledHours: optional(z.number()),
+  confirmedHours: optional(z.number()),
+  resolvedAt: optional(isoDate),
 });
 
 export const applicationDetailSchema = applicationSummarySchema.extend({
   answers: z.array(applicationAnswerSchema).default([]),
   profileSnapshot: optional(profileSnapshotSchema),
   reviewerNote: optional(z.string()),
+  attendance: optional(applicationAttendanceSchema),
 });
 
 export const applicationListSchema = z.object({

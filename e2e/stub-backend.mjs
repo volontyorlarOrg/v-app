@@ -62,6 +62,7 @@ const opportunities = [
     endsAt: at(12, 14),
     applicationDeadline: at(5, 18),
     capacity: 20,
+    estimatedTotalHours: 6,
     accepted: 4,
     questions: [
       {
@@ -93,6 +94,7 @@ const opportunities = [
     endsAt: at(10, 12),
     applicationDeadline: at(2, 18),
     capacity: null,
+    estimatedTotalHours: 4,
     accepted: 0,
     questions: [],
     sourcedByYvc: false,
@@ -114,6 +116,7 @@ const opportunities = [
     endsAt: null,
     applicationDeadline: at(7, 18),
     capacity: 10,
+    estimatedTotalHours: 8,
     accepted: 2,
     questions: [
       {
@@ -161,9 +164,32 @@ const opportunities = [
     endsAt: at(3, 10),
     applicationDeadline: at(1, 18),
     capacity: 60,
+    estimatedTotalHours: 5,
     accepted: 12,
     questions: [],
     sourcedByYvc: true,
+  },
+  {
+    id: "opp-clothing-sort",
+    slug: "winter-clothing-sorting-day",
+    title: "Winter clothing sorting day",
+    summary: "Sort donated winter clothing for families.",
+    description: "Sorting, folding and labelling.",
+    requirements: [],
+    organization: organizations.green,
+    region: "bukhara",
+    city: "Bukhara",
+    locationName: "Community hall",
+    format: "onsite",
+    status: "open",
+    startsAt: at(-4, 9),
+    endsAt: at(-4, 13),
+    applicationDeadline: at(-6, 18),
+    capacity: 15,
+    estimatedTotalHours: 4,
+    accepted: 3,
+    questions: [],
+    sourcedByYvc: false,
   },
   {
     id: "opp-read-aloud",
@@ -182,6 +208,7 @@ const opportunities = [
     endsAt: at(-1, 12),
     applicationDeadline: at(-2, 18),
     capacity: 8,
+    estimatedTotalHours: 5,
     accepted: 8,
     questions: [],
     sourcedByYvc: false,
@@ -211,6 +238,8 @@ function serializeOpportunity(item, detail) {
     applicationDeadline: item.applicationDeadline,
     imageUrl: undefined,
     capacity: item.capacity ?? undefined,
+    estimatedTotalHours: item.estimatedTotalHours ?? undefined,
+    locationName: item.locationName ?? undefined,
     spotsRemaining,
   };
   if (!detail) return base;
@@ -270,7 +299,7 @@ function freshState() {
     user: { id: "user-dilnoza", displayName: "Dilnoza Karimova", roles: ["volunteer"], createdAt: at(-40) },
     profile: {
       fullName: "Dilnoza Karimova",
-      bio: "",
+      bio: "I read to younger pupils at the library every Saturday.",
       school: "Academic lyceum No. 2",
       gradeYear: "2",
       region: "tashkent-city",
@@ -317,12 +346,53 @@ function freshState() {
         answers: [],
         profileSnapshot: {
           fullName: "Dilnoza Karimova",
+          bio: "I read to younger pupils at the library every Saturday.",
+          region: "tashkent-city",
+          city: "Tashkent",
+          school: "Academic lyceum No. 2",
+          gradeYear: "2",
+          languages: ["uz", "ru", "en"],
+          skills: ["translation", "reading aloud"],
+          phone: "",
+          telegram: "dilnoza_k",
+          links: [],
+        },
+        reviewerNote: null,
+        attendance: {
+          id: "attendance-riverbank",
+          outcome: "awaiting_confirmation",
+          scheduledHours: 4,
+          confirmedHours: null,
+          resolvedAt: null,
+        },
+      },
+      {
+        id: "app-read-aloud",
+        status: "accepted",
+        opportunityId: "opp-read-aloud",
+        createdAt: at(-9, 19),
+        updatedAt: at(-1, 15),
+        submittedAt: at(-9, 19),
+        reviewedAt: at(-7, 11),
+        withdrawnAt: null,
+        answers: [],
+        profileSnapshot: {
+          fullName: "Dilnoza Karimova",
+          bio: "I read to younger pupils at the library every Saturday.",
           region: "tashkent-city",
           school: "Academic lyceum No. 2",
+          languages: ["uz", "ru", "en"],
           phone: "",
           telegram: "dilnoza_k",
         },
-        reviewerNote: null,
+        reviewerNote: "Thank you for coming.",
+        attendance: {
+          id: "attendance-read-aloud",
+          outcome: "attended",
+          scheduledHours: 3,
+          confirmedHours: 3,
+          resolvedAt: at(-1, 18),
+        },
       },
     ],
     saved: ["opp-riverbank", "opp-translation"],
@@ -547,7 +617,28 @@ function serializeApplication(state, item, detail) {
     answers: item.answers,
     profileSnapshot: item.profileSnapshot ?? undefined,
     reviewerNote: item.reviewerNote ?? undefined,
+    attendance: item.attendance
+      ? {
+          id: item.attendance.id,
+          outcome: item.attendance.outcome,
+          scheduledHours: item.attendance.scheduledHours ?? undefined,
+          confirmedHours: item.attendance.confirmedHours ?? undefined,
+          resolvedAt: item.attendance.resolvedAt ?? undefined,
+        }
+      : undefined,
   };
+}
+
+function missingProfileFields(profile) {
+  if (!profile) return ["fullName", "bio", "region", "school", "languages", "contact"];
+  return [
+    profile.fullName.trim().length < 2 ? "fullName" : null,
+    !profile.bio.trim() ? "bio" : null,
+    !profile.region ? "region" : null,
+    !profile.school.trim() ? "school" : null,
+    profile.languages.length === 0 ? "languages" : null,
+    !profile.phone.trim() && !profile.telegram.trim() ? "contact" : null,
+  ].filter((field) => field !== null);
 }
 
 function validateAnswers(opportunity, answers, requireComplete) {
@@ -1007,6 +1098,7 @@ const server = createServer(async (request, response) => {
       answers: [],
       profileSnapshot: null,
       reviewerNote: null,
+      attendance: null,
     };
     state.applications.push(item);
     return send(response, 201, serializeApplication(state, item, true));
@@ -1033,6 +1125,12 @@ const server = createServer(async (request, response) => {
       if (errors) return send(response, 400, { code: "invalidAnswers", errors });
       if (action === "submit" && !state.profile)
         return send(response, 409, { code: "profileRequired" });
+      if (action === "submit") {
+        const missing = missingProfileFields(state.profile);
+        if (missing.length > 0) {
+          return send(response, 409, { code: "profileIncomplete", fields: missing });
+        }
+      }
       item.answers = Object.entries(answers).map(([questionId, value]) => {
         const question = opportunity.questions.find(
           (candidate) => candidate.id === questionId,
@@ -1045,16 +1143,29 @@ const server = createServer(async (request, response) => {
         item.submittedAt = item.updatedAt;
         item.profileSnapshot = {
           fullName: state.profile.fullName,
+          bio: state.profile.bio,
           region: state.profile.region,
+          city: state.profile.city,
           school: state.profile.school,
+          gradeYear: state.profile.gradeYear,
+          languages: state.profile.languages,
+          skills: state.profile.skills,
           phone: state.profile.phone,
           telegram: state.profile.telegram,
+          links: state.profile.links,
         };
       }
       return send(response, 200, serializeApplication(state, item, true));
     }
     if (action === "withdraw" && method === "POST") {
       if (!["submitted", "under_review", "accepted"].includes(item.status)) {
+        return send(response, 409, { code: "applicationCannotBeWithdrawn" });
+      }
+      if (
+        item.status === "accepted" &&
+        (new Date(opportunity.startsAt) <= new Date() ||
+          (item.attendance && item.attendance.outcome !== "awaiting_confirmation"))
+      ) {
         return send(response, 409, { code: "applicationCannotBeWithdrawn" });
       }
       item.status = "withdrawn";

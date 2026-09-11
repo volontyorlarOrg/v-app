@@ -10,6 +10,7 @@ import { OpportunityFilters } from "@/components/opportunities/opportunity-filte
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { listApplications } from "@/lib/api/applications.server";
 import { listOpportunities } from "@/lib/api/opportunities.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
 import {
@@ -24,6 +25,10 @@ import {
   serializeOpportunitySearch,
   type OpportunityView,
 } from "@/lib/opportunities/search-params";
+import {
+  applicationsByOpportunity,
+  type CardApplication,
+} from "@/lib/opportunities/card";
 import {
   OPPORTUNITY_FORMATS,
   REGIONS,
@@ -53,9 +58,10 @@ export default async function OpportunitiesPage({
   const view = opportunityViewParser.parseServerSide(query.view);
   const now = new Date();
 
-  const [saved, catalogue] = await Promise.all([
+  const [saved, catalogue, applications] = await Promise.all([
     listSaved(),
     view === "all" ? listOpportunities(filters) : null,
+    listApplications(),
   ]);
   const list =
     view === "saved"
@@ -70,6 +76,7 @@ export default async function OpportunitiesPage({
       total={view === "saved" ? list.length : (catalogue?.total ?? 0)}
       savedCount={saved.total}
       saved={savedIds(saved)}
+      applications={applicationsByOpportunity(applications.items)}
       now={now}
     />
   );
@@ -82,6 +89,7 @@ function Opportunities({
   total,
   savedCount,
   saved,
+  applications,
   now,
 }: {
   filters: Filters;
@@ -90,6 +98,7 @@ function Opportunities({
   total: number;
   savedCount: number;
   saved: ReadonlySet<string>;
+  applications: ReadonlyMap<string, CardApplication>;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -188,6 +197,7 @@ function Opportunities({
               <OpportunityCard
                 opportunity={opportunity}
                 saved={saved.has(opportunity.id)}
+                application={applications.get(opportunity.id) ?? null}
                 now={now}
               />
             </li>

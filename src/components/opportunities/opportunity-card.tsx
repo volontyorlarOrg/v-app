@@ -1,6 +1,7 @@
-import { BadgeCheck, CalendarDays, MapPin, Monitor, Users } from "lucide-react";
+import { BadgeCheck, CalendarDays, Clock, MapPin, Monitor, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import {
   DeadlineText,
   OpportunityStatusChip,
@@ -8,16 +9,19 @@ import {
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { cardAction, type CardApplication } from "@/lib/opportunities/card";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { opportunityHref } from "@/lib/routing/routes";
 
 export function OpportunityCard({
   opportunity,
   saved,
+  application = null,
   now,
 }: {
   opportunity: OpportunitySummary;
   saved: boolean;
+  application?: CardApplication | null;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -30,10 +34,18 @@ export function OpportunityCard({
       ? opportunity.city
       : t(`regions.${opportunity.region}`);
 
+  const starts = new Date(opportunity.startsAt);
+  const ends = opportunity.endsAt ? new Date(opportunity.endsAt) : null;
+  const sameDay = ends
+    ? format.dateTime(starts, "day") === format.dateTime(ends, "day")
+    : true;
+  const action = cardAction(opportunity, application, now);
+
   return (
     <article className="flex w-full flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
         <OpportunityStatusChip opportunity={opportunity} now={now} />
+        {application ? <ApplicationStatusChip status={application.status} /> : null}
         <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
       </div>
 
@@ -65,15 +77,35 @@ export function OpportunityCard({
         <li className="inline-flex items-center gap-1.5">
           <CalendarDays aria-hidden="true" className="size-3.5" />
           <time dateTime={opportunity.startsAt} className="tabular">
-            {format.dateTime(new Date(opportunity.startsAt), "day")}
+            {format.dateTime(starts, "day")}
+            {ends && !sameDay ? ` – ${format.dateTime(ends, "day")}` : null}
           </time>
         </li>
-        {opportunity.spotsRemaining !== undefined && opportunity.spotsRemaining > 0 ? (
+        {opportunity.estimatedTotalHours === undefined ? null : (
+          <li className="inline-flex items-center gap-1.5">
+            <Clock aria-hidden="true" className="size-3.5" />
+            <span className="tabular">
+              {t("estimatedHours", { hours: opportunity.estimatedTotalHours })}
+            </span>
+          </li>
+        )}
+        {opportunity.spotsRemaining !== undefined ? (
           <li className="inline-flex items-center gap-1.5">
             <Users aria-hidden="true" className="size-3.5" />
-            {t("spotsLeft", { count: opportunity.spotsRemaining })}
+            <span className="tabular">
+              {opportunity.spotsRemaining > 0
+                ? t("spotsLeft", { count: opportunity.spotsRemaining })
+                : t("noSpotsLeft")}
+            </span>
           </li>
-        ) : null}
+        ) : opportunity.capacity === undefined ? null : (
+          <li className="inline-flex items-center gap-1.5">
+            <Users aria-hidden="true" className="size-3.5" />
+            <span className="tabular">
+              {t("placesWanted", { count: opportunity.capacity })}
+            </span>
+          </li>
+        )}
       </ul>
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-5">
@@ -86,10 +118,14 @@ export function OpportunityCard({
           className="-ml-4"
         />
         <Link
-          href={opportunityHref(opportunity.slug)}
-          className={buttonClass({ variant: "outline", size: "sm" })}
+          href={action.href}
+          className={buttonClass({
+            variant: action.kind === "view" ? "outline" : "primary",
+            size: "sm",
+          })}
         >
-          {t("card.view")}
+          {t(`card.actions.${action.kind}`)}
+          <span className="sr-only"> — {opportunity.title}</span>
         </Link>
       </div>
     </article>

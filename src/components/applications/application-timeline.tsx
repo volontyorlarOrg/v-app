@@ -6,21 +6,30 @@ import { cn } from "@/lib/utils";
 
 export function ApplicationTimeline({
   application,
+  now,
 }: {
   application: ApplicationDetail;
+  now: Date;
 }) {
   const t = useTranslations("applications");
+  const record = useTranslations("record");
   const format = useFormatter();
-  const entries = applicationTimeline(application);
+  const entries = applicationTimeline(application, now);
 
   return (
-    <ol className="grid gap-4 sm:grid-cols-3">
+    <ol className="grid gap-4 sm:grid-cols-3 xl:grid-cols-5">
       {entries.map((entry) => {
         const decidedDone = entry.step === "decided" && entry.state === "done";
+        const attendanceDone = entry.step === "attendance" && entry.state === "done";
+        const outcome = application.attendance?.outcome;
         const label = decidedDone
           ? t(`status.${application.status}`)
-          : t(`detail.steps.${entry.step}`);
-        const achievement = decidedDone && application.status === "accepted";
+          : attendanceDone && outcome
+            ? record(`outcomes.${outcome}`)
+            : t(`detail.steps.${entry.step}`);
+        const achievement =
+          (decidedDone && application.status === "accepted") ||
+          (attendanceDone && outcome === "attended");
 
         return (
           <li key={entry.step} className="flex gap-3">
@@ -39,7 +48,7 @@ export function ApplicationTimeline({
                 <span className="size-2 rounded-full bg-primary" />
               ) : null}
             </span>
-            <div>
+            <div className="min-w-0">
               <p
                 className={cn(
                   "text-sm font-semibold",

@@ -15,7 +15,12 @@ import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
+import { getProfile } from "@/lib/api/profile.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
+import {
+  applicationReadiness,
+  type ApplicationReadiness,
+} from "@/lib/applications/readiness";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { canApply } from "@/lib/opportunities/deadline";
 import type { OpportunityDetail } from "@/lib/opportunities/types";
@@ -38,7 +43,11 @@ export default async function OpportunityPage({
   setRequestLocale(locale);
 
   const now = new Date();
-  const [opportunity, saved] = await Promise.all([getOpportunity(slug), listSaved()]);
+  const [opportunity, saved, profile] = await Promise.all([
+    getOpportunity(slug),
+    listSaved(),
+    getProfile(),
+  ]);
   if (!opportunity) notFound();
 
   const application = await getApplicationByOpportunity(opportunity.id);
@@ -47,7 +56,10 @@ export default async function OpportunityPage({
     <Opportunity
       opportunity={opportunity}
       saved={savedIds(saved).has(opportunity.id)}
-      application={application ? { id: application.id, status: application.status } : null}
+      application={
+        application ? { id: application.id, status: application.status } : null
+      }
+      readiness={applicationReadiness(profile)}
       now={now}
     />
   );
@@ -57,11 +69,13 @@ function Opportunity({
   opportunity,
   saved,
   application,
+  readiness,
   now,
 }: {
   opportunity: OpportunityDetail;
   saved: boolean;
   application: { id: string; status: ApplicationStatus } | null;
+  readiness: ApplicationReadiness;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -171,6 +185,25 @@ function Opportunity({
                   ? applicationsT("continueDraft")
                   : t("detail.viewApplication")}
               </Link>
+            ) : applicable && !readiness.ready ? (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm font-semibold text-ink">
+                  {applicationsT("gate.title")}
+                </p>
+                <p className="text-sm leading-relaxed text-ink-muted">
+                  {applicationsT("gate.body", {
+                    fields: readiness.missing
+                      .map((field) => applicationsT(`gate.fields.${field}`))
+                      .join(", "),
+                  })}
+                </p>
+                <Link
+                  href={navHref("profile")}
+                  className={buttonClass({ className: "w-full" })}
+                >
+                  {applicationsT("gate.action")}
+                </Link>
+              </div>
             ) : applicable ? (
               <ApplyForm
                 opportunityId={opportunity.id}

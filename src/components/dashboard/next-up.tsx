@@ -1,28 +1,21 @@
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
+import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ApplicationSummary } from "@/lib/applications/status";
-import type { OpportunitySummary } from "@/lib/opportunities/types";
-import { navHref, opportunityHref } from "@/lib/routing/routes";
-
-export function placeOf(
-  opportunity: OpportunitySummary,
-  t: (key: string) => string,
-): string {
-  if (opportunity.format === "remote") return t(`format.${opportunity.format}`);
-  const named = opportunity.locationName ?? opportunity.city;
-  return named ? named : t(`regions.${opportunity.region}`);
-}
+import { navHref } from "@/lib/routing/routes";
 
 export function NextUp({
   commitments,
+  saved,
+  now,
 }: {
   commitments: readonly ApplicationSummary[];
+  saved: ReadonlySet<string>;
+  now: Date;
 }) {
   const t = useTranslations("dashboard.nextUp");
-  const opportunities = useTranslations("opportunities");
-  const format = useFormatter();
 
   if (commitments.length === 0) {
     return (
@@ -41,48 +34,21 @@ export function NextUp({
   }
 
   return (
-    <ol>
-      {commitments.map(({ id, opportunity }) => {
-        const starts = new Date(opportunity.startsAt);
-        const ends = opportunity.endsAt ? new Date(opportunity.endsAt) : null;
-
-        return (
-          <li
-            key={id}
-            className="grid grid-cols-[3.5rem_1fr] gap-x-4 border-t border-border px-5 py-4 first:border-t-0"
-          >
-            <div className="rounded-lg bg-surface-soft py-2 text-center">
-              <time
-                dateTime={opportunity.startsAt}
-                className="display-face tabular block text-3xl leading-none text-primary-ink"
-              >
-                {format.dateTime(starts, { day: "numeric" })}
-              </time>
-              <span className="mt-1 block text-xs font-semibold tracking-[0.1em] text-primary-ink uppercase">
-                {format.dateTime(starts, { month: "short" })}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-semibold text-balance">
-                <Link
-                  href={opportunityHref(opportunity.slug)}
-                  className="text-ink hover:text-primary-ink"
-                >
-                  {opportunity.title}
-                </Link>
-              </h3>
-              <p className="mt-1 text-sm text-ink-muted">
-                {opportunity.organization.name} ·{" "}
-                {placeOf(opportunity, opportunities)}
-              </p>
-              <p className="tabular mt-1 text-sm text-ink-muted">
-                {format.dateTime(starts, "weekday")}, {format.dateTime(starts, "time")}
-                {ends ? `–${format.dateTime(ends, "time")}` : null}
-              </p>
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+    <ul className="grid gap-4 px-5 py-5 md:grid-cols-2">
+      {commitments.map((application) => (
+        <li key={application.id} className="flex">
+          <OpportunityCard
+            opportunity={application.opportunity}
+            saved={saved.has(application.opportunity.id)}
+            application={{
+              id: application.id,
+              status: application.status,
+              updatedAt: application.updatedAt,
+            }}
+            now={now}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }

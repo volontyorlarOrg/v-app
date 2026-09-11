@@ -25,6 +25,7 @@ import { connectStartHref } from "@/lib/account/connections";
 import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
 import { getProfile } from "@/lib/api/profile.server";
+import { listSaved, savedIds } from "@/lib/api/saved.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import {
@@ -67,12 +68,13 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, volunteerRecord, applications, onboarding, telegram] =
+  const [session, profile, volunteerRecord, applications, saved, onboarding, telegram] =
     await Promise.all([
       requireSession(),
       getProfile(),
       getRecord(),
       listApplications(),
+      listSaved(),
       readOnboardingState(),
       readTelegramConnection(),
     ]);
@@ -84,6 +86,7 @@ export default async function DashboardPage({
       profile={profile ?? EMPTY_PROFILE}
       record={volunteerRecord}
       applications={applications.items}
+      saved={savedIds(saved)}
       onboardingState={onboarding && serializeOnboardingState(onboarding)}
       telegramConnected={telegram}
     />
@@ -106,6 +109,7 @@ function Dashboard({
   profile,
   record: volunteerRecord,
   applications: all,
+  saved,
   onboardingState,
   telegramConnected,
 }: {
@@ -114,6 +118,7 @@ function Dashboard({
   profile: VolunteerProfile;
   record: VolunteerRecord;
   applications: readonly ApplicationSummary[];
+  saved: ReadonlySet<string>;
   onboardingState: string | null;
   telegramConnected: boolean | null;
 }) {
@@ -254,7 +259,7 @@ function Dashboard({
             description={t("nextUp.description")}
             padding="none"
           >
-            <NextUp commitments={commitments} />
+            <NextUp commitments={commitments} saved={saved} now={now} />
           </Panel>
 
           <Panel

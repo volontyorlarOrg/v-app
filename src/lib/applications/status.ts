@@ -1,3 +1,4 @@
+import type { AttendanceOutcome } from "@/lib/record/levels";
 import type { OpportunitySummary, QuestionType } from "@/lib/opportunities/types";
 
 export const APPLICATION_STATUSES = [
@@ -34,17 +35,69 @@ export type ApplicationAnswer = {
 
 export type ProfileSnapshot = {
   fullName?: string;
+  bio?: string;
   region?: string;
+  city?: string;
   school?: string;
+  gradeYear?: string;
+  languages?: string[];
+  skills?: string[];
+  links?: string[];
   phone?: string;
   telegram?: string;
+};
+
+export type ApplicationAttendance = {
+  id?: string;
+  outcome: AttendanceOutcome;
+  scheduledHours?: number;
+  confirmedHours?: number;
+  resolvedAt?: string;
 };
 
 export type ApplicationDetail = ApplicationSummary & {
   answers: ApplicationAnswer[];
   profileSnapshot?: ProfileSnapshot;
   reviewerNote?: string;
+  attendance?: ApplicationAttendance;
 };
+
+export function isAttendanceResolved(
+  attendance: ApplicationAttendance | undefined,
+): boolean {
+  if (!attendance) return false;
+  return attendance.outcome !== "awaiting_confirmation";
+}
+
+export function eventEndsAt(
+  opportunity: Pick<OpportunitySummary, "startsAt" | "endsAt">,
+): string {
+  return opportunity.endsAt ?? opportunity.startsAt;
+}
+
+export function hasEventStarted(
+  opportunity: Pick<OpportunitySummary, "startsAt">,
+  now: Date,
+): boolean {
+  return new Date(opportunity.startsAt).getTime() <= now.getTime();
+}
+
+export function hasEventEnded(
+  opportunity: Pick<OpportunitySummary, "startsAt" | "endsAt">,
+  now: Date,
+): boolean {
+  return new Date(eventEndsAt(opportunity)).getTime() <= now.getTime();
+}
+
+export function canWithdraw(
+  application: Pick<ApplicationDetail, "status" | "opportunity" | "attendance">,
+  now: Date,
+): boolean {
+  if (!isWithdrawable(application.status)) return false;
+  if (application.status !== "accepted") return true;
+  if (hasEventStarted(application.opportunity, now)) return false;
+  return !isAttendanceResolved(application.attendance);
+}
 
 export function decidedAt(
   application: Pick<ApplicationSummary, "status" | "reviewedAt" | "withdrawnAt" | "updatedAt">,
@@ -117,7 +170,13 @@ export function inApplicationGroup(
   return group === "all" || applicationGroup(status) === group;
 }
 
-export const TIMELINE_STEPS = ["submitted", "under_review", "decided"] as const;
+export const TIMELINE_STEPS = [
+  "submitted",
+  "under_review",
+  "decided",
+  "event",
+  "attendance",
+] as const;
 export type TimelineStep = (typeof TIMELINE_STEPS)[number];
 export type TimelineState = "done" | "current" | "pending";
 
@@ -127,7 +186,11 @@ export function applicationTimeline(
   application: Pick<
     ApplicationSummary,
     "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt"
-  >,
+  > & {
+    opportunity?: Pick<OpportunitySummary, "startsAt" | "endsAt">;
+    attendance?: ApplicationAttendance;
+  },
+  now: Date = new Date(),
 ): TimelineEntry[] {
   const submitted: TimelineEntry = {
     step: "submitted",
@@ -145,29 +208,69 @@ export function applicationTimeline(
     at: decidedAt(application),
   };
 
+  const ahead: TimelineEntry[] = [
+    { step: "event", state: "pending" },
+    { step: "attendance", state: "pending" },
+  ];
+
   switch (application.status) {
     case "draft":
       return [
         { step: "submitted", state: "current" },
         { step: "under_review", state: "pending" },
         { step: "decided", state: "pending" },
+        ...ahead,
       ];
     case "submitted":
       return [
         submitted,
         { step: "under_review", state: "current" },
         { step: "decided", state: "pending" },
+        ...ahead,
       ];
     case "under_review":
       return [
         submitted,
         { step: "under_review", state: "current", at: application.reviewedAt },
         { step: "decided", state: "pending" },
+        ...ahead,
       ];
-    case "accepted":
     case "rejected":
     case "withdrawn":
     case "closed":
       return [submitted, reviewed, decided];
+    case "accepted":
+      return [submitted, reviewed, decided, ...attendanceSteps(application, now)];
   }
+}
+
+function attendanceSteps(
+  application: {
+    opportunity?: Pick<OpportunitySummary, "startsAt" | "endsAt">;
+    attendance?: ApplicationAttendance;
+  },
+  now: Date,
+): TimelineEntry[] {
+  const opportunity = application.opportunity;
+  const started = opportunity ? hasEventStarted(opportunity, now) : false;
+  const ended = opportunity ? hasEventEnded(opportunity, now) : false;
+  const resolved = isAttendanceResolved(application.attendance);
+
+  const event: TimelineEntry = {
+    step: "event",
+    state: ended ? "done" : started ? "current" : "pending",
+    ...(opportunity ? { at: opportunity.startsAt } : {}),
+  };
+
+  const attendance: TimelineEntry = resolved
+    ? {
+        step: "attendance",
+        state: "done",
+        ...(application.attendance?.resolvedAt
+          ? { at: application.attendance.resolvedAt }
+          : {}),
+      }
+    : { step: "attendance", state: ended ? "current" : "pending" };
+
+  return [event, attendance];
 }

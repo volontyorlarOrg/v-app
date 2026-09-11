@@ -4,6 +4,7 @@ import {
   APPLICATION_STATUSES,
   applicationGroup,
   applicationTimeline,
+  canWithdraw,
   inApplicationGroup,
   isApplicationGroup,
   isEditable,
@@ -85,32 +86,161 @@ describe("application groups", () => {
 });
 
 describe("applicationTimeline", () => {
-  it("keeps a draft on the first step", () => {
+  it("shows the whole journey ahead of a draft", () => {
     expect(
-      applicationTimeline({ status: "draft", updatedAt: "2026-06-01T10:00:00.000Z" }).map(
-        (entry) => entry.state,
-      ),
-    ).toEqual(["current", "pending", "pending"]);
+      applicationTimeline(
+        { status: "draft", updatedAt: "2026-06-01T10:00:00.000Z" },
+        NOW,
+      ).map((entry) => entry.state),
+    ).toEqual(["current", "pending", "pending", "pending", "pending"]);
   });
 
   it("moves the current marker with the status and carries dates", () => {
-    const review = applicationTimeline({
-      status: "under_review",
-      submittedAt: "2026-06-01T10:00:00.000Z",
-      reviewedAt: "2026-06-02T10:00:00.000Z",
-      updatedAt: "2026-06-02T10:00:00.000Z",
-    });
-    expect(review.map((entry) => entry.state)).toEqual(["done", "current", "pending"]);
+    const review = applicationTimeline(
+      {
+        status: "under_review",
+        submittedAt: "2026-06-01T10:00:00.000Z",
+        reviewedAt: "2026-06-02T10:00:00.000Z",
+        updatedAt: "2026-06-02T10:00:00.000Z",
+      },
+      NOW,
+    );
+    expect(review.map((entry) => entry.state)).toEqual([
+      "done",
+      "current",
+      "pending",
+      "pending",
+      "pending",
+    ]);
     expect(review[0]?.at).toBe("2026-06-01T10:00:00.000Z");
   });
 
-  it("completes every step once a decision exists", () => {
-    for (const status of ["accepted", "rejected", "withdrawn", "closed"] as const) {
-      expect(
-        applicationTimeline({ status, updatedAt: "2026-06-04T10:00:00.000Z" }).every(
-          (entry) => entry.state === "done",
-        ),
-      ).toBe(true);
+  it("ends the journey where a negative decision ends it", () => {
+    for (const status of ["rejected", "withdrawn", "closed"] as const) {
+      const entries = applicationTimeline(
+        { status, updatedAt: "2026-06-04T10:00:00.000Z" },
+        NOW,
+      );
+      expect(entries).toHaveLength(3);
+      expect(entries.every((entry) => entry.state === "done")).toBe(true);
+    }
+  });
+
+  it("waits on the event once the volunteer is accepted", () => {
+    const entries = applicationTimeline(
+      {
+        status: "accepted",
+        submittedAt: "2026-06-01T10:00:00.000Z",
+        reviewedAt: "2026-06-02T10:00:00.000Z",
+        updatedAt: "2026-06-02T10:00:00.000Z",
+        opportunity: { startsAt: "2026-06-25T09:00:00.000Z" },
+      },
+      NOW,
+    );
+    expect(entries.map((entry) => entry.state)).toEqual([
+      "done",
+      "done",
+      "done",
+      "pending",
+      "pending",
+    ]);
+  });
+
+  it("asks for attendance once the event has ended", () => {
+    const entries = applicationTimeline(
+      {
+        status: "accepted",
+        submittedAt: "2026-06-01T10:00:00.000Z",
+        reviewedAt: "2026-06-02T10:00:00.000Z",
+        updatedAt: "2026-06-02T10:00:00.000Z",
+        opportunity: {
+          startsAt: "2026-06-10T09:00:00.000Z",
+          endsAt: "2026-06-10T15:00:00.000Z",
+        },
+      },
+      NOW,
+    );
+    expect(entries.map((entry) => entry.state)).toEqual([
+      "done",
+      "done",
+      "done",
+      "done",
+      "current",
+    ]);
+  });
+
+  it("completes the journey once attendance is confirmed", () => {
+    const entries = applicationTimeline(
+      {
+        status: "accepted",
+        submittedAt: "2026-06-01T10:00:00.000Z",
+        reviewedAt: "2026-06-02T10:00:00.000Z",
+        updatedAt: "2026-06-02T10:00:00.000Z",
+        opportunity: {
+          startsAt: "2026-06-10T09:00:00.000Z",
+          endsAt: "2026-06-10T15:00:00.000Z",
+        },
+        attendance: {
+          outcome: "attended",
+          confirmedHours: 4,
+          resolvedAt: "2026-06-11T09:00:00.000Z",
+        },
+      },
+      NOW,
+    );
+    expect(entries[4]).toEqual({
+      step: "attendance",
+      state: "done",
+      at: "2026-06-11T09:00:00.000Z",
+    });
+  });
+});
+
+describe("canWithdraw", () => {
+  const ahead = "2026-06-25T09:00:00.000Z";
+  const behind = "2026-06-05T09:00:00.000Z";
+
+  it("lets a volunteer withdraw while the organiser still holds the application", () => {
+    for (const status of ["submitted", "under_review"] as const) {
+      expect(canWithdraw(application(status, ahead), NOW)).toBe(true);
+    }
+  });
+
+  it("lets an accepted volunteer withdraw before the event starts", () => {
+    expect(canWithdraw(application("accepted", ahead), NOW)).toBe(true);
+  });
+
+  it("refuses once the event has started", () => {
+    expect(canWithdraw(application("accepted", behind), NOW)).toBe(false);
+  });
+
+  it("refuses once attendance has been resolved, so a record cannot be erased", () => {
+    expect(
+      canWithdraw(
+        {
+          ...application("accepted", ahead),
+          attendance: { outcome: "attended", confirmedHours: 4 },
+        },
+        NOW,
+      ),
+    ).toBe(false);
+  });
+
+  it("leaves an awaiting attendance record withdrawable before the event", () => {
+    expect(
+      canWithdraw(
+        {
+          ...application("accepted", ahead),
+          attendance: { outcome: "awaiting_confirmation" },
+        },
+        NOW,
+      ),
+    ).toBe(true);
+  });
+
+  it("never withdraws something already finished", () => {
+    for (const status of ["draft", "rejected", "withdrawn", "closed"] as const) {
+      expect(canWithdraw(application(status, ahead), NOW)).toBe(false);
     }
   });
 });

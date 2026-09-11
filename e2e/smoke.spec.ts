@@ -744,10 +744,88 @@ test.describe("opportunities", () => {
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {
-    await page.goto("/en/opportunities/read-aloud-day");
+    await page.goto("/en/opportunities/winter-clothing-sorting-day");
     await expect(
       page.getByRole("button", { name: "Applications are closed" }),
     ).toBeDisabled();
+  });
+
+  test("a card routes to the next step and never submits by itself", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities");
+    const drive = page
+      .getByRole("article")
+      .filter({ hasText: "Winter book drive" })
+      .first();
+    await expect(drive.getByRole("link", { name: /Continue application/ })).toBeVisible();
+    await expect(drive.getByText("Draft", { exact: true })).toBeVisible();
+
+    const marathon = page
+      .getByRole("article")
+      .filter({ hasText: "City marathon water stations" })
+      .first();
+    await expect(marathon.getByRole("link", { name: /View and apply/ })).toBeVisible();
+    await expect(marathon.getByRole("button", { name: /apply/i })).toHaveCount(0);
+  });
+
+  test("a card carries the hours, the places and the dates", async ({ page }) => {
+    await page.goto("/en/opportunities");
+    const marathon = page
+      .getByRole("article")
+      .filter({ hasText: "City marathon water stations" })
+      .first();
+    await expect(marathon).toContainText("5 h in total");
+    await expect(marathon).toContainText(/spot|place/i);
+  });
+
+  test("an incomplete profile is asked to fill it in before applying", async ({
+    page,
+  }, info) => {
+    await page.context().clearCookies();
+    await page.goto("/en/signup");
+    await page.getByLabel("Full name").fill("Nodira Alimova");
+    await page.getByLabel("Email").fill(`nodira-${info.project.name}@example.org`);
+    await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(page).toHaveURL(/\/en\/welcome/);
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await expect(page.getByText("Complete your profile first")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Go to your profile" }).first(),
+    ).toBeVisible();
+  });
+
+  test("a profile-only application is reviewed and confirmed before it is sent", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(
+      /\/en\/applications\/app-city-marathon-water-stations$/,
+    );
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Check your answers" }),
+    ).toBeVisible();
+    await expect(page.getByText("Dilnoza Karimova").first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Change/ }).first()).toBeVisible();
+
+    await page.getByRole("button", { name: "Submit application" }).click();
+    await expect(page.getByRole("alert").first()).toContainText("Tick the box");
+
+    await page.getByRole("checkbox", { name: /I confirm/ }).check();
+    await page.getByRole("button", { name: "Submit application" }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Application sent" }),
+    ).toBeVisible();
+    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Check your answers" }),
+    ).toHaveCount(0);
   });
 
   test("an unknown opportunity is a 404 inside the panel", async ({ page }) => {
@@ -801,6 +879,35 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("button", { name: "Withdraw application" }),
     ).toHaveCount(0);
+  });
+
+  test("a confirmed attendance closes the application and shows the hours", async ({
+    page,
+  }) => {
+    await page.goto("/en/applications/app-read-aloud");
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Attendance" }),
+    ).toBeVisible();
+    await expect(page.getByText("Attended").first()).toBeVisible();
+    await expect(page.getByText("3 h confirmed")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Withdraw application" }),
+    ).toHaveCount(0);
+    await expect(page.getByText(/can no longer be withdrawn/)).toBeVisible();
+  });
+
+  test("an accepted volunteer sees where to be and what is still awaited", async ({
+    page,
+  }) => {
+    await page.goto("/en/applications/app-riverbank");
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Where to be" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Attendance is confirmed after the event ends."),
+    ).toBeVisible();
   });
 
   test("an unknown application is a 404", async ({ page }) => {

@@ -364,7 +364,9 @@
       "steps": {
         "submitted": "Yuborildi",
         "under_review": "Koʻrib chiqilmoqda",
-        "decided": "Qaror"
+        "decided": "Qaror",
+        "event": "Tadbir",
+        "attendance": "Ishtirok"
       },
       "inProgress": "Jarayonda",
       "pending": "Hali emas",
@@ -384,7 +386,33 @@
         "fallback": "Qaytarib olib boʻlmadi. Qayta urinib koʻring."
       },
       "reviewerNote": "Tashkilotchi izohi",
-      "question": "{number}-savol"
+      "question": "{number}-savol",
+      "review": {
+        "title": "Javoblaringizni tekshiring",
+        "description": "Tashkilotchi aynan shuni koʻradi. Yuborishdan oldin istagan narsangizni oʻzgartiring.",
+        "change": "Oʻzgartirish",
+        "confirm": "Tasdiqlayman: hammasi toʻgʻri va tashkilotchi buni koʻrishi mumkin.",
+        "confirmRequired": "Yuborishdan oldin katakchani belgilang."
+      },
+      "receipt": {
+        "title": "Ariza yuborildi",
+        "body": "Profilingiz tashkilotchida. Javob shu sahifada va bildirishnomalarda boʻladi.",
+        "reference": "Raqam {reference}"
+      },
+      "event": {
+        "title": "Qayerga borish kerak",
+        "description": "Siz qabul qilingan tadbirning ochiq tafsilotlari."
+      },
+      "attendance": {
+        "title": "Ishtirok",
+        "awaiting": "Tashkilotchi kim kelganini hali tasdiqlamagan.",
+        "beforeEvent": "Ishtirok tadbir tugagach tasdiqlanadi.",
+        "hours": "Tasdiqlangan soatlar: {hours}",
+        "confirmedOn": "{date} da tasdiqlangan"
+      },
+      "skills": "Koʻnikmalar",
+      "withdrawClosedResolved": "Ishtirok tasdiqlangan, shuning uchun arizani endi qaytarib boʻlmaydi.",
+      "withdrawClosedStarted": "Tadbir boshlangan, shuning uchun arizani endi qaytarib boʻlmaydi."
     },
     "form": {
       "save": "Qoralamani saqlash",
@@ -401,7 +429,21 @@
         "opportunityUnavailable": "Bu imkoniyat endi ariza qabul qilmaydi.",
         "invalidAnswers": "Baʼzi javoblarni qayta tekshirish kerak.",
         "applicationNotEditable": "Bu arizani endi tahrirlab boʻlmaydi.",
-        "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring."
+        "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring.",
+        "profileIncomplete": "Profilingizda tashkilotchiga kerak boʻlgan narsa yetishmaydi."
+      }
+    },
+    "gate": {
+      "title": "Avval profilni toʻldiring",
+      "body": "Tashkilotchilar anketa emas, profilingizni oʻqiydi. Qoʻshing: {fields}.",
+      "action": "Profilga oʻtish",
+      "fields": {
+        "fullName": "ism-familiyangiz",
+        "bio": "oʻzingiz haqingizda qisqacha",
+        "region": "viloyatingiz",
+        "school": "maktabingiz",
+        "languages": "bilgan tillaringiz",
+        "contact": "telefon raqami yoki Telegram foydalanuvchi nomi"
       }
     }
   },
@@ -441,7 +483,13 @@
       "save": "Saqlash",
       "saved": "Saqlangan",
       "sourced": "Volontyorlar topgan",
-      "saveError": "Saqlab boʻlmadi"
+      "saveError": "Saqlab boʻlmadi",
+      "actions": {
+        "apply": "Koʻrish va ariza berish",
+        "continue": "Arizani davom ettirish",
+        "track": "Arizani kuzatish",
+        "view": "Vakansiyani koʻrish"
+      }
     },
     "detail": {
       "back": "Barcha imkoniyatlar",
@@ -507,7 +555,10 @@
       "tashkent-city": "Toshkent shahri",
       "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
     },
-    "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring."
+    "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring.",
+    "estimatedHours": "Jami {hours} soat",
+    "noSpotsLeft": "Joy qolmadi",
+    "placesWanted": "{count, plural, other {# joy}}"
   },
   "saved": {
     "metaTitle": "Saqlanganlar",
