@@ -13,6 +13,7 @@ import {
   authRoutes,
   getRoute,
   guardFor,
+  historyHref,
   isActivePath,
   localePath,
   navHref,
@@ -66,6 +67,16 @@ describe("app route registry", () => {
     for (const locale of locales) {
       expect(guardFor(`/${locale}/leaderboard`)).toBe("session");
     }
+  });
+
+  it("keeps the record reachable by URL but out of every navigation surface", () => {
+    const record = getRoute("record");
+    expect(record.area).toBe("volunteer");
+    expect(record.guard).toBe("session");
+    expect(record.inNav).toBe(false);
+    expect(record.inTabBar).toBe(false);
+    expect(record.inAccountMenu).toBe(false);
+    expect(historyHref()).toBe("/dashboard#history");
   });
 
   it("keeps the mobile tab bar to four essential destinations", () => {

@@ -469,10 +469,10 @@ test.describe("sign-in", () => {
   });
 
   test("sign-in returns to the page that required it", async ({ page }) => {
-    await page.goto("/en/record");
-    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Frecord$/);
+    await page.goto("/en/profile");
+    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Fprofile$/);
     await page.getByRole("link", { name: "Continue with Telegram" }).click();
-    await expect(page).toHaveURL(/\/en\/record$/);
+    await expect(page).toHaveURL(/\/en\/profile$/);
   });
 
   test("the panel is not reachable without a session", async ({ page }) => {
@@ -554,9 +554,32 @@ test.describe("the panel", () => {
       page.getByRole("heading", { level: 1, name: "Leaderboard" }),
     ).toBeVisible();
 
-    for (const path of ["/en/record", "/en/profile", "/en/settings"]) {
+    for (const path of ["/en/profile", "/en/settings"]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    }
+  });
+
+  test("the old record URL lands on the dashboard's history", async ({ page }) => {
+    await page.goto("/en/record");
+    await expect(page).toHaveURL(/\/en\/dashboard#history$/);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Participation history" }),
+    ).toBeVisible();
+  });
+
+  test("the sidebar carries notifications, the theme and sign out; the phone header the same", async ({
+    page,
+  }) => {
+    const mobile = await isMobile(page);
+    await expect(page.getByRole("button", { name: /^Notifications/ })).toBeVisible();
+    await expect(page.getByRole("switch", { name: "Dark theme" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Account menu/ })).toBeVisible();
+    if (!mobile) {
+      await expect(
+        page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
+      ).toHaveCount(4);
+      await expect(page.getByRole("banner")).toHaveCount(0);
     }
   });
 
@@ -588,6 +611,7 @@ test.describe("the panel", () => {
   test("the account menu reaches the profile and the account, and really signs out", async ({
     page,
   }) => {
+    const mobile = await isMobile(page);
     await page.getByRole("button", { name: /Account menu/ }).click();
     const menu = page.getByRole("navigation", { name: "Account menu" });
     await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
@@ -595,7 +619,13 @@ test.describe("the panel", () => {
       "href",
       "/en/settings",
     );
-    await menu.getByRole("button", { name: "Sign out" }).click();
+    if (mobile) {
+      await menu.getByRole("button", { name: "Sign out" }).click();
+    } else {
+      await expect(menu.getByRole("button", { name: "Sign out" })).toBeHidden();
+      await page.keyboard.press("Escape");
+      await page.getByRole("button", { name: "Sign out" }).click();
+    }
     await expect(page).toHaveURL(/\/en\/login$/);
 
     await page.goto("/en/dashboard");
@@ -613,7 +643,7 @@ test.describe("the panel", () => {
     for (const path of [
       "/en/dashboard",
       "/en/opportunities",
-      "/en/record",
+      "/en/leaderboard",
       "/en/profile",
       "/en/settings",
       "/en/applications/app-book-drive",
@@ -808,10 +838,10 @@ test.describe("applications, record, profile and settings", () => {
     expect(response?.status()).toBe(404);
   });
 
-  test("the record shows a history table with the awaiting-confirmation rule", async ({
+  test("the dashboard shows the history table with the awaiting-confirmation rule", async ({
     page,
   }) => {
-    await page.goto("/en/record");
+    await page.goto("/en/dashboard");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
@@ -1215,19 +1245,27 @@ test.describe("the leaderboard", () => {
   test("ranks volunteers on the backend's own numbers", async ({ page }) => {
     await expect(page.getByRole("heading", { level: 1, name: "Leaderboard" })).toBeVisible();
 
-    const first = page.getByRole("row").nth(1);
-    await expect(first).toContainText("@volunteer_01");
-    await expect(first).toContainText("3,000");
-    await expect(page.getByRole("row")).toHaveCount(26);
+    const podium = page.getByRole("region", { name: "Top three" });
+    await expect(podium.getByRole("listitem")).toHaveCount(3);
+    const first = podium.getByRole("listitem").filter({ hasText: "@volunteer_01" });
+    await expect(first).toContainText("3,000 XP");
+    await expect(first.getByLabel("Place 1")).toBeVisible();
+
+    const fourth = page.getByRole("row").nth(1);
+    await expect(fourth).toContainText("@volunteer_04");
+    await expect(fourth).toContainText("2,730 XP");
+    await expect(page.getByRole("row")).toHaveCount(23);
+    await expect(page.getByText("30 volunteers")).toBeVisible();
   });
 
   test("shows the signed-in volunteer even from a page they are not on", async ({
     page,
   }) => {
-    const standing = page.getByRole("definition").first();
-    await expect(standing).toHaveText("30");
-    await expect(page.getByText("of 30 volunteers")).toBeVisible();
-    await expect(page.getByText("@dilnoza_k").first()).toBeVisible();
+    const standing = page.getByRole("region", { name: "Dilnoza Karimova" });
+    await expect(standing.getByRole("definition").first()).toHaveText("#30");
+    await expect(standing).toContainText("of 30 volunteers");
+    await expect(standing).toContainText("@dilnoza_k");
+    await expect(standing).toContainText("50 XP for every confirmed event");
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
   });
 

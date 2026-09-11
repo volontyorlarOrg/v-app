@@ -7,64 +7,52 @@ import { cn } from "@/lib/utils";
 
 export type SidebarItem = { key: RouteKey; href: string; label: string };
 
-function Items({
+export function SidebarNav({
   items,
-  pathname,
+  label,
+  heading,
 }: {
   items: readonly SidebarItem[];
-  pathname: string;
-}) {
-  return (
-    <ul className="flex flex-col gap-1">
-      {items.map((item) => {
-        const Icon = routeIcon(item.key);
-        const active = isActivePath(pathname, item.href);
-        return (
-          <li key={item.key}>
-            <Link
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors",
-                active
-                  ? "bg-surface-soft text-primary-ink"
-                  : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
-              )}
-            >
-              <Icon aria-hidden="true" className="size-5 shrink-0" />
-              {item.label}
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-export function SidebarNav({
-  primary,
-  secondary,
-  primaryLabel,
-  secondaryLabel,
-}: {
-  primary: readonly SidebarItem[];
-  secondary: readonly SidebarItem[];
-  primaryLabel: string;
-  secondaryLabel: string;
+  label: string;
+  heading: string;
 }) {
   const pathname = usePathname();
 
   return (
-    <>
-      <nav aria-label={primaryLabel} className="px-3">
-        <Items items={primary} pathname={pathname} />
-      </nav>
-      <nav
-        aria-label={secondaryLabel}
-        className="mt-6 border-t border-border px-3 pt-6"
-      >
-        <Items items={secondary} pathname={pathname} />
-      </nav>
-    </>
+    <nav aria-label={label}>
+      <p className="px-3 pb-2 text-xs font-semibold tracking-[0.14em] text-shell-muted/80 uppercase">
+        {heading}
+      </p>
+      <ul className="flex flex-col gap-1">
+        {items.map((item) => {
+          const Icon = routeIcon(item.key);
+          const active = isActivePath(pathname, item.href);
+          return (
+            <li key={item.key}>
+              <Link
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors",
+                  active
+                    ? "bg-primary-muted text-primary-deep"
+                    : "text-shell-muted hover:bg-shell-raised hover:text-shell-ink",
+                )}
+              >
+                <Icon
+                  aria-hidden="true"
+                  className={cn(
+                    "size-5 shrink-0",
+                    active ? "text-primary-deep" : "text-shell-muted",
+                  )}
+                  strokeWidth={active ? 2.25 : 2}
+                />
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

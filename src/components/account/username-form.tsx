@@ -98,7 +98,7 @@ export function UsernameForm({
         {result.status === "ok" ? (
           <ActionStatus tone="done">{labels.saved}</ActionStatus>
         ) : null}
-        <Button type="submit" size="sm" disabled={pending} className="sm:self-start">
+        <Button type="submit" disabled={pending} className="sm:self-start">
           {pending ? labels.saving : labels.save}
         </Button>
       </div>

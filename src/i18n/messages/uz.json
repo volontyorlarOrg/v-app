@@ -43,7 +43,8 @@
     },
     "userMenu": {
       "label": "Hisob menyusi"
-    }
+    },
+    "menuLabel": "Menyu"
   },
   "auth": {
     "providers": {
@@ -157,7 +158,8 @@
     },
     "progress": {
       "title": "Oʻsishingiz",
-      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda."
+      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda.",
+      "leaderboard": "Reytingdagi oʻrningiz"
     },
     "record": {
       "title": "Tarixingiz",
@@ -328,7 +330,14 @@
       "next": "Keyingi",
       "page": "{page}-sahifa",
       "current": "{page}-sahifa, joriy sahifa"
-    }
+    },
+    "count": "{count, plural, other {koʻngilli}}",
+    "podium": {
+      "label": "Eng yaxshi uchlik",
+      "place": "{rank}-oʻrin"
+    },
+    "xpValue": "{xp} XP",
+    "scoring": "Har bir tasdiqlangan tadbir uchun {event} XP, har bir tasdiqlangan soat uchun {hour} XP."
   },
   "applications": {
     "metaTitle": "Arizalar",
@@ -541,7 +550,8 @@
       "education": "Taʼlim",
       "location": "Qayerdasiz",
       "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
-      "links": "Havolalar"
+      "links": "Havolalar",
+      "about": "Siz haqingizda"
     },
     "fields": {
       "fullName": "Toʻliq ism",
@@ -581,6 +591,13 @@
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
       "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi."
+    },
+    "sectionHelp": {
+      "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
+      "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
+      "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
+      "contact": "Faqat ariza berganingizdan soʻng tashkilotchiga koʻrsatiladi.",
+      "links": "Ishingizni koʻrsatadigan har qanday havola. Ixtiyoriy."
     }
   },
   "settings": {
@@ -709,7 +726,9 @@
       "cancelled": "Soʻrov bekor qilindi.",
       "freshAuthTitle": "Tasdiqlash uchun qaytadan kiring",
       "freshAuthDescription": "Tasdiqlash ikki hisobni birlashtiradi, shuning uchun bu brauzer avval shu hisobga qaytadan kirishi kerak.",
-      "freshAuthAction": "Qaytadan kirish"
+      "freshAuthAction": "Qaytadan kirish",
+      "title": "Hisoblarni birlashtirish",
+      "waitingCount": "{count, plural, =0 {Hech narsa kutilmayapti} other {# ta soʻrov kutilmoqda}}"
     },
     "errors": {
       "accountLinkingUnavailable": "Hisoblarni ulash hozir mavjud emas. Birozdan soʻng urinib koʻring.",
@@ -756,6 +775,17 @@
       "expired": "Qoʻshilish soʻrovi muddati oʻtdi",
       "other": "Hisoblarni birlashtirish boʻyicha yangilik bor",
       "body": "Holatni koʻrish uchun sozlamalarni oching."
+    },
+    "account": {
+      "title": "Hisobingiz",
+      "signsInWith": "Kirish usullari",
+      "nothingConnected": "Hali birorta kirish usuli ulanmagan."
+    },
+    "password": {
+      "label": "Parol"
+    },
+    "index": {
+      "label": "Sozlamalar boʻlimlari"
     }
   },
   "notFound": {

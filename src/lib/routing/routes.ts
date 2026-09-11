@@ -87,7 +87,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/record",
     area: "volunteer",
     guard: "session",
-    inNav: true,
+    inNav: false,
     inTabBar: false,
     inAccountMenu: false,
   },
@@ -158,6 +158,12 @@ export function opportunityHref(slug: string): string {
 
 export function applicationHref(id: string): string {
   return `${navHref("applications")}/${id}`;
+}
+
+export const HISTORY_ANCHOR = "history";
+
+export function historyHref(): string {
+  return `${navHref("dashboard")}#${HISTORY_ANCHOR}`;
 }
 
 export function localePath(locale: Locale, key: RouteKey): string {

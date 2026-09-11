@@ -18,10 +18,11 @@ two disagree, check whether `v-web` moved first; the design system is sourced
 from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
-sidebar and a top bar with notifications and an account menu on desktop, a top
-bar and a four-destination tab bar on a phone, and panels of content on a flat
-workspace. Only the sign-in pages keep the marketing site's whiteboard ground.
-See [`DESIGN.md`](DESIGN.md).
+navy sidebar that carries everything on desktop — the lockup, the user card
+that opens the account menu, the sections, notifications, the theme switch and
+sign out — with no top bar; a slim header and a four-destination tab bar on a
+phone; and panels of content on a flat workspace. Only the sign-in pages keep
+the marketing site's whiteboard ground. See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
 
@@ -116,9 +117,13 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
 band of three figures read from the record, the bio, the facts and the links —
 and the editor is the one `Panel` below it. It carries nothing else: the
-account lives on `/settings`, the theme, the interface language and sign-out
-live in the top bar and the sidebar, and there is no notification, privacy or
-appearance group anywhere in the app. Nothing reads or writes
+account lives on `/settings`, the theme and sign-out live in the sidebar (the
+phone header on a phone), the interface language in the account menu, and
+there is no notification, privacy or appearance group anywhere in the app.
+**The record lives on the dashboard.** `/record` redirects to
+`/dashboard#history`; the dashboard carries the four figures, the level rail
+and the participation history, and the leaderboard is where "Your progress"
+leads. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
 privacy,appearance}` are unused and are kept only because that decision is
 reversible.
@@ -193,9 +198,9 @@ src/lib/api/                    -> the server-only client on openapi-fetch, the 
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
                                    around the Server Actions
 src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
-src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
-                                   applications[/id], saved, record, leaderboard,
-                                   profile, settings
+src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
+                                   applications[/id], saved and record (redirects),
+                                   leaderboard, profile, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs

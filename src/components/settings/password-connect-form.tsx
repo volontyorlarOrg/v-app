@@ -45,11 +45,13 @@ export function PasswordForm({
   mode,
   email,
   labels,
+  headed = true,
 }: {
   locale: string;
   mode: "set" | "change";
   email: string | null;
   labels: PasswordFormLabels;
+  headed?: boolean;
 }) {
   const id = useId();
   const { form, result, pending, formProps } = useActionForm({
@@ -89,12 +91,16 @@ export function PasswordForm({
     <form {...formProps}>
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" {...register("mode")} />
-      <h3 className="font-sans text-sm font-semibold text-ink">{labels.title}</h3>
-      <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-        {labels.description}
-      </p>
+      {headed ? (
+        <>
+          <h3 className="font-sans text-sm font-semibold text-ink">{labels.title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+            {labels.description}
+          </p>
+        </>
+      ) : null}
 
-      <FieldGroup className="mt-4">
+      <FieldGroup className={headed ? "mt-4" : undefined}>
         {email ? (
           <input type="hidden" {...register("email")} />
         ) : (
@@ -180,7 +186,7 @@ export function PasswordForm({
         {result.status === "ok" ? (
           <ActionStatus tone="done">{labels.done}</ActionStatus>
         ) : null}
-        <Button type="submit" size="sm" disabled={pending} className="sm:self-start">
+        <Button type="submit" disabled={pending} className="sm:self-start">
           {pending ? labels.pending : labels.submit}
         </Button>
       </div>

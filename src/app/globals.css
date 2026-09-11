@@ -27,6 +27,12 @@
   --color-accent: #e85d30;
   --color-accent-ink: #b34917;
 
+  --color-shell: #0b2340;
+  --color-shell-raised: #14345a;
+  --color-shell-line: #1e3f66;
+  --color-shell-ink: #f1f6fb;
+  --color-shell-muted: #9db4cc;
+
   --color-background: var(--color-paper);
   --color-foreground: var(--color-ink);
   --color-card: var(--color-surface);
@@ -80,16 +86,16 @@
   :root[data-theme="dark"] {
     color-scheme: dark;
 
-    --color-paper: #0a0e13;
-    --color-surface: #131920;
-    --color-surface-sunk: #0e1319;
-    --color-surface-soft: #0f1b28;
+    --color-paper: #070d17;
+    --color-surface: #101a2b;
+    --color-surface-sunk: #0b1321;
+    --color-surface-soft: #10233a;
 
     --color-ink: #edf1f5;
-    --color-ink-muted: #a6b1bd;
+    --color-ink-muted: #a9b4c2;
 
-    --color-border: #1f2833;
-    --color-border-control: #5b6774;
+    --color-border: #1e2b3f;
+    --color-border-control: #5d6b80;
 
     --color-primary: #3aa0e4;
     --color-primary-ink: #6fbff2;
@@ -102,6 +108,12 @@
     --color-band-copy: #a9cfea;
 
     --color-accent-ink: #f08a55;
+
+    --color-shell: #0b1424;
+    --color-shell-raised: #16243a;
+    --color-shell-line: #1b2a40;
+    --color-shell-ink: #edf2f8;
+    --color-shell-muted: #9aacc2;
 
     --board-dot: color-mix(in srgb, var(--color-primary) 22%, transparent);
     --board-wash: color-mix(in srgb, var(--color-primary) 12%, transparent);
@@ -273,11 +285,31 @@
 
 @layer components {
   .workspace-backdrop {
-    background-image: radial-gradient(
-      48rem 28rem at 85% 0%,
-      color-mix(in srgb, var(--color-primary) 8%, transparent),
-      transparent 72%
-    );
+    background-image:
+      radial-gradient(
+        52rem 30rem at 88% -6%,
+        color-mix(in srgb, var(--color-primary) 13%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        40rem 26rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 7%, transparent),
+        transparent 70%
+      );
+  }
+
+  .shell-glow {
+    background-image:
+      radial-gradient(
+        22rem 16rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 34%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        18rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 16%, transparent),
+        transparent 70%
+      );
   }
 
   .dashboard-hero {
@@ -289,12 +321,61 @@
     border-radius: var(--radius-xl);
     background:
       radial-gradient(
-        32rem 20rem at 92% 38%,
-        color-mix(in srgb, var(--color-primary) 11%, transparent),
+        34rem 22rem at 94% 30%,
+        color-mix(in srgb, var(--color-primary) 16%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        20rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 9%, transparent),
         transparent 72%
       ),
       var(--color-surface);
     padding: 1.25rem;
+  }
+
+  .identity-cover {
+    background:
+      radial-gradient(
+        30rem 14rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 26%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        24rem 12rem at 100% 100%,
+        color-mix(in srgb, var(--color-accent) 22%, transparent),
+        transparent 72%
+      ),
+      var(--color-surface-soft);
+  }
+
+  .podium-stage {
+    background:
+      radial-gradient(
+        28rem 16rem at 50% 100%,
+        color-mix(in srgb, var(--color-accent) 18%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 12%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 12%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface);
+  }
+
+  .standing-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
+      var(--color-surface) 55%,
+      color-mix(in srgb, var(--color-accent) 10%, var(--color-surface))
+    );
   }
 
   .impact-orbit {
@@ -372,6 +453,79 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  :root[data-theme="dark"] .workspace-backdrop {
+    background-image:
+      radial-gradient(
+        52rem 30rem at 88% -6%,
+        color-mix(in srgb, var(--color-primary) 26%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        40rem 26rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 14%, transparent),
+        transparent 70%
+      );
+  }
+
+  :root[data-theme="dark"] .dashboard-hero {
+    background:
+      radial-gradient(
+        34rem 22rem at 94% 30%,
+        color-mix(in srgb, var(--color-primary) 34%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 22%, transparent),
+        transparent 72%
+      ),
+      var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .identity-cover {
+    background:
+      radial-gradient(
+        30rem 14rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 42%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        20rem 10rem at 96% 110%,
+        color-mix(in srgb, var(--color-accent) 24%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface-soft);
+  }
+
+  :root[data-theme="dark"] .podium-stage {
+    background:
+      radial-gradient(
+        28rem 16rem at 50% 100%,
+        color-mix(in srgb, var(--color-accent) 30%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 24%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 24%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .standing-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 30%, var(--color-surface)),
+      var(--color-surface) 55%,
+      color-mix(in srgb, var(--color-accent) 22%, var(--color-surface))
+    );
   }
 
   .hero-copy {
