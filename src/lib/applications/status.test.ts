@@ -4,6 +4,7 @@ import {
   APPLICATION_STATUSES,
   applicationGroup,
   applicationTimeline,
+  canWithdrawApplication,
   inApplicationGroup,
   isApplicationGroup,
   isEditable,
@@ -24,7 +25,12 @@ function opportunity(startsAt: string): OpportunitySummary {
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
     summary: "",
-    organization: { id: "green", name: "Green Corridor Group", slug: "green", verified: false },
+    organization: {
+      id: "green",
+      name: "Green Corridor Group",
+      slug: "green",
+      verified: false,
+    },
     region: "samarkand",
     format: "onsite",
     status: "open",
@@ -87,9 +93,10 @@ describe("application groups", () => {
 describe("applicationTimeline", () => {
   it("keeps a draft on the first step", () => {
     expect(
-      applicationTimeline({ status: "draft", updatedAt: "2026-06-01T10:00:00.000Z" }).map(
-        (entry) => entry.state,
-      ),
+      applicationTimeline({
+        status: "draft",
+        updatedAt: "2026-06-01T10:00:00.000Z",
+      }).map((entry) => entry.state),
     ).toEqual(["current", "pending", "pending"]);
   });
 
@@ -104,14 +111,38 @@ describe("applicationTimeline", () => {
     expect(review[0]?.at).toBe("2026-06-01T10:00:00.000Z");
   });
 
-  it("completes every step once a decision exists", () => {
-    for (const status of ["accepted", "rejected", "withdrawn", "closed"] as const) {
+  it("completes decision steps for terminal applications", () => {
+    for (const status of ["rejected", "withdrawn", "closed"] as const) {
       expect(
         applicationTimeline({ status, updatedAt: "2026-06-04T10:00:00.000Z" }).every(
           (entry) => entry.state === "done",
         ),
       ).toBe(true);
     }
+  });
+
+  it("keeps accepted attendance current until the coordinator resolves it", () => {
+    expect(
+      applicationTimeline({
+        status: "accepted",
+        updatedAt: "2026-06-04T10:00:00.000Z",
+        attendance: {
+          id: "attendance-1",
+          outcome: "awaiting_confirmation",
+        },
+      }).map((entry) => entry.state),
+    ).toEqual(["done", "done", "done", "current"]);
+    expect(
+      applicationTimeline({
+        status: "accepted",
+        updatedAt: "2026-06-04T10:00:00.000Z",
+        attendance: {
+          id: "attendance-1",
+          outcome: "attended",
+          resolvedAt: "2026-06-26T10:00:00.000Z",
+        },
+      }).at(-1),
+    ).toMatchObject({ state: "done", at: "2026-06-26T10:00:00.000Z" });
   });
 });
 
@@ -133,7 +164,9 @@ describe("decidedAt", () => {
 
   it("falls back to the last update when the decision has no date of its own", () => {
     expect(decidedAt({ status: "closed", ...dates })).toBe(dates.updatedAt);
-    expect(decidedAt({ status: "accepted", updatedAt: dates.updatedAt })).toBe(dates.updatedAt);
+    expect(decidedAt({ status: "accepted", updatedAt: dates.updatedAt })).toBe(
+      dates.updatedAt,
+    );
   });
 
   it("has no decision while the application is still open", () => {
@@ -159,5 +192,30 @@ describe("isUpcomingCommitment", () => {
     for (const status of ["draft", "submitted", "under_review", "rejected"] as const) {
       expect(isUpcomingCommitment(application(status, ahead), NOW)).toBe(false);
     }
+  });
+});
+
+describe("canWithdrawApplication", () => {
+  it("allows an accepted volunteer to withdraw only before the event starts", () => {
+    const accepted = {
+      ...application("accepted", "2026-06-25T09:00:00.000Z"),
+      attendance: { id: "attendance-1", outcome: "awaiting_confirmation" as const },
+    };
+    expect(canWithdrawApplication(accepted, NOW)).toBe(true);
+    expect(canWithdrawApplication(accepted, new Date("2026-06-25T09:00:00.000Z"))).toBe(
+      false,
+    );
+  });
+
+  it("does not offer withdrawal after attendance is resolved", () => {
+    expect(
+      canWithdrawApplication(
+        {
+          ...application("accepted", "2026-06-25T09:00:00.000Z"),
+          attendance: { id: "attendance-1", outcome: "attended" },
+        },
+        NOW,
+      ),
+    ).toBe(false);
   });
 });

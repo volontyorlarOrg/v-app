@@ -55,7 +55,12 @@ describe("onboarding steps", () => {
   it("covers every field that counts toward profile completeness", () => {
     const covered = new Set<string>(Object.values(PROFILE_STEP_FIELDS).flat());
     for (const field of COMPLETION_FIELDS) {
-      expect(covered.has(field), field).toBe(true);
+      expect(
+        field === "contact"
+          ? covered.has("phone") && covered.has("telegram")
+          : covered.has(field),
+        field,
+      ).toBe(true);
     }
     expect(covered.has("phone") && covered.has("telegram")).toBe(true);
   });

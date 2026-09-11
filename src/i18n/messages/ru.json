@@ -366,6 +366,11 @@
     "appliedOn": "Подана {date}",
     "startedOn": "Начата {date}",
     "continueDraft": "Продолжить черновик",
+    "card": {
+      "continue": "Продолжить",
+      "track": "Статус заявки",
+      "attendance": "Посещаемость"
+    },
     "detail": {
       "eyebrow": "Заявка",
       "back": "Все заявки",
@@ -373,7 +378,8 @@
       "steps": {
         "submitted": "Отправлена",
         "under_review": "На рассмотрении",
-        "decided": "Решение"
+        "decided": "Решение",
+        "attendance": "Посещаемость"
       },
       "inProgress": "В процессе",
       "pending": "Ещё нет",
@@ -393,7 +399,27 @@
         "fallback": "Не удалось отозвать. Попробуйте ещё раз."
       },
       "reviewerNote": "Комментарий организатора",
-      "question": "Вопрос {number}"
+      "question": "Вопрос {number}",
+      "snapshot": {
+        "bio": "О себе",
+        "city": "Город или район",
+        "gradeYear": "Курс или класс",
+        "languages": "Языки",
+        "skills": "Навыки",
+        "links": "Ссылки"
+      }
+    },
+    "attendance": {
+      "title": "Посещаемость",
+      "description": "После мероприятия координатор подтверждает результат и часы.",
+      "state": "Результат",
+      "hours": "Подтверждённые часы",
+      "outcome": {
+        "attended": "Присутствовал",
+        "excused": "Уважительная причина",
+        "cancelled": "Отменено",
+        "awaiting_confirmation": "Ожидает подтверждения координатора"
+      }
     },
     "form": {
       "save": "Сохранить черновик",
@@ -406,6 +432,7 @@
       "fieldInvalid": "Проверьте этот ответ.",
       "errors": {
         "profileRequired": "Перед отправкой заполните профиль.",
+        "profileIncomplete": "Заполните обязательные поля профиля и добавьте способ связи перед отправкой.",
         "profileLink": "Открыть профиль",
         "opportunityUnavailable": "Эта возможность больше не принимает заявки.",
         "invalidAnswers": "Некоторые ответы нужно проверить.",
@@ -461,6 +488,7 @@
       "deadline": "Приём заявок до",
       "format": "Формат",
       "capacity": "Нужно волонтёров",
+      "estimatedTotalHours": "Оценка времени",
       "spotsOf": "Осталось {spots} из {capacity} мест",
       "requirements": "Что нужно",
       "description": "Об этой возможности",
@@ -474,6 +502,8 @@
       "applyClosed": "Приём заявок закрыт",
       "applying": "Открываем…",
       "viewApplication": "Открыть заявку",
+      "profileRequired": "Перед подачей заявки заполните основные поля профиля и добавьте телефон или имя пользователя Telegram.",
+      "completeProfile": "Заполнить профиль",
       "applyErrors": {
         "opportunityUnavailable": "На эту возможность сейчас нельзя подать заявку.",
         "opportunityNotFound": "Эта возможность больше недоступна.",
@@ -516,7 +546,8 @@
       "tashkent-city": "город Ташкент",
       "karakalpakstan": "Каракалпакстан"
     },
-    "showingOf": "Показано {shown} из {total}. Уточните фильтры, чтобы увидеть остальные."
+    "showingOf": "Показано {shown} из {total}. Уточните фильтры, чтобы увидеть остальные.",
+    "estimatedHours": "Всего {hours, number} ч"
   },
   "saved": {
     "metaTitle": "Сохранённое",
@@ -577,7 +608,8 @@
       "bio": "Био",
       "region": "Регион",
       "school": "Школа",
-      "languages": "Языки"
+      "languages": "Языки",
+      "contact": "Телефон или Telegram"
     },
     "optional": "Необязательно",
     "save": "Сохранить профиль",

@@ -1,4 +1,5 @@
 import type { OpportunitySummary, QuestionType } from "@/lib/opportunities/types";
+import type { AttendanceOutcome } from "@/lib/record/levels";
 
 export const APPLICATION_STATUSES = [
   "draft",
@@ -21,6 +22,15 @@ export type ApplicationSummary = {
   submittedAt?: string;
   reviewedAt?: string;
   withdrawnAt?: string;
+  attendance?: ApplicationAttendance;
+};
+
+export type ApplicationAttendance = {
+  id: string;
+  outcome: AttendanceOutcome;
+  scheduledHours?: number;
+  confirmedHours?: number;
+  resolvedAt?: string;
 };
 
 export type AnswerValue = string | string[];
@@ -34,10 +44,16 @@ export type ApplicationAnswer = {
 
 export type ProfileSnapshot = {
   fullName?: string;
+  bio?: string;
   region?: string;
+  city?: string;
   school?: string;
+  gradeYear?: string;
+  languages?: string[];
+  skills?: string[];
   phone?: string;
   telegram?: string;
+  links?: string[];
 };
 
 export type ApplicationDetail = ApplicationSummary & {
@@ -47,7 +63,10 @@ export type ApplicationDetail = ApplicationSummary & {
 };
 
 export function decidedAt(
-  application: Pick<ApplicationSummary, "status" | "reviewedAt" | "withdrawnAt" | "updatedAt">,
+  application: Pick<
+    ApplicationSummary,
+    "status" | "reviewedAt" | "withdrawnAt" | "updatedAt"
+  >,
 ): string | undefined {
   switch (application.status) {
     case "withdrawn":
@@ -76,6 +95,18 @@ export function isEditable(status: ApplicationStatus): boolean {
 
 export function isWithdrawable(status: ApplicationStatus): boolean {
   return WITHDRAWABLE.has(status);
+}
+
+export function canWithdrawApplication(
+  application: Pick<ApplicationSummary, "status" | "opportunity" | "attendance">,
+  now: Date,
+): boolean {
+  if (!isWithdrawable(application.status)) return false;
+  if (application.status !== "accepted") return true;
+  return (
+    new Date(application.opportunity.startsAt).getTime() > now.getTime() &&
+    application.attendance?.outcome === "awaiting_confirmation"
+  );
 }
 
 export function isTerminal(status: ApplicationStatus): boolean {
@@ -117,7 +148,12 @@ export function inApplicationGroup(
   return group === "all" || applicationGroup(status) === group;
 }
 
-export const TIMELINE_STEPS = ["submitted", "under_review", "decided"] as const;
+export const TIMELINE_STEPS = [
+  "submitted",
+  "under_review",
+  "decided",
+  "attendance",
+] as const;
 export type TimelineStep = (typeof TIMELINE_STEPS)[number];
 export type TimelineState = "done" | "current" | "pending";
 
@@ -126,7 +162,7 @@ export type TimelineEntry = { step: TimelineStep; state: TimelineState; at?: str
 export function applicationTimeline(
   application: Pick<
     ApplicationSummary,
-    "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt"
+    "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt" | "attendance"
   >,
 ): TimelineEntry[] {
   const submitted: TimelineEntry = {
@@ -143,6 +179,15 @@ export function applicationTimeline(
     step: "decided",
     state: "done",
     at: decidedAt(application),
+  };
+  const attendance: TimelineEntry = {
+    step: "attendance",
+    state:
+      !application.attendance ||
+      application.attendance.outcome === "awaiting_confirmation"
+        ? "current"
+        : "done",
+    at: application.attendance?.resolvedAt,
   };
 
   switch (application.status) {
@@ -165,6 +210,7 @@ export function applicationTimeline(
         { step: "decided", state: "pending" },
       ];
     case "accepted":
+      return [submitted, reviewed, decided, attendance];
     case "rejected":
     case "withdrawn":
     case "closed":

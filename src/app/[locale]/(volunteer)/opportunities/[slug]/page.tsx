@@ -15,10 +15,16 @@ import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
+import { getProfile } from "@/lib/api/profile.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { canApply } from "@/lib/opportunities/deadline";
 import type { OpportunityDetail } from "@/lib/opportunities/types";
+import {
+  EMPTY_PROFILE,
+  profileCompletion,
+  type ProfileCompletion,
+} from "@/lib/profile/completion";
 import { applicationHref, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +44,11 @@ export default async function OpportunityPage({
   setRequestLocale(locale);
 
   const now = new Date();
-  const [opportunity, saved] = await Promise.all([getOpportunity(slug), listSaved()]);
+  const [opportunity, saved, profile] = await Promise.all([
+    getOpportunity(slug),
+    listSaved(),
+    getProfile(),
+  ]);
   if (!opportunity) notFound();
 
   const application = await getApplicationByOpportunity(opportunity.id);
@@ -50,6 +60,7 @@ export default async function OpportunityPage({
       application={
         application ? { id: application.id, status: application.status } : null
       }
+      profileCompletion={profileCompletion(profile ?? EMPTY_PROFILE)}
       now={now}
     />
   );
@@ -59,11 +70,13 @@ function Opportunity({
   opportunity,
   saved,
   application,
+  profileCompletion: completion,
   now,
 }: {
   opportunity: OpportunityDetail;
   saved: boolean;
   application: { id: string; status: ApplicationStatus } | null;
+  profileCompletion: ProfileCompletion;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -185,20 +198,37 @@ function Opportunity({
                   : t("detail.viewApplication")}
               </Link>
             ) : applicable ? (
-              <ApplyForm
-                opportunityId={opportunity.id}
-                labels={{
-                  apply: t("detail.apply"),
-                  applying: t("detail.applying"),
-                  errors: {
-                    opportunityUnavailable: t(
-                      "detail.applyErrors.opportunityUnavailable",
-                    ),
-                    opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
-                  },
-                  fallback: t("detail.applyErrors.fallback"),
-                }}
-              />
+              completion.complete ? (
+                <ApplyForm
+                  opportunityId={opportunity.id}
+                  labels={{
+                    apply: t("detail.apply"),
+                    applying: t("detail.applying"),
+                    errors: {
+                      opportunityUnavailable: t(
+                        "detail.applyErrors.opportunityUnavailable",
+                      ),
+                      opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
+                    },
+                    fallback: t("detail.applyErrors.fallback"),
+                  }}
+                />
+              ) : (
+                <div>
+                  <p className="text-sm leading-relaxed text-ink-muted">
+                    {t("detail.profileRequired")}
+                  </p>
+                  <Link
+                    href={navHref("profile")}
+                    className={buttonClass({
+                      variant: "outline",
+                      className: "mt-4 w-full",
+                    })}
+                  >
+                    {t("detail.completeProfile")}
+                  </Link>
+                </div>
+              )
             ) : (
               <button
                 type="button"
