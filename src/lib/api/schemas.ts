@@ -57,7 +57,16 @@ export const opportunitySummarySchema = z.object({
   applicationDeadline: isoDate,
   imageUrl: optional(z.string()),
   capacity: optional(z.number().int()),
+  estimatedTotalHours: optional(z.number()),
   spotsRemaining: optional(z.number().int()),
+});
+
+export const applicationAttendanceSchema = z.object({
+  id: z.string().min(1),
+  outcome: z.enum(ATTENDANCE_OUTCOMES),
+  scheduledHours: optional(z.number()),
+  confirmedHours: optional(z.number()),
+  resolvedAt: optional(isoDate),
 });
 
 const questionOptionSchema = z
@@ -105,6 +114,7 @@ export const applicationSummarySchema = z.object({
   submittedAt: optional(isoDate),
   reviewedAt: optional(isoDate),
   withdrawnAt: optional(isoDate),
+  attendance: optional(applicationAttendanceSchema),
 });
 
 const answerValueSchema = z.unknown().transform((value): string | string[] => {
@@ -124,8 +134,10 @@ export const applicationAnswerSchema = z.object({
 
 export const profileSnapshotSchema = z.object({
   fullName: optional(z.string()),
+  bio: optional(z.string()),
   region: optional(z.string()),
   school: optional(z.string()),
+  languages: optional(z.array(z.string())),
   phone: optional(z.string()),
   telegram: optional(z.string()),
 });

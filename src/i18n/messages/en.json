@@ -366,6 +366,11 @@
     "appliedOn": "Applied {date}",
     "startedOn": "Started {date}",
     "continueDraft": "Continue draft",
+    "card": {
+      "continue": "Continue",
+      "track": "Track status",
+      "attendance": "Attendance"
+    },
     "detail": {
       "eyebrow": "Application",
       "back": "All applications",
@@ -373,7 +378,8 @@
       "steps": {
         "submitted": "Submitted",
         "under_review": "Under review",
-        "decided": "Decision"
+        "decided": "Decision",
+        "attendance": "Attendance"
       },
       "inProgress": "In progress",
       "pending": "Not yet",
@@ -393,7 +399,27 @@
         "fallback": "Couldn't withdraw. Please try again."
       },
       "reviewerNote": "Note from the organiser",
-      "question": "Question {number}"
+      "question": "Question {number}",
+      "snapshot": {
+        "bio": "Bio",
+        "city": "City or district",
+        "gradeYear": "Year or grade",
+        "languages": "Languages",
+        "skills": "Skills",
+        "links": "Links"
+      }
+    },
+    "attendance": {
+      "title": "Attendance",
+      "description": "After the event, the coordinator confirms your outcome and hours.",
+      "state": "Outcome",
+      "hours": "Confirmed hours",
+      "outcome": {
+        "attended": "Attended",
+        "excused": "Excused",
+        "cancelled": "Cancelled",
+        "awaiting_confirmation": "Awaiting coordinator confirmation"
+      }
     },
     "form": {
       "save": "Save draft",
@@ -406,6 +432,7 @@
       "fieldInvalid": "Check this answer.",
       "errors": {
         "profileRequired": "Complete your profile before submitting.",
+        "profileIncomplete": "Complete the required profile fields and add a contact method before submitting.",
         "profileLink": "Go to your profile",
         "opportunityUnavailable": "This opportunity is no longer taking applications.",
         "invalidAnswers": "Some answers need another look.",
@@ -461,6 +488,7 @@
       "deadline": "Applications close",
       "format": "Format",
       "capacity": "Volunteers needed",
+      "estimatedTotalHours": "Estimated effort",
       "spotsOf": "{spots} of {capacity} spots left",
       "requirements": "What you need",
       "description": "About this opportunity",
@@ -474,6 +502,8 @@
       "applyClosed": "Applications are closed",
       "applying": "Starting…",
       "viewApplication": "View your application",
+      "profileRequired": "Complete the core profile fields and add a phone number or Telegram username before applying.",
+      "completeProfile": "Complete profile",
       "applyErrors": {
         "opportunityUnavailable": "This opportunity isn't taking applications right now.",
         "opportunityNotFound": "This opportunity is no longer available.",
@@ -516,7 +546,8 @@
       "tashkent-city": "Tashkent City",
       "karakalpakstan": "Karakalpakstan"
     },
-    "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest."
+    "showingOf": "Showing {shown} of {total}. Narrow the filters to see the rest.",
+    "estimatedHours": "{hours, number} hours total"
   },
   "saved": {
     "metaTitle": "Saved",
@@ -577,7 +608,8 @@
       "bio": "Bio",
       "region": "Region",
       "school": "School",
-      "languages": "Languages"
+      "languages": "Languages",
+      "contact": "Phone or Telegram"
     },
     "optional": "Optional",
     "save": "Save profile",

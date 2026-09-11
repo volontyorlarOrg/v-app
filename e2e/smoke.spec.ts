@@ -544,7 +544,9 @@ test.describe("the panel", () => {
     ).toBeVisible();
 
     if (mobile) {
-      await expect(navigation.getByRole("link", { name: "Leaderboard" })).toHaveCount(0);
+      await expect(navigation.getByRole("link", { name: "Leaderboard" })).toHaveCount(
+        0,
+      );
       await page.goto("/en/leaderboard");
     } else {
       await navigation.getByRole("link", { name: "Leaderboard" }).click();
@@ -757,6 +759,11 @@ test.describe("opportunities", () => {
     page,
   }) => {
     await page.goto("/en/opportunities/remote-translation-support");
+    await expect(page.getByRole("link", { name: "Complete profile" })).toBeVisible();
+    await page.getByRole("link", { name: "Complete profile" }).click();
+    await page.getByLabel("Bio").fill("I translate community information.");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await page.goto("/en/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
 
@@ -825,6 +832,10 @@ test.describe("applications, record, profile and settings", () => {
     page,
   }) => {
     await page.goto("/en/applications/app-riverbank");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Attendance" }),
+    ).toBeVisible();
+    await expect(page.getByText("Awaiting coordinator confirmation")).toBeVisible();
     await page.getByRole("button", { name: "Withdraw application" }).click();
     await page.getByRole("button", { name: "Yes, withdraw" }).click();
     await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
@@ -868,7 +879,7 @@ test.describe("applications, record, profile and settings", () => {
     await page.goto("/en/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "80");
+    ).toHaveAttribute("aria-valuenow", "83");
 
     await page.getByLabel("Bio").fill("Second-year student.");
     await page.getByRole("button", { name: "Save profile" }).click();
@@ -881,12 +892,17 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveCount(0);
   });
 
-  test("contact details are optional and never block completeness", async ({
+  test("either contact method satisfies readiness without requiring both inputs", async ({
     page,
   }) => {
     await page.goto("/en/profile");
     await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
     await expect(page.getByLabel("Phone number")).toHaveValue("");
+    await expect(page.getByLabel("Telegram username")).not.toHaveAttribute(
+      "required",
+      "",
+    );
+    await expect(page.getByLabel("Telegram username")).toHaveValue("dilnoza_k");
     await expect(page.getByLabel("Bio")).toBeVisible();
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
   });
@@ -1235,7 +1251,6 @@ test.describe("account connections and merges", () => {
   });
 });
 
-
 test.describe("the leaderboard", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
@@ -1243,7 +1258,9 @@ test.describe("the leaderboard", () => {
   });
 
   test("ranks volunteers on the backend's own numbers", async ({ page }) => {
-    await expect(page.getByRole("heading", { level: 1, name: "Leaderboard" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Leaderboard" }),
+    ).toBeVisible();
 
     const podium = page.getByRole("region", { name: "Top three" });
     await expect(podium.getByRole("listitem")).toHaveCount(3);
@@ -1273,10 +1290,9 @@ test.describe("the leaderboard", () => {
     await expect(page.getByRole("status")).toContainText("Showing 1\u201325 of 30");
 
     const pages = page.getByRole("navigation", { name: "Leaderboard pages" });
-    await expect(pages.getByRole("link", { name: "Page 1, current page" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    await expect(
+      pages.getByRole("link", { name: "Page 1, current page" }),
+    ).toHaveAttribute("aria-current", "page");
 
     await pages.getByRole("link", { name: "Next" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
@@ -1324,9 +1340,9 @@ test.describe("the leaderboard handle", () => {
     await expect(panel).toContainText("@chilonzor_reader");
 
     await page.goto("/en/leaderboard?page=2");
-    await expect(page.getByRole("row").filter({ hasText: "@chilonzor_reader" })).toContainText(
-      "You",
-    );
+    await expect(
+      page.getByRole("row").filter({ hasText: "@chilonzor_reader" }),
+    ).toContainText("You");
   });
 
   test("a handle another volunteer holds is refused by name", async ({ page }) => {
@@ -1347,7 +1363,9 @@ test.describe("the leaderboard handle", () => {
     const field = panel.getByLabel("New handle");
     await field.fill("no");
     await panel.getByRole("button", { name: "Save handle" }).click();
-    await expect(panel.getByText("A handle needs at least 5 characters.")).toBeVisible();
+    await expect(
+      panel.getByText("A handle needs at least 5 characters."),
+    ).toBeVisible();
     await expect(field).toHaveAttribute("aria-invalid", "true");
   });
 

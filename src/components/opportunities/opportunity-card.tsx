@@ -1,26 +1,33 @@
-import { BadgeCheck, CalendarDays, MapPin, Monitor, Users } from "lucide-react";
+import { BadgeCheck, CalendarDays, Clock3, MapPin, Monitor, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
 import {
   DeadlineText,
   OpportunityStatusChip,
 } from "@/components/dashboard/opportunity-status";
+import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { ApplicationStatus } from "@/lib/applications/status";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
-import { opportunityHref } from "@/lib/routing/routes";
+import { applicationHref, opportunityHref } from "@/lib/routing/routes";
 
 export function OpportunityCard({
   opportunity,
   saved,
   now,
+  application,
+  showSave = true,
 }: {
   opportunity: OpportunitySummary;
   saved: boolean;
   now: Date;
+  application?: { id: string; status: ApplicationStatus } | undefined;
+  showSave?: boolean;
 }) {
   const t = useTranslations("opportunities");
+  const applications = useTranslations("applications");
   const format = useFormatter();
 
   const remote = opportunity.format === "remote";
@@ -34,6 +41,7 @@ export function OpportunityCard({
     <article className="flex w-full flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
         <OpportunityStatusChip opportunity={opportunity} now={now} />
+        {application ? <ApplicationStatusChip status={application.status} /> : null}
         <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
       </div>
 
@@ -74,22 +82,42 @@ export function OpportunityCard({
             {t("spotsLeft", { count: opportunity.spotsRemaining })}
           </li>
         ) : null}
+        {opportunity.estimatedTotalHours !== undefined ? (
+          <li className="inline-flex items-center gap-1.5">
+            <Clock3 aria-hidden="true" className="size-3.5" />
+            {t("estimatedHours", { hours: opportunity.estimatedTotalHours })}
+          </li>
+        ) : null}
       </ul>
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-        <SaveButton
-          opportunityId={opportunity.id}
-          saved={saved}
-          saveLabel={t("card.save")}
-          savedLabel={t("card.saved")}
-          errorLabel={t("card.saveError")}
-          className="-ml-4"
-        />
+        {showSave ? (
+          <SaveButton
+            opportunityId={opportunity.id}
+            saved={saved}
+            saveLabel={t("card.save")}
+            savedLabel={t("card.saved")}
+            errorLabel={t("card.saveError")}
+            className="-ml-4"
+          />
+        ) : (
+          <span />
+        )}
         <Link
-          href={opportunityHref(opportunity.slug)}
+          href={
+            application
+              ? applicationHref(application.id)
+              : opportunityHref(opportunity.slug)
+          }
           className={buttonClass({ variant: "outline", size: "sm" })}
         >
-          {t("card.view")}
+          {application
+            ? application.status === "draft"
+              ? applications("card.continue")
+              : application.status === "accepted"
+                ? applications("card.attendance")
+                : applications("card.track")
+            : t("card.view")}
         </Link>
       </div>
     </article>
