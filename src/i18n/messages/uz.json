@@ -366,6 +366,11 @@
     "appliedOn": "Yuborilgan: {date}",
     "startedOn": "Boshlangan: {date}",
     "continueDraft": "Qoralamani davom ettirish",
+    "card": {
+      "continue": "Davom ettirish",
+      "track": "Holatni kuzatish",
+      "attendance": "Ishtirok"
+    },
     "detail": {
       "eyebrow": "Ariza",
       "back": "Barcha arizalar",
@@ -373,7 +378,8 @@
       "steps": {
         "submitted": "Yuborildi",
         "under_review": "Koʻrib chiqilmoqda",
-        "decided": "Qaror"
+        "decided": "Qaror",
+        "attendance": "Ishtirok"
       },
       "inProgress": "Jarayonda",
       "pending": "Hali emas",
@@ -393,7 +399,27 @@
         "fallback": "Qaytarib olib boʻlmadi. Qayta urinib koʻring."
       },
       "reviewerNote": "Tashkilotchi izohi",
-      "question": "{number}-savol"
+      "question": "{number}-savol",
+      "snapshot": {
+        "bio": "Oʻzingiz haqingizda",
+        "city": "Shahar yoki tuman",
+        "gradeYear": "Kurs yoki sinf",
+        "languages": "Tillar",
+        "skills": "Koʻnikmalar",
+        "links": "Havolalar"
+      }
+    },
+    "attendance": {
+      "title": "Ishtirok",
+      "description": "Tadbirdan keyin koordinator natija va soatlaringizni tasdiqlaydi.",
+      "state": "Natija",
+      "hours": "Tasdiqlangan soatlar",
+      "outcome": {
+        "attended": "Qatnashdi",
+        "excused": "Sababli",
+        "cancelled": "Bekor qilindi",
+        "awaiting_confirmation": "Koordinator tasdigʻi kutilmoqda"
+      }
     },
     "form": {
       "save": "Qoralamani saqlash",
@@ -406,6 +432,7 @@
       "fieldInvalid": "Bu javobni tekshiring.",
       "errors": {
         "profileRequired": "Yuborishdan oldin profilingizni toʻldiring.",
+        "profileIncomplete": "Majburiy profil maydonlarini toʻldiring va aloqa usulini qoʻshing.",
         "profileLink": "Profilga oʻtish",
         "opportunityUnavailable": "Bu imkoniyat endi ariza qabul qilmaydi.",
         "invalidAnswers": "Baʼzi javoblarni qayta tekshirish kerak.",
@@ -461,6 +488,7 @@
       "deadline": "Arizalar yopiladi",
       "format": "Shakl",
       "capacity": "Kerakli volontyorlar",
+      "estimatedTotalHours": "Taxminiy mehnat",
       "spotsOf": "{capacity} ta joydan {spots} tasi qoldi",
       "requirements": "Nima kerak",
       "description": "Bu imkoniyat haqida",
@@ -474,6 +502,8 @@
       "applyClosed": "Arizalar yopilgan",
       "applying": "Boshlanmoqda…",
       "viewApplication": "Arizani koʻrish",
+      "profileRequired": "Ariza berishdan oldin profilning asosiy maydonlarini toʻldiring va telefon yoki Telegram nomini qoʻshing.",
+      "completeProfile": "Profilni toʻldirish",
       "applyErrors": {
         "opportunityUnavailable": "Bu imkoniyat hozir ariza qabul qilmayapti.",
         "opportunityNotFound": "Bu imkoniyat endi mavjud emas.",
@@ -516,7 +546,8 @@
       "tashkent-city": "Toshkent shahri",
       "karakalpakstan": "Qoraqalpogʻiston Respublikasi"
     },
-    "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring."
+    "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring.",
+    "estimatedHours": "Jami {hours, number} soat"
   },
   "saved": {
     "metaTitle": "Saqlanganlar",
@@ -577,7 +608,8 @@
       "bio": "Bio",
       "region": "Hudud",
       "school": "Maktab",
-      "languages": "Tillar"
+      "languages": "Tillar",
+      "contact": "Telefon yoki Telegram"
     },
     "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",

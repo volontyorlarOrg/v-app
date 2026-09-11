@@ -51,6 +51,7 @@ export type OpportunitySummary = {
   applicationDeadline: string;
   imageUrl?: string;
   capacity?: number;
+  estimatedTotalHours?: number;
   spotsRemaining?: number;
 };
 

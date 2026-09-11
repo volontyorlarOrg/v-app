@@ -18,8 +18,8 @@ import { getApplication } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
 import {
+  canWithdrawApplication,
   isEditable,
-  isWithdrawable,
   type AnswerValue,
   type ApplicationDetail,
   type ProfileSnapshot,
@@ -54,8 +54,10 @@ export default async function ApplicationPage({
 
   const snapshot: ProfileSnapshot = application.profileSnapshot ?? {
     fullName: profile?.fullName,
+    bio: profile?.bio,
     region: profile?.region ?? undefined,
     school: profile?.school,
+    languages: profile?.languages,
     phone: profile?.phone,
     telegram: profile?.telegram,
   };
@@ -135,6 +137,11 @@ function Application({
       value: snapshot.fullName?.trim() || "—",
     },
     {
+      key: "bio",
+      label: t("detail.snapshot.bio"),
+      value: snapshot.bio?.trim() || "—",
+    },
+    {
       key: "region",
       label: profileT("fields.region"),
       value: isRegion(snapshot.region)
@@ -147,11 +154,20 @@ function Application({
       value: snapshot.school?.trim() || "—",
     },
     {
+      key: "languages",
+      label: t("detail.snapshot.languages"),
+      value: snapshot.languages?.join(", ") || "—",
+    },
+    {
       key: "contact",
       label: profileT("fields.contact"),
-      value: snapshot.telegram?.trim()
-        ? `@${snapshot.telegram.trim()}`
-        : snapshot.phone?.trim() || "—",
+      value:
+        [
+          snapshot.phone?.trim() || null,
+          snapshot.telegram?.trim() ? `@${snapshot.telegram.trim()}` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ") || "—",
     },
   ];
 
@@ -233,6 +249,37 @@ function Application({
             </Panel>
           ) : null}
 
+          {application.status === "accepted" ? (
+            <Panel
+              id="attendance"
+              title={t("attendance.title")}
+              description={t("attendance.description")}
+            >
+              <dl className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                    {t("attendance.state")}
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-ink">
+                    {t(
+                      `attendance.outcome.${application.attendance?.outcome ?? "awaiting_confirmation"}`,
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                    {t("attendance.hours")}
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-ink">
+                    {application.attendance?.confirmedHours === undefined
+                      ? "—"
+                      : application.attendance.confirmedHours}
+                  </dd>
+                </div>
+              </dl>
+            </Panel>
+          ) : null}
+
           <Panel
             id="snapshot"
             title={t("detail.fromProfile")}
@@ -266,7 +313,7 @@ function Application({
             </Link>
           </Panel>
 
-          {isWithdrawable(application.status) ? (
+          {canWithdrawApplication(application, now) ? (
             <Panel id="actions">
               <WithdrawForm
                 applicationId={application.id}
@@ -307,6 +354,7 @@ function answersLabels(
     fieldInvalid: t("form.fieldInvalid"),
     errors: {
       profileRequired: t("form.errors.profileRequired"),
+      profileIncomplete: t("form.errors.profileIncomplete"),
       opportunityUnavailable: t("form.errors.opportunityUnavailable"),
       invalidAnswers: t("form.errors.invalidAnswers"),
       applicationNotEditable: t("form.errors.applicationNotEditable"),
