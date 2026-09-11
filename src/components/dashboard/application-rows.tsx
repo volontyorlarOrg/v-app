@@ -61,17 +61,17 @@ export function ApplicationRows({
           </h3>
           <p className="mt-1 text-sm text-ink-muted">
             {application.opportunity.organization.name}
-            {application.status === "draft" ? (
-              <>
-                {" · "}
-                <Link
-                  href={applicationHref(application.id)}
-                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
-                >
-                  {t("continueDraft")}
-                </Link>
-              </>
-            ) : null}
+            {" · "}
+            <Link
+              href={applicationHref(application.id)}
+              className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+            >
+              {application.status === "draft"
+                ? t("continueDraft")
+                : application.status === "accepted"
+                  ? t("card.attendance")
+                  : t("card.track")}
+            </Link>
           </p>
         </li>
       ))}

@@ -111,7 +111,7 @@
     --color-surface: #18243d;
     --color-surface-sunk: #0d1524;
     --color-surface-soft: #1f3350;
-    --color-surface-raised: #20304c;
+    --color-surface-raised: #243655;
     --color-field: #0e1727;
 
     --color-ink: #e9eef5;
@@ -151,7 +151,7 @@
     --board-dot: color-mix(in srgb, var(--color-primary) 18%, transparent);
     --board-wash: color-mix(in srgb, var(--color-primary) 10%, transparent);
     --raised-shadow: rgb(0 0 0 / 0.65);
-    --panel-shadow: inset 0 1px 0 rgb(255 255 255 / 0.045);
+    --panel-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
     --wash-primary: 16%;
     --wash-accent: 6%;
     --metal-mix-top: 34%;
@@ -426,24 +426,6 @@
   .medal[data-place="3"] {
     --metal: var(--color-bronze);
     --metal-ink: var(--color-bronze-ink);
-  }
-
-  .medal-ring {
-    outline: 3px solid var(--metal);
-    outline-offset: 4px;
-  }
-
-  .medal-disc {
-    background: color-mix(in srgb, var(--metal) 22%, var(--color-surface));
-  }
-
-  .medal-badge {
-    background: var(--metal-ink);
-    color: var(--color-medal-label);
-  }
-
-  .medal-ink {
-    color: var(--metal-ink);
   }
 
   .podium-step {
@@ -769,6 +751,28 @@
     .load-pulse {
       animation: none;
     }
+  }
+}
+
+@layer utilities {
+  .medal .medal-ring,
+  .medal.medal-ring {
+    outline: 3px solid var(--metal);
+    outline-offset: 4px;
+  }
+
+  .medal .medal-disc {
+    background: color-mix(in srgb, var(--metal) 22%, var(--color-surface));
+  }
+
+  .medal .medal-badge {
+    background: var(--metal-ink);
+    color: var(--color-medal-label);
+  }
+
+  .medal .medal-ink,
+  .medal.medal-ink {
+    color: var(--metal-ink);
   }
 }
 

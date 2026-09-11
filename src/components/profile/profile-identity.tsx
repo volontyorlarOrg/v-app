@@ -63,25 +63,47 @@ export function ProfileIdentity({
 
       <div className="-mt-10 px-5 sm:-mt-12 sm:px-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex min-w-0 items-end gap-4">
-            <Avatar
-              aria-hidden="true"
-              className="size-20 shrink-0 ring-4 ring-surface sm:size-24"
-            >
-              <AvatarFallback className="text-2xl sm:text-3xl">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 pb-1">
-              <h1
-                id="identity-name"
-                className="text-3xl tracking-[-0.025em] text-balance sm:text-4xl"
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-end gap-4">
+              <Avatar
+                aria-hidden="true"
+                className="size-20 shrink-0 ring-4 ring-surface sm:size-24"
               >
-                {name}
-              </h1>
+                <AvatarFallback className="text-2xl sm:text-3xl">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 pb-1">
+                <h1
+                  id="identity-name"
+                  className="text-3xl tracking-[-0.025em] text-balance sm:text-4xl"
+                >
+                  {name}
+                </h1>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+              <Badge variant="achievement">{labels.level}</Badge>
+              {complete ? (
+                <span className="inline-flex items-center gap-1.5 font-semibold text-accent-ink">
+                  <CircleCheck aria-hidden="true" className="size-4" />
+                  {labels.complete}
+                </span>
+              ) : null}
+              {handle || labels.joined ? (
+                <p className="text-ink-muted">
+                  {handle ? (
+                    <span className="font-semibold text-ink">@{handle}</span>
+                  ) : null}
+                  {handle && labels.joined ? <span aria-hidden="true"> · </span> : null}
+                  {labels.joined}
+                </p>
+              ) : null}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 sm:shrink-0 sm:pb-1">
+
+          <div className="flex flex-wrap gap-2 sm:shrink-0 sm:pb-0.5">
             <Link href={navHref("profileEdit")} className={buttonClass({ size: "sm" })}>
               {labels.edit}
             </Link>
@@ -92,25 +114,6 @@ export function ProfileIdentity({
               {labels.record}
             </Link>
           </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-          <Badge variant="achievement">{labels.level}</Badge>
-          {complete ? (
-            <span className="inline-flex items-center gap-1.5 font-semibold text-accent-ink">
-              <CircleCheck aria-hidden="true" className="size-4" />
-              {labels.complete}
-            </span>
-          ) : null}
-          {handle || labels.joined ? (
-            <p className="text-ink-muted">
-              {handle ? (
-                <span className="font-semibold text-ink">@{handle}</span>
-              ) : null}
-              {handle && labels.joined ? <span aria-hidden="true"> · </span> : null}
-              {labels.joined}
-            </p>
-          ) : null}
         </div>
       </div>
 
