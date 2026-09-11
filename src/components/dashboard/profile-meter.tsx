@@ -61,7 +61,7 @@ export function ProfileMeter({
 
       {withAction ? (
         <Link
-          href={navHref("profile")}
+          href={navHref("profileEdit")}
           className={buttonClass({ variant: "outline", size: "sm", className: "mt-4" })}
         >
           {completion.complete ? dashboard("edit") : dashboard("cta")}

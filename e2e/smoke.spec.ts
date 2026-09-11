@@ -164,7 +164,7 @@ test.describe("welcome flow", () => {
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
 
-    await page.goto("/en/profile");
+    await page.goto("/en/profile/edit");
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
@@ -531,32 +531,31 @@ test.describe("the panel", () => {
       name: mobile ? "App sections" : "Main navigation",
     });
 
-    await navigation.getByRole("link", { name: "Applications" }).click();
-    await expect(page).toHaveURL(/\/en\/applications$/);
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Your applications" }),
-    ).toBeVisible();
-
     await navigation.getByRole("link", { name: "Opportunities" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
 
-    if (mobile) {
-      await expect(navigation.getByRole("link", { name: "Leaderboard" })).toHaveCount(
-        0,
-      );
-      await page.goto("/en/leaderboard");
-    } else {
-      await navigation.getByRole("link", { name: "Leaderboard" }).click();
-    }
+    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
+    await expect(sections.getByRole("link")).toHaveCount(3);
+    await sections.getByRole("link", { name: /^Applications/ }).click();
+    await expect(page).toHaveURL(/\/en\/applications$/);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your applications" }),
+    ).toBeVisible();
+    await expect(navigation.getByRole("link", { name: "Applications" })).toHaveCount(0);
+    await expect(
+      navigation.getByRole("link", { name: "Opportunities" }),
+    ).toHaveAttribute("aria-current", "page");
+
+    await navigation.getByRole("link", { name: "Leaderboard" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Leaderboard" }),
     ).toBeVisible();
 
-    for (const path of ["/en/profile", "/en/settings"]) {
+    for (const path of ["/en/profile", "/en/profile/edit", "/en/settings"]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     }
@@ -580,7 +579,7 @@ test.describe("the panel", () => {
     if (!mobile) {
       await expect(
         page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-      ).toHaveCount(4);
+      ).toHaveCount(3);
       await expect(page.getByRole("banner")).toHaveCount(0);
     }
   });
@@ -684,13 +683,35 @@ test.describe("opportunities", () => {
     await page.goto("/en/saved");
     await expect(page).toHaveURL(/\/en\/opportunities\?view=saved$/);
     const views = page.getByRole("navigation", {
-      name: "Choose which opportunities to show",
+      name: "Opportunities sections",
     });
     await expect(views.getByRole("link", { name: /Saved/ })).toHaveAttribute(
       "aria-current",
       "page",
     );
     await expect(page.getByRole("article")).toHaveCount(2);
+  });
+
+  test("a listing that fails to load keeps the section standing and offers a retry", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities?q=__fail__");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Opportunities" }),
+    ).toBeVisible();
+    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
+    await expect(sections.getByRole("link", { name: /^All/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    const alert = page.getByRole("alert").filter({ hasText: "Something went wrong" });
+    await expect(alert).toBeVisible();
+    await expect(alert.getByRole("button", { name: "Try again" })).toBeVisible();
+    await expect(page.getByRole("article")).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Clear filters" }).first().click();
+    await expect(page.getByRole("article").first()).toBeVisible();
+    await expect(alert).toHaveCount(0);
   });
 
   test("filtering by region puts the filter in the URL and asks the backend", async ({
@@ -858,7 +879,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
-  test("the profile opens on the volunteer's own record, then edits below it", async ({
+  test("the profile opens on the volunteer's own record and hands editing to its own page", async ({
     page,
   }) => {
     await page.goto("/en/profile");
@@ -866,11 +887,17 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
     await expect(page.getByText("Events")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Edit profile" })).toHaveAttribute(
-      "href",
-      "#edit",
-    );
-    await expect(page.locator("#edit")).toBeVisible();
+    await expect(page.getByLabel("Bio")).toHaveCount(0);
+    const edit = page.getByRole("link", { name: "Edit profile" }).first();
+    await expect(edit).toHaveAttribute("href", "/en/profile/edit");
+    await edit.click();
+    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Edit your profile" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save profile" })).toBeVisible();
+    await page.getByRole("link", { name: "Cancel" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
   });
 
   test("the profile form saves to the backend and completes the profile", async ({
@@ -881,21 +908,24 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveAttribute("aria-valuenow", "83");
 
+    await page.goto("/en/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
     await page.getByRole("button", { name: "Save profile" }).click();
 
-    await page.reload();
-    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page).toHaveURL(/\/en\/profile$/);
     await expect(page.getByText("Profile complete", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveCount(0);
+
+    await page.goto("/en/profile/edit");
+    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
   test("either contact method satisfies readiness without requiring both inputs", async ({
     page,
   }) => {
-    await page.goto("/en/profile");
+    await page.goto("/en/profile/edit");
     await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
     await expect(page.getByLabel("Phone number")).toHaveValue("");
     await expect(page.getByLabel("Telegram username")).not.toHaveAttribute(

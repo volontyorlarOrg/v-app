@@ -1,10 +1,12 @@
 import { Lock } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { PODIUM_SIZE } from "@/components/leaderboard/leaderboard-podium";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { navHref } from "@/lib/routing/routes";
+import { cn } from "@/lib/utils";
 
 export function LeaderboardStanding({
   name,
@@ -61,7 +63,13 @@ export function LeaderboardStanding({
             <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
               {t("standing.rank")}
             </dt>
-            <dd className="display-face tabular mt-1 text-3xl leading-none text-accent-ink sm:text-4xl">
+            <dd
+              data-place={rank <= PODIUM_SIZE ? rank : undefined}
+              className={cn(
+                "display-face tabular mt-1 text-3xl leading-none sm:text-4xl",
+                rank <= PODIUM_SIZE ? "medal medal-ink" : "text-accent-ink",
+              )}
+            >
               #{format.number(rank)}
             </dd>
             <dd className="mt-1 text-xs text-ink-muted">

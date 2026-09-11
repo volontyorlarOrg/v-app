@@ -18,7 +18,6 @@ export type AccountMenuItem = {
   key: RouteKey;
   href: string;
   label: string;
-  phoneOnly?: boolean;
 };
 
 export type AccountMenuLabels = {
@@ -115,7 +114,7 @@ export function AccountMenu({
             {items.map((item) => {
               const Icon = routeIcon(item.key);
               return (
-                <li key={item.key} className={cn(item.phoneOnly && "lg:hidden")}>
+                <li key={item.key}>
                   <Link href={item.href} onClick={close} className={ITEM_CLASS}>
                     <Icon aria-hidden="true" className="size-4 text-primary" />
                     {item.label}

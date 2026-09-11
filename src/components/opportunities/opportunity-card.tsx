@@ -38,7 +38,7 @@ export function OpportunityCard({
       : t(`regions.${opportunity.region}`);
 
   return (
-    <article className="flex w-full flex-col rounded-xl border border-border bg-surface p-5">
+    <article className="panel-surface flex w-full flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
         <OpportunityStatusChip opportunity={opportunity} now={now} />
         {application ? <ApplicationStatusChip status={application.status} /> : null}

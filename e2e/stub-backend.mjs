@@ -2,6 +2,12 @@ import { createServer } from "node:http";
 
 const PORT = Number(process.env.STUB_PORT ?? 3212);
 const APP_URL = process.env.E2E_APP_URL ?? "http://127.0.0.1:3211";
+const FAIL_PATHS = (process.env.STUB_FAIL_PATHS ?? "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
+const FAILING_SEARCH = "__fail__";
+const SERVER_ERROR = { statusCode: 500, message: "Internal server error" };
 const ACCESS_TOKEN_TTL_SECONDS = 45;
 const DAY = 86_400_000;
 const START = Date.now();
@@ -789,6 +795,8 @@ const server = createServer(async (request, response) => {
 
   if (path === "/" || path === "/health/live")
     return send(response, 200, { status: "ok" });
+  if (FAIL_PATHS.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)))
+    return send(response, 500, SERVER_ERROR);
 
   if (path === "/auth/telegram/authorize" && method === "POST") {
     started += 1;
@@ -870,7 +878,9 @@ const server = createServer(async (request, response) => {
     return send(response, 201, issueSession(state));
   }
   if (path === "/opportunities" && method === "GET")
-    return send(response, 200, listOpportunities(url.searchParams));
+    return url.searchParams.get("q") === FAILING_SEARCH
+      ? send(response, 500, SERVER_ERROR)
+      : send(response, 200, listOpportunities(url.searchParams));
   if (path.startsWith("/opportunities/") && method === "GET") {
     const item = opportunities.find(
       (candidate) => candidate.slug === path.slice("/opportunities/".length),

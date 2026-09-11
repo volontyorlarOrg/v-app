@@ -3,11 +3,9 @@ import { CircleCheck, GraduationCap, Languages, Link2, MapPin } from "lucide-rea
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Link } from "@/i18n/navigation";
-import type { ProfileCompletion } from "@/lib/profile/completion";
 import type { ProfileLink } from "@/lib/profile/links";
-import { historyHref } from "@/lib/routing/routes";
+import { historyHref, navHref } from "@/lib/routing/routes";
 
 export type IdentityStat = {
   id: string;
@@ -27,11 +25,6 @@ export type ProfileIdentityLabels = {
   bioEmpty: string;
   edit: string;
   record: string;
-  completion: {
-    label: string;
-    value: string;
-    missing: string;
-  };
 };
 
 const FACT_ICONS = {
@@ -48,7 +41,7 @@ export function ProfileIdentity({
   bio,
   facts,
   links,
-  completion,
+  complete,
   labels,
 }: {
   name: string;
@@ -58,13 +51,13 @@ export function ProfileIdentity({
   bio: string;
   facts: readonly IdentityFact[];
   links: readonly ProfileLink[];
-  completion: ProfileCompletion;
+  complete: boolean;
   labels: ProfileIdentityLabels;
 }) {
   return (
     <section
       aria-labelledby="identity-name"
-      className="enter-rise overflow-hidden rounded-xl border border-border bg-surface"
+      className="panel-surface enter-rise overflow-hidden rounded-xl border border-border bg-surface"
     >
       <div aria-hidden="true" className="identity-cover h-24 sm:h-32" />
 
@@ -89,9 +82,9 @@ export function ProfileIdentity({
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:shrink-0 sm:pb-1">
-            <a href="#edit" className={buttonClass({ size: "sm" })}>
+            <Link href={navHref("profileEdit")} className={buttonClass({ size: "sm" })}>
               {labels.edit}
-            </a>
+            </Link>
             <Link
               href={historyHref()}
               className={buttonClass({ variant: "outline", size: "sm" })}
@@ -103,7 +96,7 @@ export function ProfileIdentity({
 
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
           <Badge variant="achievement">{labels.level}</Badge>
-          {completion.complete ? (
+          {complete ? (
             <span className="inline-flex items-center gap-1.5 font-semibold text-accent-ink">
               <CircleCheck aria-hidden="true" className="size-4" />
               {labels.complete}
@@ -174,26 +167,6 @@ export function ProfileIdentity({
           </ul>
         ) : null}
       </div>
-
-      {completion.complete ? null : (
-        <div className="border-t border-border px-5 py-5 sm:px-7">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-semibold text-ink">{labels.completion.label}</p>
-            <span className="tabular text-sm font-semibold text-primary-ink">
-              {labels.completion.value}
-            </span>
-          </div>
-          <Progress
-            value={completion.percent}
-            valueText={labels.completion.value}
-            aria-label={labels.completion.label}
-            className="mt-3"
-          />
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            {labels.completion.missing}
-          </p>
-        </div>
-      )}
     </section>
   );
 }

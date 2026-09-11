@@ -2,7 +2,7 @@
 
 import { routeIcon } from "@/components/app/route-icons";
 import { Link, usePathname } from "@/i18n/navigation";
-import { isActivePath, type RouteKey } from "@/lib/routing/routes";
+import { isSectionActive, type RouteKey } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
 export type TabBarItem = { key: RouteKey; href: string; label: string };
@@ -27,7 +27,7 @@ export function TabBar({
       >
         {items.map((item) => {
           const Icon = routeIcon(item.key);
-          const active = isActivePath(pathname, item.href);
+          const active = isSectionActive(pathname, item.key);
           return (
             <li key={item.key}>
               <Link
@@ -41,7 +41,7 @@ export function TabBar({
                 <span
                   className={cn(
                     "inline-grid h-7 w-12 place-items-center rounded-full transition-colors",
-                    active && "bg-primary-muted text-primary-deep",
+                    active && "bg-shell-active text-shell-active-ink",
                   )}
                 >
                   <Icon

@@ -28,42 +28,38 @@ export function LeaderboardPodium({
       aria-label={t("podium.label")}
       className="podium-stage enter-rise overflow-hidden rounded-xl border border-border [--enter-delay:180ms]"
     >
-      <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-8 pb-6 sm:gap-6 sm:px-8">
+      <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-12 sm:gap-5 sm:px-8">
         {entries.map((entry) => {
           const first = entry.rank === 1;
           return (
             <li
               key={entry.username}
+              data-place={entry.rank}
               aria-current={entry.isCurrentUser ? "true" : undefined}
               className={cn(
-                "flex min-w-0 flex-col items-center text-center",
+                "medal flex min-w-0 flex-col items-center text-center",
                 ORDER[entry.rank] ?? "order-3",
-                first ? "pb-6" : "pb-0",
               )}
             >
-              <div className="relative">
+              <div className="relative mb-3">
                 {first ? (
                   <Crown
                     aria-hidden="true"
-                    className="absolute -top-7 left-1/2 size-6 -translate-x-1/2 fill-accent text-accent"
+                    className="absolute -top-9 left-1/2 size-7 -translate-x-1/2 fill-gold text-gold"
                     strokeWidth={1.5}
                   />
                 ) : null}
                 <Avatar
                   aria-hidden="true"
                   className={cn(
-                    "ring-4 ring-surface",
+                    "medal-ring ring-4 ring-surface",
                     first ? "size-20 sm:size-24" : "size-16 sm:size-20",
-                    first
-                      ? "outline outline-2 outline-accent"
-                      : "outline outline-2 outline-primary-muted",
                   )}
                 >
                   <AvatarFallback
                     className={cn(
-                      first
-                        ? "bg-accent/15 text-xl text-accent-ink sm:text-2xl"
-                        : "bg-surface-soft text-lg text-primary-ink sm:text-xl",
+                      "medal-disc medal-ink",
+                      first ? "text-xl sm:text-2xl" : "text-lg sm:text-xl",
                     )}
                   >
                     {initialsOf(entry.username)}
@@ -71,15 +67,12 @@ export function LeaderboardPodium({
                 </Avatar>
                 <span
                   aria-label={t("podium.place", { rank: entry.rank })}
-                  className={cn(
-                    "tabular absolute -right-1 -bottom-1 inline-grid size-7 place-items-center rounded-full border-2 border-surface text-xs font-bold",
-                    first ? "bg-accent text-knockout" : "bg-action text-knockout",
-                  )}
+                  className="medal-badge tabular absolute -right-1 -bottom-1 inline-grid size-7 place-items-center rounded-full border-2 border-surface text-xs font-bold"
                 >
                   {format.number(entry.rank)}
                 </span>
               </div>
-              <p className="mt-3 flex max-w-full flex-col items-center gap-1">
+              <p className="flex max-w-full flex-col items-center gap-1">
                 <span className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
                   @{entry.username}
                 </span>
@@ -95,6 +88,15 @@ export function LeaderboardPodium({
               >
                 {t("xpValue", { xp: format.number(entry.xp) })}
               </p>
+              <div
+                aria-hidden="true"
+                className="podium-step mt-4"
+                data-place={entry.rank}
+              >
+                <span className="display-face tabular text-3xl leading-none sm:text-4xl">
+                  {format.number(entry.rank)}
+                </span>
+              </div>
             </li>
           );
         })}

@@ -5,9 +5,15 @@ import type { z } from "zod";
 
 import type { paths } from "@/lib/api/generated/schema";
 import { apiBaseUrl } from "@/lib/auth/config";
-import { ApiError, classifyApiError, codeForStatus } from "@/lib/api/errors";
+import {
+  ApiError,
+  classifyApiError,
+  codeForStatus,
+  isTransient,
+} from "@/lib/api/errors";
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+const DEFAULT_TIMEOUT_MS = 20_000;
+const RETRY_DELAY_MS = 1_200;
 const REQUEST_ID_HEADER = "X-Request-Id";
 
 type QueryValue = string | number | boolean | null | undefined;
@@ -160,22 +166,30 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
   }
 
   const request = clientFor(baseUrl).request as unknown as RawRequest;
+  const attempts = method === "GET" ? 2 : 1;
   let data: unknown;
   let response: Response;
 
-  try {
-    ({ data, response } = await request(method, path, {
-      params: { query: cleanQuery(query) },
-      body,
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      signal: requestSignal(signal, timeoutMs),
-      parseAs: "text",
-      fetch: nextFetch(init),
-    }));
-  } catch (cause) {
-    const error = classifyApiError(cause);
-    logFailure(method, path, error);
-    throw error;
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      ({ data, response } = await request(method, path, {
+        params: { query: cleanQuery(query) },
+        body,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+        signal: requestSignal(signal, timeoutMs),
+        parseAs: "text",
+        fetch: nextFetch(init),
+      }));
+      break;
+    } catch (cause) {
+      const error = classifyApiError(cause);
+      if (attempt < attempts && isTransient(error) && !signal?.aborted) {
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+        continue;
+      }
+      logFailure(method, path, error);
+      throw error;
+    }
   }
 
   const payload = typeof data === "string" && data ? parseJson(data) : null;

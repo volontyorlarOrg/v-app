@@ -2,6 +2,11 @@ import { useFormatter, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import {
+  LoadErrorRows,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
@@ -25,28 +30,22 @@ import type { Locale } from "@/i18n/routing";
 import { connectStartHref } from "@/lib/account/connections";
 import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
+import { settle, type Loaded } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { getHistory, getRecord } from "@/lib/api/record.server";
+import type { ApplicationList, History, Profile } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
-import {
-  isUpcomingCommitment,
-  type ApplicationSummary,
-} from "@/lib/applications/status";
+import { isUpcomingCommitment } from "@/lib/applications/status";
 import { serializeOnboardingState } from "@/lib/onboarding/state";
 import { readOnboardingState } from "@/lib/onboarding/state.server";
 import { FORM_STEPS, FORM_STEP_COUNT, type FormStep } from "@/lib/onboarding/steps";
-import {
-  EMPTY_PROFILE,
-  profileCompletion,
-  type VolunteerProfile,
-} from "@/lib/profile/completion";
+import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
   isReliabilityMeaningful,
   levelProgress,
   reliabilityPercent,
   type Level,
-  type ParticipationEntry,
   type VolunteerRecord,
 } from "@/lib/record/levels";
 import { HISTORY_ANCHOR, navHref } from "@/lib/routing/routes";
@@ -77,26 +76,30 @@ export default async function DashboardPage({
     applications,
     onboarding,
     telegram,
+    common,
   ] = await Promise.all([
     requireSession(),
-    getProfile(),
+    settle(() => getProfile()),
     getRecord(),
-    getHistory(),
-    listApplications(),
+    settle(() => getHistory()),
+    settle(() => listApplications()),
     readOnboardingState(),
     readTelegramConnection(),
+    getTranslations({ locale, namespace: "common" }),
   ]);
+  const loadedProfile = profile.status === "loaded" ? profile.data : null;
 
   return (
     <Dashboard
       locale={locale as Locale}
-      displayName={profile?.fullName.trim() || session.displayName?.trim() || ""}
-      profile={profile ?? EMPTY_PROFILE}
+      displayName={loadedProfile?.fullName.trim() || session.displayName?.trim() || ""}
+      profile={profile}
       record={volunteerRecord}
-      history={history.items}
-      applications={applications.items}
+      history={history}
+      applications={applications}
       onboardingState={onboarding && serializeOnboardingState(onboarding)}
       telegramConnected={telegram}
+      errorLabels={loadErrorLabels(common)}
     />
   );
 }
@@ -115,18 +118,20 @@ function Dashboard({
   profile,
   record: volunteerRecord,
   history,
-  applications: all,
+  applications: loadedApplications,
   onboardingState,
   telegramConnected,
+  errorLabels,
 }: {
   locale: Locale;
   displayName: string;
-  profile: VolunteerProfile;
+  profile: Loaded<Profile | null>;
   record: VolunteerRecord;
-  history: readonly ParticipationEntry[];
-  applications: readonly ApplicationSummary[];
+  history: Loaded<History>;
+  applications: Loaded<ApplicationList>;
   onboardingState: string | null;
   telegramConnected: boolean | null;
+  errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("dashboard");
   const onboarding = useTranslations("onboarding");
@@ -138,7 +143,10 @@ function Dashboard({
   const progress = levelProgress(volunteerRecord.counts);
   const percent = reliabilityPercent(volunteerRecord.counts);
   const meaningful = isReliabilityMeaningful(volunteerRecord.counts);
-  const completion = profileCompletion(profile);
+  const completion =
+    profile.status === "loaded"
+      ? profileCompletion(profile.data ?? EMPTY_PROFILE)
+      : null;
   const levelName = (level: Level) => record(`level.${level}`);
   const firstName = displayName.split(/\s+/)[0] ?? "";
 
@@ -194,6 +202,9 @@ function Dashboard({
       note: record("figures.awaitingHelp"),
     },
   ];
+
+  const all =
+    loadedApplications.status === "loaded" ? loadedApplications.data.items : [];
 
   const commitments = all
     .filter((application) => isUpcomingCommitment(application, now))
@@ -273,15 +284,28 @@ function Dashboard({
             description={t("nextUp.description")}
             padding="none"
           >
-            <NextUp commitments={commitments} />
+            {loadedApplications.status === "failed" ? (
+              <LoadErrorRows
+                failure={loadedApplications.failure}
+                labels={errorLabels}
+              />
+            ) : (
+              <NextUp commitments={commitments} />
+            )}
           </Panel>
 
           <Panel
             id="applications"
             title={t("applications.title")}
             action={{ href: navHref("applications"), label: t("applications.viewAll") }}
+            padding={loadedApplications.status === "failed" ? "none" : "md"}
           >
-            {applications.length === 0 ? (
+            {loadedApplications.status === "failed" ? (
+              <LoadErrorRows
+                failure={loadedApplications.failure}
+                labels={errorLabels}
+              />
+            ) : applications.length === 0 ? (
               <div className="py-3 text-center">
                 <p className="font-semibold text-ink">{applicationsT("empty.title")}</p>
                 <p className="mt-1 text-sm text-ink-muted">
@@ -315,7 +339,11 @@ function Dashboard({
             padding="none"
             className="scroll-mt-20"
           >
-            <HistoryTable entries={history} />
+            {history.status === "failed" ? (
+              <LoadErrorRows failure={history.failure} labels={errorLabels} />
+            ) : (
+              <HistoryTable entries={history.data.items} />
+            )}
           </Panel>
         </div>
 
@@ -328,7 +356,15 @@ function Dashboard({
           >
             <RecordProgress record={volunteerRecord} />
             <div className="mt-5 border-t border-border pt-5">
-              <ProfileMeter completion={completion} />
+              {completion ? (
+                <ProfileMeter completion={completion} />
+              ) : profile.status === "failed" ? (
+                <LoadErrorRows
+                  failure={profile.failure}
+                  labels={errorLabels}
+                  className="px-0 py-2"
+                />
+              ) : null}
             </div>
           </Panel>
         </div>

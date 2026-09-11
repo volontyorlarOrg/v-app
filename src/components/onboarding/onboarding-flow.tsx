@@ -276,7 +276,7 @@ function DoneBody({
         <p className="mt-3 text-pretty text-ink">
           {fill(labels.done.incomplete, { percent, fields: missing.join(", ") })}{" "}
           <Link
-            href={navHref("profile")}
+            href={navHref("profileEdit")}
             className="font-semibold text-primary-ink underline-offset-4 hover:underline"
           >
             {labels.done.finishOnProfile}

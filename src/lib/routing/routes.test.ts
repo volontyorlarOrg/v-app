@@ -15,11 +15,13 @@ import {
   guardFor,
   historyHref,
   isActivePath,
+  isSectionActive,
   localePath,
   navHref,
   navRoutes,
   onboardingRoutes,
   opportunityHref,
+  sectionKeyFor,
   tabBarRoutes,
   volunteerRoutes,
 } from "@/lib/routing/routes";
@@ -53,20 +55,55 @@ describe("app route registry", () => {
     );
   });
 
-  it("puts the leaderboard in the desktop sidebar and out of the phone tab bar", () => {
+  it("puts the leaderboard in the sidebar and the phone tab bar, never the account menu", () => {
     const leaderboard = getRoute("leaderboard");
     expect(leaderboard.area).toBe("volunteer");
     expect(leaderboard.guard).toBe("session");
     expect(leaderboard.inNav).toBe(true);
-    expect(leaderboard.inTabBar).toBe(false);
+    expect(leaderboard.inTabBar).toBe(true);
     expect(leaderboard.inAccountMenu).toBe(false);
     expect(navRoutes).toContain(leaderboard);
-    expect(tabBarRoutes).not.toContain(leaderboard);
+    expect(tabBarRoutes).toContain(leaderboard);
     expect(accountRoutes).not.toContain(leaderboard);
     expect(navHref("leaderboard")).toBe("/leaderboard");
     for (const locale of locales) {
       expect(guardFor(`/${locale}/leaderboard`)).toBe("session");
     }
+  });
+
+  it("keeps the sidebar to three sections", () => {
+    expect(navRoutes.map((route) => route.key)).toEqual([
+      "dashboard",
+      "opportunities",
+      "leaderboard",
+    ]);
+  });
+
+  it("folds applications and saved items into the opportunities section", () => {
+    for (const key of ["applications", "saved"] as const) {
+      const route = getRoute(key);
+      expect(route.inNav).toBe(false);
+      expect(route.inTabBar).toBe(false);
+      expect(route.section).toBe("opportunities");
+    }
+    expect(sectionKeyFor("/applications")).toBe("opportunities");
+    expect(sectionKeyFor("/en/applications/app-1")).toBe("opportunities");
+    expect(sectionKeyFor("/saved")).toBe("opportunities");
+    expect(isSectionActive("/applications/app-1", "opportunities")).toBe(true);
+    expect(isSectionActive("/applications/app-1", "dashboard")).toBe(false);
+    expect(sectionKeyFor("/opportunities/winter-book-drive")).toBe("opportunities");
+  });
+
+  it("keeps the profile editor under the profile", () => {
+    const editor = getRoute("profileEdit");
+    expect(editor.path).toBe("/profile/edit");
+    expect(editor.guard).toBe("session");
+    expect(editor.section).toBe("profile");
+    expect(editor.inNav).toBe(false);
+    expect(editor.inTabBar).toBe(false);
+    expect(editor.inAccountMenu).toBe(false);
+    expect(sectionKeyFor("/profile/edit")).toBe("profile");
+    expect(guardFor("/uz/profile/edit")).toBe("session");
   });
 
   it("keeps the record reachable by URL but out of every navigation surface", () => {
@@ -76,6 +113,8 @@ describe("app route registry", () => {
     expect(record.inNav).toBe(false);
     expect(record.inTabBar).toBe(false);
     expect(record.inAccountMenu).toBe(false);
+    expect(record.section).toBe("dashboard");
+    expect(sectionKeyFor("/record")).toBe("dashboard");
     expect(historyHref()).toBe("/dashboard#history");
   });
 
@@ -83,9 +122,15 @@ describe("app route registry", () => {
     expect(tabBarRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
-      "applications",
+      "leaderboard",
       "profile",
     ]);
+  });
+
+  it("names no section for a path outside the registry", () => {
+    expect(sectionKeyFor("/en")).toBeNull();
+    expect(sectionKeyFor("/en/unknown")).toBeNull();
+    expect(isSectionActive("/en/unknown", "dashboard")).toBe(false);
   });
 
   it("enters through sign-in and lands on the dashboard", () => {

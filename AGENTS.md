@@ -19,9 +19,11 @@ from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
 navy sidebar that carries everything on desktop — the lockup, the user card
-that opens the account menu, the sections, notifications, the theme switch and
-sign out — with no top bar; a slim header and a four-destination tab bar on a
-phone; and panels of content on a flat workspace. Only the sign-in pages keep
+that opens the account menu, three sections (dashboard, opportunities,
+leaderboard), notifications, the theme switch and sign out — with no top bar;
+a slim header and a four-destination tab bar on a phone; and panels of content
+on a flat workspace. Applications and saved items are tabs inside the
+opportunities section, not sections of their own. Only the sign-in pages keep
 the marketing site's whiteboard ground. See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
@@ -79,9 +81,15 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   `src/lib/<domain>/actions.ts` returning the
   `ActionResult` envelope from `src/lib/api/action-result.ts`. Errors are
   backend codes the catalog translates, never sentences from a server;
-- a section that fails to load renders `LoadErrorPanel` with a retry inside
-  `PanelErrorBoundary`. The palette still defines no red: error states use
-  the sunk surface and ink;
+- a read that fails does not take the page down. Pages wrap each read in
+  `settle()` from `src/lib/api/load.server.ts` and render `LoadErrorPanel` (a
+  whole listing) or `LoadErrorRows` (inside a panel) in its place, with the
+  rest of the page standing; the panel says whether the server was unreachable
+  or answered with an error, shows the request reference, and retries on its
+  own three times (5, 10, 20 seconds) before leaving the button to the
+  volunteer. `GET` requests also retry once on a transient failure inside the
+  client. `PanelErrorBoundary` only catches a render that throws. The palette
+  still defines no red: error states use the soft surface and ink;
 - **one account, two ways in.** `/settings` is the account page: it reads
   `/me` and `/me/account-merge-requests` on the server and shows Telegram,
   Google and email as separate connection states. A Google-owned address is
@@ -94,7 +102,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   session, which the Server Action writes into the same encrypted cookie.
   Nothing is unlinked, unmerged, exported or deleted here;
 - **the leaderboard is the backend's arithmetic, shown.** `/leaderboard` is a
-  sidebar section (never the phone tab bar) reading `GET /leaderboard`; every
+  sidebar section and a phone tab reading `GET /leaderboard`; every
   rank and every experience total arrives from the backend and none is ever
   computed here, pagination is rendered from the response's own `page`,
   `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
@@ -116,7 +124,10 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
 band of three figures read from the record, the bio, the facts and the links —
-and the editor is the one `Panel` below it. It carries nothing else: the
+followed by the contact details and the completeness meter, all read-only.
+Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
+and the welcome flow's "finish on your profile" all lead there, and a saved
+form returns to `/profile`. The profile carries nothing else: the
 account lives on `/settings`, the theme and sign-out live in the sidebar (the
 phone header on a phone), the interface language in the account menu, and
 there is no notification, privacy or appearance group anywhere in the app.
@@ -200,7 +211,7 @@ src/hooks/                      -> useServerAction and useActionForm: TanStack Q
 src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
                                    applications[/id], saved and record (redirects),
-                                   leaderboard, profile, settings
+                                   leaderboard, profile, profile/edit, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
@@ -236,8 +247,10 @@ docs/                           -> stable project documentation and the plan
   argument parity.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
   the tab bar, the account menu, the proxy's `guard` and the tests all read
-  from it. Detail pages
-  hang off a section through `opportunityHref` and `applicationHref`.
+  from it. A route that belongs inside a section names it in `section`, which
+  is what keeps the sidebar and the tab bar lit on `/applications` and
+  `/profile/edit`. Detail pages hang off a section through `opportunityHref`
+  and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
   structure, chips for a system state, primary actions, the mark. **Orange is
   the person**: the level reached, an accepted application, a confirmed
