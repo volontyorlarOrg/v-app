@@ -696,6 +696,7 @@ function validateAnswers(opportunity, answers, requireComplete) {
 }
 
 const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
+  displayName: `Volunteer ${String(index + 1).padStart(2, "0")}`,
   username: `volunteer_${String(index + 1).padStart(2, "0")}`,
   xp: 3000 - index * 90,
 }));
@@ -706,6 +707,7 @@ function leaderboard(state, query) {
   const rows = [
     ...leaderboardRoster,
     {
+      displayName: state.user.displayName,
       username: state.account.username,
       xp: VIEWER_XP,
     },
@@ -728,7 +730,14 @@ function leaderboard(state, query) {
     total: rows.length,
     viewer: (() => {
       const row = rows.find((candidate) => candidate.isCurrentUser);
-      return row ? { rank: row.rank, username: row.username, xp: row.xp } : null;
+      return row
+        ? {
+            rank: row.rank,
+            displayName: row.displayName,
+            username: row.username,
+            xp: row.xp,
+          }
+        : null;
     })(),
     scoring: {
       attendedEventXp: 50,

@@ -64,14 +64,19 @@ export function LeaderboardTable({
                 <span className="flex items-center gap-3">
                   <Avatar aria-hidden="true" className="size-9">
                     <AvatarFallback className="text-xs">
-                      {initialsOf(entry.username)}
+                      {initialsOf(entry.displayName)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="font-semibold break-words text-ink">
-                      @{entry.username}
+                  <span className="min-w-0">
+                    <span className="block text-base leading-tight font-semibold break-words text-ink">
+                      {entry.displayName}
                     </span>
-                    {isViewer ? <Badge variant="structure">{t("you")}</Badge> : null}
+                    <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="text-xs break-words text-ink-muted">
+                        @{entry.username}
+                      </span>
+                      {isViewer ? <Badge variant="structure">{t("you")}</Badge> : null}
+                    </span>
                   </span>
                 </span>
               </TableCell>

@@ -62,7 +62,7 @@ export function LeaderboardPodium({
                       first ? "text-xl sm:text-2xl" : "text-lg sm:text-xl",
                     )}
                   >
-                    {initialsOf(entry.username)}
+                    {initialsOf(entry.displayName)}
                   </AvatarFallback>
                 </Avatar>
                 <span
@@ -72,14 +72,19 @@ export function LeaderboardPodium({
                   {format.number(entry.rank)}
                 </span>
               </div>
-              <p className="flex max-w-full flex-col items-center gap-1">
-                <span className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
-                  @{entry.username}
-                </span>
-                {entry.isCurrentUser ? (
-                  <Badge variant="structure">{t("you")}</Badge>
-                ) : null}
-              </p>
+              <div className="flex max-w-full flex-col items-center gap-0.5">
+                <p className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
+                  {entry.displayName}
+                </p>
+                <div className="flex max-w-full items-center gap-1.5">
+                  <p className="max-w-full truncate text-xs text-ink-muted sm:text-sm">
+                    @{entry.username}
+                  </p>
+                  {entry.isCurrentUser ? (
+                    <Badge variant="structure">{t("you")}</Badge>
+                  ) : null}
+                </div>
+              </div>
               <p
                 className={cn(
                   "display-face tabular mt-1.5 text-accent-ink",
