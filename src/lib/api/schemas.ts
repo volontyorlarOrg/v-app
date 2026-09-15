@@ -230,6 +230,7 @@ export const notificationListSchema = z.object({
 export const leaderboardEntrySchema = z
   .object({
     rank: z.number().int().positive(),
+    displayName: z.string().min(1),
     username: usernameField,
     xp: z.number().int().nonnegative(),
     isCurrentUser: z.boolean(),
@@ -239,6 +240,7 @@ export const leaderboardEntrySchema = z
 const leaderboardViewerSchema = z
   .object({
     rank: z.number().int().positive(),
+    displayName: z.string().min(1),
     username: usernameField,
     xp: z.number().int().nonnegative(),
   })
