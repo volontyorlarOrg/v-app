@@ -1355,10 +1355,12 @@ test.describe("the leaderboard", () => {
     const podium = page.getByRole("region", { name: "Top three" });
     await expect(podium.getByRole("listitem")).toHaveCount(3);
     const first = podium.getByRole("listitem").filter({ hasText: "@volunteer_01" });
+    await expect(first).toContainText("Volunteer 01");
     await expect(first).toContainText("3,000 XP");
     await expect(first.getByLabel("Place 1")).toBeVisible();
 
     const fourth = page.getByRole("row").nth(1);
+    await expect(fourth).toContainText("Volunteer 04");
     await expect(fourth).toContainText("@volunteer_04");
     await expect(fourth).toContainText("2,730 XP");
     await expect(page.getByRole("row")).toHaveCount(23);

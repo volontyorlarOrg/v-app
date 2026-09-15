@@ -53,7 +53,7 @@ export default async function LeaderboardRoute({
 
   const query = await searchParams;
   const requested = Math.max(1, leaderboardPageParser.parseServerSide(query.page));
-  const [session, me, loaded, common] = await Promise.all([
+  const [, me, loaded, common] = await Promise.all([
     requireSession(),
     getMe(),
     settle(() => getLeaderboard(requested)),
@@ -82,13 +82,10 @@ export default async function LeaderboardRoute({
     );
   }
 
-  const name = me.displayName?.trim() || session.displayName?.trim() || "";
-
   return (
     <Leaderboard
       board={board}
       state={state}
-      name={name}
       handleEditable={usernameIdentity(me).editable}
     />
   );
@@ -114,20 +111,16 @@ function LeaderboardUnavailable({
 function Leaderboard({
   board,
   state,
-  name,
   handleEditable,
 }: {
   board: LeaderboardPage;
   state: PageState;
-  name: string;
   handleEditable: boolean;
 }) {
   const t = useTranslations("leaderboard");
-  const common = useTranslations("common");
   const format = useFormatter();
 
   const viewer = board.viewer;
-  const displayName = name || common("volunteer");
   const podium =
     board.page === 1 ? board.items.filter((entry) => entry.rank <= PODIUM_SIZE) : [];
   const rest =
@@ -153,8 +146,8 @@ function Leaderboard({
 
       <div className="mt-6 flex flex-col gap-6">
         <LeaderboardStanding
-          name={displayName}
-          initials={initialsOf(displayName)}
+          name={viewer.displayName}
+          initials={initialsOf(viewer.displayName)}
           username={viewer.username}
           rank={viewer.rank}
           xp={viewer.xp}
