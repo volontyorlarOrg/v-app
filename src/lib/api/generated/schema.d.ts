@@ -1694,6 +1694,46 @@ export interface components {
         RemoveCoordinatorDto: {
             reassignToCoordinatorId?: string;
         };
+        LeaderboardEntryDto: {
+            /** @example 1 */
+            rank: number;
+            /** @example Aziza Karimova */
+            displayName: string;
+            /** @example aziza_uz */
+            username: string;
+            /** @example 365 */
+            xp: number;
+            isCurrentUser: boolean;
+        };
+        LeaderboardViewerDto: {
+            /** @example 42 */
+            rank: number;
+            /** @example Dilnoza Karimova */
+            displayName: string;
+            /** @example dilnoza_k */
+            username: string;
+            /** @example 0 */
+            xp: number;
+        };
+        LeaderboardScoringDto: {
+            /** @example 50 */
+            attendedEventXp: number;
+            /** @example 10 */
+            confirmedHourXp: number;
+            /** @enum {string} */
+            rounding: "nearest-total";
+        };
+        LeaderboardResponseDto: {
+            items: components["schemas"]["LeaderboardEntryDto"][];
+            viewer: components["schemas"]["LeaderboardViewerDto"];
+            /** @example 1 */
+            page: number;
+            /** @example 50 */
+            pageSize: number;
+            /** @example 240 */
+            total: number;
+            scoring: components["schemas"]["LeaderboardScoringDto"];
+        };
     };
     responses: never;
     parameters: never;
@@ -3856,7 +3896,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["LeaderboardResponseDto"];
+                };
             };
         };
     };
