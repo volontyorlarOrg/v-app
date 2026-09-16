@@ -12,6 +12,18 @@ import {
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
+export function PanelAction({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex min-h-8 shrink-0 items-center gap-1 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+    >
+      {label}
+      <ArrowRight aria-hidden="true" className="size-4" />
+    </Link>
+  );
+}
+
 export function Panel({
   id,
   title,
@@ -44,14 +56,8 @@ export function Panel({
                 {description ? <CardDescription>{description}</CardDescription> : null}
               </div>
               {action ? (
-                <CardAction asChild>
-                  <Link
-                    href={action.href}
-                    className="inline-flex min-h-8 items-center gap-1 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-                  >
-                    {action.label}
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
+                <CardAction>
+                  <PanelAction href={action.href} label={action.label} />
                 </CardAction>
               ) : null}
             </header>

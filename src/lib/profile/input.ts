@@ -41,7 +41,7 @@ export const profileFormSchema = z.object({
   gradeYear: boundedText(PROFILE_TEXT_LIMITS.gradeYear),
   region: z.union([z.literal(""), z.enum(REGIONS)]),
   city: boundedText(PROFILE_TEXT_LIMITS.city),
-  languages: z.string(),
+  languages: z.array(z.string().trim().min(1).max(35)).max(LIST_LIMITS.languages),
   phone: z.string().trim(),
   telegram: z.string().trim(),
   links: z.string(),
@@ -68,7 +68,7 @@ export function profileFormValues(profile: {
     gradeYear: profile.gradeYear,
     region: profile.region ?? "",
     city: profile.city,
-    languages: profile.languages.join(", "),
+    languages: [...profile.languages],
     phone: profile.phone,
     telegram: profile.telegram,
     links: profile.links.join(", "),
@@ -81,11 +81,15 @@ function text(formData: FormData, name: string): string {
 }
 
 function list(formData: FormData, name: keyof typeof LIST_LIMITS): string[] {
-  return text(formData, name)
-    .split(/[,\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, LIST_LIMITS[name]);
+  return [
+    ...new Set(
+      formData
+        .getAll(name)
+        .flatMap((value) => (typeof value === "string" ? value.split(/[,\n]/) : []))
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, LIST_LIMITS[name]);
 }
 
 function region(formData: FormData): Region | null {

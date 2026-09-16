@@ -1,4 +1,4 @@
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -19,6 +19,7 @@ import { settle, type LoadFailure } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
+import type { Locale } from "@/i18n/routing";
 import {
   EMPTY_PROFILE,
   profileCompletion,
@@ -26,6 +27,7 @@ import {
 } from "@/lib/profile/completion";
 import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
   isReliabilityMeaningful,
   levelFor,
@@ -110,6 +112,7 @@ function Profile({
   const opportunities = useTranslations("opportunities");
   const recordLabels = useTranslations("record");
   const format = useFormatter();
+  const locale = useLocale() as Locale;
 
   const completion = profileCompletion(values);
   const joinedOn = new Date(joinedAt);
@@ -145,7 +148,10 @@ function Profile({
         values.city,
       ]),
     },
-    { id: "languages" as const, value: join(values.languages) },
+    {
+      id: "languages" as const,
+      value: languageDirectory.format(values.languages, locale),
+    },
   ].filter((fact) => fact.value.length > 0);
 
   const contact = [

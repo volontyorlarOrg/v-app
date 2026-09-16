@@ -25,6 +25,12 @@ export type OnboardingLabels = {
     | Exclude<keyof ProfileFormValues, "gradeYear" | "city" | "links">
     | "bioHelp"
     | "languagesHelp"
+    | "languagesSearch"
+    | "languagesEmpty"
+    | "languagesCommon"
+    | "languagesAll"
+    | "languagesRemove"
+    | "languagesLimit"
     | "phoneHelp"
     | "telegramHelp"
     | "regionAny",

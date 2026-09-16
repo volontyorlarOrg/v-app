@@ -26,6 +26,7 @@ import {
   type CompletionField,
   type VolunteerProfile,
 } from "@/lib/profile/completion";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 
 export const dynamic = "force-dynamic";
 
@@ -52,9 +53,13 @@ export default async function WelcomePage({
     readOnboardingState(),
   ]);
 
-  const values: VolunteerProfile = profile ?? {
+  const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
     fullName: me.displayName?.trim() || session.displayName?.trim() || "",
+  };
+  const values = {
+    ...stored,
+    languages: languageDirectory.canonicalList(stored.languages),
   };
 
   return (
@@ -99,6 +104,12 @@ function Welcome({
     "regionAny",
     "languages",
     "languagesHelp",
+    "languagesSearch",
+    "languagesEmpty",
+    "languagesCommon",
+    "languagesAll",
+    "languagesRemove",
+    "languagesLimit",
     "phone",
     "phoneHelp",
     "telegram",
@@ -188,6 +199,7 @@ function Welcome({
         value: region,
         label: opportunities(`regions.${region}`),
       }))}
+      languageOptions={languageDirectory.options(locale, values.languages)}
       username={username}
       labels={labels}
       completionFields={completionFields}

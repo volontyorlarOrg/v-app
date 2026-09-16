@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Panel } from "@/components/app/panel";
+import { LanguagePicker } from "@/components/profile/language-picker";
 import { Button, buttonClass } from "@/components/ui/button";
 import {
   Field,
@@ -27,6 +28,7 @@ import {
   profileFormValues,
   type ProfileFormValues,
 } from "@/lib/profile/input";
+import type { LanguageOption } from "@/lib/profile/languages";
 
 export type ProfileSection = "about" | "education" | "location" | "contact" | "links";
 
@@ -46,6 +48,12 @@ export type ProfileFormLabels = {
     | "city"
     | "languages"
     | "languagesHelp"
+    | "languagesSearch"
+    | "languagesEmpty"
+    | "languagesCommon"
+    | "languagesAll"
+    | "languagesRemove"
+    | "languagesLimit"
     | "phone"
     | "phoneHelp"
     | "telegram"
@@ -80,7 +88,7 @@ function ProfileField({
 }) {
   return (
     <Field invalid={Boolean(error)}>
-      <FieldLabel htmlFor={id}>
+      <FieldLabel id={`${id}-label`} htmlFor={id}>
         {label}
         {optional ? (
           <>
@@ -118,6 +126,7 @@ function FormSection({
 
 export function ProfileForm({
   values,
+  languageOptions,
   regions,
   labels,
   headed = true,
@@ -125,6 +134,7 @@ export function ProfileForm({
   cancelHref,
 }: {
   values: VolunteerProfile;
+  languageOptions: readonly LanguageOption[];
   regions: readonly { value: string; label: string }[];
   labels: ProfileFormLabels;
   headed?: boolean;
@@ -142,7 +152,7 @@ export function ProfileForm({
       if (doneHref) router.push(doneHref);
     },
   });
-  const { register, formState } = form;
+  const { register, formState, control: formControl } = form;
 
   const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
   const invalid = (name: keyof ProfileFormValues) =>
@@ -200,9 +210,20 @@ export function ProfileForm({
                 help={labels.fields.languagesHelp}
                 error={errorFor("languages")}
               >
-                <Input
-                  {...control("languages", labels.fields.languagesHelp)}
-                  defaultValue={values.languages.join(", ")}
+                <LanguagePicker
+                  id={fieldId("languages")}
+                  control={formControl}
+                  options={languageOptions}
+                  invalid={invalid("languages")}
+                  describedBy={`${fieldId("languages")}-help`}
+                  labels={{
+                    search: labels.fields.languagesSearch,
+                    empty: labels.fields.languagesEmpty,
+                    common: labels.fields.languagesCommon,
+                    all: labels.fields.languagesAll,
+                    remove: labels.fields.languagesRemove,
+                    limit: labels.fields.languagesLimit,
+                  }}
                 />
               </ProfileField>
             </FieldGroup>

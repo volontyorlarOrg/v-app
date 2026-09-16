@@ -6,11 +6,13 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/app/page-header";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
 import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, type VolunteerProfile } from "@/lib/profile/completion";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +28,12 @@ const FIELD_KEYS = [
   "city",
   "languages",
   "languagesHelp",
+  "languagesSearch",
+  "languagesEmpty",
+  "languagesCommon",
+  "languagesAll",
+  "languagesRemove",
+  "languagesLimit",
   "phone",
   "phoneHelp",
   "telegram",
@@ -56,15 +64,25 @@ export default async function ProfileEditPage({
     getMe(),
   ]);
 
-  const values: VolunteerProfile = profile ?? {
+  const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
     fullName: me.displayName?.trim() || session.displayName?.trim() || "",
   };
+  const values = {
+    ...stored,
+    languages: languageDirectory.canonicalList(stored.languages),
+  };
 
-  return <ProfileEditor values={values} />;
+  return <ProfileEditor values={values} locale={locale as Locale} />;
 }
 
-function ProfileEditor({ values }: { values: VolunteerProfile }) {
+function ProfileEditor({
+  values,
+  locale,
+}: {
+  values: VolunteerProfile;
+  locale: Locale;
+}) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
 
@@ -87,6 +105,7 @@ function ProfileEditor({ values }: { values: VolunteerProfile }) {
 
       <ProfileForm
         values={values}
+        languageOptions={languageDirectory.options(locale, values.languages)}
         regions={REGIONS.map((region) => ({
           value: region,
           label: opportunities(`regions.${region}`),

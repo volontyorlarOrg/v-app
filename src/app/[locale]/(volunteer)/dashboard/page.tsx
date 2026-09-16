@@ -15,13 +15,14 @@ import {
   ConnectTelegram,
   type ConnectTelegramLabels,
 } from "@/components/dashboard/connect-telegram";
-import { ImpactOrbit } from "@/components/dashboard/impact-orbit";
 import { NextUp } from "@/components/dashboard/next-up";
+import { VolunteerPassBadge } from "@/components/onboarding/volunteer-pass-badge";
 import {
   OnboardingResume,
   type OnboardingResumeLabels,
 } from "@/components/onboarding/onboarding-resume";
-import { ProfileMeter } from "@/components/dashboard/profile-meter";
+import { HeroCell } from "@/components/dashboard/hero-cell";
+import { ProfileMeterSummary } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
 import { HistoryTable } from "@/components/record/history-table";
 import { buttonClass } from "@/components/ui/button";
@@ -38,7 +39,12 @@ import { requireSession } from "@/lib/api/session.server";
 import { isUpcomingCommitment } from "@/lib/applications/status";
 import { serializeOnboardingState } from "@/lib/onboarding/state";
 import { readOnboardingState } from "@/lib/onboarding/state.server";
-import { FORM_STEPS, FORM_STEP_COUNT, type FormStep } from "@/lib/onboarding/steps";
+import {
+  FORM_STEPS,
+  FORM_STEP_COUNT,
+  passParts,
+  type FormStep,
+} from "@/lib/onboarding/steps";
 import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
@@ -137,6 +143,7 @@ function Dashboard({
   const onboarding = useTranslations("onboarding");
   const record = useTranslations("record");
   const applicationsT = useTranslations("applications");
+  const profileT = useTranslations("profile");
   const format = useFormatter();
 
   const now = new Date();
@@ -147,6 +154,12 @@ function Dashboard({
     profile.status === "loaded"
       ? profileCompletion(profile.data ?? EMPTY_PROFILE)
       : null;
+  const profileForPass =
+    profile.status === "loaded" ? (profile.data ?? EMPTY_PROFILE) : EMPTY_PROFILE;
+  const badgeParts = passParts(
+    profileForPass,
+    completion?.complete ? "done" : "contact",
+  );
   const levelName = (level: Level) => record(`level.${level}`);
   const firstName = displayName.split(/\s+/)[0] ?? "";
 
@@ -246,12 +259,13 @@ function Dashboard({
   return (
     <>
       <section className="dashboard-hero">
-        <div className="min-w-0 py-1">
+        <div className="dashboard-hero-intro">
           <PageHeader
             title={
               firstName ? t("greeting", { name: firstName }) : t("greetingAnonymous")
             }
             description={lead}
+            className="sm:flex-col sm:items-start sm:justify-start"
             actions={
               <Link
                 href={navHref("opportunities")}
@@ -262,7 +276,36 @@ function Dashboard({
             }
           />
         </div>
-        <ImpactOrbit />
+        <div className="dashboard-pass" aria-hidden="true">
+          <VolunteerPassBadge parts={badgeParts} />
+        </div>
+        <div id="progress" className="dashboard-hero-band scroll-mt-20">
+          <HeroCell
+            id="dashboard-progress"
+            title={t("progress.title")}
+            action={{ href: navHref("leaderboard"), label: t("progress.leaderboard") }}
+          >
+            <RecordProgress record={volunteerRecord} />
+          </HeroCell>
+          <HeroCell
+            id="dashboard-profile"
+            title={profileT("completion.label")}
+            action={{
+              href: navHref("profileEdit"),
+              label: completion?.complete ? t("profile.edit") : t("profile.cta"),
+            }}
+          >
+            {completion ? (
+              <ProfileMeterSummary completion={completion} />
+            ) : profile.status === "failed" ? (
+              <LoadErrorRows
+                failure={profile.failure}
+                labels={errorLabels}
+                className="dashboard-hero-meter px-0 py-2"
+              />
+            ) : null}
+          </HeroCell>
+        </div>
       </section>
 
       <OnboardingResume serverState={onboardingState} labels={resumeLabels} />
@@ -276,83 +319,53 @@ function Dashboard({
 
       <StatTiles stats={stats} className="mt-6" />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <Panel
-            id="next-up"
-            title={t("nextUp.title")}
-            description={t("nextUp.description")}
-            padding="none"
-          >
-            {loadedApplications.status === "failed" ? (
-              <LoadErrorRows
-                failure={loadedApplications.failure}
-                labels={errorLabels}
-              />
-            ) : (
-              <NextUp commitments={commitments} />
-            )}
-          </Panel>
+      <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-2">
+        <Panel
+          id="next-up"
+          title={t("nextUp.title")}
+          description={t("nextUp.description")}
+          padding="none"
+        >
+          {loadedApplications.status === "failed" ? (
+            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
+          ) : (
+            <NextUp commitments={commitments} />
+          )}
+        </Panel>
 
-          <Panel
-            id="applications"
-            title={t("applications.title")}
-            action={{ href: navHref("applications"), label: t("applications.viewAll") }}
-            padding="none"
-          >
-            {loadedApplications.status === "failed" ? (
-              <LoadErrorRows
-                failure={loadedApplications.failure}
-                labels={errorLabels}
-              />
-            ) : (
-              <ApplicationRows
-                applications={applications}
-                now={now}
-                empty={{
-                  title: applicationsT("empty.title"),
-                  body: applicationsT("empty.body"),
-                }}
-              />
-            )}
-          </Panel>
+        <Panel
+          id="applications"
+          title={t("applications.title")}
+          action={{ href: navHref("applications"), label: t("applications.viewAll") }}
+          padding="none"
+        >
+          {loadedApplications.status === "failed" ? (
+            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
+          ) : (
+            <ApplicationRows
+              applications={applications}
+              now={now}
+              empty={{
+                title: applicationsT("empty.title"),
+                body: applicationsT("empty.body"),
+              }}
+            />
+          )}
+        </Panel>
 
-          <Panel
-            id={HISTORY_ANCHOR}
-            title={record("history.title")}
-            description={record("history.description")}
-            padding="none"
-            className="scroll-mt-20"
-          >
-            {history.status === "failed" ? (
-              <LoadErrorRows failure={history.failure} labels={errorLabels} />
-            ) : (
-              <HistoryTable entries={history.data.items} />
-            )}
-          </Panel>
-        </div>
-
-        <div className="min-w-0">
-          <Panel
-            id="progress"
-            title={t("progress.title")}
-            action={{ href: navHref("leaderboard"), label: t("progress.leaderboard") }}
-            className="xl:sticky xl:top-8"
-          >
-            <RecordProgress record={volunteerRecord} />
-            <div className="mt-5 border-t border-border pt-5">
-              {completion ? (
-                <ProfileMeter completion={completion} />
-              ) : profile.status === "failed" ? (
-                <LoadErrorRows
-                  failure={profile.failure}
-                  labels={errorLabels}
-                  className="px-0 py-2"
-                />
-              ) : null}
-            </div>
-          </Panel>
-        </div>
+        <Panel
+          id={HISTORY_ANCHOR}
+          title={record("history.title")}
+          description={record("history.description")}
+          padding="none"
+          className="scroll-mt-20 xl:col-span-2"
+        >
+          {history.status === "failed" ? (
+            <LoadErrorRows failure={history.failure} labels={errorLabels} />
+          ) : (
+            <HistoryTable entries={history.data.items} />
+          )}
+        </Panel>
       </div>
     </>
   );

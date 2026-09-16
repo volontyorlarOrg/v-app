@@ -152,7 +152,13 @@ test.describe("welcome flow", () => {
       .getByLabel("School, college, or university")
       .fill("Academic lyceum No. 1");
     await page.getByLabel("Region").selectOption("tashkent-city");
-    await page.getByLabel("Languages you speak").fill("Uzbek, English");
+    const languages = page.getByRole("combobox", { name: "Languages you speak" });
+    await languages.fill("uzb");
+    await languages.press("Enter");
+    await languages.fill("ingl");
+    await page.getByRole("option", { name: "English" }).click();
+    await languages.press("Escape");
+    await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
@@ -178,6 +184,8 @@ test.describe("welcome flow", () => {
     await expect(page.getByLabel("Bio")).toHaveValue(
       "I read to younger pupils on Saturdays.",
     );
+    await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Remove: English" })).toBeVisible();
 
     await page.goto("/en/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
