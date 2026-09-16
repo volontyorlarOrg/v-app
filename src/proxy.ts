@@ -29,6 +29,14 @@ function isNavigation(request: NextRequest) {
   return request.headers.get("accept")?.includes("text/html") ?? false;
 }
 
+function isLegacySession(session: SessionPayload) {
+  return Boolean(session.refreshToken) && isAccessTokenExpiring(session);
+}
+
+async function upgradeLegacySession(session: SessionPayload) {
+  return session.refreshToken ? refreshSession(session.refreshToken) : null;
+}
+
 function expireSessionCookie(response: NextResponse) {
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     ...sessionCookieOptions(),
@@ -44,18 +52,14 @@ export default async function proxy(request: NextRequest) {
 
   const current = await decryptSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
   let session: SessionPayload | null = current;
-  let rotated: SessionPayload | null = null;
-  let refreshFailed = false;
+  let upgraded: SessionPayload | null = null;
 
-  if (current && isAccessTokenExpiring(current) && isNavigation(request)) {
-    rotated = current.refreshToken ? await refreshSession(current.refreshToken) : null;
-    if (rotated) {
-      session = rotated;
-    } else if (isAccessTokenExpired(current)) {
-      refreshFailed = true;
-      session = null;
-    }
+  if (current && isLegacySession(current) && isNavigation(request)) {
+    upgraded = await upgradeLegacySession(current);
+    if (upgraded) session = upgraded;
   }
+
+  if (session && isAccessTokenExpired(session)) session = null;
 
   if (guard === "session" && !session) {
     const loginUrl = new URL(localePath(locale, ENTRY_ROUTE), request.url);
@@ -72,10 +76,10 @@ export default async function proxy(request: NextRequest) {
 
   const response = intl(request);
 
-  if (rotated) {
-    const value = await encryptSession(rotated);
+  if (upgraded) {
+    const value = await encryptSession(upgraded);
     if (value) response.cookies.set(SESSION_COOKIE_NAME, value, sessionCookieOptions());
-  } else if (refreshFailed) {
+  } else if (current && !session) {
     expireSessionCookie(response);
   }
 
