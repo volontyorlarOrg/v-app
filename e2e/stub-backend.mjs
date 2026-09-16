@@ -8,7 +8,7 @@ const FAIL_PATHS = (process.env.STUB_FAIL_PATHS ?? "")
   .filter(Boolean);
 const FAILING_SEARCH = "__fail__";
 const SERVER_ERROR = { statusCode: 500, message: "Internal server error" };
-const ACCESS_TOKEN_TTL_SECONDS = 45;
+const ACCESS_TOKEN_TTL_SECONDS = Number(process.env.STUB_ACCESS_TTL ?? 259_200);
 const DAY = 86_400_000;
 const START = Date.now();
 
@@ -510,7 +510,6 @@ function issueSession(state) {
   return {
     userId: state.user.id,
     accessToken,
-    refreshToken,
     accessTokenExpiresAt: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_TTL_SECONDS,
     displayName: state.user.displayName,
     roles: state.user.roles,
@@ -903,8 +902,10 @@ const server = createServer(async (request, response) => {
   const state = sessions.get(token);
   if (!state) return send(response, 401, { code: "unauthenticated" });
 
-  if (path === "/auth/logout" && method === "POST")
+  if (path === "/auth/logout" && method === "POST") {
+    sessions.delete(token);
     return send(response, 201, { loggedOut: true });
+  }
   if (path === "/auth/password/change" && method === "POST") {
     const currentEmail = state.account.email;
     if (state.account.authMethods.password) {

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const session = await getSession();
   if (session) {
     try {
-      await endBackendSession(session.accessToken, session.refreshToken);
+      await endBackendSession(session.accessToken);
     } catch (error) {
       console.error(
         "[account-connect] backend sign-out failed; clearing the local session anyway",
