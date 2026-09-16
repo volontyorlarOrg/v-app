@@ -173,8 +173,8 @@ authorisation.
 
 There is no theme or general animation library. Light and dark are one token
 set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
-CSS, and `three` is isolated to two lazy objects: the dashboard progress orbit
-and the welcome flow's pass. Panels and task content never depend on
+CSS, and `three` is isolated to one lazy object: the welcome flow's pass. The
+dashboard draws the same pass as an SVG. Panels and task content never depend on
 JavaScript for visibility or scrolling.
 
 Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every

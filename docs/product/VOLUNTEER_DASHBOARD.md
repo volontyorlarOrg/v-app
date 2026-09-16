@@ -25,9 +25,20 @@ the Record, or the account pages.
 | 3   | What improves my next application?           | **Your progress**     | level progress plus profile completeness      | improve and apply |
 
 The hero greets the volunteer, states the current level and next requirement,
-and offers one action: browse opportunities. Its Three.js orbit represents the
-four participation levels without carrying information that must be read. The
-three figures below it are completed events, reliability, and recorded hours.
+and offers one action: browse opportunities. Beside the greeting hangs the
+volunteer's pass, the badge from the welcome flow, showing the parts their
+profile has filled. Question 3 lives in the hero's band rather than in a
+column of its own, so it is read first: the level rail and the next-level
+meter on one side, the profile's six fields and its completeness meter on the
+other, each with its one action. The figures below it are completed events,
+reliability, recorded hours, and events awaiting confirmation.
+
+Profile languages are chosen from a searchable list rather than typed: the
+common languages of the region first, then every other language by name in
+the interface language, found by typing its name in any of the three. They
+are stored as ISO 639 codes and named from the `languages` catalog; a value
+typed before the list existed is recognised where it can be and kept as it
+was where it cannot.
 
 Closing-soon and saved opportunities now live together on Opportunities.
 Recent changes live in Notifications. This keeps the dashboard personal and

@@ -5,6 +5,7 @@ import { useId, type ReactNode } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
+import { LanguagePicker } from "@/components/profile/language-picker";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -28,6 +29,7 @@ import {
   profileInputFromFormData,
   type ProfileFormValues,
 } from "@/lib/profile/input";
+import type { LanguageOption } from "@/lib/profile/languages";
 
 const ALL_FIELDS = [
   "fullName",
@@ -45,6 +47,7 @@ const ALL_FIELDS = [
 export function ProfileStepForm({
   step,
   values,
+  languageOptions,
   regions,
   labels,
   onSaved,
@@ -53,6 +56,7 @@ export function ProfileStepForm({
 }: {
   step: ProfileStep;
   values: VolunteerProfile;
+  languageOptions: readonly LanguageOption[];
   regions: readonly { value: string; label: string }[];
   labels: OnboardingLabels;
   onSaved: (profile: VolunteerProfile) => void;
@@ -70,7 +74,7 @@ export function ProfileStepForm({
       if (element) onSaved(profileInputFromFormData(new FormData(element)));
     },
   });
-  const { register, formState } = form;
+  const { register, formState, control: formControl } = form;
 
   const shown: readonly (keyof ProfileFormValues)[] = PROFILE_STEP_FIELDS[step];
   const hidden = ALL_FIELDS.filter((field) => !shown.includes(field));
@@ -96,14 +100,25 @@ export function ProfileStepForm({
 
   return (
     <form {...formProps} className="mt-6">
-      {hidden.map((name) => (
-        <input
-          key={name}
-          type="hidden"
-          {...register(name)}
-          defaultValue={defaults[name]}
-        />
-      ))}
+      {hidden.map((name) =>
+        name === "languages" ? (
+          defaults.languages.map((language) => (
+            <input
+              key={`languages-${language}`}
+              type="hidden"
+              name="languages"
+              value={language}
+            />
+          ))
+        ) : (
+          <input
+            key={name}
+            type="hidden"
+            {...register(name)}
+            defaultValue={defaults[name]}
+          />
+        ),
+      )}
 
       <FieldGroup>
         {step === "about" ? (
@@ -170,9 +185,20 @@ export function ProfileStepForm({
               help={labels.fields.languagesHelp}
               error={errorFor("languages")}
             >
-              <Input
-                {...control("languages", labels.fields.languagesHelp)}
-                defaultValue={defaults.languages}
+              <LanguagePicker
+                id={fieldId("languages")}
+                control={formControl}
+                options={languageOptions}
+                invalid={invalid("languages")}
+                describedBy={`${fieldId("languages")}-help`}
+                labels={{
+                  search: labels.fields.languagesSearch,
+                  empty: labels.fields.languagesEmpty,
+                  common: labels.fields.languagesCommon,
+                  all: labels.fields.languagesAll,
+                  remove: labels.fields.languagesRemove,
+                  limit: labels.fields.languagesLimit,
+                }}
               />
             </StepField>
           </>
@@ -242,7 +268,9 @@ export function StepField({
 }) {
   return (
     <Field invalid={Boolean(error)}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel id={`${id}-label`} htmlFor={id}>
+        {label}
+      </FieldLabel>
       {children}
       {help ? <FieldDescription id={`${id}-help`}>{help}</FieldDescription> : null}
       <FieldError>{error}</FieldError>

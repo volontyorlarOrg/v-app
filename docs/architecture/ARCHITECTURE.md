@@ -225,7 +225,7 @@ Runtime dependencies are `next`, `react`, `react-dom`, `next-intl`,
 and — added by Telegram sign-in — `jose` for the encrypted session cookie,
 `zod` for parsing every backend response, and `server-only` to keep the API
 client and the cookie reader out of any client bundle. The Three.js module is
-dynamically imported for the dashboard orbit.
+dynamically imported for the welcome flow's pass.
 
 `feat/ui-libraries` added the library layer in one decision, each package
 against a component that had grown its own version of the same behaviour:

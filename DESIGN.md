@@ -209,11 +209,14 @@ volunteer into the room.
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
 
-The dashboard is the decision screen and the record: a progress orbit, four
-stat tiles, then panels for the next commitment, applications and the
-participation history in the main column, and progress (the level rail, the
-next-level meter, profile completeness) in the aside, leading to the
-leaderboard. The opportunities section holds three tabs — All, Saved and
+The dashboard is the decision screen and the record: a hero that greets the
+volunteer beside their pass and carries their progress in a ruled band, four
+stat tiles, then the next commitment and applications side by side from the
+extra-large breakpoint, and the participation history across both columns.
+The band has two cells built the same way — a title and its action, a rail,
+a labelled meter, one sentence — the level rail and next-level meter leading
+to the leaderboard, the profile's six fields and completeness leading to the
+editor. The opportunities section holds three tabs — All, Saved and
 Applications — under one header, and the applications tab keeps its pill
 filter inside its panel. The leaderboard opens on the viewer's standing card,
 the top three on a podium stage, and the ranked table from fourth place. The
@@ -314,9 +317,12 @@ two surfaces that are not a `Panel`.
 
 The page header and stat tiles use the `enter-*` keyframes because they are
 above the fold. Panels are always visible and never depend on JavaScript to
-enter the page. The dashboard orbit and the welcome pass are the two authored loops:
-each pauses when offscreen or hidden, reads its colours from the tokens, and
-keeps a static composition under reduced motion or without WebGL. The pass is
+enter the page. The welcome pass is the one authored loop: it
+pauses when offscreen or hidden, reads its colours from the tokens, and keeps a
+static composition under reduced motion or without WebGL. On the dashboard the
+same badge is drawn in SVG, hangs from the hero's top edge, shows the parts the
+profile has filled, and settles once on arrival with a short swing that
+reduced motion removes. The pass is
 the flow's one authored moment: a saved step prints a line on the badge and
 nudges it on its lanyard, the last screen stamps it with the orange seal, and
 each step panel slides in the direction the volunteer moved. Menus open and

@@ -25,6 +25,7 @@ import {
   type ProfileSnapshot,
 } from "@/lib/applications/status";
 import { isRegion, type ApplicationQuestion } from "@/lib/opportunities/types";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { localePath, navHref, opportunityHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -156,7 +157,7 @@ function Application({
     {
       key: "languages",
       label: t("detail.snapshot.languages"),
-      value: snapshot.languages?.join(", ") || "—",
+      value: languageDirectory.format(snapshot.languages ?? [], locale) || "—",
     },
     {
       key: "contact",
