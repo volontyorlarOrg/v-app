@@ -9,6 +9,7 @@ import type {
   Shape,
 } from "three";
 
+import { ICON_GLYPH, ICON_HEART } from "@/components/brand/logo-paths";
 import { PASS_PART_KEYS, type PassParts } from "@/lib/onboarding/steps";
 import { cn } from "@/lib/utils";
 import { VolunteerPassBadge } from "@/components/onboarding/volunteer-pass-badge";
@@ -22,6 +23,8 @@ const SWING_DAMPING = 1.35;
 const IDLE_SWING = 0.03;
 const BASE_YAW = 0.2;
 const PART_SPEED = 5.5;
+const GLYPH_CENTER = { x: 497.93, y: 556.07 };
+const GLYPH_HEIGHT = 555.32;
 
 function easeOut(value: number): number {
   return 1 - (1 - value) ** 3;
@@ -52,7 +55,10 @@ export function PassStage({
     let cleanup = () => {};
 
     async function mount() {
-      const THREE = await import("three");
+      const [THREE, { SVGLoader }] = await Promise.all([
+        import("three"),
+        import("three/addons/loaders/SVGLoader.js"),
+      ]);
       if (disposed || !stage || !canvas) return;
 
       const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -152,24 +158,31 @@ export function PassStage({
         return created;
       };
 
-      const brandMark = (scale: number, surface: Material) => {
+      const glyphShapes = (path: string) =>
+        new SVGLoader()
+          .parse(
+            `<svg xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="${path}"/></svg>`,
+          )
+          .paths.flatMap((parsed) => SVGLoader.createShapes(parsed));
+
+      const brandGlyph = (height: number, letters: Material, heart: Material) => {
         const group = new THREE.Group();
-        const dot = mesh(
-          keep(new THREE.SphereGeometry(0.2 * scale, 20, 20)),
-          surface,
-          0,
-          0.146 * scale,
-          0,
-        );
-        const arc = mesh(
-          keep(new THREE.TorusGeometry(0.59 * scale, 0.065 * scale, 10, 40, 3.459)),
-          surface,
-          0,
-          0,
-          0,
-        );
-        arc.rotation.z = 2.982;
-        group.add(dot, arc);
+        const scale = height / GLYPH_HEIGHT;
+        const depth = 0.02 / scale;
+        for (const [path, surface] of [
+          [ICON_GLYPH, letters],
+          [ICON_HEART, heart],
+        ] as const) {
+          const geometry = new THREE.ExtrudeGeometry(glyphShapes(path), {
+            depth,
+            bevelEnabled: false,
+            curveSegments: 8,
+          });
+          geometry.translate(-GLYPH_CENTER.x, -GLYPH_CENTER.y, -depth / 2);
+          geometry.rotateX(Math.PI);
+          geometry.scale(scale, scale, scale);
+          group.add(new THREE.Mesh(keep(geometry), surface));
+        }
         return group;
       };
 
@@ -187,6 +200,7 @@ export function PassStage({
       const rimMaterial = material("border-control", 0.85);
       const bandMaterial = material("primary", 0.5);
       const knockoutMaterial = material("knockout", 0.6);
+      const heartMaterial = material("logo-orange", 0.5);
       const tileMaterial = material("primary-muted", 0.7);
       const silhouetteMaterial = material("primary", 0.6);
 
@@ -264,9 +278,9 @@ export function PassStage({
         0.05,
       );
       card.add(band);
-      const mark = brandMark(0.42, knockoutMaterial);
-      mark.position.set(0, 1.2, 0.075);
-      card.add(mark);
+      const glyph = brandGlyph(0.36, knockoutMaterial, heartMaterial);
+      glyph.position.set(0, 1.17, 0.075);
+      card.add(glyph);
 
       card.add(
         mesh(
@@ -389,9 +403,9 @@ export function PassStage({
         group.add(
           mesh(keep(new THREE.TorusGeometry(0.31, 0.02, 10, 48)), knockout, 0, 0, 0.03),
         );
-        const sealMark = brandMark(0.24, knockout);
-        sealMark.position.set(0, -0.02, 0.035);
-        group.add(sealMark);
+        const sealGlyph = brandGlyph(0.26, knockout, knockout);
+        sealGlyph.position.set(0, 0, 0.035);
+        group.add(sealGlyph);
         group.position.set(0.56, -1.0, 0.12);
         group.rotation.z = -0.24;
       }

@@ -29,6 +29,10 @@
   --color-accent: #e85d30;
   --color-accent-ink: #b34917;
 
+  --color-logo-blue: #007fc2;
+  --color-logo-orange: #e85d30;
+  --color-logo-word: #007fc2;
+
   --color-shell: #0b2340;
   --color-shell-raised: #14345a;
   --color-shell-line: #1e3f66;
@@ -131,6 +135,7 @@
     --color-band-copy: #b8d8f0;
 
     --color-accent-ink: #f5a278;
+    --color-logo-word: #ffffff;
 
     --color-shell: #0f1f36;
     --color-shell-raised: #1a2e4a;
