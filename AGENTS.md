@@ -37,8 +37,11 @@ organisers, sources events, builds partnerships, supplies volunteers, and is
 building regional operations toward all 14 regions.
 
 Do not call the product "Youth Volunteer Club", "YVC", "Youth Volunteering
-Community", or "Volontyor"; all four names are retired. The organisation name is
-rendered as real text beside the mark, never with the delivered SVG lockup.
+Community", or "Volontyor"; all four names are retired. The logo is the
+Volontyorlar web logo kit, drawn inline by `src/components/brand/logo.tsx` from
+the kit's own paths exactly as `../v-web` draws it; how it is installed and used
+is in `../v-web/docs/brand/BRAND_ASSETS.md`. The wordmark is outlined artwork,
+never set as text, and never narrower than the kit's 120px minimum.
 
 Verified facts live in the marketing repository (`../v-web/PRODUCT.md` and its
 `src/lib/content/org.ts`) and are summarised in [`PRODUCT.md`](PRODUCT.md).
@@ -259,11 +262,12 @@ docs/                           -> stable project documentation and the plan
   `/profile/edit`. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
-  structure, chips for a system state, primary actions, the mark. **Orange is
-  the person**: the level reached, an accepted application, a confirmed
-  attendance, the record's figures, a completed profile. Blue and orange sit
-  1.25:1 apart and must never be combined. Each hue has a graphics value and a
-  text value. The palette defines no red; an error colour needs a decision
+  structure, chips for a system state, primary actions. **Orange is the
+  person**: the level reached, an accepted application, a confirmed attendance,
+  the record's figures, a completed profile. Blue and orange sit 1.25:1 apart
+  and must never be combined; the logo's orange heart is the one exception,
+  drawn by the kit as its own shape beside the blue. Each hue has a graphics
+  value and a text value. The palette defines no red; an error colour needs a decision
   before it is used (see the plan). Use semantic tokens, never a literal hex.
   Solid fills use `action` and `band`, never `primary-ink`.
 - Every screen is private. The root layout sends `noindex`, every response

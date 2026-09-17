@@ -1,5 +1,6 @@
 import { useId } from "react";
 
+import { ICON_GLYPH, ICON_HEART } from "@/components/brand/logo-paths";
 import type { PassParts } from "@/lib/onboarding/steps";
 import { cn } from "@/lib/utils";
 
@@ -64,13 +65,10 @@ export function VolunteerPassBadge({
         d="M18 162 a18 18 0 0 1 18 -18 h168 a18 18 0 0 1 18 18 v28 h-204 z"
         className="fill-primary"
       />
-      <circle cx="120" cy="167" r="6" className="fill-knockout" />
-      <path
-        d="M104 176 a16 16 0 0 0 32 0"
-        className="stroke-knockout"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
+      <g transform="translate(104.91 154) scale(0.04682) translate(-175.73 -278.41)">
+        <path d={ICON_GLYPH} fillRule="evenodd" className="fill-knockout" />
+        <path d={ICON_HEART} fillRule="evenodd" className="fill-logo-orange" />
+      </g>
       <rect
         x="34"
         y="204"
@@ -129,13 +127,13 @@ export function VolunteerPassBadge({
           className="stroke-knockout"
           strokeWidth="2.5"
         />
-        <circle cx="184" cy="281" r="3.5" className="fill-knockout" />
-        <path
-          d="M175 287 a9 9 0 0 0 18 0"
-          className="stroke-knockout"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
+        <g
+          transform="translate(174.14 277.5) scale(0.030613) translate(-175.73 -278.41)"
+          className="fill-knockout"
+        >
+          <path d={ICON_GLYPH} fillRule="evenodd" />
+          <path d={ICON_HEART} fillRule="evenodd" />
+        </g>
       </g>
     </svg>
   );

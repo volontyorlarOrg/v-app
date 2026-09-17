@@ -48,13 +48,13 @@ fills them.
 
 ## The steps
 
-| Step            | Saves                                                                  | Counts toward completeness |
-| --------------- | ---------------------------------------------------------------------- | -------------------------- |
-| Welcome         | Nothing                                                                |                            |
-| About you       | `fullName`, `bio` through `updateProfileAction`                        | name, bio                  |
-| Where you study | `school`, `region`, `languages` through `updateProfileAction`          | school, region, languages  |
-| Contact         | `phone`, `telegram` through `updateProfileAction`                      | neither, by design         |
-| Ready           | The leaderboard handle, if the account may rename it                   |                            |
+| Step            | Saves                                                         | Counts toward completeness |
+| --------------- | ------------------------------------------------------------- | -------------------------- |
+| Welcome         | Nothing                                                       |                            |
+| About you       | `fullName`, `bio` through `updateProfileAction`               | name, bio                  |
+| Where you study | `school`, `region`, `languages` through `updateProfileAction` | school, region, languages  |
+| Contact         | `phone`, `telegram` through `updateProfileAction`             | neither, by design         |
+| Ready           | The leaderboard handle, if the account may rename it          |                            |
 
 Every profile step posts the whole profile: the fields the step does not show
 travel as hidden inputs, because `PUT /profile` replaces the record. A step
@@ -113,7 +113,8 @@ fields each step owns, and which pass parts saved data earns) and `state.ts`
 ## The pass
 
 `PassStage` renders a lanyard badge with Three.js: two straps, a clip, a card
-with the brand band and mark, an avatar tile, and five parts that appear as
+with the brand band and the logo's glyph (the "on" and its heart, extruded
+from the kit's own paths), an avatar tile, and five parts that appear as
 they are earned: the printed name lines, the place row, three language
 chips, the contact row, and the orange seal at the end. Parts are derived from the saved profile, so a
 returning volunteer sees what is already there. A saved step nudges the

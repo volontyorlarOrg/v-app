@@ -4,15 +4,17 @@
 
 Volontyorlar helps high school students in Uzbekistan discover and apply to
 meaningful volunteering. It was founded on **4 June 2025** by **Arslon
-Rajabov** and **Parizoda Abdurakhimova**. It finds volunteer opportunities,
-contacts organisers, sources events, builds partnerships, supplies volunteers,
-and builds regional operations toward all 14 regions.
+Rajabov**, co-founder and CEO, and **Abdulaziz Yusupaliev**, co-founder and CTO.
+It finds volunteer opportunities, contacts organisers, sources events, builds
+partnerships, supplies volunteers, and builds regional operations toward all 14
+regions.
 
 The verified facts — traction figures, the one partnership, the supporters and
 the opportunity sources — are owned by the marketing repository
 (`../v-web/PRODUCT.md`, encoded in its `src/lib/content/org.ts`). This
-application presents none of them as content of its own, and its sample data
-never uses a real partner or source as an organiser.
+application presents none of them as content of its own. All volunteer data
+shown behind sign-in comes from `v-backend`; the frontend has no sample or
+preview mode.
 
 ## The loop this application exists to serve
 
@@ -72,17 +74,18 @@ Volunteers are young people, potentially including minors:
 Uzbek (default), Russian, and English. Every user-facing string exists in all
 three, and the language is carried by the URL, never by browser storage.
 
-## Presented, not implemented
+## Implemented boundary
 
-Sign-in with Google, Telegram, or email; the reusable profile; applications;
-saved opportunities; the record and its confirmations. All of it is
-presented in this repository as interface and sample data, none of it is
-connected, and this document is not evidence that any of it is live.
+Sign-in with Google, Telegram, or email and password; the reusable profile;
+applications and drafts; saved opportunities; notifications; account settings;
+the leaderboard; and the participation record are connected to `v-backend`.
+OAuth buttons still depend on their providers being configured in the active
+environment, and no local fallback fabricates a successful sign-in or product
+data.
 
 ## Needs verification
 
 - Production origin of this application and of the marketing site
 - Google Cloud project and OAuth client ownership
 - Telegram bot username and ownership
-- Email delivery provider for verification and password reset
 - Legal basis and consent handling for minors

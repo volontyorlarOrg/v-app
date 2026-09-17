@@ -1,40 +1,37 @@
+import {
+  ICON_GLYPH,
+  ICON_HEART,
+  ICON_TILE,
+  WORDMARK,
+  WORDMARK_HEART,
+} from "@/components/brand/logo-paths";
 import { cn } from "@/lib/utils";
 
-export function BrandMark({ className }: { className?: string }) {
+export function BrandIcon({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 200 200"
+      viewBox="0 0 1000 1000"
       aria-hidden="true"
       focusable="false"
       className={cn("shrink-0", className)}
     >
-      <circle cx="100" cy="76" r="20" fill="currentColor" />
-      <path
-        d="M 41.74 81.30 A 59 59 0 0 0 158.26 81.30"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="13"
-        strokeLinecap="round"
-      />
+      <path d={ICON_TILE} className="fill-logo-blue" />
+      <path d={ICON_GLYPH} fillRule="evenodd" className="fill-knockout" />
+      <path d={ICON_HEART} fillRule="evenodd" className="fill-logo-orange" />
     </svg>
   );
 }
 
-export function BrandArc({ className }: { className?: string }) {
+export function BrandWordmark({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 200 200"
+      viewBox="0 0 1000 210.74"
       aria-hidden="true"
       focusable="false"
       className={cn("shrink-0", className)}
     >
-      <path
-        d="M 41.74 81.30 A 59 59 0 0 0 158.26 81.30"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="13"
-        strokeLinecap="round"
-      />
+      <path d={WORDMARK} fillRule="evenodd" fill="currentColor" />
+      <path d={WORDMARK_HEART} fillRule="evenodd" className="fill-logo-orange" />
     </svg>
   );
 }
@@ -49,18 +46,18 @@ export function BrandLockup({
   tone?: "primary" | "inverse";
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <BrandMark
-        className={cn("size-8", tone === "primary" ? "text-primary" : "text-knockout")}
-      />
-      <span
+    <span
+      role="img"
+      aria-label={name}
+      className={cn("inline-flex items-start [--logo:2.65rem]", className)}
+    >
+      <BrandIcon className="size-(--logo)" />
+      <BrandWordmark
         className={cn(
-          "hidden text-base leading-none font-bold tracking-[-0.02em] lowercase min-[360px]:inline",
-          tone === "primary" ? "text-ink" : "text-knockout",
+          "mt-[calc(var(--logo)*0.24)] ml-[calc(var(--logo)*0.3025)] hidden h-[calc(var(--logo)*0.6006)] w-auto min-[360px]:block",
+          tone === "primary" ? "text-logo-word" : "text-knockout",
         )}
-      >
-        {name}
-      </span>
+      />
     </span>
   );
 }
