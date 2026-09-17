@@ -99,8 +99,9 @@ picture, and every real value, lives in the `env/` store beside these
 repositories, which is deliberately outside version control.
 
 Environment values are set in the Vercel project, not in this repository. It
-carries a value-free `.env.example` and nothing else. `VOLONTYORLAR_API_URL` and
-`VOLONTYORLAR_SESSION_SECRET` are server-only and must never gain a
+carries a value-free `.env.example` and nothing else. `VOLONTYORLAR_API_URL`,
+`VOLONTYORLAR_SESSION_SECRET` and `VOLONTYORLAR_PROXY_SECRET` (equal to the
+backend's `FRONTEND_PROXY_SECRET`) are server-only and must never gain a
 `NEXT_PUBLIC_` prefix; the two `NEXT_PUBLIC_` origins are inlined at build time,
 so changing one needs a rebuild, not just a restart.
 

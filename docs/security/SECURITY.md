@@ -188,9 +188,18 @@ The application still requires no secret to install, lint, typecheck, test, or
 build, and CI supplies none. The two `NEXT_PUBLIC_*` variables are embedded in
 the browser bundle by design.
 
-`VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET` are server-only.
-Neither may ever carry a `NEXT_PUBLIC_` prefix; `src/lib/api/client.server.ts`
-and `src/lib/auth/session.server.ts` import `server-only` so an accidental
+Every server-side backend call carries `X-Volontyorlar-Client-Ip`, the visitor
+address Vercel reports in `x-real-ip`, together with
+`X-Volontyorlar-Proxy-Secret` (`VOLONTYORLAR_PROXY_SECRET`, equal to the
+backend's `FRONTEND_PROXY_SECRET`). Every call reaches the backend from this
+server, so without them all volunteers share one rate-limit budget and sign-in
+fails for everyone once it is spent. The backend ignores the address unless the
+secret matches, and counts signed-in calls per account.
+
+`VOLONTYORLAR_API_URL`, `VOLONTYORLAR_SESSION_SECRET` and
+`VOLONTYORLAR_PROXY_SECRET` are server-only. None may ever carry a
+`NEXT_PUBLIC_` prefix; `src/lib/api/client.server.ts` and
+`src/lib/auth/session.server.ts` import `server-only` so an accidental
 client import fails the build. The bot token lives in `v-backend` and never
 enters this deployment — see
 [`../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../../../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md)
