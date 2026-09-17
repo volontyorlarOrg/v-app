@@ -12,24 +12,22 @@ follows its codebase patterns and system design. The API lives in
 
 ```bash
 npm ci
-cp .env.example .env.local
 npm run dev
 ```
 
 http://localhost:3001 redirects to `/uz/login`. Sign-in is Telegram: the
 button hands off to Telegram's sign-in page, and the callback route writes
 the session cookie.
-Everything behind it reads `v-backend`, so set `VOLONTYORLAR_API_URL` and
-`VOLONTYORLAR_SESSION_SECRET` in `.env.local` (see
-`docs/operations/DEVELOPMENT_AND_DEPLOYMENT.md`). Run `../v-web` on port 3000
-at the same time and its "Log in" button points here through
+`npm run dev` loads the shared local environment, so everything behind sign-in
+reads the local `v-backend` and its separate development database. Run
+`../v-web` on port 3000 at the same time and its "Log in" button points here through
 `NEXT_PUBLIC_APP_ORIGIN`.
 
 ## Commands
 
 | Command             | What it does                                              |
 | ------------------- | --------------------------------------------------------- |
-| `npm run dev`       | Turbopack development server on port 3001                 |
+| `npm run dev`       | Shared real-API development server on port 3001           |
 | `npm run build`     | Production build                                          |
 | `npm run start`     | Serve an existing production build on port 3001           |
 | `npm run lint`      | ESLint                                                    |
@@ -46,13 +44,10 @@ at the same time and its "Log in" button points here through
   account menu on desktop; a top bar and a four-tab bar on a phone.
 - The dashboard: greeting and level, three figures, the next commitment,
   recent applications, and one progress panel for record and profile readiness.
-- Every section on mock data: opportunities with URL-backed filters and detail
-  pages, applications with status groups and a timeline per application,
-  a saved Opportunities view, the record with a participation history, a profile editor, and
-  settings full of switches for notifications, privacy, appearance and linked
-  sign-in methods.
-- The plan for making it real:
-  [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md).
+- Live-data product screens: opportunities with URL-backed filters and detail
+  pages, applications with status groups and a timeline per application, a
+  saved Opportunities view, the record with a participation history, a profile
+  editor, and settings for appearance and linked sign-in methods.
 
 ## Where to read next
 
