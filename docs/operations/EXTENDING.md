@@ -13,17 +13,19 @@ inside the source. Compiler and linter directives are not comments and stay.
 
 ## Add a section
 
-1. **Register the route** in `src/lib/routing/routes.ts` with its area and
-   whether it belongs in the sidebar's main list (`inNav`) and the phone tab
-   bar (`inTabBar`). Routes in the volunteer area that are not `inNav` land in
-   the sidebar's account list. The sidebar, the tab bar, the account menu and
+1. **Register the route** in `src/lib/routing/routes.ts` with its area, where
+   it sits in the sidebar (`navGroup`: `"primary"` for the stack under the
+   lockup, `"account"` for the stack at the foot, `null` for neither) and
+   whether it belongs in the phone tab bar (`inTabBar`). A volunteer route in
+   none of them is reachable by URL only, like the two redirects. The
+   sidebar, the tab bar, the phone's account menu and
    `routes.test.ts` all read from the registry; give it an icon in
    `src/components/app/route-icons.ts`.
 2. **Add `nav.<key>`** to all three catalogs in `src/i18n/messages/`, plus a
    namespace for the page's own copy with at least a `metaTitle`, `title` and
    `description`.
 3. **Create** `src/app/[locale]/(volunteer)/<path>/page.tsx` following the
-   record page: `dynamic = "force-dynamic"` because it reads the backend per request,
+   leaderboard page: `dynamic = "force-dynamic"` because it reads the backend per request,
    `generateMetadata` reading the catalog, a default export that awaits
    `params` and calls `setRequestLocale`, and a synchronous component that
    opens with `PageHeader` and composes `Panel`s.

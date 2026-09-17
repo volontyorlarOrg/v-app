@@ -6,6 +6,13 @@ import { LoadErrorPanel, type LoadErrorLabels } from "@/components/app/load-erro
 import { buttonClass } from "@/components/ui/button";
 import { useRouter } from "@/i18n/navigation";
 
+const RENDER_FAILURE = {
+  code: "server",
+  reason: "failed",
+  retryable: false,
+  reference: null,
+} as const;
+
 type BoundaryProps = {
   labels: LoadErrorLabels;
   onRetry: () => void;
@@ -35,9 +42,14 @@ class Boundary extends Component<BoundaryProps, BoundaryState> {
 
     return (
       <LoadErrorPanel
+        failure={RENDER_FAILURE}
         labels={this.props.labels}
         action={
-          <button type="button" onClick={this.retry} className={buttonClass({ size: "sm" })}>
+          <button
+            type="button"
+            onClick={this.retry}
+            className={buttonClass({ size: "sm" })}
+          >
             {this.props.labels.retry}
           </button>
         }

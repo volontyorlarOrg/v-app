@@ -33,6 +33,7 @@ import {
   type CompletionField,
   type VolunteerProfile,
 } from "@/lib/profile/completion";
+import type { LanguageOption } from "@/lib/profile/languages";
 import { localePath, navHref } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,7 @@ export function OnboardingFlow({
   profileSaved,
   next,
   regions,
+  languageOptions,
   username,
   labels,
   completionFields,
@@ -63,6 +65,7 @@ export function OnboardingFlow({
   profileSaved: boolean;
   next: string | null;
   regions: readonly { value: string; label: string }[];
+  languageOptions: readonly LanguageOption[];
   username: UsernameIdentity;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
@@ -185,6 +188,7 @@ export function OnboardingFlow({
               <ProfileStepForm
                 step={step}
                 values={values}
+                languageOptions={languageOptions}
                 regions={regions}
                 labels={labels}
                 onSaved={(profile) => {
@@ -276,7 +280,7 @@ function DoneBody({
         <p className="mt-3 text-pretty text-ink">
           {fill(labels.done.incomplete, { percent, fields: missing.join(", ") })}{" "}
           <Link
-            href={navHref("profile")}
+            href={navHref("profileEdit")}
             className="font-semibold text-primary-ink underline-offset-4 hover:underline"
           >
             {labels.done.finishOnProfile}

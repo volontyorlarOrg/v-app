@@ -22,7 +22,7 @@ export function ConnectTelegram({
     >
       <span
         aria-hidden="true"
-        className="hidden size-11 shrink-0 items-center justify-center rounded-lg bg-surface-soft text-primary-ink sm:inline-flex"
+        className="hidden size-11 shrink-0 items-center justify-center rounded-full bg-surface-soft text-primary-ink sm:inline-flex"
       >
         <TelegramMark className="size-5" />
       </span>

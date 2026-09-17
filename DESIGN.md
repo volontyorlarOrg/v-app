@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a sidebar and top bar, panels on a flat workspace, blue for the institution, orange for what the volunteer did, and the same panel after dark.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, three sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -21,6 +21,21 @@ colors:
   accent: "#E85D30"
   accent-ink: "#B34917"
   knockout: "#FFFFFF"
+  shell: "#0B2340"
+  shell-raised: "#14345A"
+  shell-line: "#1E3F66"
+  shell-ink: "#F1F6FB"
+  shell-muted: "#9DB4CC"
+  shell-active: "#BFDCEF"
+  shell-active-ink: "#004A73"
+  surface-raised: "#FFFFFF"
+  field: "#FFFFFF"
+  gold: "#D4A53A"
+  gold-ink: "#7A5A0E"
+  silver: "#B5BFCA"
+  silver-ink: "#5B6774"
+  bronze: "#C58256"
+  bronze-ink: "#7D4A24"
 typography:
   page:
     fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
@@ -66,7 +81,7 @@ rounded:
   2xl: "28px"
   full: "9999px"
 spacing:
-  sidebar: "16rem"
+  sidebar: "16.5rem"
   aside: "22rem"
   gutter-mobile: "16px"
   gutter-wide: "32px"
@@ -84,9 +99,15 @@ components:
     rounded: "{rounded.xl}"
     padding: "16px 20px"
   sidebar:
-    backgroundColor: "{colors.surface}"
-    borderColor: "{colors.border}"
+    backgroundColor: "{colors.shell}"
+    textColor: "{colors.shell-ink}"
+    borderColor: "{colors.shell-line}"
     width: "{spacing.sidebar}"
+  sidebar-active:
+    backgroundColor: "{colors.shell-active}"
+    textColor: "{colors.shell-active-ink}"
+    rounded: "{rounded.md}"
+    height: "44px"
   workspace:
     backgroundColor: "{colors.surface-sunk}"
   switch-on:
@@ -124,12 +145,21 @@ components:
 
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
-a sidebar that names the sections, a top bar with notifications and account
-controls, and a flat workspace carrying panels of content. It shares every
+a navy sidebar that names three sections — dashboard, opportunities,
+leaderboard — at the top and the account — who you are, profile, settings,
+sign out — at the foot, and a flat workspace carrying panels of content, with
+no top bar between them. Every entry in the sidebar is a plain link: nothing
+in it expands, and the only tray is the notification bell beside the lockup.
+What used to hide inside the user card now has a place — profile and settings
+are links at the foot, the theme switch and the interface language are a panel
+on `/settings`. Anything that belongs to a section is a tab under
+that section's header, never a fourth sidebar entry. It shares every
 token, both typefaces, the two brand colours and their rules, the theme and the
-motion system with `../v-web/DESIGN.md`, and nothing else about its layout. A
-volunteer coming from the marketing site should recognise the ink; a volunteer
-coming from any other product should recognise a panel.
+motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
+institution's blue is used as a field on the left, not only as an accent; the
+volunteer's own work stays orange on the right. A volunteer coming from the
+marketing site should recognise the ink; a volunteer coming from any other
+product should recognise a panel.
 
 Only the sign-in pages keep the marketing site's dot-grid ground: they are the
 doorway between the two. The welcome flow a new account meets on `/welcome`
@@ -139,8 +169,26 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 16rem sidebar and a 56px top bar on desktop; a top bar and a four-tab bar
-  on a phone. The workspace is `surface-sunk`, the panels are `surface`.
+- A 16.5rem navy sidebar (`shell`) with three sections at the top, the
+  identity card and the account links at the foot, and no top bar on
+  desktop; a 56px header and a four-tab bar (dashboard, opportunities,
+  leaderboard, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
+  `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
+  after dark. The workspace is `surface-sunk` under two faint radial washes
+  (blue top-right, orange bottom-left), the panels are `surface`.
+- The dark theme is an elevation model, not an inversion: the floor
+  (`surface-sunk`) is the darkest navy, every panel (`surface`) sits a step
+  above it with a one-pixel highlight along its top edge, popovers
+  (`surface-raised`) a step above that, and fields (`field`) sink below the
+  panel they sit in. Every neutral is tinted toward navy rather than grey, the
+  washes are halved so orange never muddies to brown, and the accent text
+  values are lifted so both hues keep their AA ratios.
+- Underlined section tabs under a page header, with a count on each, where a
+  section has more than one listing: All, Saved and Applications under
+  Opportunities.
+- Washes of the two hues where a surface is the volunteer's own: the dashboard
+  hero, the profile's identity cover, the leaderboard's standing card and the
+  podium stage. A wash never carries text contrast; the tokens beneath do.
 - Panels, stat tiles and cards with a `border` edge and a 20px radius. Content
   inside a panel is ruled rows, never nested boxes.
 - A serif page title at 30 to 36px, sans panel titles at 16px, and serif
@@ -156,14 +204,27 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `surface`, right hairline: lockup, main sections, account routes, the user card with level and sign out | Absent                                                                    |
-| Top bar   | Sticky, `surface`, bottom hairline: notifications, language, theme, account menu                                             | Same controls plus the brand mark                                         |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card, profile, settings and sign out — all plain links | Absent                                                                    |
+| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: profile, settings, sign out) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
-| Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, applications, profile |
+| Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
 
-The dashboard is the decision screen: a progress orbit, three stat tiles, then
-three panels for the next commitment, applications, and progress. The profile
-is the volunteer's own page: an identity card, then the editor. Every other
+The dashboard is the decision screen and the record: a hero that greets the
+volunteer beside their pass and carries their progress in a ruled band, four
+stat tiles, then the next commitment and applications side by side from the
+extra-large breakpoint, and the participation history across both columns.
+The band has two cells built the same way — a title and its action, a rail,
+a labelled meter, one sentence — the level rail and next-level meter leading
+to the leaderboard, the profile's six fields and completeness leading to the
+editor. The opportunities section holds three tabs — All, Saved and
+Applications — under one header, and the applications tab keeps its pill
+filter inside its panel. The leaderboard opens on the viewer's standing card,
+the top three on a podium stage, and the ranked table from fourth place. The
+profile is the volunteer's own page: an identity card under a washed cover,
+then the contact details and the completeness meter, all read-only; editing is
+its own page, `/profile/edit`, a page header over the editor in titled sections
+with Save and Cancel, returning to the profile once saved. Settings opens on an
+account summary and an anchor index to its panels. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 
@@ -186,13 +247,21 @@ things the institution did.
 
 | Surface                                                               | Treatment                          |
 | --------------------------------------------------------------------- | ---------------------------------- |
-| The level in the sidebar user card, the dashboard tile and the record | `text-accent-ink`                  |
+| The level in the sidebar identity card, the dashboard tile and the record | `text-accent-ink`                  |
 | Events completed, hours, reliability on the record                    | `text-accent-ink` at figure size   |
 | Reached nodes and labels on the level rail                            | `bg-accent` / `text-accent-ink`    |
 | The "accepted" chip and the "attended" outcome                        | `border-accent/50 text-accent-ink` |
 | The decision node on an accepted application's timeline               | `bg-accent`                        |
 | A completed profile, and the preview "saved" status                   | `text-accent-ink`                  |
 | Activity dots for a confirmation, an acceptance, a level              | `bg-accent`                        |
+
+**Gold, silver and bronze** appear in exactly one place: the top three on the
+leaderboard. Each place owns a metal (`gold`, `silver`, `bronze`) for its
+avatar ring, its podium step and the step's crown, and a metal ink
+(`*-ink`) for the numeral badge and the viewer's own rank when it is a podium
+one; the badge label is `medal-label`, white by day and the page ground after
+dark. The metals never label a system state or a person's action elsewhere,
+and the experience figures stay orange even on the podium.
 
 Nothing orange sits on blue and nothing blue sits on orange. The level rail's
 reached nodes are orange on a `border-control` hairline. The palette still
@@ -212,6 +281,15 @@ disabled, not a red one.
   facts and the links, and the two actions. A profile that is not complete
   gains a last band with the meter and what is still missing; a complete one
   drops that band and gains a tick beside the level.
+- **Podium** — the leaderboard's top three: each place is an avatar in its
+  metal ring, the handle, the experience figure, and a podium step in that
+  metal, the three steps at three heights so the silhouette reads before a
+  number does. Second stands left, first centre under the crown, third right.
+- **Failed read** — where a listing or a panel's rows would be: a soft disc
+  with a cloud-off (unreachable) or a warning (the server answered with an
+  error) glyph, a title, one sentence, the retry button and a live countdown
+  beneath it, and the request reference in small tabular type. The rest of the
+  page stays up around it.
 - **Stat tile** — the same box carrying one label, one figure and one note.
 - **Card** — the opportunity card in a grid: chips, title, organiser, meta,
   then save and view actions along the bottom edge.
@@ -239,9 +317,12 @@ two surfaces that are not a `Panel`.
 
 The page header and stat tiles use the `enter-*` keyframes because they are
 above the fold. Panels are always visible and never depend on JavaScript to
-enter the page. The dashboard orbit and the welcome pass are the two authored loops:
-each pauses when offscreen or hidden, reads its colours from the tokens, and
-keeps a static composition under reduced motion or without WebGL. The pass is
+enter the page. The welcome pass is the one authored loop: it
+pauses when offscreen or hidden, reads its colours from the tokens, and keeps a
+static composition under reduced motion or without WebGL. On the dashboard the
+same badge is drawn in SVG, hangs from the hero's top edge, shows the parts the
+profile has filled, and settles once on arrival with a short swing that
+reduced motion removes. The pass is
 the flow's one authored moment: a saved step prints a line on the badge and
 nudges it on its lanyard, the last screen stamps it with the orange seal, and
 each step panel slides in the direction the volunteer moved. Menus open and
@@ -263,3 +344,6 @@ close without transition. No JavaScript and print see the full page.
   and the welcome flow.
 - **Don't** put a literal hex value in a component, or reach for a red.
 - **Don't** add a hover-only affordance; the audience is on a phone.
+- **Don't** let a failed read blank a page: settle the read and draw the failed
+  panel in its place, with the retry inside it.
+- **Don't** use a metal for anything but a podium place.

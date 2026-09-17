@@ -19,12 +19,14 @@ export type NotificationItem = {
 };
 
 export function NotificationsMenu({
+  variant = "icon",
   label,
   title,
   emptyLabel,
   markAllLabel,
   items,
 }: {
+  variant?: "icon" | "shell";
   label: string;
   title: string;
   emptyLabel: string;
@@ -34,14 +36,20 @@ export function NotificationsMenu({
   const markAll = useServerAction(markAllReadAction);
   const allRead = markAll.isSuccess;
   const unread = allRead ? 0 : items.filter((item) => item.unread).length;
+  const name = unread > 0 ? `${label} (${unread})` : label;
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={unread > 0 ? `${label} (${unread})` : label}
-          className="relative inline-grid size-11 place-items-center rounded-full border border-border bg-surface text-ink transition-colors hover:border-border-control hover:text-primary-ink"
+          aria-label={name}
+          className={cn(
+            "relative inline-grid size-11 shrink-0 place-items-center rounded-full border transition-colors",
+            variant === "shell"
+              ? "border-shell-line bg-shell-raised/60 text-shell-muted hover:bg-shell-raised hover:text-shell-ink data-[state=open]:bg-shell-raised data-[state=open]:text-shell-ink"
+              : "border-border bg-surface text-ink hover:border-primary hover:text-primary-ink data-[state=open]:border-primary",
+          )}
         >
           <Bell aria-hidden="true" className="size-4" />
           {unread > 0 ? (
@@ -55,7 +63,13 @@ export function NotificationsMenu({
         </button>
       </PopoverTrigger>
 
-      <PopoverContent aria-label={title} className="w-80 overflow-hidden p-0">
+      <PopoverContent
+        aria-label={title}
+        side="bottom"
+        align="end"
+        sideOffset={8}
+        className="w-80 overflow-hidden p-0"
+      >
         <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
           <p className="text-sm font-semibold text-ink">{title}</p>
           {unread > 0 ? (
@@ -72,7 +86,7 @@ export function NotificationsMenu({
         {items.length === 0 ? (
           <p className="px-4 py-6 text-sm text-ink-muted">{emptyLabel}</p>
         ) : (
-          <ul>
+          <ul className="max-h-96 overflow-y-auto">
             {items.map((item) => (
               <li
                 key={item.id}

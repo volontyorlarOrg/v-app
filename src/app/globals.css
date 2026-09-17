@@ -5,6 +5,8 @@
   --color-surface: #ffffff;
   --color-surface-sunk: #ecf1f5;
   --color-surface-soft: #e7f1f9;
+  --color-surface-raised: #ffffff;
+  --color-field: #ffffff;
 
   --color-ink: #222b33;
   --color-ink-muted: #566270;
@@ -27,17 +29,36 @@
   --color-accent: #e85d30;
   --color-accent-ink: #b34917;
 
+  --color-shell: #0b2340;
+  --color-shell-raised: #14345a;
+  --color-shell-line: #1e3f66;
+  --color-shell-ink: #f1f6fb;
+  --color-shell-muted: #9db4cc;
+  --color-shell-active: #bfdcef;
+  --color-shell-active-ink: #004a73;
+
+  --color-gold: #d4a53a;
+  --color-gold-ink: #7a5a0e;
+  --color-silver: #b5bfca;
+  --color-silver-ink: #5b6774;
+  --color-bronze: #c58256;
+  --color-bronze-ink: #7d4a24;
+  --color-medal-label: #ffffff;
+
   --color-background: var(--color-paper);
   --color-foreground: var(--color-ink);
   --color-card: var(--color-surface);
   --color-card-foreground: var(--color-ink);
-  --color-popover: var(--color-surface);
+  --color-popover: var(--color-surface-raised);
   --color-popover-foreground: var(--color-ink);
   --color-primary-foreground: var(--color-knockout);
   --color-muted: var(--color-surface-sunk);
   --color-muted-foreground: var(--color-ink-muted);
   --color-input: var(--color-border-control);
   --color-ring: var(--color-primary-ink);
+
+  --shadow-raised: 0 18px 40px -28px var(--raised-shadow);
+  --shadow-panel: var(--panel-shadow);
 
   --ease-scene: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -75,36 +96,66 @@
     color-scheme: light;
     --board-dot: color-mix(in srgb, var(--color-primary) 16%, transparent);
     --board-wash: color-mix(in srgb, var(--color-primary) 9%, transparent);
+    --raised-shadow: rgb(28 36 43 / 0.45);
+    --panel-shadow: 0 1px 2px rgb(28 36 43 / 0.04);
+    --wash-primary: 13%;
+    --wash-accent: 7%;
+    --metal-mix-top: 30%;
+    --metal-mix-bottom: 8%;
   }
 
   :root[data-theme="dark"] {
     color-scheme: dark;
 
-    --color-paper: #0a0e13;
-    --color-surface: #131920;
-    --color-surface-sunk: #0e1319;
-    --color-surface-soft: #0f1b28;
+    --color-paper: #0a101b;
+    --color-surface: #18243d;
+    --color-surface-sunk: #0d1524;
+    --color-surface-soft: #1f3350;
+    --color-surface-raised: #243655;
+    --color-field: #0e1727;
 
-    --color-ink: #edf1f5;
-    --color-ink-muted: #a6b1bd;
+    --color-ink: #e9eef5;
+    --color-ink-muted: #a6b3c4;
 
-    --color-border: #1f2833;
-    --color-border-control: #5b6774;
+    --color-border: #263650;
+    --color-border-control: #5b6c86;
 
-    --color-primary: #3aa0e4;
-    --color-primary-ink: #6fbff2;
-    --color-primary-deep: #0b3d63;
-    --color-primary-muted: #9ecdec;
+    --color-primary: #46a6e6;
+    --color-primary-ink: #8fcbf3;
+    --color-primary-deep: #d2e8f8;
+    --color-primary-muted: #1e3d5e;
 
-    --color-action: #0e6fb2;
-    --color-action-hover: #1178bf;
-    --color-band: #0d1e31;
-    --color-band-copy: #a9cfea;
+    --color-action: #1470b4;
+    --color-action-hover: #1975ba;
+    --color-band: #10233a;
+    --color-band-copy: #b8d8f0;
 
-    --color-accent-ink: #f08a55;
+    --color-accent-ink: #f5a278;
 
-    --board-dot: color-mix(in srgb, var(--color-primary) 22%, transparent);
-    --board-wash: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    --color-shell: #0f1f36;
+    --color-shell-raised: #1a2e4a;
+    --color-shell-line: #22385a;
+    --color-shell-ink: #eef3f9;
+    --color-shell-muted: #a9bbd1;
+    --color-shell-active: #1f4468;
+    --color-shell-active-ink: #d6eaf9;
+
+    --color-gold: #d9a83e;
+    --color-gold-ink: #f2cf6e;
+    --color-silver: #a9b5c3;
+    --color-silver-ink: #d6dee8;
+    --color-bronze: #c9825a;
+    --color-bronze-ink: #f0b48e;
+    --color-medal-label: #0a101b;
+
+    --board-dot: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    --board-wash: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    --raised-shadow: rgb(0 0 0 / 0.65);
+    --panel-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+    --wash-primary: 16%;
+    --wash-accent: 6%;
+    --metal-mix-top: 34%;
+    --metal-mix-bottom: 10%;
   }
 
   html {
@@ -273,105 +324,339 @@
 
 @layer components {
   .workspace-backdrop {
-    background-image: radial-gradient(
-      48rem 28rem at 85% 0%,
-      color-mix(in srgb, var(--color-primary) 8%, transparent),
-      transparent 72%
-    );
+    background-image:
+      radial-gradient(
+        52rem 30rem at 88% -6%,
+        color-mix(in srgb, var(--color-primary) var(--wash-primary), transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        40rem 26rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) var(--wash-accent), transparent),
+        transparent 70%
+      );
+  }
+
+  .shell-glow {
+    background-image:
+      radial-gradient(
+        22rem 16rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 30%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        18rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 12%, transparent),
+        transparent 70%
+      );
+  }
+
+  .panel-surface {
+    box-shadow: var(--shadow-panel);
   }
 
   .dashboard-hero {
     position: relative;
     display: grid;
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "intro pass"
+      "band band";
     overflow: clip;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-panel);
     background:
       radial-gradient(
-        32rem 20rem at 92% 38%,
-        color-mix(in srgb, var(--color-primary) 11%, transparent),
+        34rem 22rem at 94% 30%,
+        color-mix(in srgb, var(--color-primary) 16%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        20rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 8%, transparent),
         transparent 72%
       ),
       var(--color-surface);
+  }
+
+  .dashboard-hero-intro {
+    grid-area: intro;
+    align-self: center;
+    min-width: 0;
+    padding: 1.25rem 0 1.5rem 1.25rem;
+  }
+
+  .dashboard-pass {
+    grid-area: pass;
+    align-self: start;
+    width: 4.75rem;
+    margin-inline: 0.75rem 1rem;
+  }
+
+  .dashboard-pass svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    transform-origin: 50% 0;
+    animation: pass-settle 1400ms ease-in-out both;
+  }
+
+  @keyframes pass-settle {
+    0% {
+      rotate: 6deg;
+    }
+
+    35% {
+      rotate: -3deg;
+    }
+
+    65% {
+      rotate: 1.25deg;
+    }
+
+    100% {
+      rotate: 0deg;
+    }
+  }
+
+  .dashboard-hero-band {
+    grid-area: band;
+    display: grid;
+    gap: 1.5rem;
+    border-top: 1px solid var(--color-border);
     padding: 1.25rem;
   }
 
-  .impact-orbit {
-    position: relative;
-    min-height: 12rem;
+  .dashboard-hero-cell {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-width: 0;
   }
 
-  .impact-orbit::before,
-  .impact-orbit::after {
-    position: absolute;
-    inset: 50% auto auto 50%;
-    width: min(76vw, 16rem);
-    aspect-ratio: 2 / 1;
-    content: "";
-    translate: -50% -50%;
-    border: 1px solid color-mix(in srgb, var(--color-primary-muted) 72%, transparent);
-    border-radius: 50%;
+  .dashboard-hero-cell + .dashboard-hero-cell {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.5rem;
   }
 
-  .impact-orbit::after {
-    rotate: 58deg;
+  .dashboard-hero-meter {
+    align-self: end;
+    min-width: 0;
   }
 
-  .impact-orbit-core,
-  .impact-orbit-node {
-    position: absolute;
-    z-index: 0;
-    display: block;
-    border-radius: 50%;
+  .identity-cover {
+    background:
+      radial-gradient(
+        30rem 14rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 26%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        24rem 12rem at 100% 100%,
+        color-mix(in srgb, var(--color-accent) 18%, transparent),
+        transparent 72%
+      ),
+      var(--color-surface-soft);
   }
 
-  .impact-orbit-core {
-    inset: 50% auto auto 50%;
-    width: 4.25rem;
-    aspect-ratio: 1;
-    translate: -50% -50%;
-    border: 1px solid var(--color-primary);
-    background: var(--color-surface-soft);
-    box-shadow: 0 1rem 2.5rem -1.5rem
-      color-mix(in srgb, var(--color-primary) 60%, transparent);
+  .podium-stage {
+    background:
+      radial-gradient(
+        30rem 16rem at 50% 100%,
+        color-mix(in srgb, var(--color-gold) 16%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 10%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 10%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface);
   }
 
-  .impact-orbit-node {
-    width: 0.75rem;
-    aspect-ratio: 1;
-    background: var(--color-primary);
-    box-shadow: 0 0 0 0.25rem var(--color-surface);
+  .medal[data-place="1"] {
+    --metal: var(--color-gold);
+    --metal-ink: var(--color-gold-ink);
   }
 
-  .impact-orbit-node-a {
-    top: 26%;
-    left: 22%;
+  .medal[data-place="2"] {
+    --metal: var(--color-silver);
+    --metal-ink: var(--color-silver-ink);
   }
 
-  .impact-orbit-node-b {
-    top: 20%;
-    right: 18%;
-    background: var(--color-accent);
+  .medal[data-place="3"] {
+    --metal: var(--color-bronze);
+    --metal-ink: var(--color-bronze-ink);
   }
 
-  .impact-orbit-node-c {
-    right: 21%;
-    bottom: 20%;
-  }
-
-  .impact-orbit-node-d {
-    bottom: 19%;
-    left: 25%;
-  }
-
-  .impact-orbit canvas {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
+  .podium-step {
+    display: grid;
     width: 100%;
-    height: 100%;
+    height: var(--step-height, 3rem);
+    place-items: center;
+    border-top: 3px solid var(--metal);
+    border-radius: 0.75rem 0.75rem 0 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--metal) var(--metal-mix-top), var(--color-surface)),
+      color-mix(in srgb, var(--metal) var(--metal-mix-bottom), var(--color-surface)) 92%
+    );
+    color: var(--metal-ink);
+    transition: height 500ms var(--ease-scene);
+  }
+
+  .podium-step[data-place="1"] {
+    --step-height: 6.25rem;
+  }
+
+  .podium-step[data-place="2"] {
+    --step-height: 4.25rem;
+  }
+
+  .podium-step[data-place="3"] {
+    --step-height: 3rem;
+  }
+
+  .standing-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 14%, var(--color-surface)),
+      var(--color-surface) 55%,
+      color-mix(in srgb, var(--color-accent) 9%, var(--color-surface))
+    );
+  }
+
+  .section-tabs ul {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    margin-bottom: -1px;
+    padding-inline: 0.75rem;
+    border-bottom: 2px solid transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--color-ink-muted);
+    transition:
+      color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .section-tab:hover {
+    color: var(--color-ink);
+  }
+
+  .section-tab[aria-current="page"] {
+    color: var(--color-ink);
+    border-bottom-color: var(--color-action);
+  }
+
+  .section-tab-count {
+    display: inline-grid;
+    min-width: 1.25rem;
+    padding-inline: 0.375rem;
+    place-items: center;
+    border-radius: 9999px;
+    background: var(--color-surface-sunk);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--color-ink-muted);
+  }
+
+  .section-tab[aria-current="page"] .section-tab-count {
+    background: var(--color-surface-soft);
+    color: var(--color-primary-ink);
+  }
+
+  :root[data-theme="dark"] .shell-glow {
+    background-image:
+      radial-gradient(
+        22rem 16rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 22%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        18rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 8%, transparent),
+        transparent 70%
+      );
+  }
+
+  :root[data-theme="dark"] .dashboard-hero {
+    background:
+      radial-gradient(
+        34rem 22rem at 94% 30%,
+        color-mix(in srgb, var(--color-primary) 22%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 14rem at 0% 100%,
+        color-mix(in srgb, var(--color-accent) 9%, transparent),
+        transparent 72%
+      ),
+      var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .identity-cover {
+    background:
+      radial-gradient(
+        30rem 14rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 34%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        20rem 10rem at 96% 110%,
+        color-mix(in srgb, var(--color-accent) 14%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface-soft);
+  }
+
+  :root[data-theme="dark"] .podium-stage {
+    background:
+      radial-gradient(
+        30rem 16rem at 50% 100%,
+        color-mix(in srgb, var(--color-gold) 14%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 0% 0%,
+        color-mix(in srgb, var(--color-primary) 16%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        22rem 12rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) 16%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .podium-step {
+    box-shadow: 0 -1.25rem 2.5rem -1.5rem
+      color-mix(in srgb, var(--metal) 55%, transparent);
+  }
+
+  :root[data-theme="dark"] .standing-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 22%, var(--color-surface)),
+      var(--color-surface) 55%,
+      color-mix(in srgb, var(--color-accent) 10%, var(--color-surface))
+    );
   }
 
   .hero-copy {
@@ -413,23 +698,118 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  @media (width >= 64rem) {
-    .dashboard-hero {
-      grid-template-columns: minmax(0, 1fr) 21rem;
-      align-items: center;
-      min-height: 17rem;
-      padding: 2rem;
-    }
-
-    .impact-orbit {
-      min-height: 13rem;
+  @keyframes load-pulse {
+    50% {
+      opacity: 0.45;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .impact-orbit canvas {
+  .load-pulse {
+    animation: load-pulse 1.6s ease-in-out infinite;
+  }
+
+  @media (width < 22.5rem) {
+    .dashboard-pass {
       display: none;
     }
+
+    .dashboard-hero-intro {
+      padding-right: 1.25rem;
+    }
+  }
+
+  @media (width >= 40rem) {
+    .dashboard-hero-intro {
+      padding: 1.75rem 0 1.75rem 1.75rem;
+    }
+
+    .dashboard-pass {
+      width: 6.5rem;
+      margin-inline: 1.5rem 2rem;
+    }
+
+    .dashboard-hero-band {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto 1fr auto;
+      gap: 1rem 0;
+      padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    .dashboard-hero-cell {
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      padding-right: 1.75rem;
+    }
+
+    .dashboard-hero-cell + .dashboard-hero-cell {
+      border-top: 0;
+      border-left: 1px solid var(--color-border);
+      padding: 0 0 0 1.75rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .dashboard-hero-intro {
+      padding: 2rem 0 2rem 2rem;
+    }
+
+    .dashboard-pass {
+      width: 8rem;
+      margin-inline: 2rem 2.75rem;
+    }
+
+    .dashboard-hero-band {
+      padding: 1.5rem 2rem 1.75rem;
+    }
+
+    .dashboard-hero-cell {
+      padding-right: 2rem;
+    }
+
+    .dashboard-hero-cell + .dashboard-hero-cell {
+      padding-left: 2rem;
+    }
+
+    .podium-step[data-place="1"] {
+      --step-height: 7.5rem;
+    }
+
+    .podium-step[data-place="2"] {
+      --step-height: 5.25rem;
+    }
+
+    .podium-step[data-place="3"] {
+      --step-height: 3.75rem;
+    }
+  }
+
+  @media print, (prefers-reduced-motion: reduce) {
+    .load-pulse,
+    .dashboard-pass svg {
+      animation: none;
+    }
+  }
+}
+
+@layer utilities {
+  .medal .medal-ring,
+  .medal.medal-ring {
+    outline: 3px solid var(--metal);
+    outline-offset: 4px;
+  }
+
+  .medal .medal-disc {
+    background: color-mix(in srgb, var(--metal) 22%, var(--color-surface));
+  }
+
+  .medal .medal-badge {
+    background: var(--metal-ink);
+    color: var(--color-medal-label);
+  }
+
+  .medal .medal-ink,
+  .medal.medal-ink {
+    color: var(--metal-ink);
   }
 }
 

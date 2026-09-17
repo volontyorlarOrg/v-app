@@ -75,7 +75,9 @@ export class ApiError extends Error {
     const output: FieldErrors = {};
     for (const [field, messages] of Object.entries(errors)) {
       if (Array.isArray(messages)) {
-        output[field] = messages.filter((item): item is string => typeof item === "string");
+        output[field] = messages.filter(
+          (item): item is string => typeof item === "string",
+        );
       }
     }
     return output;
@@ -84,6 +86,29 @@ export class ApiError extends Error {
 
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
+}
+
+const TRANSIENT_STATUSES = new Set([502, 503, 504]);
+
+export function isTransient(error: ApiError): boolean {
+  return (
+    error.code === "network" ||
+    error.code === "timeout" ||
+    TRANSIENT_STATUSES.has(error.status)
+  );
+}
+
+const SESSION_OVER_BACKEND_CODES = new Set([
+  "unauthenticated",
+  "invalidAccessToken",
+  "invalidRefreshToken",
+]);
+
+export function isSessionOver(error: unknown): boolean {
+  if (!isApiError(error) || error.code !== "unauthenticated") return false;
+
+  const backendCode = error.backendCode;
+  return backendCode === null || SESSION_OVER_BACKEND_CODES.has(backendCode);
 }
 
 export function codeForStatus(status: number): ApiErrorCode {

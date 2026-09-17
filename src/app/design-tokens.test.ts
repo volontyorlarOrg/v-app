@@ -145,6 +145,86 @@ describe("structural tokens", () => {
   });
 });
 
+describe("the shell", () => {
+  const SHELL_SURFACES = ["shell", "shell-raised"];
+
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the light shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
+        expect(
+          contrast(token(foreground), token(surface)),
+          `${foreground} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    },
+  );
+
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the dark shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
+        expect(
+          contrast(darkToken(foreground), darkToken(surface)),
+          `${foreground} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    },
+  );
+
+  it("is the institution's blue as a field, never a neutral grey", () => {
+    for (const read of [token, darkToken]) {
+      const shell = read("shell");
+      const [r = 0, g = 0, b = 0] = [1, 3, 5].map((offset) =>
+        parseInt(shell.slice(offset, offset + 2), 16),
+      );
+      expect(b).toBeGreaterThan(r);
+      expect(b).toBeGreaterThan(g);
+      expect(relativeLuminance(shell)).toBeLessThan(0.03);
+    }
+  });
+
+  it("keeps the active section legible on its own fill in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(
+        contrast(read("shell-active-ink"), read("shell-active")),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(contrast(read("shell-active"), read("shell"))).toBeGreaterThanOrEqual(1.5);
+    }
+  });
+});
+
+describe("the podium metals", () => {
+  const METALS = ["gold", "silver", "bronze"] as const;
+
+  it.each(METALS)("%s ink meets AA on the panel surface in both themes", (metal) => {
+    expect(contrast(token(`${metal}-ink`), token("surface"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+    expect(
+      contrast(darkToken(`${metal}-ink`), darkToken("surface")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
+  it.each(METALS)(
+    "a %s badge label meets AA on the metal ink in both themes",
+    (metal) => {
+      expect(
+        contrast(token("medal-label"), token(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(
+        contrast(darkToken("medal-label"), darkToken(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  it("gives the three places three different hues in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(new Set(METALS.map((metal) => read(metal))).size).toBe(3);
+    }
+  });
+});
+
 describe("the dark theme", () => {
   it("is switched by a data attribute, so the same tokens carry both themes", () => {
     expect(DARK_START).toBeGreaterThan(0);
@@ -154,6 +234,15 @@ describe("the dark theme", () => {
   it("turns the page ground near-black rather than blue", () => {
     expect(relativeLuminance(darkToken("paper"))).toBeLessThan(0.01);
     expect(relativeLuminance(darkToken("band"))).toBeLessThan(0.03);
+  });
+
+  it("raises panels above the workspace and sinks fields into panels", () => {
+    const workspace = relativeLuminance(darkToken("surface-sunk"));
+    const panel = relativeLuminance(darkToken("surface"));
+    expect(panel).toBeGreaterThan(workspace);
+    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(panel);
+    expect(relativeLuminance(darkToken("field"))).toBeLessThan(panel);
+    expect(contrast(darkToken("border"), darkToken("surface"))).toBeGreaterThan(1.2);
   });
 
   it.each(TEXT_TOKENS)("%s meets AA on every dark surface", (foreground) => {

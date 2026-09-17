@@ -2,17 +2,29 @@ import { useLocale, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import { EmptyState } from "@/components/app/empty-state";
+import {
+  LoadErrorPanel,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { Segmented, type SegmentedItem } from "@/components/app/segmented";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityFilters } from "@/components/opportunities/opportunity-filters";
+import { OpportunitySectionTabs } from "@/components/opportunities/section-tabs";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { listApplications } from "@/lib/api/applications.server";
+import { dataOf, settle, type Loaded } from "@/lib/api/load.server";
 import { listOpportunities } from "@/lib/api/opportunities.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
+import type { OpportunityList, SavedList } from "@/lib/api/schemas";
+import {
+  applicationsByOpportunity,
+  type CardApplication,
+} from "@/lib/opportunities/card";
 import {
   OPPORTUNITY_SORTS,
   activeFilterCount,
@@ -26,10 +38,6 @@ import {
   type OpportunityView,
 } from "@/lib/opportunities/search-params";
 import {
-  applicationsByOpportunity,
-  type CardApplication,
-} from "@/lib/opportunities/card";
-import {
   OPPORTUNITY_FORMATS,
   REGIONS,
   type OpportunitySummary,
@@ -37,6 +45,10 @@ import {
 import { localePath, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
+
+type Listing = { items: readonly OpportunitySummary[]; total: number };
+
+type ApplicationByOpportunity = ReadonlyMap<string, CardApplication>;
 
 export async function generateMetadata({
   params,
@@ -58,80 +70,89 @@ export default async function OpportunitiesPage({
   const view = opportunityViewParser.parseServerSide(query.view);
   const now = new Date();
 
-  const [saved, catalogue, applications] = await Promise.all([
-    listSaved(),
-    view === "all" ? listOpportunities(filters) : null,
-    listApplications(),
+  const [saved, applications, catalogue, common] = await Promise.all([
+    settle(() => listSaved()),
+    settle(() => listApplications()),
+    view === "all" ? settle(() => listOpportunities(filters)) : Promise.resolve(null),
+    getTranslations({ locale, namespace: "common" }),
   ]);
-  const list =
-    view === "saved"
-      ? filterOpportunities(saved.items, filters, now)
-      : (catalogue?.items ?? []);
+  const listing =
+    catalogue === null
+      ? savedListing(saved, filters, now)
+      : catalogueListing(catalogue);
+  const savedList = dataOf(saved);
 
   return (
     <Opportunities
       filters={filters}
       view={view}
-      list={list}
-      total={view === "saved" ? list.length : (catalogue?.total ?? 0)}
-      savedCount={saved.total}
-      saved={savedIds(saved)}
-      applications={applicationsByOpportunity(applications.items)}
+      listing={listing}
+      savedCount={savedList?.total ?? null}
+      saved={savedList ? savedIds(savedList) : new Set()}
+      applications={applicationsByOpportunity(dataOf(applications)?.items ?? [])}
+      applicationCount={dataOf(applications)?.items.length ?? null}
       now={now}
+      errorLabels={loadErrorLabels(common)}
     />
   );
+}
+
+function savedListing(
+  saved: Loaded<SavedList>,
+  filters: Filters,
+  now: Date,
+): Loaded<Listing> {
+  if (saved.status === "failed") return saved;
+  const items = filterOpportunities(saved.data.items, filters, now);
+  return { status: "loaded", data: { items, total: items.length } };
+}
+
+function catalogueListing(catalogue: Loaded<OpportunityList>): Loaded<Listing> {
+  if (catalogue.status === "failed") return catalogue;
+  return {
+    status: "loaded",
+    data: { items: catalogue.data.items, total: catalogue.data.total },
+  };
 }
 
 function Opportunities({
   filters,
   view,
-  list,
-  total,
+  listing,
   savedCount,
   saved,
   applications,
+  applicationCount,
   now,
+  errorLabels,
 }: {
   filters: Filters;
   view: OpportunityView;
-  list: readonly OpportunitySummary[];
-  total: number;
-  savedCount: number;
+  listing: Loaded<Listing>;
+  savedCount: number | null;
   saved: ReadonlySet<string>;
-  applications: ReadonlyMap<string, CardApplication>;
+  applications: ApplicationByOpportunity;
+  applicationCount: number | null;
   now: Date;
+  errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("opportunities");
   const locale = useLocale() as Locale;
 
   const activeCount = activeFilterCount(filters);
-  const views: SegmentedItem[] = [
-    {
-      key: "all",
-      href: serializeOpportunitySearch(navHref("opportunities"), { view: "all" }),
-      label: t("views.all"),
-      active: view === "all",
-    },
-    {
-      key: "saved",
-      href: serializeOpportunitySearch(navHref("opportunities"), { view: "saved" }),
-      label: t("views.saved"),
-      active: view === "saved",
-      count: savedCount,
-    },
-  ];
 
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
 
-      <Segmented
-        label={t("views.label")}
-        items={views}
+      <OpportunitySectionTabs
+        current={view}
+        savedCount={savedCount}
+        applicationCount={applicationCount}
         className="enter-rise mt-6 [--enter-delay:90ms]"
       />
 
-      <div className="mt-4">
+      <div className="mt-5">
         <OpportunityFilters
           action={localePath(locale, "opportunities")}
           labels={{
@@ -165,44 +186,54 @@ function Opportunities({
         />
       </div>
 
-      <p
-        role="status"
-        className="enter-rise mt-4 text-sm text-ink-muted [--enter-delay:160ms]"
-      >
-        {t("count", { count: total })}
-        {total > list.length
-          ? ` · ${t("showingOf", { shown: list.length, total })}`
-          : null}
-      </p>
-
-      {list.length === 0 ? (
-        <Panel className="mt-4">
-          <p className="font-semibold text-ink">{t("empty.title")}</p>
-          <p className="mt-1 text-sm text-ink-muted">{t("empty.body")}</p>
-          <Link
-            href={navHref("opportunities")}
-            className={buttonClass({
-              variant: "outline",
-              size: "sm",
-              className: "mt-4",
-            })}
-          >
-            {t("filters.clear")}
-          </Link>
-        </Panel>
+      {listing.status === "failed" ? (
+        <LoadErrorPanel
+          failure={listing.failure}
+          labels={errorLabels}
+          className="mx-0 mt-5 max-w-none"
+        />
       ) : (
-        <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {list.map((opportunity) => (
-            <li key={opportunity.id} className="flex">
-              <OpportunityCard
-                opportunity={opportunity}
-                saved={saved.has(opportunity.id)}
-                application={applications.get(opportunity.id) ?? null}
-                now={now}
+        <>
+          <p
+            role="status"
+            className="enter-rise mt-4 text-sm text-ink-muted [--enter-delay:160ms]"
+          >
+            {t("count", { count: listing.data.total })}
+            {listing.data.total > listing.data.items.length
+              ? ` · ${t("showingOf", { shown: listing.data.items.length, total: listing.data.total })}`
+              : null}
+          </p>
+
+          {listing.data.items.length === 0 ? (
+            <Panel className="mt-4" padding="none">
+              <EmptyState
+                title={t("empty.title")}
+                body={t("empty.body")}
+                action={
+                  <Link
+                    href={navHref("opportunities")}
+                    className={buttonClass({ variant: "outline", size: "sm" })}
+                  >
+                    {t("filters.clear")}
+                  </Link>
+                }
               />
-            </li>
-          ))}
-        </ul>
+            </Panel>
+          ) : (
+            <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {listing.data.items.map((opportunity) => (
+                <li key={opportunity.id} className="flex">
+                  <OpportunityCard
+                    opportunity={opportunity}
+                    saved={saved.has(opportunity.id)}
+                    application={applications.get(opportunity.id)}
+                    now={now}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </>
   );

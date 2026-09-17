@@ -9,7 +9,7 @@ import { authorizeTelegramConnection } from "@/lib/api/account.server";
 import { apiBaseUrl, isAuthConfigured } from "@/lib/auth/config";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
-import { applyRotation, getSession, rotatedSession } from "@/lib/auth/session.server";
+import { getSession } from "@/lib/auth/session.server";
 import { isTrustedAuthorizationUrl } from "@/lib/auth/telegram";
 import { localePath } from "@/lib/routing/routes";
 
@@ -28,13 +28,9 @@ export async function GET(request: NextRequest) {
     return relativeRedirect(withQuery(settingsPath, { connect: "unavailable" }));
   }
 
-  const rotated = await rotatedSession(session);
-  const accessToken = (rotated ?? session).accessToken;
+  const accessToken = session.accessToken;
   const unavailable = () =>
-    applyRotation(
-      relativeRedirect(withQuery(settingsPath, { connect: "unavailable" })),
-      rotated,
-    );
+    relativeRedirect(withQuery(settingsPath, { connect: "unavailable" }));
 
   let authorization;
 
@@ -54,5 +50,5 @@ export async function GET(request: NextRequest) {
   const handoff = handoffCookieOptions();
   response.cookies.set(CONNECT_STATE_COOKIE_NAME, authorization.state, handoff);
   response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, locale, handoff);
-  return applyRotation(response, rotated);
+  return response;
 }

@@ -18,10 +18,16 @@ two disagree, check whether `v-web` moved first; the design system is sourced
 from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
-sidebar and a top bar with notifications and an account menu on desktop, a top
-bar and a four-destination tab bar on a phone, and panels of content on a flat
-workspace. Only the sign-in pages keep the marketing site's whiteboard ground.
-See [`DESIGN.md`](DESIGN.md).
+navy sidebar that carries everything on desktop — the lockup and the
+notification bell, three sections (dashboard, opportunities, leaderboard), and
+at the foot the identity card with profile, settings and sign out — with no top
+bar; a slim header and a four-destination tab bar on a phone; and panels of
+content on a flat workspace. **Every sidebar entry is a plain link — nothing in
+it collapses**, and the bell is the only tray. The theme switch and the
+interface language are a panel on `/settings`, not shell controls.
+Applications and saved items are tabs inside the opportunities section, not
+sections of their own. Only the sign-in pages keep the marketing site's
+whiteboard ground. See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
 
@@ -78,9 +84,15 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   `src/lib/<domain>/actions.ts` returning the
   `ActionResult` envelope from `src/lib/api/action-result.ts`. Errors are
   backend codes the catalog translates, never sentences from a server;
-- a section that fails to load renders `LoadErrorPanel` with a retry inside
-  `PanelErrorBoundary`. The palette still defines no red: error states use
-  the sunk surface and ink;
+- a read that fails does not take the page down. Pages wrap each read in
+  `settle()` from `src/lib/api/load.server.ts` and render `LoadErrorPanel` (a
+  whole listing) or `LoadErrorRows` (inside a panel) in its place, with the
+  rest of the page standing; the panel says whether the server was unreachable
+  or answered with an error, shows the request reference, and retries on its
+  own three times (5, 10, 20 seconds) before leaving the button to the
+  volunteer. `GET` requests also retry once on a transient failure inside the
+  client. `PanelErrorBoundary` only catches a render that throws. The palette
+  still defines no red: error states use the soft surface and ink;
 - **one account, two ways in.** `/settings` is the account page: it reads
   `/me` and `/me/account-merge-requests` on the server and shows Telegram,
   Google and email as separate connection states. A Google-owned address is
@@ -93,7 +105,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   session, which the Server Action writes into the same encrypted cookie.
   Nothing is unlinked, unmerged, exported or deleted here;
 - **the leaderboard is the backend's arithmetic, shown.** `/leaderboard` is a
-  sidebar section (never the phone tab bar) reading `GET /leaderboard`; every
+  sidebar section and a phone tab reading `GET /leaderboard`; every
   rank and every experience total arrives from the backend and none is ever
   computed here, pagination is rendered from the response's own `page`,
   `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
@@ -115,13 +127,22 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
 band of three figures read from the record, the bio, the facts and the links —
-and the editor is the one `Panel` below it. It carries nothing else: the
-account lives on `/settings`, the theme, the interface language and sign-out
-live in the top bar and the sidebar, and there is no notification, privacy or
-appearance group anywhere in the app. Nothing reads or writes
+followed by the contact details and the completeness meter, all read-only.
+Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
+and the welcome flow's "finish on your profile" all lead there, and a saved
+form returns to `/profile`. The profile carries nothing else: the
+account lives on `/settings`, sign-out at the foot of the sidebar (in the phone
+header's account menu on a phone), and the theme and the interface language in
+the **Appearance** panel on `/settings` — the one place either is changed
+inside the app.
+**The record lives on the dashboard.** `/record` redirects to
+`/dashboard#history`; the dashboard carries the four figures, the level rail
+and the participation history, and the leaderboard is where "Your progress"
+leads. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
-privacy,appearance}` are unused and are kept only because that decision is
-reversible.
+privacy}` are unused and are kept only because that decision is
+reversible. `settings.appearance` is live: it labels the theme switch and the
+language picker on `/settings`.
 
 ## Repository boundary
 
@@ -152,8 +173,8 @@ authorisation.
 
 There is no theme or general animation library. Light and dark are one token
 set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
-CSS, and `three` is isolated to two lazy objects: the dashboard progress orbit
-and the welcome flow's pass. Panels and task content never depend on
+CSS, and `three` is isolated to one lazy object: the welcome flow's pass. The
+dashboard draws the same pass as an SVG. Panels and task content never depend on
 JavaScript for visibility or scrolling.
 
 Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every
@@ -193,9 +214,9 @@ src/lib/api/                    -> the server-only client on openapi-fetch, the 
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
                                    around the Server Actions
 src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
-src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug],
-                                   applications[/id], saved, record, leaderboard,
-                                   profile, settings
+src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
+                                   applications[/id], saved and record (redirects),
+                                   leaderboard, profile, profile/edit, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
@@ -230,9 +251,13 @@ docs/                           -> stable project documentation and the plan
   comma `ʻ` (U+02BB), Russian uses Cyrillic, and a test enforces key and ICU
   argument parity.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
-  the tab bar, the account menu, the proxy's `guard` and the tests all read
-  from it. Detail pages
-  hang off a section through `opportunityHref` and `applicationHref`.
+  the tab bar, the phone's account menu, the proxy's `guard` and the tests all
+  read from it. `navGroup` says where in the sidebar a route lands —
+  `"primary"` for the stack under the lockup, `"account"` for the stack at the
+  foot, `null` for a route no navigation surface names. A route that belongs inside a section names it in `section`, which
+  is what keeps the sidebar and the tab bar lit on `/applications` and
+  `/profile/edit`. Detail pages hang off a section through `opportunityHref`
+  and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
   structure, chips for a system state, primary actions, the mark. **Orange is
   the person**: the level reached, an accepted application, a confirmed

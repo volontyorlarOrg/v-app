@@ -4,7 +4,7 @@ import {
   APPLICATION_STATUSES,
   applicationGroup,
   applicationTimeline,
-  canWithdraw,
+  canWithdrawApplication,
   inApplicationGroup,
   isApplicationGroup,
   isEditable,
@@ -25,7 +25,12 @@ function opportunity(startsAt: string): OpportunitySummary {
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
     summary: "",
-    organization: { id: "green", name: "Green Corridor Group", slug: "green", verified: false },
+    organization: {
+      id: "green",
+      name: "Green Corridor Group",
+      slug: "green",
+      verified: false,
+    },
     region: "samarkand",
     format: "onsite",
     status: "open",
@@ -181,6 +186,7 @@ describe("applicationTimeline", () => {
           endsAt: "2026-06-10T15:00:00.000Z",
         },
         attendance: {
+          id: "attendance-1",
           outcome: "attended",
           confirmedHours: 4,
           resolvedAt: "2026-06-11T09:00:00.000Z",
@@ -196,30 +202,34 @@ describe("applicationTimeline", () => {
   });
 });
 
-describe("canWithdraw", () => {
+describe("canWithdrawApplication", () => {
   const ahead = "2026-06-25T09:00:00.000Z";
   const behind = "2026-06-05T09:00:00.000Z";
 
   it("lets a volunteer withdraw while the organiser still holds the application", () => {
     for (const status of ["submitted", "under_review"] as const) {
-      expect(canWithdraw(application(status, ahead), NOW)).toBe(true);
+      expect(canWithdrawApplication(application(status, ahead), NOW)).toBe(true);
     }
   });
 
-  it("lets an accepted volunteer withdraw before the event starts", () => {
-    expect(canWithdraw(application("accepted", ahead), NOW)).toBe(true);
+  it("requires an awaiting attendance record for an accepted application", () => {
+    expect(canWithdrawApplication(application("accepted", ahead), NOW)).toBe(false);
   });
 
   it("refuses once the event has started", () => {
-    expect(canWithdraw(application("accepted", behind), NOW)).toBe(false);
+    expect(canWithdrawApplication(application("accepted", behind), NOW)).toBe(false);
   });
 
   it("refuses once attendance has been resolved, so a record cannot be erased", () => {
     expect(
-      canWithdraw(
+      canWithdrawApplication(
         {
           ...application("accepted", ahead),
-          attendance: { outcome: "attended", confirmedHours: 4 },
+          attendance: {
+            id: "attendance-1",
+            outcome: "attended",
+            confirmedHours: 4,
+          },
         },
         NOW,
       ),
@@ -228,10 +238,10 @@ describe("canWithdraw", () => {
 
   it("leaves an awaiting attendance record withdrawable before the event", () => {
     expect(
-      canWithdraw(
+      canWithdrawApplication(
         {
           ...application("accepted", ahead),
-          attendance: { outcome: "awaiting_confirmation" },
+          attendance: { id: "attendance-1", outcome: "awaiting_confirmation" },
         },
         NOW,
       ),
@@ -240,7 +250,7 @@ describe("canWithdraw", () => {
 
   it("never withdraws something already finished", () => {
     for (const status of ["draft", "rejected", "withdrawn", "closed"] as const) {
-      expect(canWithdraw(application(status, ahead), NOW)).toBe(false);
+      expect(canWithdrawApplication(application(status, ahead), NOW)).toBe(false);
     }
   });
 });
@@ -263,7 +273,9 @@ describe("decidedAt", () => {
 
   it("falls back to the last update when the decision has no date of its own", () => {
     expect(decidedAt({ status: "closed", ...dates })).toBe(dates.updatedAt);
-    expect(decidedAt({ status: "accepted", updatedAt: dates.updatedAt })).toBe(dates.updatedAt);
+    expect(decidedAt({ status: "accepted", updatedAt: dates.updatedAt })).toBe(
+      dates.updatedAt,
+    );
   });
 
   it("has no decision while the application is still open", () => {

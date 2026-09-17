@@ -17,9 +17,9 @@ flowchart LR
   Auth --> AuthPages["login · signup"]
   AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,callback}"]
   Handlers -- session cookie --> Panel
-  Locale --> Panel["(volunteer) layout: AppShell = sidebar + top bar + tab bar"]
+  Locale --> Panel["(volunteer) layout: AppShell = sidebar + phone header + tab bar"]
   Panel --> Dashboard["dashboard"]
-  Panel --> Sections["opportunities[/slug] · applications[/id] · saved · record · leaderboard · profile · settings"]
+  Panel --> Sections["opportunities[/slug] · applications[/id] · saved (redirect) · record (redirect) · leaderboard · profile · settings"]
   Sections -- connection handoff --> ConnectHandlers["api/auth/connect/{telegram,google}/{start,callback} · connect/reauthenticate"]
   ConnectHandlers --> Api
   Dashboard --> Api["lib/api: *.server.ts reads · schemas.ts · actions"]
@@ -32,10 +32,10 @@ flowchart LR
 
 | Location                                              | Responsibility                                                                                                                                                                                                                                                                                                |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/proxy.ts`                                        | Sends a prefix-less URL to a locale using `Accept-Language`; once sign-in is configured, also reads the session cookie, enforces each route's `guard`, rotates an expiring access token on a navigation, and marks signed-in responses `private, no-store`                                                    |
+| `src/proxy.ts`                                        | Sends a prefix-less URL to a locale using `Accept-Language`; once sign-in is configured, also reads the session cookie, enforces each route's `guard`, ends a session whose token has run out, and marks signed-in responses `private, no-store`                                                    |
 | `src/app/api/auth/telegram/{start,callback}/route.ts` | The two hops of Telegram sign-in: ask the backend for the authorization URL, bind its `state` to this browser with a cookie and redirect to Telegram; on return, check the state, redeem the code through the backend and write the session cookie                                                            |
 | `src/app/api/auth/connect/*/route.ts`                 | The same two hops for a signed-in account joining a second identity, on cookies of their own: `telegram/{start,callback}` and `google/{start,callback}` return to `/{locale}/settings?connect=<status>`, and `reauthenticate` ends the session and returns to sign-in with `next=/{locale}/settings`          |
-| `src/lib/auth/`                                       | `config.ts` reads the two server-only variables; `session.ts` holds the cookie schema, its JWE encryption and `safeReturnPath`; `session.server.ts` reads and writes it through `cookies()`; `refresh.ts` rotates a refresh token; `actions.ts` is the sign-out Server Action                                 |
+| `src/lib/auth/`                                       | `config.ts` reads the two server-only variables; `session.ts` holds the cookie schema, its JWE encryption and `safeReturnPath`; `session.server.ts` reads and writes it through `cookies()`; `refresh.ts` is the legacy one-shot upgrade the proxy uses on pre-single-token cookies; `actions.ts` is the sign-out Server Action                                 |
 | `src/lib/api/`                                        | `client.server.ts`, the one server-only client, built on `openapi-fetch` over `generated/schema.d.ts`: middleware adds the request id and turns every failure into an `ApiError`, the call adds the bearer token and the timeout, and Zod parses every response                                               |
 | `src/app/[locale]/layout.tsx`                         | Root document, `lang`, the two typefaces, the theme boot script, `noindex`, the client provider with `messages={null}`                                                                                                                                                                                        |
 | `src/app/[locale]/page.tsx`                           | Redirects to the entry route (`login`)                                                                                                                                                                                                                                                                        |
@@ -63,14 +63,14 @@ flowchart LR
 | `src/lib/applications/status.ts`                      | Application statuses, predicates, the status groups, the timeline derivation                                                                                                                                                                                                                                  |
 | `src/lib/profile/completion.ts`                       | The six-field completion rule and the full profile shape                                                                                                                                                                                                                                                      |
 | `src/lib/notifications/`, `src/lib/account/`          | The notification shape, linked identities and preference keys                                                                                                                                                                                                                                                 |
-| `src/lib/api/`                                        | The server-only client (`client.server.ts`), the authenticated call with refresh-and-retry (`session.server.ts`), one read module per domain (`*.server.ts`), the Zod schemas every response passes through (`schemas.ts`), error codes and the `ActionResult` envelope                                       |
+| `src/lib/api/`                                        | The server-only client (`client.server.ts`), the authenticated call that ends the session when the backend refuses the token (`session.server.ts`), one read module per domain (`*.server.ts`), the Zod schemas every response passes through (`schemas.ts`), error codes and the `ActionResult` envelope                                       |
 | `src/lib/<domain>/actions.ts`                         | The Server Actions that write: apply, save and submit a draft, withdraw, save an opportunity, save the profile, a preference, mark notifications read, sign out                                                                                                                                               |
 | `src/components/ui/`                                  | The shadcn/ui components: `Button` and `buttonClass`, `Badge`, `Card`, `Field`, `Input`, `Textarea`, `NativeSelect`, `Label`, `Switch` and `SwitchControl`, `DropdownMenu`, `Popover`, `AlertDialog`, `Table`, `Progress`, `Skeleton`, `Avatar`, `Separator`, `Toggle`, `Toaster`                             |
 | `src/hooks/`                                          | `useServerAction` and `useOptimisticServerAction` (TanStack Query's `useMutation` around a Server Action) and `useActionForm` (React Hook Form validation in front of `useActionState`)                                                                                                                       |
 | `src/lib/api/generated/`                              | `schema.d.ts`, generated by `npm run api:types` from `../v-backend/docs/api/openapi.json`; never edited by hand                                                                                                                                                                                               |
 | `src/components/brand/`                               | The mark, the arc, the lockup, and the two provider marks                                                                                                                                                                                                                                                     |
 | `src/components/motion/`                              | `Scene`, `SplitWords`, the one observer, and `SmoothScroll`                                                                                                                                                                                                                                                   |
-| `src/components/app/`                                 | The shell (`AppShell`, `Sidebar`, `SidebarNav`, `TopBar`, `TabBar`, `AppFooter`), its menus (`NotificationsMenu`, `UserMenu`), the language and theme controls, `Providers`, and the composition primitives (`Panel`, `StatTiles`, `PageHeader`, `Segmented`, `StatusChip`, `ActionStatus`, `LoadErrorPanel`) |
+| `src/components/app/`                                 | The shell (`AppShell`, `Sidebar`, `SidebarNav`, `MobileHeader`, `TabBar`, `AppFooter`), its menus (`NotificationsMenu`, `AccountMenu`), the language and theme controls, `Providers`, and the composition primitives (`Panel`, `StatTiles`, `PageHeader`, `Segmented`, `StatusChip`, `ActionStatus`, `LoadErrorPanel`) |
 | `src/components/auth/`                                | Intro, panel, status line, provider buttons, sign-out form                                                                                                                                                                                                                                                    |
 | `src/components/dashboard/`                           | Next up, application rows, record progress, profile meter, activity feed, the status chips                                                                                                                                                                                                                    |
 | `src/components/opportunities/`                       | Filters, card, rows, facts, save button                                                                                                                                                                                                                                                                       |
@@ -100,9 +100,11 @@ Server Components are the default. The client components are the ones that
 own a browser API or interactive state, and all of them receive their copy as
 props so no page-level translation reaches the browser:
 
-- `LocaleSwitcher` and `UserMenu` are Radix dropdown menus and
-  `NotificationsMenu` a Radix popover; Radix owns the open state, Escape,
-  focus return and taps outside.
+- `LocaleSwitcher` is a Radix dropdown menu (the sign-in and welcome
+  headers); `AccountMenu` and `NotificationsMenu` are Radix popovers, the
+  first holding a `nav` landmark so the account links and the sign-out form
+  are ordinary links and a button; Radix owns the open state, Escape, focus
+  return and taps outside.
 - `SidebarNav` and `TabBar` need the pathname to mark the active section.
 - `ThemeToggle` and `ThemeSwitch` need the document's theme; both are the
   Radix switch, one as an icon button and one as a labelled track.
@@ -137,13 +139,21 @@ request.
 
 ## The panel shell
 
-`AppShell` lays out a sidebar and a column. The sidebar is sticky and full
-height from the large breakpoint and absent below it; the column holds the top
-bar, the workspace and the footer. On a phone the top bar carries the lockup and
-the tab bar carries four essential destinations. Both navigations read the registry:
-`navRoutes` for the main list, `accountRoutes` for profile,
-`tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. Saved remains
-a registered compatibility route but is intentionally absent from navigation.
+`AppShell` lays out a sidebar and a column. The sidebar is a navy column from
+the large breakpoint, sticky and full height, and absent below it; there is no
+desktop top bar, because the sidebar carries the lockup and the notification
+bell, the sections, and at its foot the identity card, profile, settings and
+sign out. Every entry is a plain link — the bell is the sidebar's only
+popover, and the identity card is static text, not a trigger. The theme and
+the interface language are not shell controls at all; they are the Appearance
+panel on `/settings`. The column holds the phone header (lockup, bell, avatar;
+hidden from the large breakpoint), the workspace and the footer, and the tab
+bar carries four essential destinations on a phone. Every navigation reads the
+registry: `primaryNavRoutes` for the stack under the lockup,
+`accountNavRoutes` for the stack at the foot (and for the phone's account
+menu), `tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. Saved and record remain registered compatibility
+routes that redirect (`/saved` to the saved view, `/record` to
+`/dashboard#history`) and are intentionally absent from navigation.
 
 Opportunity search is a GET form on the opportunities route, so a search is a
 URL; with JavaScript, `nuqs` writes the same URL without a page load. The
@@ -173,9 +183,8 @@ serializes the group links.
 ## Backend data
 
 Every read is a function in `src/lib/api/<domain>.server.ts` that calls the
-backend through `authed()` — which attaches the session's access token,
-rotates it once on a 401 when a cookie can be written, and otherwise ends the
-session through `/api/auth/session/expired` — and parses the body with a
+backend through `authed()` — which attaches the session token and, on a 401,
+ends the session through `/api/auth/session/expired` — and parses the body with a
 schema from `src/lib/api/schemas.ts`. Underneath, `client.server.ts` is an
 `openapi-fetch` client typed by `src/lib/api/generated/schema.d.ts`, so a path
 autocompletes against the backend's OpenAPI document; `npm run api:types`
@@ -215,7 +224,7 @@ Runtime dependencies are `next`, `react`, `react-dom`, `next-intl`,
 and — added by Telegram sign-in — `jose` for the encrypted session cookie,
 `zod` for parsing every backend response, and `server-only` to keep the API
 client and the cookie reader out of any client bundle. The Three.js module is
-dynamically imported for the dashboard orbit.
+dynamically imported for the welcome flow's pass.
 
 `feat/ui-libraries` added the library layer in one decision, each package
 against a component that had grown its own version of the same behaviour:

@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { StatusChip } from "@/components/app/section";
 import { OpportunityStatusChip } from "@/components/dashboard/opportunity-status";
+import { StateChip } from "@/components/dashboard/state-chip";
 import { ApplyForm } from "@/components/opportunities/apply-form";
 import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { SaveButton } from "@/components/opportunities/save-button";
@@ -17,13 +17,14 @@ import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
-import {
-  applicationReadiness,
-  type ApplicationReadiness,
-} from "@/lib/applications/readiness";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { canApply } from "@/lib/opportunities/deadline";
 import type { OpportunityDetail } from "@/lib/opportunities/types";
+import {
+  EMPTY_PROFILE,
+  profileCompletion,
+  type ProfileCompletion,
+} from "@/lib/profile/completion";
 import { applicationHref, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +60,7 @@ export default async function OpportunityPage({
       application={
         application ? { id: application.id, status: application.status } : null
       }
-      readiness={applicationReadiness(profile)}
+      profileCompletion={profileCompletion(profile ?? EMPTY_PROFILE)}
       now={now}
     />
   );
@@ -69,13 +70,13 @@ function Opportunity({
   opportunity,
   saved,
   application,
-  readiness,
+  profileCompletion: completion,
   now,
 }: {
   opportunity: OpportunityDetail;
   saved: boolean;
   application: { id: string; status: ApplicationStatus } | null;
-  readiness: ApplicationReadiness;
+  profileCompletion: ProfileCompletion;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -94,13 +95,22 @@ function Opportunity({
 
       <PageHeader
         className="mt-3"
-        eyebrow={opportunity.organization.name}
         title={opportunity.title}
+        description={
+          <span className="inline-flex flex-wrap items-center gap-1.5">
+            {opportunity.organization.name}
+            {opportunity.organization.verified ? (
+              <BadgeCheck aria-label={t("verified")} className="size-4 text-primary" />
+            ) : null}
+          </span>
+        }
         actions={
           <>
             <OpportunityStatusChip opportunity={opportunity} now={now} />
             {opportunity.sourcedByTeam ? (
-              <StatusChip>{t("card.sourced")}</StatusChip>
+              <StateChip tone="structure" icon={<BadgeCheck aria-hidden="true" />}>
+                {t("card.sourced")}
+              </StateChip>
             ) : null}
           </>
         }
@@ -149,7 +159,9 @@ function Opportunity({
                     <div>
                       <p className="font-semibold text-ink">{question.prompt}</p>
                       {question.helpText ? (
-                        <p className="mt-1 text-sm text-ink-muted">{question.helpText}</p>
+                        <p className="mt-1 text-sm text-ink-muted">
+                          {question.helpText}
+                        </p>
                       ) : null}
                       <p className="mt-1.5 text-xs text-ink-muted">
                         {question.required
@@ -185,38 +197,42 @@ function Opportunity({
                   ? applicationsT("continueDraft")
                   : t("detail.viewApplication")}
               </Link>
-            ) : applicable && !readiness.ready ? (
-              <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-ink">
-                  {applicationsT("gate.title")}
-                </p>
-                <p className="text-sm leading-relaxed text-ink-muted">
-                  {applicationsT("gate.body", {
-                    fields: readiness.missing
-                      .map((field) => applicationsT(`gate.fields.${field}`))
-                      .join(", "),
-                  })}
-                </p>
-                <Link
-                  href={navHref("profile")}
-                  className={buttonClass({ className: "w-full" })}
-                >
-                  {applicationsT("gate.action")}
-                </Link>
-              </div>
             ) : applicable ? (
-              <ApplyForm
-                opportunityId={opportunity.id}
-                labels={{
-                  apply: t("detail.apply"),
-                  applying: t("detail.applying"),
-                  errors: {
-                    opportunityUnavailable: t("detail.applyErrors.opportunityUnavailable"),
-                    opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
-                  },
-                  fallback: t("detail.applyErrors.fallback"),
-                }}
-              />
+              completion.complete ? (
+                <ApplyForm
+                  opportunityId={opportunity.id}
+                  labels={{
+                    apply: t("detail.apply"),
+                    applying: t("detail.applying"),
+                    errors: {
+                      opportunityUnavailable: t(
+                        "detail.applyErrors.opportunityUnavailable",
+                      ),
+                      opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
+                    },
+                    fallback: t("detail.applyErrors.fallback"),
+                  }}
+                />
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm font-semibold text-ink">
+                    {applicationsT("gate.title")}
+                  </p>
+                  <p className="text-sm leading-relaxed text-ink-muted">
+                    {applicationsT("gate.body", {
+                      fields: completion.missing
+                        .map((field) => applicationsT(`gate.fields.${field}`))
+                        .join(", "),
+                    })}
+                  </p>
+                  <Link
+                    href={navHref("profileEdit")}
+                    className={buttonClass({ className: "w-full" })}
+                  >
+                    {applicationsT("gate.action")}
+                  </Link>
+                </div>
+              )
             ) : (
               <button
                 type="button"

@@ -73,6 +73,17 @@ export function OpportunityFacts({
       label: t("detail.format"),
       value: t(`format.${opportunity.format}`),
     },
+    ...(opportunity.estimatedTotalHours !== undefined
+      ? [
+          {
+            key: "estimatedTotalHours",
+            label: t("detail.estimatedTotalHours"),
+            value: t("estimatedHours", {
+              hours: opportunity.estimatedTotalHours,
+            }),
+          },
+        ]
+      : []),
     ...(opportunity.capacity !== undefined
       ? [
           {

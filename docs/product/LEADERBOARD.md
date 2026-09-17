@@ -5,11 +5,11 @@ they are ordered under.
 
 ## What the volunteer sees
 
-`/leaderboard` is a session-protected section in the desktop sidebar, between
-the record and the account list. It is deliberately **not** in the phone tab
-bar: the tab bar keeps its four essential destinations (dashboard,
-opportunities, applications, profile), and the leaderboard is reached from the
-sidebar on a wide screen and by URL on a phone.
+`/leaderboard` is a session-protected section: the third of the three in the
+desktop sidebar, and the third of the four thumbs in the phone tab bar
+(dashboard, opportunities, leaderboard, profile). It took the tab bar slot that
+applications used to hold once applications became a tab inside the
+opportunities section.
 
 The page has three parts:
 
@@ -17,7 +17,9 @@ The page has three parts:
    the place and the experience, with the total volunteers as the place's note.
    Beneath them, the handle the volunteer appears under and a link to the
    account page, which is where a handle is changed.
-2. **Standings** — one page of the board: place, public handle and experience.
+2. **Standings** — one page of the board: place, public display name, public
+   handle and experience. The name is the primary identifier; the `@handle`
+   sits beneath it in the smaller metadata role.
    The first three places and the volunteer's own row are in orange, the colour
    that belongs to the person; every other experience figure is plain ink so
    the orange keeps meaning something. The reader's own row is on the soft
@@ -46,8 +48,9 @@ infer identity from another field.
 ## The handle
 
 Every account has a `username`: lowercase letters, digits and underscores, 5 to
-32 characters, unique across the service. It is the only name shown on the
-board, so it is public to every signed-in volunteer, and it has a `source`:
+32 characters, unique across the service. The leaderboard also shows the
+account's public `displayName`. Both are visible to every signed-in volunteer;
+the display name is the primary label and the username has a `source`:
 
 | Source      | Where it came from                                | Renameable |
 | ----------- | ------------------------------------------------- | ---------- |
@@ -72,8 +75,9 @@ Placement and treatment are frontend decisions; what a source means is not.
 ## The contract
 
 Read: `GET /leaderboard?page&pageSize` → `{ items, viewer, page, pageSize,
-total, scoring }`. Each item is `{ rank, username, xp, isCurrentUser }`; the
-viewer is `{ rank, username, xp }`. Write: `PUT /me/username` with `{ username
+total, scoring }`. Each item is `{ rank, displayName, username, xp,
+isCurrentUser }`; the viewer is `{ rank, displayName, username, xp }`. Write:
+`PUT /me/username` with `{ username
 }` → `{ username, usernameSource, usernameEditable }`. Those same username
 fields are required on `GET /me`.
 

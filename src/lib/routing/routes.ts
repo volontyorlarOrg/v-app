@@ -10,6 +10,7 @@ export type RouteKey =
   | "record"
   | "leaderboard"
   | "profile"
+  | "profileEdit"
   | "settings"
   | "welcome";
 
@@ -17,14 +18,16 @@ export type RouteArea = "auth" | "volunteer" | "onboarding";
 
 export type RouteGuard = "guest" | "session";
 
+export type NavGroup = "primary" | "account";
+
 export type AppRoute = {
   key: RouteKey;
   path: string;
   area: RouteArea;
   guard: RouteGuard;
-  inNav: boolean;
+  navGroup: NavGroup | null;
   inTabBar: boolean;
-  inAccountMenu: boolean;
+  section: RouteKey | null;
 };
 
 export const appRoutes: readonly AppRoute[] = [
@@ -33,99 +36,108 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/login",
     area: "auth",
     guard: "guest",
-    inNav: false,
+    navGroup: null,
     inTabBar: false,
-    inAccountMenu: false,
+    section: null,
   },
   {
     key: "signup",
     path: "/signup",
     area: "auth",
     guard: "guest",
-    inNav: false,
+    navGroup: null,
     inTabBar: false,
-    inAccountMenu: false,
+    section: null,
   },
   {
     key: "dashboard",
     path: "/dashboard",
     area: "volunteer",
     guard: "session",
-    inNav: true,
+    navGroup: "primary",
     inTabBar: true,
-    inAccountMenu: false,
+    section: null,
   },
   {
     key: "opportunities",
     path: "/opportunities",
     area: "volunteer",
     guard: "session",
-    inNav: true,
+    navGroup: "primary",
     inTabBar: true,
-    inAccountMenu: false,
+    section: null,
   },
   {
     key: "applications",
     path: "/applications",
     area: "volunteer",
     guard: "session",
-    inNav: true,
-    inTabBar: true,
-    inAccountMenu: false,
+    navGroup: null,
+    inTabBar: false,
+    section: "opportunities",
   },
   {
     key: "saved",
     path: "/saved",
     area: "volunteer",
     guard: "session",
-    inNav: false,
+    navGroup: null,
     inTabBar: false,
-    inAccountMenu: false,
+    section: "opportunities",
   },
   {
     key: "record",
     path: "/record",
     area: "volunteer",
     guard: "session",
-    inNav: true,
+    navGroup: null,
     inTabBar: false,
-    inAccountMenu: false,
+    section: "dashboard",
   },
   {
     key: "leaderboard",
     path: "/leaderboard",
     area: "volunteer",
     guard: "session",
-    inNav: true,
-    inTabBar: false,
-    inAccountMenu: false,
+    navGroup: "primary",
+    inTabBar: true,
+    section: null,
   },
   {
     key: "profile",
     path: "/profile",
     area: "volunteer",
     guard: "session",
-    inNav: false,
+    navGroup: "account",
     inTabBar: true,
-    inAccountMenu: true,
+    section: null,
+  },
+  {
+    key: "profileEdit",
+    path: "/profile/edit",
+    area: "volunteer",
+    guard: "session",
+    navGroup: null,
+    inTabBar: false,
+    section: "profile",
   },
   {
     key: "settings",
     path: "/settings",
     area: "volunteer",
     guard: "session",
-    inNav: false,
+    navGroup: "account",
     inTabBar: false,
-    inAccountMenu: true,
+    section: null,
   },
   {
     key: "welcome",
     path: "/welcome",
     area: "onboarding",
     guard: "session",
-    inNav: false,
+    navGroup: null,
     inTabBar: false,
-    inAccountMenu: false,
+    section: null,
   },
 ] as const;
 
@@ -138,8 +150,12 @@ export const volunteerRoutes = appRoutes.filter((route) => route.area === "volun
 export const onboardingRoutes = appRoutes.filter(
   (route) => route.area === "onboarding",
 );
-export const navRoutes = appRoutes.filter((route) => route.inNav);
-export const accountRoutes = volunteerRoutes.filter((route) => route.inAccountMenu);
+export const primaryNavRoutes = appRoutes.filter(
+  (route) => route.navGroup === "primary",
+);
+export const accountNavRoutes = appRoutes.filter(
+  (route) => route.navGroup === "account",
+);
 export const tabBarRoutes = appRoutes.filter((route) => route.inTabBar);
 
 export function getRoute(key: RouteKey): AppRoute {
@@ -160,6 +176,12 @@ export function applicationHref(id: string): string {
   return `${navHref("applications")}/${id}`;
 }
 
+export const HISTORY_ANCHOR = "history";
+
+export function historyHref(): string {
+  return `${navHref("dashboard")}#${HISTORY_ANCHOR}`;
+}
+
 export function localePath(locale: Locale, key: RouteKey): string {
   return `/${locale}${getRoute(key).path}`;
 }
@@ -168,9 +190,30 @@ export function isActivePath(pathname: string, path: string): boolean {
   return pathname === path || pathname.startsWith(`${path}/`);
 }
 
+function withoutLocale(pathname: string): string {
+  const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+  return stripped === "" ? "/" : stripped;
+}
+
+export function routeFor(pathname: string): AppRoute | null {
+  const path = withoutLocale(pathname);
+  let match: AppRoute | null = null;
+  for (const route of appRoutes) {
+    if (!isActivePath(path, route.path)) continue;
+    if (!match || route.path.length > match.path.length) match = route;
+  }
+  return match;
+}
+
+export function sectionKeyFor(pathname: string): RouteKey | null {
+  const route = routeFor(pathname);
+  return route ? (route.section ?? route.key) : null;
+}
+
+export function isSectionActive(pathname: string, key: RouteKey): boolean {
+  return sectionKeyFor(pathname) === key;
+}
+
 export function guardFor(pathname: string): RouteGuard | null {
-  const withoutLocale = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-  const path = withoutLocale === "" ? "/" : withoutLocale;
-  const match = appRoutes.find((route) => isActivePath(path, route.path));
-  return match?.guard ?? null;
+  return routeFor(pathname)?.guard ?? null;
 }

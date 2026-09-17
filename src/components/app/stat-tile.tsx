@@ -20,14 +20,14 @@ export function StatTiles({
   const wideColumns = stats.length === 3 ? "xl:grid-cols-3" : "xl:grid-cols-4";
 
   return (
-    <dl className={cn("grid gap-4 sm:grid-cols-2", wideColumns, className)}>
+    <dl className={cn("grid grid-cols-2 gap-3 sm:gap-4", wideColumns, className)}>
       {stats.map((stat, index) => (
         <div
           key={stat.id}
-          className="enter-rise rounded-xl border border-border bg-surface px-5 py-4"
+          className="panel-surface enter-rise min-w-0 rounded-xl border border-border bg-surface px-4 py-3.5 sm:px-5 sm:py-4"
           style={{ "--enter-delay": `${120 + index * 70}ms` } as CSSProperties}
         >
-          <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+          <dt className="min-h-[2lh] text-xs font-semibold tracking-[0.1em] text-ink-muted uppercase sm:tracking-[0.14em] xl:min-h-0">
             {stat.label}
           </dt>
           <dd

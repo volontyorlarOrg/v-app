@@ -8,9 +8,16 @@
     "loading": "Yuklanmoqda…",
     "error": {
       "title": "Sahifani yuklab boʻlmadi",
-      "body": "Server bilan bogʻlanib boʻlmadi. Bir ozdan keyin qayta urinib koʻring.",
-      "retry": "Qayta urinish"
-    }
+      "body": "Server bilan bogʻlanib boʻlmadi. U uygʻonayotgan boʻlishi mumkin — odatda bunga bir daqiqadan kam vaqt ketadi.",
+      "failedTitle": "Nimadir xato ketdi",
+      "failedBody": "Server xato bilan javob berdi. Bir ozdan keyin qayta urinib koʻring; takrorlansa, quyidagi raqamni bizga yuboring.",
+      "section": "Bu boʻlimni yuklab boʻlmadi",
+      "retry": "Qayta urinish",
+      "retrying": "{seconds} soniyadan keyin qayta urinamiz…",
+      "retryingNow": "Qayta urinilmoqda…",
+      "reference": "Raqam: {id}"
+    },
+    "slowLoad": "Hali yuklanmoqda. Server uygʻonayotgan boʻlishi mumkin — bunga bir daqiqagacha vaqt ketishi mumkin."
   },
   "nav": {
     "dashboard": "Bosh panel",
@@ -43,7 +50,9 @@
     },
     "userMenu": {
       "label": "Hisob menyusi"
-    }
+    },
+    "menuLabel": "Menyu",
+    "profileEdit": "Profilni tahrirlash"
   },
   "auth": {
     "providers": {
@@ -157,7 +166,8 @@
     },
     "progress": {
       "title": "Oʻsishingiz",
-      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda."
+      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda.",
+      "leaderboard": "Reytingdagi oʻrningiz"
     },
     "record": {
       "title": "Tarixingiz",
@@ -328,7 +338,14 @@
       "next": "Keyingi",
       "page": "{page}-sahifa",
       "current": "{page}-sahifa, joriy sahifa"
-    }
+    },
+    "count": "{count, plural, other {koʻngilli}}",
+    "podium": {
+      "label": "Eng yaxshi uchlik",
+      "place": "{rank}-oʻrin"
+    },
+    "xpValue": "{xp} XP",
+    "scoring": "Har bir tasdiqlangan tadbir uchun {event} XP, har bir tasdiqlangan soat uchun {hour} XP."
   },
   "applications": {
     "metaTitle": "Arizalar",
@@ -357,6 +374,11 @@
     "appliedOn": "Yuborilgan: {date}",
     "startedOn": "Boshlangan: {date}",
     "continueDraft": "Qoralamani davom ettirish",
+    "card": {
+      "continue": "Davom ettirish",
+      "track": "Holatni kuzatish",
+      "attendance": "Ishtirok"
+    },
     "detail": {
       "eyebrow": "Ariza",
       "back": "Barcha arizalar",
@@ -410,9 +432,9 @@
         "hours": "Tasdiqlangan soatlar: {hours}",
         "confirmedOn": "{date} da tasdiqlangan"
       },
-      "skills": "Koʻnikmalar",
       "withdrawClosedResolved": "Ishtirok tasdiqlangan, shuning uchun arizani endi qaytarib boʻlmaydi.",
-      "withdrawClosedStarted": "Tadbir boshlangan, shuning uchun arizani endi qaytarib boʻlmaydi."
+      "withdrawClosedStarted": "Tadbir boshlangan, shuning uchun arizani endi qaytarib boʻlmaydi.",
+      "withdrawClosedUnavailable": "Bu arizani endi qaytarib olib boʻlmaydi."
     },
     "form": {
       "save": "Qoralamani saqlash",
@@ -425,12 +447,12 @@
       "fieldInvalid": "Bu javobni tekshiring.",
       "errors": {
         "profileRequired": "Yuborishdan oldin profilingizni toʻldiring.",
+        "profileIncomplete": "Profilingizda tashkilotchiga kerak boʻlgan narsa yetishmaydi.",
         "profileLink": "Profilga oʻtish",
         "opportunityUnavailable": "Bu imkoniyat endi ariza qabul qilmaydi.",
         "invalidAnswers": "Baʼzi javoblarni qayta tekshirish kerak.",
         "applicationNotEditable": "Bu arizani endi tahrirlab boʻlmaydi.",
-        "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring.",
-        "profileIncomplete": "Profilingizda tashkilotchiga kerak boʻlgan narsa yetishmaydi."
+        "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring."
       }
     },
     "gate": {
@@ -500,6 +522,7 @@
       "deadline": "Arizalar yopiladi",
       "format": "Shakl",
       "capacity": "Kerakli volontyorlar",
+      "estimatedTotalHours": "Taxminiy mehnat",
       "spotsOf": "{capacity} ta joydan {spots} tasi qoldi",
       "requirements": "Nima kerak",
       "description": "Bu imkoniyat haqida",
@@ -513,6 +536,8 @@
       "applyClosed": "Arizalar yopilgan",
       "applying": "Boshlanmoqda…",
       "viewApplication": "Arizani koʻrish",
+      "profileRequired": "Ariza berishdan oldin profilning asosiy maydonlarini toʻldiring va telefon yoki Telegram nomini qoʻshing.",
+      "completeProfile": "Profilni toʻldirish",
       "applyErrors": {
         "opportunityUnavailable": "Bu imkoniyat hozir ariza qabul qilmayapti.",
         "opportunityNotFound": "Bu imkoniyat endi mavjud emas.",
@@ -558,7 +583,13 @@
     "showingOf": "{total} tadan {shown} tasi koʻrsatilmoqda. Qolganini koʻrish uchun filtrlarni toraytiring.",
     "estimatedHours": "Jami {hours} soat",
     "noSpotsLeft": "Joy qolmadi",
-    "placesWanted": "{count, plural, other {# joy}}"
+    "placesWanted": "{count, plural, other {# joy}}",
+    "tabs": {
+      "label": "Imkoniyatlar boʻlimlari",
+      "all": "Barchasi",
+      "saved": "Saqlanganlar",
+      "applications": "Arizalar"
+    }
   },
   "saved": {
     "metaTitle": "Saqlanganlar",
@@ -592,7 +623,8 @@
       "education": "Taʼlim",
       "location": "Qayerdasiz",
       "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
-      "links": "Havolalar"
+      "links": "Havolalar",
+      "about": "Siz haqingizda"
     },
     "fields": {
       "fullName": "Toʻliq ism",
@@ -604,7 +636,13 @@
       "regionAny": "Hududni tanlang",
       "city": "Shahar yoki tuman",
       "languages": "Biladigan tillaringiz",
-      "languagesHelp": "Vergul bilan ajrating.",
+      "languagesHelp": "Oʻntagacha. Nomini yozishni boshlang.",
+      "languagesSearch": "Tillardan qidiring",
+      "languagesEmpty": "Bu soʻrovga mos til topilmadi.",
+      "languagesCommon": "Asosiy",
+      "languagesAll": "Barcha tillar",
+      "languagesRemove": "Olib tashlash",
+      "languagesLimit": "Oʻnta tanlandi. Boshqasini qoʻshish uchun bittasini olib tashlang.",
       "phone": "Telefon raqami",
       "phoneHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
       "telegram": "Telegram foydalanuvchi nomi",
@@ -618,7 +656,8 @@
       "bio": "Bio",
       "region": "Hudud",
       "school": "Maktab",
-      "languages": "Tillar"
+      "languages": "Tillar",
+      "contact": "Telefon yoki Telegram"
     },
     "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",
@@ -631,8 +670,87 @@
       "value": "{percent}% toʻldirilgan",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
-      "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi."
+      "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi.",
+      "filled": "toʻldirilgan",
+      "empty": "toʻldirilmagan"
+    },
+    "sectionHelp": {
+      "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
+      "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
+      "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
+      "contact": "Faqat ariza berganingizdan soʻng tashkilotchiga koʻrsatiladi.",
+      "links": "Ishingizni koʻrsatadigan har qanday havola. Ixtiyoriy."
+    },
+    "edit": {
+      "back": "Profilga qaytish",
+      "cancel": "Bekor qilish"
+    },
+    "overview": {
+      "contactTitle": "Tashkilotchilar siz bilan qanday bogʻlanadi",
+      "contactHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
+      "empty": "Hali kiritilmagan"
     }
+  },
+  "languages": {
+    "uz": "Oʻzbek tili",
+    "ru": "Rus tili",
+    "en": "Ingliz tili",
+    "kaa": "Qoraqalpoq tili",
+    "tg": "Tojik tili",
+    "kk": "Qozoq tili",
+    "ky": "Qirgʻiz tili",
+    "tk": "Turkman tili",
+    "tt": "Tatar tili",
+    "ug": "Uygʻur tili",
+    "crh": "Qrim-tatar tili",
+    "az": "Ozarbayjon tili",
+    "tr": "Turk tili",
+    "fa": "Fors tili",
+    "ar": "Arab tili",
+    "zh": "Xitoy tili",
+    "ja": "Yapon tili",
+    "ko": "Koreys tili",
+    "hi": "Hind tili",
+    "ur": "Urdu tili",
+    "bn": "Bengal tili",
+    "pa": "Panjob tili",
+    "ps": "Pushtu tili",
+    "ne": "Nepal tili",
+    "de": "Nemis tili",
+    "fr": "Fransuz tili",
+    "es": "Ispan tili",
+    "it": "Italyan tili",
+    "pt": "Portugal tili",
+    "nl": "Niderland tili",
+    "pl": "Polyak tili",
+    "cs": "Chex tili",
+    "sk": "Slovak tili",
+    "uk": "Ukrain tili",
+    "be": "Belarus tili",
+    "ro": "Rumin tili",
+    "hu": "Venger tili",
+    "sr": "Serb tili",
+    "hr": "Xorvat tili",
+    "bs": "Bosniya tili",
+    "el": "Yunon tili",
+    "he": "Ivrit",
+    "sv": "Shved tili",
+    "no": "Norveg tili",
+    "da": "Dan tili",
+    "fi": "Fin tili",
+    "et": "Eston tili",
+    "lv": "Latish tili",
+    "lt": "Litva tili",
+    "ka": "Gruzin tili",
+    "hy": "Arman tili",
+    "id": "Indonez tili",
+    "ms": "Malay tili",
+    "vi": "Vyetnam tili",
+    "th": "Tay tili",
+    "sw": "Suaxili tili",
+    "am": "Amxar tili",
+    "so": "Somali tili",
+    "mn": "Moʻgʻul tili"
   },
   "settings": {
     "metaTitle": "Sozlamalar",
@@ -760,7 +878,9 @@
       "cancelled": "Soʻrov bekor qilindi.",
       "freshAuthTitle": "Tasdiqlash uchun qaytadan kiring",
       "freshAuthDescription": "Tasdiqlash ikki hisobni birlashtiradi, shuning uchun bu brauzer avval shu hisobga qaytadan kirishi kerak.",
-      "freshAuthAction": "Qaytadan kirish"
+      "freshAuthAction": "Qaytadan kirish",
+      "title": "Hisoblarni birlashtirish",
+      "waitingCount": "{count, plural, =0 {Hech narsa kutilmayapti} other {# ta soʻrov kutilmoqda}}"
     },
     "errors": {
       "accountLinkingUnavailable": "Hisoblarni ulash hozir mavjud emas. Birozdan soʻng urinib koʻring.",
@@ -807,6 +927,17 @@
       "expired": "Qoʻshilish soʻrovi muddati oʻtdi",
       "other": "Hisoblarni birlashtirish boʻyicha yangilik bor",
       "body": "Holatni koʻrish uchun sozlamalarni oching."
+    },
+    "account": {
+      "title": "Hisobingiz",
+      "signsInWith": "Kirish usullari",
+      "nothingConnected": "Hali birorta kirish usuli ulanmagan."
+    },
+    "password": {
+      "label": "Parol"
+    },
+    "index": {
+      "label": "Sozlamalar boʻlimlari"
     }
   },
   "notFound": {

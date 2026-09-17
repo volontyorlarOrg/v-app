@@ -6,23 +6,23 @@ Nothing here decides whether a vacancy is visible. What this repository owns is
 the volunteer's path through one: find it, check what it costs, apply, and
 watch it to the end.
 
-## The card is the whole vacancy, in one block
+## The catalogue card is the whole vacancy, in one block
 
-`src/components/opportunities/opportunity-card.tsx` is the only card. Discovery
-and the dashboard both render it, so a vacancy looks the same wherever a
-volunteer meets it. It carries the organiser and whether they are verified, the
+`src/components/opportunities/opportunity-card.tsx` is the catalogue card used
+for all and saved opportunities. The dashboard keeps its denser next-up rows.
+The catalogue card carries the organiser and whether they are verified, the
 availability chip, the deadline, the place, the event dates, the places left or
 wanted, the estimated hours for the whole event, and — when the volunteer has
 one — the state of their own application.
 
 Its primary action is decided once, in `src/lib/opportunities/card.ts`:
 
-| Situation                        | Action                | Goes to             |
-| -------------------------------- | --------------------- | ------------------- |
-| No application, still open       | View and apply        | the vacancy         |
-| No application, closed or full   | View vacancy          | the vacancy         |
-| A draft                          | Continue application  | the application     |
-| Anything already sent            | Track application     | the application     |
+| Situation                      | Action               | Goes to         |
+| ------------------------------ | -------------------- | --------------- |
+| No application, still open     | View and apply       | the vacancy     |
+| No application, closed or full | View vacancy         | the vacancy     |
+| A draft                        | Continue application | the application |
+| Anything already sent          | Track application    | the application |
 
 A card never submits. It routes to the next step and the step happens there.
 
@@ -30,18 +30,18 @@ A card never submits. It routes to the next step and the step happens there.
 
 New vacancies ask no questions. `POST /applications/{id}/submit` snapshots the
 profile instead, and refuses with `profileIncomplete` and a list of fields when
-it is not ready. `src/lib/applications/readiness.ts` is the same rule in front
-of it: full name, a bio, a region, a school, at least one language, and a phone
+it is not ready. `src/lib/profile/completion.ts` is the same rule in front of
+it: full name, a bio, a region, a school, at least one language, and a phone
 number or a Telegram username.
 
 The vacancy page checks it before offering to apply: an incomplete profile is
-told which fields are missing and sent to `/profile`, never to a button that
+told which fields are missing and sent to `/profile/edit`, never to a button that
 would fail. A complete one starts a draft and lands on the application.
 
 ## Check, confirm, then send
 
 The draft is the check-answers step. `/applications/{id}` shows every field the
-organiser will read, each with its own way back to `/profile`, and a
+organiser will read, each with its own way back to `/profile/edit`, and a
 confirmation the volunteer has to tick before the submit control does anything.
 Only then is the profile snapshotted, and the snapshot is what the page shows
 from that moment: what was sent, not what the profile says today.
@@ -64,7 +64,7 @@ feature here.
 
 ## Withdrawing has a floor
 
-`canWithdraw` allows it while the organiser still holds the application, and for
+`canWithdrawApplication` allows it while the organiser still holds the application, and for
 an accepted one only while the event has not started and attendance has not been
 resolved. That mirrors `v-backend`, which refuses the same cases with
 `applicationCannotBeWithdrawn`: a confirmed record is part of the volunteer's

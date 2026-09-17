@@ -39,6 +39,16 @@ describe("profileInputFromFormData", () => {
     expect(input.bio).toBe("");
     expect(input.languages).toEqual([]);
   });
+
+  it("keeps selected language values distinct while supporting the previous comma-separated form shape", () => {
+    const selected = new FormData();
+    selected.append("languages", "uz");
+    selected.append("languages", "en");
+    selected.append("languages", "uz");
+    const input = profileInputFromFormData(selected);
+
+    expect(input.languages).toEqual(["uz", "en"]);
+  });
 });
 
 describe("profileFormSchema", () => {
@@ -49,7 +59,7 @@ describe("profileFormSchema", () => {
     gradeYear: "",
     region: "",
     city: "",
-    languages: "",
+    languages: [],
     phone: "",
     telegram: "",
     links: "",
@@ -72,6 +82,10 @@ describe("profileFormSchema", () => {
     expect(profileFormSchema.safeParse({ ...valid, region: "atlantis" }).success).toBe(
       false,
     );
+    expect(
+      profileFormSchema.safeParse({ ...valid, languages: Array(11).fill("en") })
+        .success,
+    ).toBe(false);
   });
 
   it("turns a stored profile into the form's default values", () => {
@@ -88,7 +102,7 @@ describe("profileFormSchema", () => {
       links: [],
     });
     expect(values.region).toBe("");
-    expect(values.languages).toBe("uz, ru");
+    expect(values.languages).toEqual(["uz", "ru"]);
     expect(values.telegram).toBe("dilnoza_k");
   });
 });

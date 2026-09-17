@@ -373,6 +373,7 @@ describe("the account schema", () => {
 describe("the leaderboard schema", () => {
   const entry = {
     rank: 1,
+    displayName: "Dilnoza Karimova",
     username: "dilnoza_k",
     xp: 1200,
     isCurrentUser: true,
@@ -384,7 +385,12 @@ describe("the leaderboard schema", () => {
   };
   const board = {
     items: [entry],
-    viewer: { rank: 1, username: "dilnoza_k", xp: 1200 },
+    viewer: {
+      rank: 1,
+      displayName: "Dilnoza Karimova",
+      username: "dilnoza_k",
+      xp: 1200,
+    },
     page: 1,
     pageSize: 25,
     total: 1,
@@ -395,12 +401,23 @@ describe("the leaderboard schema", () => {
     const parsed = leaderboardSchema.parse({
       items: [
         { ...entry, isCurrentUser: false },
-        { rank: 2, username: "bekzod_r", xp: 0, isCurrentUser: true },
+        {
+          rank: 2,
+          displayName: "Bekzod Rustamov",
+          username: "bekzod_r",
+          xp: 0,
+          isCurrentUser: true,
+        },
       ],
       page: 2,
       pageSize: 25,
       total: 143,
-      viewer: { rank: 57, username: "bekzod_r", xp: 0 },
+      viewer: {
+        rank: 57,
+        displayName: "Bekzod Rustamov",
+        username: "bekzod_r",
+        xp: 0,
+      },
       scoring,
     });
 
@@ -414,11 +431,17 @@ describe("the leaderboard schema", () => {
     expect(parsed.scoring).toEqual(scoring);
   });
 
-  it("refuses private or undocumented row fields", () => {
+  it("accepts the documented public display name and refuses private row fields", () => {
     expect(
       leaderboardSchema.safeParse({
         ...board,
         items: [{ ...entry, displayName: "Dilnoza" }],
+      }).success,
+    ).toBe(true);
+    expect(
+      leaderboardSchema.safeParse({
+        ...board,
+        items: [{ ...entry, id: "private-user-id" }],
       }).success,
     ).toBe(false);
   });

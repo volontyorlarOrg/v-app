@@ -13,6 +13,10 @@ function PopoverTrigger(props: ComponentProps<typeof PopoverPrimitive.Trigger>) 
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
+function PopoverAnchor(props: ComponentProps<typeof PopoverPrimitive.Anchor>) {
+  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
+}
+
 function PopoverContent({
   className,
   align = "end",
@@ -26,7 +30,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-72 rounded-lg border border-border bg-popover p-4 text-sm text-popover-foreground shadow-[0_18px_40px_-32px_rgb(28_36_43/0.45)] outline-hidden",
+          "z-50 w-72 rounded-lg border border-border bg-popover p-4 text-sm text-popover-foreground shadow-raised outline-hidden",
           className,
         )}
         {...props}
@@ -55,4 +59,11 @@ function PopoverTitle({ className, ...props }: ComponentProps<"p">) {
   );
 }
 
-export { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger };
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+};

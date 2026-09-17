@@ -2,6 +2,11 @@ import { useFormatter, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import {
+  LoadErrorRows,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
@@ -10,36 +15,37 @@ import {
   ConnectTelegram,
   type ConnectTelegramLabels,
 } from "@/components/dashboard/connect-telegram";
-import { ImpactOrbit } from "@/components/dashboard/impact-orbit";
 import { NextUp } from "@/components/dashboard/next-up";
+import { VolunteerPassBadge } from "@/components/onboarding/volunteer-pass-badge";
 import {
   OnboardingResume,
   type OnboardingResumeLabels,
 } from "@/components/onboarding/onboarding-resume";
-import { ProfileMeter } from "@/components/dashboard/profile-meter";
+import { HeroCell } from "@/components/dashboard/hero-cell";
+import { ProfileMeterSummary } from "@/components/dashboard/profile-meter";
 import { RecordProgress } from "@/components/dashboard/record-progress";
+import { HistoryTable } from "@/components/record/history-table";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { connectStartHref } from "@/lib/account/connections";
 import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
+import { settle, type Loaded } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
-import { listSaved, savedIds } from "@/lib/api/saved.server";
-import { getRecord } from "@/lib/api/record.server";
+import { getHistory, getRecord } from "@/lib/api/record.server";
+import type { ApplicationList, History, Profile } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
-import {
-  isUpcomingCommitment,
-  type ApplicationSummary,
-} from "@/lib/applications/status";
+import { isUpcomingCommitment } from "@/lib/applications/status";
 import { serializeOnboardingState } from "@/lib/onboarding/state";
 import { readOnboardingState } from "@/lib/onboarding/state.server";
-import { FORM_STEPS, FORM_STEP_COUNT, type FormStep } from "@/lib/onboarding/steps";
 import {
-  EMPTY_PROFILE,
-  profileCompletion,
-  type VolunteerProfile,
-} from "@/lib/profile/completion";
+  FORM_STEPS,
+  FORM_STEP_COUNT,
+  passParts,
+  type FormStep,
+} from "@/lib/onboarding/steps";
+import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
   isReliabilityMeaningful,
@@ -48,7 +54,7 @@ import {
   type Level,
   type VolunteerRecord,
 } from "@/lib/record/levels";
-import { navHref } from "@/lib/routing/routes";
+import { HISTORY_ANCHOR, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -68,33 +74,42 @@ export default async function DashboardPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, volunteerRecord, applications, saved, onboarding, telegram] =
-    await Promise.all([
-      requireSession(),
-      getProfile(),
-      getRecord(),
-      listApplications(),
-      listSaved(),
-      readOnboardingState(),
-      readTelegramConnection(),
-    ]);
+  const [
+    session,
+    profile,
+    volunteerRecord,
+    history,
+    applications,
+    onboarding,
+    telegram,
+    common,
+  ] = await Promise.all([
+    requireSession(),
+    settle(() => getProfile()),
+    getRecord(),
+    settle(() => getHistory()),
+    settle(() => listApplications()),
+    readOnboardingState(),
+    readTelegramConnection(),
+    getTranslations({ locale, namespace: "common" }),
+  ]);
+  const loadedProfile = profile.status === "loaded" ? profile.data : null;
 
   return (
     <Dashboard
       locale={locale as Locale}
-      displayName={profile?.fullName.trim() || session.displayName?.trim() || ""}
-      profile={profile ?? EMPTY_PROFILE}
+      displayName={loadedProfile?.fullName.trim() || session.displayName?.trim() || ""}
+      profile={profile}
       record={volunteerRecord}
-      applications={applications.items}
-      saved={savedIds(saved)}
+      history={history}
+      applications={applications}
       onboardingState={onboarding && serializeOnboardingState(onboarding)}
       telegramConnected={telegram}
+      errorLabels={loadErrorLabels(common)}
     />
   );
 }
 
-// The dashboard is worth rendering even when the account service is not
-// answering; an unknown connection simply hides the invitation.
 async function readTelegramConnection(): Promise<boolean | null> {
   try {
     return (await getMe()).authMethods.telegram;
@@ -108,31 +123,43 @@ function Dashboard({
   displayName,
   profile,
   record: volunteerRecord,
-  applications: all,
-  saved,
+  history,
+  applications: loadedApplications,
   onboardingState,
   telegramConnected,
+  errorLabels,
 }: {
   locale: Locale;
   displayName: string;
-  profile: VolunteerProfile;
+  profile: Loaded<Profile | null>;
   record: VolunteerRecord;
-  applications: readonly ApplicationSummary[];
-  saved: ReadonlySet<string>;
+  history: Loaded<History>;
+  applications: Loaded<ApplicationList>;
   onboardingState: string | null;
   telegramConnected: boolean | null;
+  errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("dashboard");
   const onboarding = useTranslations("onboarding");
   const record = useTranslations("record");
   const applicationsT = useTranslations("applications");
+  const profileT = useTranslations("profile");
   const format = useFormatter();
 
   const now = new Date();
   const progress = levelProgress(volunteerRecord.counts);
   const percent = reliabilityPercent(volunteerRecord.counts);
   const meaningful = isReliabilityMeaningful(volunteerRecord.counts);
-  const completion = profileCompletion(profile);
+  const completion =
+    profile.status === "loaded"
+      ? profileCompletion(profile.data ?? EMPTY_PROFILE)
+      : null;
+  const profileForPass =
+    profile.status === "loaded" ? (profile.data ?? EMPTY_PROFILE) : EMPTY_PROFILE;
+  const badgeParts = passParts(
+    profileForPass,
+    completion?.complete ? "done" : "contact",
+  );
   const levelName = (level: Level) => record(`level.${level}`);
   const firstName = displayName.split(/\s+/)[0] ?? "";
 
@@ -166,7 +193,10 @@ function Dashboard({
       id: "reliability",
       label: t("tiles.reliability"),
       value: meaningful && percent !== null ? `${percent}%` : "—",
-      note: meaningful ? undefined : t("tiles.reliabilityPending"),
+      note: meaningful
+        ? record("figures.reliabilityHelp")
+        : t("tiles.reliabilityPending"),
+      achievement: true,
     },
     {
       id: "hours",
@@ -176,8 +206,18 @@ function Dashboard({
           ? "—"
           : format.number(volunteerRecord.hours),
       note: volunteerRecord.hoursVerified ? undefined : t("tiles.hoursUnverified"),
+      achievement: true,
+    },
+    {
+      id: "awaiting",
+      label: record("figures.awaiting"),
+      value: format.number(volunteerRecord.counts.acceptedUnconfirmed),
+      note: record("figures.awaitingHelp"),
     },
   ];
+
+  const all =
+    loadedApplications.status === "loaded" ? loadedApplications.data.items : [];
 
   const commitments = all
     .filter((application) => isUpcomingCommitment(application, now))
@@ -191,8 +231,6 @@ function Dashboard({
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, APPLICATIONS_SHOWN);
 
-  // The catalogue stays on the server, so the resume card is handed one
-  // sentence per step count and picks its own once it has read localStorage.
   const resumeLabels: OnboardingResumeLabels = {
     title: onboarding("resume.title"),
     bodyByDone: Array.from({ length: FORM_STEP_COUNT + 1 }, (_, done) =>
@@ -221,12 +259,13 @@ function Dashboard({
   return (
     <>
       <section className="dashboard-hero">
-        <div className="min-w-0 py-1">
+        <div className="dashboard-hero-intro">
           <PageHeader
             title={
               firstName ? t("greeting", { name: firstName }) : t("greetingAnonymous")
             }
             description={lead}
+            className="sm:flex-col sm:items-start sm:justify-start"
             actions={
               <Link
                 href={navHref("opportunities")}
@@ -237,7 +276,36 @@ function Dashboard({
             }
           />
         </div>
-        <ImpactOrbit />
+        <div className="dashboard-pass" aria-hidden="true">
+          <VolunteerPassBadge parts={badgeParts} />
+        </div>
+        <div id="progress" className="dashboard-hero-band scroll-mt-20">
+          <HeroCell
+            id="dashboard-progress"
+            title={t("progress.title")}
+            action={{ href: navHref("leaderboard"), label: t("progress.leaderboard") }}
+          >
+            <RecordProgress record={volunteerRecord} />
+          </HeroCell>
+          <HeroCell
+            id="dashboard-profile"
+            title={profileT("completion.label")}
+            action={{
+              href: navHref("profileEdit"),
+              label: completion?.complete ? t("profile.edit") : t("profile.cta"),
+            }}
+          >
+            {completion ? (
+              <ProfileMeterSummary completion={completion} />
+            ) : profile.status === "failed" ? (
+              <LoadErrorRows
+                failure={profile.failure}
+                labels={errorLabels}
+                className="dashboard-hero-meter px-0 py-2"
+              />
+            ) : null}
+          </HeroCell>
+        </div>
       </section>
 
       <OnboardingResume serverState={onboardingState} labels={resumeLabels} />
@@ -251,23 +319,29 @@ function Dashboard({
 
       <StatTiles stats={stats} className="mt-6" />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <Panel
-            id="next-up"
-            title={t("nextUp.title")}
-            description={t("nextUp.description")}
-            padding="none"
-          >
-            <NextUp commitments={commitments} saved={saved} now={now} />
-          </Panel>
+      <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-2">
+        <Panel
+          id="next-up"
+          title={t("nextUp.title")}
+          description={t("nextUp.description")}
+          padding="none"
+        >
+          {loadedApplications.status === "failed" ? (
+            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
+          ) : (
+            <NextUp commitments={commitments} />
+          )}
+        </Panel>
 
-          <Panel
-            id="applications"
-            title={t("applications.title")}
-            action={{ href: navHref("applications"), label: t("applications.viewAll") }}
-            padding="none"
-          >
+        <Panel
+          id="applications"
+          title={t("applications.title")}
+          action={{ href: navHref("applications"), label: t("applications.viewAll") }}
+          padding="none"
+        >
+          {loadedApplications.status === "failed" ? (
+            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
+          ) : (
             <ApplicationRows
               applications={applications}
               now={now}
@@ -276,22 +350,22 @@ function Dashboard({
                 body: applicationsT("empty.body"),
               }}
             />
-          </Panel>
-        </div>
+          )}
+        </Panel>
 
-        <div className="min-w-0">
-          <Panel
-            id="progress"
-            title={t("progress.title")}
-            description={t("progress.description")}
-            action={{ href: navHref("record"), label: t("record.viewAll") }}
-          >
-            <RecordProgress record={volunteerRecord} />
-            <div className="mt-5 border-t border-border pt-5">
-              <ProfileMeter completion={completion} />
-            </div>
-          </Panel>
-        </div>
+        <Panel
+          id={HISTORY_ANCHOR}
+          title={record("history.title")}
+          description={record("history.description")}
+          padding="none"
+          className="scroll-mt-20 xl:col-span-2"
+        >
+          {history.status === "failed" ? (
+            <LoadErrorRows failure={history.failure} labels={errorLabels} />
+          ) : (
+            <HistoryTable entries={history.data.items} />
+          )}
+        </Panel>
       </div>
     </>
   );

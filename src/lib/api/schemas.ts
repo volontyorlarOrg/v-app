@@ -61,6 +61,14 @@ export const opportunitySummarySchema = z.object({
   spotsRemaining: optional(z.number().int()),
 });
 
+export const applicationAttendanceSchema = z.object({
+  id: z.string().min(1),
+  outcome: z.enum(ATTENDANCE_OUTCOMES),
+  scheduledHours: optional(z.number()),
+  confirmedHours: optional(z.number()),
+  resolvedAt: optional(isoDate),
+});
+
 const questionOptionSchema = z
   .object({ value: z.string(), label: z.string().optional() })
   .transform((option) => ({
@@ -106,6 +114,7 @@ export const applicationSummarySchema = z.object({
   submittedAt: optional(isoDate),
   reviewedAt: optional(isoDate),
   withdrawnAt: optional(isoDate),
+  attendance: optional(applicationAttendanceSchema),
 });
 
 const answerValueSchema = z.unknown().transform((value): string | string[] => {
@@ -127,29 +136,16 @@ export const profileSnapshotSchema = z.object({
   fullName: optional(z.string()),
   bio: optional(z.string()),
   region: optional(z.string()),
-  city: optional(z.string()),
   school: optional(z.string()),
-  gradeYear: optional(z.string()),
   languages: optional(z.array(z.string())),
-  skills: optional(z.array(z.string())),
-  links: optional(z.array(z.string())),
   phone: optional(z.string()),
   telegram: optional(z.string()),
-});
-
-export const applicationAttendanceSchema = z.object({
-  id: optional(z.string()),
-  outcome: z.enum(ATTENDANCE_OUTCOMES),
-  scheduledHours: optional(z.number()),
-  confirmedHours: optional(z.number()),
-  resolvedAt: optional(isoDate),
 });
 
 export const applicationDetailSchema = applicationSummarySchema.extend({
   answers: z.array(applicationAnswerSchema).default([]),
   profileSnapshot: optional(profileSnapshotSchema),
   reviewerNote: optional(z.string()),
-  attendance: optional(applicationAttendanceSchema),
 });
 
 export const applicationListSchema = z.object({
@@ -234,6 +230,7 @@ export const notificationListSchema = z.object({
 export const leaderboardEntrySchema = z
   .object({
     rank: z.number().int().positive(),
+    displayName: z.string().min(1),
     username: usernameField,
     xp: z.number().int().nonnegative(),
     isCurrentUser: z.boolean(),
@@ -243,6 +240,7 @@ export const leaderboardEntrySchema = z
 const leaderboardViewerSchema = z
   .object({
     rank: z.number().int().positive(),
+    displayName: z.string().min(1),
     username: usernameField,
     xp: z.number().int().nonnegative(),
   })

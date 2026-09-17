@@ -22,6 +22,7 @@ export type ApplicationSummary = {
   submittedAt?: string;
   reviewedAt?: string;
   withdrawnAt?: string;
+  attendance?: ApplicationAttendance;
 };
 
 export type AnswerValue = string | string[];
@@ -37,18 +38,14 @@ export type ProfileSnapshot = {
   fullName?: string;
   bio?: string;
   region?: string;
-  city?: string;
   school?: string;
-  gradeYear?: string;
   languages?: string[];
-  skills?: string[];
-  links?: string[];
   phone?: string;
   telegram?: string;
 };
 
 export type ApplicationAttendance = {
-  id?: string;
+  id: string;
   outcome: AttendanceOutcome;
   scheduledHours?: number;
   confirmedHours?: number;
@@ -59,7 +56,6 @@ export type ApplicationDetail = ApplicationSummary & {
   answers: ApplicationAnswer[];
   profileSnapshot?: ProfileSnapshot;
   reviewerNote?: string;
-  attendance?: ApplicationAttendance;
 };
 
 export function isAttendanceResolved(
@@ -89,18 +85,21 @@ export function hasEventEnded(
   return new Date(eventEndsAt(opportunity)).getTime() <= now.getTime();
 }
 
-export function canWithdraw(
-  application: Pick<ApplicationDetail, "status" | "opportunity" | "attendance">,
+export function canWithdrawApplication(
+  application: Pick<ApplicationSummary, "status" | "opportunity" | "attendance">,
   now: Date,
 ): boolean {
   if (!isWithdrawable(application.status)) return false;
   if (application.status !== "accepted") return true;
   if (hasEventStarted(application.opportunity, now)) return false;
-  return !isAttendanceResolved(application.attendance);
+  return application.attendance?.outcome === "awaiting_confirmation";
 }
 
 export function decidedAt(
-  application: Pick<ApplicationSummary, "status" | "reviewedAt" | "withdrawnAt" | "updatedAt">,
+  application: Pick<
+    ApplicationSummary,
+    "status" | "reviewedAt" | "withdrawnAt" | "updatedAt"
+  >,
 ): string | undefined {
   switch (application.status) {
     case "withdrawn":

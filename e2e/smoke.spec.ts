@@ -8,6 +8,12 @@ async function isMobile(page: Page) {
   return (page.viewportSize()?.width ?? 1280) < 1024;
 }
 
+async function shellIdentity(page: Page, name: string) {
+  return (await isMobile(page))
+    ? page.getByRole("button", { name: new RegExp(`Account menu: ${name}`) })
+    : page.getByRole("complementary").getByText(name, { exact: true });
+}
+
 async function signIn(page: Page, locale = "en") {
   await page.goto(`/api/auth/telegram/start?locale=${locale}`);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
@@ -146,7 +152,13 @@ test.describe("welcome flow", () => {
       .getByLabel("School, college, or university")
       .fill("Academic lyceum No. 1");
     await page.getByLabel("Region").selectOption("tashkent-city");
-    await page.getByLabel("Languages you speak").fill("Uzbek, English");
+    const languages = page.getByRole("combobox", { name: "Languages you speak" });
+    await languages.fill("uzb");
+    await languages.press("Enter");
+    await languages.fill("ingl");
+    await page.getByRole("option", { name: "English" }).click();
+    await languages.press("Escape");
+    await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
@@ -164,7 +176,7 @@ test.describe("welcome flow", () => {
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
 
-    await page.goto("/en/profile");
+    await page.goto("/en/profile/edit");
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
@@ -172,6 +184,8 @@ test.describe("welcome flow", () => {
     await expect(page.getByLabel("Bio")).toHaveValue(
       "I read to younger pupils on Saturdays.",
     );
+    await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Remove: English" })).toBeVisible();
 
     await page.goto("/en/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
@@ -469,10 +483,10 @@ test.describe("sign-in", () => {
   });
 
   test("sign-in returns to the page that required it", async ({ page }) => {
-    await page.goto("/en/record");
-    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Frecord$/);
+    await page.goto("/en/profile");
+    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Fprofile$/);
     await page.getByRole("link", { name: "Continue with Telegram" }).click();
-    await expect(page).toHaveURL(/\/en\/record$/);
+    await expect(page).toHaveURL(/\/en\/profile$/);
   });
 
   test("the panel is not reachable without a session", async ({ page }) => {
@@ -531,33 +545,72 @@ test.describe("the panel", () => {
       name: mobile ? "App sections" : "Main navigation",
     });
 
-    await navigation.getByRole("link", { name: "Applications" }).click();
-    await expect(page).toHaveURL(/\/en\/applications$/);
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Your applications" }),
-    ).toBeVisible();
-
     await navigation.getByRole("link", { name: "Opportunities" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
 
-    if (mobile) {
-      await expect(navigation.getByRole("link", { name: "Leaderboard" })).toHaveCount(0);
-      await page.goto("/en/leaderboard");
-    } else {
-      await navigation.getByRole("link", { name: "Leaderboard" }).click();
-    }
+    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
+    await expect(sections.getByRole("link")).toHaveCount(3);
+    await sections.getByRole("link", { name: /^Applications/ }).click();
+    await expect(page).toHaveURL(/\/en\/applications$/);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your applications" }),
+    ).toBeVisible();
+    await expect(navigation.getByRole("link", { name: "Applications" })).toHaveCount(0);
+    await expect(
+      navigation.getByRole("link", { name: "Opportunities" }),
+    ).toHaveAttribute("aria-current", "page");
+
+    await navigation.getByRole("link", { name: "Leaderboard" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Leaderboard" }),
     ).toBeVisible();
 
-    for (const path of ["/en/record", "/en/profile", "/en/settings"]) {
+    for (const path of ["/en/profile", "/en/profile/edit", "/en/settings"]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     }
+  });
+
+  test("the old record URL lands on the dashboard's history", async ({ page }) => {
+    await page.goto("/en/record");
+    await expect(page).toHaveURL(/\/en\/dashboard#history$/);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Participation history" }),
+    ).toBeVisible();
+  });
+
+  test("the sidebar carries notifications, a flat account group and sign out; the phone header its menu", async ({
+    page,
+  }) => {
+    const mobile = await isMobile(page);
+    await expect(page.getByRole("button", { name: /^Notifications/ })).toBeVisible();
+    await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
+    if (mobile) {
+      await expect(page.getByRole("button", { name: /Account menu/ })).toBeVisible();
+      return;
+    }
+
+    const sidebar = page.getByRole("complementary");
+    await expect(
+      page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
+    ).toHaveCount(3);
+    await expect(page.getByRole("banner")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
+
+    const account = page.getByRole("navigation", { name: "Account" });
+    await expect(account.getByRole("link", { name: "Profile" })).toHaveAttribute(
+      "href",
+      "/en/profile",
+    );
+    await expect(account.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/en/settings",
+    );
+    await expect(sidebar.getByRole("button", { name: "Sign out" })).toBeVisible();
   });
 
   test("the notifications menu shows the backend's messages and marks them read", async ({
@@ -585,35 +638,77 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the account menu reaches the profile and the account, and really signs out", async ({
+  test("the profile and the account are one click away, and sign out really signs out", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: /Account menu/ }).click();
-    const menu = page.getByRole("navigation", { name: "Account menu" });
-    await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
-    await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
-      "href",
-      "/en/settings",
-    );
-    await menu.getByRole("button", { name: "Sign out" }).click();
+    const mobile = await isMobile(page);
+    if (mobile) {
+      await page.getByRole("button", { name: /Account menu/ }).click();
+      const menu = page.getByRole("navigation", { name: "Account menu" });
+      await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
+      await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
+        "href",
+        "/en/settings",
+      );
+      await menu.getByRole("button", { name: "Sign out" }).click();
+    } else {
+      const account = page.getByRole("navigation", { name: "Account" });
+      await account.getByRole("link", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/\/en\/settings$/);
+      await account.getByRole("link", { name: "Profile" }).click();
+      await expect(page).toHaveURL(/\/en\/profile$/);
+      await page.getByRole("button", { name: "Sign out" }).click();
+    }
     await expect(page).toHaveURL(/\/en\/login$/);
 
     await page.goto("/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
-  test("the theme switch flips the document theme", async ({ page }) => {
-    const toggle = page.getByRole("switch", { name: "Dark theme" });
+  test("the theme switch lives in settings and flips the document theme", async ({
+    page,
+  }) => {
+    await page.goto("/en/settings");
+    const appearance = page.getByRole("region", { name: "Appearance" });
+    const toggle = appearance.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await toggle.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
+  });
+
+  test.describe("on a browser that prefers dark", () => {
+    test.use({ colorScheme: "dark" });
+
+    test("the switch reads on before anyone has chosen a theme", async ({ page }) => {
+      await page.context().clearCookies({ name: "theme" });
+      await page.goto("/en/settings");
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      await expect(
+        page
+          .getByRole("region", { name: "Appearance" })
+          .getByRole("switch", { name: "Dark theme" }),
+      ).toHaveAttribute("aria-checked", "true");
+    });
+  });
+
+  test("settings carries the interface language, and switching it keeps the page", async ({
+    page,
+  }) => {
+    await page.goto("/en/settings");
+    const appearance = page.getByRole("region", { name: "Appearance" });
+    await expect(
+      appearance.getByRole("link", { name: "English", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    await appearance.getByRole("link", { name: "O‘zbekcha", exact: true }).click();
+    await expect(page).toHaveURL(/\/uz\/settings$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "uz");
   });
 
   test("nothing overflows horizontally", async ({ page }) => {
     for (const path of [
       "/en/dashboard",
       "/en/opportunities",
-      "/en/record",
+      "/en/leaderboard",
       "/en/profile",
       "/en/settings",
       "/en/applications/app-book-drive",
@@ -652,13 +747,35 @@ test.describe("opportunities", () => {
     await page.goto("/en/saved");
     await expect(page).toHaveURL(/\/en\/opportunities\?view=saved$/);
     const views = page.getByRole("navigation", {
-      name: "Choose which opportunities to show",
+      name: "Opportunities sections",
     });
     await expect(views.getByRole("link", { name: /Saved/ })).toHaveAttribute(
       "aria-current",
       "page",
     );
     await expect(page.getByRole("article")).toHaveCount(2);
+  });
+
+  test("a listing that fails to load keeps the section standing and offers a retry", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities?q=__fail__");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Opportunities" }),
+    ).toBeVisible();
+    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
+    await expect(sections.getByRole("link", { name: /^All/ })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    const alert = page.getByRole("alert").filter({ hasText: "Something went wrong" });
+    await expect(alert).toBeVisible();
+    await expect(alert.getByRole("button", { name: "Try again" })).toBeVisible();
+    await expect(page.getByRole("article")).toHaveCount(0);
+
+    await page.getByRole("link", { name: "Clear filters" }).first().click();
+    await expect(page.getByRole("article").first()).toBeVisible();
+    await expect(alert).toHaveCount(0);
   });
 
   test("filtering by region puts the filter in the URL and asks the backend", async ({
@@ -758,7 +875,9 @@ test.describe("opportunities", () => {
       .getByRole("article")
       .filter({ hasText: "Winter book drive" })
       .first();
-    await expect(drive.getByRole("link", { name: /Continue application/ })).toBeVisible();
+    await expect(
+      drive.getByRole("link", { name: /Continue application/ }),
+    ).toBeVisible();
     await expect(drive.getByText("Draft", { exact: true })).toBeVisible();
 
     const marathon = page
@@ -873,6 +992,12 @@ test.describe("applications, record, profile and settings", () => {
     page,
   }) => {
     await page.goto("/en/applications/app-riverbank");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Attendance" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Attendance is confirmed after the event ends."),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Withdraw application" }).click();
     await page.getByRole("button", { name: "Yes, withdraw" }).click();
     await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
@@ -915,16 +1040,16 @@ test.describe("applications, record, profile and settings", () => {
     expect(response?.status()).toBe(404);
   });
 
-  test("the record shows a history table with the awaiting-confirmation rule", async ({
+  test("the dashboard shows the history table with the awaiting-confirmation rule", async ({
     page,
   }) => {
-    await page.goto("/en/record");
+    await page.goto("/en/dashboard");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
-  test("the profile opens on the volunteer's own record, then edits below it", async ({
+  test("the profile opens on the volunteer's own record and hands editing to its own page", async ({
     page,
   }) => {
     await page.goto("/en/profile");
@@ -932,11 +1057,17 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
     await expect(page.getByText("Events")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Edit profile" })).toHaveAttribute(
-      "href",
-      "#edit",
-    );
-    await expect(page.locator("#edit")).toBeVisible();
+    await expect(page.getByLabel("Bio")).toHaveCount(0);
+    const edit = page.getByRole("link", { name: "Edit profile" }).first();
+    await expect(edit).toHaveAttribute("href", "/en/profile/edit");
+    await edit.click();
+    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Edit your profile" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save profile" })).toBeVisible();
+    await page.getByRole("link", { name: "Cancel" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
   });
 
   test("the profile form saves to the backend and completes the profile", async ({
@@ -945,25 +1076,33 @@ test.describe("applications, record, profile and settings", () => {
     await page.goto("/en/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "80");
+    ).toHaveAttribute("aria-valuenow", "83");
 
+    await page.goto("/en/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
     await page.getByRole("button", { name: "Save profile" }).click();
 
-    await page.reload();
-    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page).toHaveURL(/\/en\/profile$/);
     await expect(page.getByText("Profile complete", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveCount(0);
+
+    await page.goto("/en/profile/edit");
+    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
-  test("contact details are optional and never block completeness", async ({
+  test("either contact method satisfies readiness without requiring both inputs", async ({
     page,
   }) => {
-    await page.goto("/en/profile");
+    await page.goto("/en/profile/edit");
     await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
     await expect(page.getByLabel("Phone number")).toHaveValue("");
+    await expect(page.getByLabel("Telegram username")).not.toHaveAttribute(
+      "required",
+      "",
+    );
+    await expect(page.getByLabel("Telegram username")).toHaveValue("dilnoza_k");
     await expect(page.getByLabel("Bio")).toBeVisible();
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
   });
@@ -976,9 +1115,16 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("region", { name: "Ways to sign in" })).toHaveCount(0);
   });
 
-  test("the theme is switched from the top bar", async ({ page }) => {
+  test("the theme is switched from settings, not from the profile", async ({
+    page,
+  }) => {
     await page.goto("/en/profile");
-    const dark = page.getByRole("switch", { name: "Dark theme" });
+    await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
+
+    await page.goto("/en/settings");
+    const dark = page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
     await dark.click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
@@ -1225,18 +1371,14 @@ test.describe("account connections and merges", () => {
   test("approving replaces this browser with the account that asked", async ({
     page,
   }) => {
-    await expect(
-      page.getByRole("button", { name: /Account menu: Dilnoza Karimova/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Dilnoza Karimova")).toBeVisible();
 
     await requestRow(page, "Waiting for your approval", "Google")
       .getByRole("button", { name: "Approve" })
       .click();
 
     await expect(page).toHaveURL(/\/en\/settings$/);
-    await expect(
-      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
     await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for your approval" }),
@@ -1286,9 +1428,7 @@ test.describe("account connections and merges", () => {
     await expect(reject).toBeDisabled();
 
     await expect(page).toHaveURL(/\/en\/settings$/);
-    await expect(
-      page.getByRole("button", { name: /Account menu: Bekzod Rustamov/ }),
-    ).toBeVisible();
+    await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
   });
 
   test("works from the keyboard, at both themes, and with reduced motion", async ({
@@ -1305,13 +1445,15 @@ test.describe("account connections and merges", () => {
     await expect(approve).toBeFocused();
 
     const before = await page.locator("html").getAttribute("data-theme");
-    await page.getByRole("switch", { name: "Dark theme" }).first().click();
+    await page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("switch", { name: "Dark theme" })
+      .click();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme", before ?? "");
     await expect(approve).toBeVisible();
     expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
   });
 });
-
 
 test.describe("the leaderboard", () => {
   test.beforeEach(async ({ page }) => {
@@ -1320,21 +1462,33 @@ test.describe("the leaderboard", () => {
   });
 
   test("ranks volunteers on the backend's own numbers", async ({ page }) => {
-    await expect(page.getByRole("heading", { level: 1, name: "Leaderboard" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Leaderboard" }),
+    ).toBeVisible();
 
-    const first = page.getByRole("row").nth(1);
-    await expect(first).toContainText("@volunteer_01");
-    await expect(first).toContainText("3,000");
-    await expect(page.getByRole("row")).toHaveCount(26);
+    const podium = page.getByRole("region", { name: "Top three" });
+    await expect(podium.getByRole("listitem")).toHaveCount(3);
+    const first = podium.getByRole("listitem").filter({ hasText: "@volunteer_01" });
+    await expect(first).toContainText("Volunteer 01");
+    await expect(first).toContainText("3,000 XP");
+    await expect(first.getByLabel("Place 1")).toBeVisible();
+
+    const fourth = page.getByRole("row").nth(1);
+    await expect(fourth).toContainText("Volunteer 04");
+    await expect(fourth).toContainText("@volunteer_04");
+    await expect(fourth).toContainText("2,730 XP");
+    await expect(page.getByRole("row")).toHaveCount(23);
+    await expect(page.getByText("30 volunteers")).toBeVisible();
   });
 
   test("shows the signed-in volunteer even from a page they are not on", async ({
     page,
   }) => {
-    const standing = page.getByRole("definition").first();
-    await expect(standing).toHaveText("30");
-    await expect(page.getByText("of 30 volunteers")).toBeVisible();
-    await expect(page.getByText("@dilnoza_k").first()).toBeVisible();
+    const standing = page.getByRole("region", { name: "Dilnoza Karimova" });
+    await expect(standing.getByRole("definition").first()).toHaveText("#30");
+    await expect(standing).toContainText("of 30 volunteers");
+    await expect(standing).toContainText("@dilnoza_k");
+    await expect(standing).toContainText("50 XP for every confirmed event");
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
   });
 
@@ -1342,10 +1496,9 @@ test.describe("the leaderboard", () => {
     await expect(page.getByRole("status")).toContainText("Showing 1\u201325 of 30");
 
     const pages = page.getByRole("navigation", { name: "Leaderboard pages" });
-    await expect(pages.getByRole("link", { name: "Page 1, current page" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    await expect(
+      pages.getByRole("link", { name: "Page 1, current page" }),
+    ).toHaveAttribute("aria-current", "page");
 
     await pages.getByRole("link", { name: "Next" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
@@ -1393,9 +1546,9 @@ test.describe("the leaderboard handle", () => {
     await expect(panel).toContainText("@chilonzor_reader");
 
     await page.goto("/en/leaderboard?page=2");
-    await expect(page.getByRole("row").filter({ hasText: "@chilonzor_reader" })).toContainText(
-      "You",
-    );
+    await expect(
+      page.getByRole("row").filter({ hasText: "@chilonzor_reader" }),
+    ).toContainText("You");
   });
 
   test("a handle another volunteer holds is refused by name", async ({ page }) => {
@@ -1416,7 +1569,9 @@ test.describe("the leaderboard handle", () => {
     const field = panel.getByLabel("New handle");
     await field.fill("no");
     await panel.getByRole("button", { name: "Save handle" }).click();
-    await expect(panel.getByText("A handle needs at least 5 characters.")).toBeVisible();
+    await expect(
+      panel.getByText("A handle needs at least 5 characters."),
+    ).toBeVisible();
     await expect(field).toHaveAttribute("aria-invalid", "true");
   });
 

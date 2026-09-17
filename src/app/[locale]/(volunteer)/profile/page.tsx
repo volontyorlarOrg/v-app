@@ -1,30 +1,40 @@
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { ProfileForm } from "@/components/profile/profile-form";
+import {
+  LoadErrorPanel,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
+import { Panel } from "@/components/app/panel";
+import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import {
   ProfileIdentity,
   type IdentityFact,
   type IdentityStat,
 } from "@/components/profile/profile-identity";
 import { getMe } from "@/lib/api/account.server";
+import { settle, type LoadFailure } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
-import { REGIONS } from "@/lib/opportunities/types";
+import type { Locale } from "@/i18n/routing";
 import {
   EMPTY_PROFILE,
   profileCompletion,
   type VolunteerProfile,
 } from "@/lib/profile/completion";
+import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
   isReliabilityMeaningful,
   levelFor,
   reliabilityPercent,
   type VolunteerRecord,
 } from "@/lib/record/levels";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -40,14 +50,21 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, me, volunteerRecord] = await Promise.all([
+  const [session, profile, me, volunteerRecord, common] = await Promise.all([
     requireSession(),
-    getProfile(),
+    settle(() => getProfile()),
     getMe(),
     getRecord(),
+    getTranslations({ locale, namespace: "common" }),
   ]);
 
-  const values: VolunteerProfile = profile ?? {
+  if (profile.status === "failed") {
+    return (
+      <ProfileUnavailable failure={profile.failure} labels={loadErrorLabels(common)} />
+    );
+  }
+
+  const values: VolunteerProfile = profile.data ?? {
     ...EMPTY_PROFILE,
     fullName: me.displayName?.trim() || session.displayName?.trim() || "",
   };
@@ -59,6 +76,23 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       handle={me.telegramIdentity?.username?.trim() || null}
       joinedAt={me.createdAt}
     />
+  );
+}
+
+function ProfileUnavailable({
+  failure,
+  labels,
+}: {
+  failure: LoadFailure;
+  labels: LoadErrorLabels;
+}) {
+  const t = useTranslations("profile");
+
+  return (
+    <>
+      <h1 className="sr-only">{t("metaTitle")}</h1>
+      <LoadErrorPanel failure={failure} labels={labels} className="mt-0" />
+    </>
   );
 }
 
@@ -78,6 +112,7 @@ function Profile({
   const opportunities = useTranslations("opportunities");
   const recordLabels = useTranslations("record");
   const format = useFormatter();
+  const locale = useLocale() as Locale;
 
   const completion = profileCompletion(values);
   const joinedOn = new Date(joinedAt);
@@ -113,28 +148,49 @@ function Profile({
         values.city,
       ]),
     },
-    { id: "languages" as const, value: join(values.languages) },
+    {
+      id: "languages" as const,
+      value: languageDirectory.format(values.languages, locale),
+    },
   ].filter((fact) => fact.value.length > 0);
 
-  const fieldKeys = [
-    "fullName",
-    "bio",
-    "bioHelp",
-    "school",
-    "gradeYear",
-    "region",
-    "regionAny",
-    "city",
-    "languages",
-    "languagesHelp",
-    "phone",
-    "phoneHelp",
-    "telegram",
-    "telegramHelp",
-    "links",
-    "linksHelp",
-  ] as const;
-  const sectionKeys = ["education", "location", "contact", "links"] as const;
+  const contact = [
+    { id: "phone", label: t("fields.phone"), value: values.phone.trim() },
+    {
+      id: "telegram",
+      label: t("fields.telegram"),
+      value: values.telegram.trim() ? `@${values.telegram.trim()}` : "",
+    },
+  ];
+
+  const contactPanel = (
+    <Panel
+      id="contact"
+      title={t("overview.contactTitle")}
+      description={t("overview.contactHelp")}
+      padding="none"
+      className="enter-rise order-2 [--enter-delay:120ms] xl:order-1"
+    >
+      <dl>
+        {contact.map((row) => (
+          <div
+            key={row.id}
+            className="flex flex-col gap-1 border-t border-border px-5 py-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+          >
+            <dt className="text-sm font-semibold text-ink">{row.label}</dt>
+            <dd
+              className={cn(
+                "text-sm",
+                row.value ? "tabular text-ink" : "text-ink-muted",
+              )}
+            >
+              {row.value || t("overview.empty")}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </Panel>
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -146,7 +202,7 @@ function Profile({
         bio={values.bio}
         facts={facts}
         links={profileLinks(values.links)}
-        completion={completion}
+        complete={completion.complete}
         labels={{
           level: recordLabels(`level.${levelFor(record.counts)}`),
           complete: t("identity.complete"),
@@ -157,42 +213,23 @@ function Profile({
               }),
           bioEmpty: t("identity.bioEmpty"),
           edit: t("identity.edit"),
-          record: t("identity.record"),
-          completion: {
-            label: t("completion.label"),
-            value: t("completion.value", { percent: completion.percent }),
-            missing: t("completion.missing", {
-              fields: completion.missing
-                .map((field) => t(`completionFields.${field}`))
-                .join(", "),
-            }),
-          },
+          record: recordLabels("history.title"),
         }}
       />
 
-      <ProfileForm
-        values={values}
-        regions={REGIONS.map((region) => ({
-          value: region,
-          label: opportunities(`regions.${region}`),
-        }))}
-        labels={{
-          title: t("form.title"),
-          description: t("form.description"),
-          sections: Object.fromEntries(
-            sectionKeys.map((key) => [key, t(`sections.${key}`)]),
-          ) as Record<(typeof sectionKeys)[number], string>,
-          fields: Object.fromEntries(
-            fieldKeys.map((key) => [key, t(`fields.${key}`)]),
-          ) as Record<(typeof fieldKeys)[number], string>,
-          optional: t("optional"),
-          save: t("save"),
-          saving: t("saving"),
-          saved: t("saved"),
-          saveError: t("saveError"),
-          fieldInvalid: t("fieldInvalid"),
-        }}
-      />
+      {completion.complete ? (
+        contactPanel
+      ) : (
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+          {contactPanel}
+          <Panel
+            id="completeness"
+            className="enter-rise order-1 [--enter-delay:60ms] xl:sticky xl:top-8 xl:order-2"
+          >
+            <ProfileMeter completion={completion} />
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }
@@ -202,12 +239,4 @@ function join(parts: readonly string[]): string {
     .map((part) => part.trim())
     .filter(Boolean)
     .join(", ");
-}
-
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean).slice(0, 2);
-  return parts
-    .map((part) => [...part][0] ?? "")
-    .join("")
-    .toLocaleUpperCase();
 }

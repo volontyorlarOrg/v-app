@@ -24,12 +24,9 @@ import { getApplication } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
 import {
-  applicationReadiness,
-  type ApplicationReadiness,
-} from "@/lib/applications/readiness";
-import {
-  canWithdraw,
+  canWithdrawApplication,
   hasEventEnded,
+  hasEventStarted,
   isAttendanceResolved,
   isEditable,
   type AnswerValue,
@@ -37,6 +34,12 @@ import {
   type ProfileSnapshot,
 } from "@/lib/applications/status";
 import { isRegion, type ApplicationQuestion } from "@/lib/opportunities/types";
+import {
+  EMPTY_PROFILE,
+  profileCompletion,
+  type ProfileCompletion,
+} from "@/lib/profile/completion";
+import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { localePath, navHref, opportunityHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -61,18 +64,15 @@ export default async function ApplicationPage({
 
   const [opportunity, profile] = await Promise.all([
     getOpportunity(application.opportunity.slug),
-    getProfile(),
+    application.profileSnapshot ? null : getProfile(),
   ]);
 
   const snapshot: ProfileSnapshot = application.profileSnapshot ?? {
     fullName: profile?.fullName,
     bio: profile?.bio,
     region: profile?.region ?? undefined,
-    city: profile?.city,
     school: profile?.school,
-    gradeYear: profile?.gradeYear,
     languages: profile?.languages,
-    links: profile?.links,
     phone: profile?.phone,
     telegram: profile?.telegram,
   };
@@ -82,7 +82,7 @@ export default async function ApplicationPage({
       application={application}
       questions={opportunity?.questions ?? null}
       snapshot={snapshot}
-      readiness={applicationReadiness(profile)}
+      completion={profileCompletion(profile ?? EMPTY_PROFILE)}
       now={now}
     />
   );
@@ -107,13 +107,13 @@ function Application({
   application,
   questions,
   snapshot,
-  readiness,
+  completion,
   now,
 }: {
   application: ApplicationDetail;
   questions: readonly ApplicationQuestion[] | null;
   snapshot: ProfileSnapshot;
-  readiness: ApplicationReadiness;
+  completion: ProfileCompletion;
   now: Date;
 }) {
   const t = useTranslations("applications");
@@ -152,15 +152,6 @@ function Application({
   }));
 
   const empty = "—";
-  const list = (values: string[] | undefined) =>
-    values && values.length > 0 ? values.join(", ") : empty;
-  const optionalRow = (
-    key: string,
-    label: string,
-    value: string | undefined,
-  ): ProfileSummaryRow[] =>
-    value && value.trim() ? [{ key, label, value: value.trim() }] : [];
-
   const rows: ProfileSummaryRow[] = [
     {
       key: "fullName",
@@ -179,49 +170,34 @@ function Application({
         ? opportunitiesT(`regions.${snapshot.region}`)
         : empty,
     },
-    ...optionalRow("city", profileT("fields.city"), snapshot.city),
     {
       key: "school",
       label: profileT("fields.school"),
       value: snapshot.school?.trim() || empty,
     },
-    ...optionalRow("gradeYear", profileT("fields.gradeYear"), snapshot.gradeYear),
     {
       key: "languages",
       label: profileT("fields.languages"),
-      value: list(snapshot.languages),
+      value: languageDirectory.format(snapshot.languages ?? [], locale) || empty,
     },
-    ...(snapshot.skills && snapshot.skills.length > 0
-      ? [
-          {
-            key: "skills",
-            label: t("detail.skills"),
-            value: list(snapshot.skills),
-          },
-        ]
-      : []),
     {
       key: "contact",
       label: profileT("fields.contact"),
-      value: snapshot.telegram?.trim()
-        ? `@${snapshot.telegram.trim()}`
-        : snapshot.phone?.trim() || empty,
-    },
-    ...(snapshot.links && snapshot.links.length > 0
-      ? [
-          {
-            key: "links",
-            label: profileT("fields.links"),
-            value: list(snapshot.links),
-          },
+      value:
+        [
+          snapshot.phone?.trim() || null,
+          snapshot.telegram?.trim() ? `@${snapshot.telegram.trim()}` : null,
         ]
-      : []),
+          .filter(Boolean)
+          .join(" · ") || empty,
+    },
   ];
 
   const accepted = application.status === "accepted";
   const ended = hasEventEnded(application.opportunity, now);
   const resolved = isAttendanceResolved(application.attendance);
-  const withdrawable = canWithdraw(application, now);
+  const started = hasEventStarted(application.opportunity, now);
+  const withdrawable = canWithdrawApplication(application, now);
   const received =
     application.status === "submitted" || application.status === "under_review";
 
@@ -237,7 +213,6 @@ function Application({
 
       <PageHeader
         className="mt-3"
-        eyebrow={t("detail.eyebrow")}
         title={application.opportunity.title}
         description={application.opportunity.organization.name}
         actions={<ApplicationStatusChip status={application.status} />}
@@ -271,7 +246,7 @@ function Application({
                 applicationId={application.id}
                 questions={fields}
                 answers={answers}
-                labels={answersLabels(t, localePath(locale, "profile"))}
+                labels={answersLabels(t, localePath(locale, "profileEdit"))}
               />
             </Panel>
           ) : null}
@@ -285,13 +260,13 @@ function Application({
               <ProfileSummary
                 rows={rows}
                 change={{
-                  href: navHref("profile"),
+                  href: navHref("profileEdit"),
                   label: t("detail.review.change"),
                 }}
               />
 
               <div className="mt-6 border-t border-border pt-6">
-                {readiness.ready ? (
+                {completion.complete ? (
                   <ReviewSubmitForm
                     applicationId={application.id}
                     labels={{
@@ -307,7 +282,7 @@ function Application({
                       },
                       fallback: t("form.errors.fallback"),
                       profileLink: {
-                        href: localePath(locale, "profile"),
+                        href: localePath(locale, "profileEdit"),
                         label: t("form.errors.profileLink"),
                       },
                     }}
@@ -316,14 +291,14 @@ function Application({
                   <div className="flex flex-col gap-3">
                     <ActionStatus tone="info">
                       {t("gate.body", {
-                        fields: readiness.missing
+                        fields: completion.missing
                           .map((field) => t(`gate.fields.${field}`))
                           .join(", "),
                       })}
                     </ActionStatus>
                     <div>
                       <Link
-                        href={navHref("profile")}
+                        href={navHref("profileEdit")}
                         className={buttonClass({ size: "sm" })}
                       >
                         {t("gate.action")}
@@ -462,7 +437,9 @@ function Application({
               <p className="text-sm leading-relaxed text-ink-muted">
                 {resolved
                   ? t("detail.withdrawClosedResolved")
-                  : t("detail.withdrawClosedStarted")}
+                  : started
+                    ? t("detail.withdrawClosedStarted")
+                    : t("detail.withdrawClosedUnavailable")}
               </p>
             </Panel>
           ) : null}

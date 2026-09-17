@@ -2,7 +2,13 @@ import { createServer } from "node:http";
 
 const PORT = Number(process.env.STUB_PORT ?? 3212);
 const APP_URL = process.env.E2E_APP_URL ?? "http://127.0.0.1:3211";
-const ACCESS_TOKEN_TTL_SECONDS = 45;
+const FAIL_PATHS = (process.env.STUB_FAIL_PATHS ?? "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
+const FAILING_SEARCH = "__fail__";
+const SERVER_ERROR = { statusCode: 500, message: "Internal server error" };
+const ACCESS_TOKEN_TTL_SECONDS = Number(process.env.STUB_ACCESS_TTL ?? 259_200);
 const DAY = 86_400_000;
 const START = Date.now();
 
@@ -282,11 +288,39 @@ function counterparty(displayName, authMethods) {
 }
 
 function seededMergeRequests() {
-  const asking = counterparty("Bekzod Rustamov", { telegram: true, google: true, password: false });
+  const asking = counterparty("Bekzod Rustamov", {
+    telegram: true,
+    google: true,
+    password: false,
+  });
   return [
-    { id: "merge-incoming", status: "pending", direction: "incoming", requestedVia: "google", createdAt: at(0, 9), expiresAt: at(1, 9), counterparty: asking },
-    { id: "merge-reauth", status: "pending", direction: "incoming", requestedVia: "telegram", createdAt: at(0, 8), expiresAt: at(1, 8), counterparty: asking },
-    { id: "merge-expired", status: "pending", direction: "incoming", requestedVia: "password", createdAt: at(-1, 8), expiresAt: at(1, 7), counterparty: asking },
+    {
+      id: "merge-incoming",
+      status: "pending",
+      direction: "incoming",
+      requestedVia: "google",
+      createdAt: at(0, 9),
+      expiresAt: at(1, 9),
+      counterparty: asking,
+    },
+    {
+      id: "merge-reauth",
+      status: "pending",
+      direction: "incoming",
+      requestedVia: "telegram",
+      createdAt: at(0, 8),
+      expiresAt: at(1, 8),
+      counterparty: asking,
+    },
+    {
+      id: "merge-expired",
+      status: "pending",
+      direction: "incoming",
+      requestedVia: "password",
+      createdAt: at(-1, 8),
+      expiresAt: at(1, 7),
+      counterparty: asking,
+    },
   ];
 }
 
@@ -296,7 +330,12 @@ function freshState() {
     mergeRequests: seededMergeRequests(),
     connectStates: new Set(),
     googleConnectStates: new Set(),
-    user: { id: "user-dilnoza", displayName: "Dilnoza Karimova", roles: ["volunteer"], createdAt: at(-40) },
+    user: {
+      id: "user-dilnoza",
+      displayName: "Dilnoza Karimova",
+      roles: ["volunteer"],
+      createdAt: at(-40),
+    },
     profile: {
       fullName: "Dilnoza Karimova",
       bio: "I read to younger pupils at the library every Saturday.",
@@ -333,6 +372,7 @@ function freshState() {
         answers: [],
         profileSnapshot: null,
         reviewerNote: null,
+        attendance: null,
       },
       {
         id: "app-riverbank",
@@ -348,14 +388,10 @@ function freshState() {
           fullName: "Dilnoza Karimova",
           bio: "I read to younger pupils at the library every Saturday.",
           region: "tashkent-city",
-          city: "Tashkent",
           school: "Academic lyceum No. 2",
-          gradeYear: "2",
           languages: ["uz", "ru", "en"],
-          skills: ["translation", "reading aloud"],
           phone: "",
           telegram: "dilnoza_k",
-          links: [],
         },
         reviewerNote: null,
         attendance: {
@@ -433,9 +469,33 @@ function freshState() {
       },
     ],
     notifications: [
-      { id: "n-accepted", kind: "application.accepted", title: "You were accepted to Riverbank clean-up", body: "See you on the day.", data: null, readAt: null, createdAt: at(-4, 11) },
-      { id: "n-received", kind: "application.submitted", title: "Application received", body: "", data: null, readAt: at(-6, 20), createdAt: at(-6, 19) },
-      { id: "n-merge", kind: "account.merge.requested", title: "bekzod@example.org asked to join dilnoza@example.org", body: "Merge request merge-incoming is waiting.", data: null, readAt: at(-1, 20), createdAt: at(-1, 19) },
+      {
+        id: "n-accepted",
+        kind: "application.accepted",
+        title: "You were accepted to Riverbank clean-up",
+        body: "See you on the day.",
+        data: null,
+        readAt: null,
+        createdAt: at(-4, 11),
+      },
+      {
+        id: "n-received",
+        kind: "application.submitted",
+        title: "Application received",
+        body: "",
+        data: null,
+        readAt: at(-6, 20),
+        createdAt: at(-6, 19),
+      },
+      {
+        id: "n-merge",
+        kind: "account.merge.requested",
+        title: "bekzod@example.org asked to join dilnoza@example.org",
+        body: "Merge request merge-incoming is waiting.",
+        data: null,
+        readAt: at(-1, 20),
+        createdAt: at(-1, 19),
+      },
     ],
   };
 }
@@ -448,13 +508,24 @@ function newAccountState(email, fullName) {
     roles: ["volunteer"],
     createdAt: new Date().toISOString(),
   };
-  state.account = { ...freshAccount(), email: email ?? null, username: `user_new_${issued + 1}`, usernameSource: "generated", authMethods: { telegram: false, google: false, password: true } };
+  state.account = {
+    ...freshAccount(),
+    email: email ?? null,
+    username: `user_new_${issued + 1}`,
+    usernameSource: "generated",
+    authMethods: { telegram: false, google: false, password: true },
+  };
   state.mergeRequests = [];
   state.profile = null;
   state.applications = [];
   state.saved = [];
   state.record = {
-    counts: { attended: 0, acceptedResolved: 0, acceptedUnconfirmed: 0, standoutReviews: false },
+    counts: {
+      attended: 0,
+      acceptedResolved: 0,
+      acceptedUnconfirmed: 0,
+      standoutReviews: false,
+    },
     hours: 0,
     hoursVerified: true,
   };
@@ -486,7 +557,6 @@ function issueSession(state) {
   return {
     userId: state.user.id,
     accessToken,
-    refreshToken,
     accessTokenExpiresAt: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_TTL_SECONDS,
     displayName: state.user.displayName,
     roles: state.user.roles,
@@ -502,8 +572,17 @@ function passwordState(email) {
 
 function requesterState() {
   const state = freshState();
-  state.user = { id: "user-bekzod", displayName: "Bekzod Rustamov", roles: ["volunteer"], createdAt: at(-60) };
-  state.profile = { ...state.profile, fullName: "Bekzod Rustamov", telegram: "bekzod_r" };
+  state.user = {
+    id: "user-bekzod",
+    displayName: "Bekzod Rustamov",
+    roles: ["volunteer"],
+    createdAt: at(-60),
+  };
+  state.profile = {
+    ...state.profile,
+    fullName: "Bekzod Rustamov",
+    telegram: "bekzod_r",
+  };
   state.account = {
     email: "bekzod@example.org",
     emailVerified: true,
@@ -532,7 +611,10 @@ function connectionOutcome(state, provider, code) {
     return { status: 503, body: { code: "accountLinkingUnavailable" } };
   }
   if (code === "connect-already") {
-    return { status: 200, body: { outcome: "alreadyLinked", account: serializeAccount(state) } };
+    return {
+      status: 200,
+      body: { outcome: "alreadyLinked", account: serializeAccount(state) },
+    };
   }
   if (code === "connect-approval") {
     merged += 1;
@@ -543,15 +625,25 @@ function connectionOutcome(state, provider, code) {
       requestedVia: provider,
       createdAt: new Date().toISOString(),
       expiresAt: at(1, 12),
-      counterparty: counterparty("Bekzod Rustamov", { telegram: true, google: false, password: true }),
+      counterparty: counterparty("Bekzod Rustamov", {
+        telegram: true,
+        google: false,
+        password: true,
+      }),
     };
     state.mergeRequests.push(request);
-    return { status: 200, body: { outcome: "approvalRequired", mergeRequest: request } };
+    return {
+      status: 200,
+      body: { outcome: "approvalRequired", mergeRequest: request },
+    };
   }
 
   if (provider === "telegram") {
     state.account.authMethods.telegram = true;
-    state.account.telegramIdentity = { username: "dilnoza_k", linkedAt: new Date().toISOString() };
+    state.account.telegramIdentity = {
+      username: "dilnoza_k",
+      linkedAt: new Date().toISOString(),
+    };
   }
   if (provider === "google") {
     state.account.authMethods.google = true;
@@ -585,7 +677,11 @@ function resolveMergeRequest(state, id, resolution) {
   }
 
   request.status =
-    resolution === "approve" ? "completed" : resolution === "reject" ? "rejected" : "cancelled";
+    resolution === "approve"
+      ? "completed"
+      : resolution === "reject"
+        ? "rejected"
+        : "cancelled";
   request.decidedAt = new Date().toISOString();
   if (resolution === "approve") request.completedAt = request.decidedAt;
 
@@ -610,6 +706,7 @@ function serializeApplication(state, item, detail) {
     submittedAt: item.submittedAt ?? undefined,
     reviewedAt: item.reviewedAt ?? undefined,
     withdrawnAt: item.withdrawnAt ?? undefined,
+    attendance: item.attendance ?? undefined,
   };
   if (!detail) return summary;
   return {
@@ -666,6 +763,7 @@ function validateAnswers(opportunity, answers, requireComplete) {
 }
 
 const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
+  displayName: `Volunteer ${String(index + 1).padStart(2, "0")}`,
   username: `volunteer_${String(index + 1).padStart(2, "0")}`,
   xp: 3000 - index * 90,
 }));
@@ -676,6 +774,7 @@ function leaderboard(state, query) {
   const rows = [
     ...leaderboardRoster,
     {
+      displayName: state.user.displayName,
       username: state.account.username,
       xp: VIEWER_XP,
     },
@@ -698,7 +797,14 @@ function leaderboard(state, query) {
     total: rows.length,
     viewer: (() => {
       const row = rows.find((candidate) => candidate.isCurrentUser);
-      return row ? { rank: row.rank, username: row.username, xp: row.xp } : null;
+      return row
+        ? {
+            rank: row.rank,
+            displayName: row.displayName,
+            username: row.username,
+            xp: row.xp,
+          }
+        : null;
     })(),
     scoring: {
       attendedEventXp: 50,
@@ -765,6 +871,8 @@ const server = createServer(async (request, response) => {
 
   if (path === "/" || path === "/health/live")
     return send(response, 200, { status: "ok" });
+  if (FAIL_PATHS.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)))
+    return send(response, 500, SERVER_ERROR);
 
   if (path === "/auth/telegram/authorize" && method === "POST") {
     started += 1;
@@ -784,7 +892,8 @@ const server = createServer(async (request, response) => {
     if (!pendingStates.delete(body.state))
       return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
-    if (body.code !== "e2e-code") return send(response, 401, { code: "invalidAuthorizationCode" });
+    if (body.code !== "e2e-code")
+      return send(response, 401, { code: "invalidAuthorizationCode" });
     const opened = freshState();
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
@@ -811,8 +920,10 @@ const server = createServer(async (request, response) => {
     });
   }
   if (path === "/auth/google/complete" && method === "POST") {
-    if (!googleChallenges.delete(body.state)) return send(response, 401, { code: "invalidGoogleState" });
-    if (body.credential !== "e2e-google-id-token") return send(response, 401, { code: "invalidGoogleCredential" });
+    if (!googleChallenges.delete(body.state))
+      return send(response, 401, { code: "invalidGoogleState" });
+    if (body.credential !== "e2e-google-id-token")
+      return send(response, 401, { code: "invalidGoogleCredential" });
     const opened = freshState();
     opened.account.email = SEEDED_EMAIL;
     opened.account.emailVerified = true;
@@ -843,7 +954,9 @@ const server = createServer(async (request, response) => {
     return send(response, 201, issueSession(state));
   }
   if (path === "/opportunities" && method === "GET")
-    return send(response, 200, listOpportunities(url.searchParams));
+    return url.searchParams.get("q") === FAILING_SEARCH
+      ? send(response, 500, SERVER_ERROR)
+      : send(response, 200, listOpportunities(url.searchParams));
   if (path.startsWith("/opportunities/") && method === "GET") {
     const item = opportunities.find(
       (candidate) => candidate.slug === path.slice("/opportunities/".length),
@@ -857,16 +970,22 @@ const server = createServer(async (request, response) => {
   const state = sessions.get(token);
   if (!state) return send(response, 401, { code: "unauthenticated" });
 
-  if (path === "/auth/logout" && method === "POST") return send(response, 201, { loggedOut: true });
+  if (path === "/auth/logout" && method === "POST") {
+    sessions.delete(token);
+    return send(response, 201, { loggedOut: true });
+  }
   if (path === "/auth/password/change" && method === "POST") {
     const currentEmail = state.account.email;
     if (state.account.authMethods.password) {
-      if (!currentEmail || passwordAccounts.get(currentEmail) !== body.currentPassword) return send(response, 401, { code: "invalidCredentials" });
-      if (body.newPassword === body.currentPassword) return send(response, 422, { code: "passwordUnchanged" });
+      if (!currentEmail || passwordAccounts.get(currentEmail) !== body.currentPassword)
+        return send(response, 401, { code: "invalidCredentials" });
+      if (body.newPassword === body.currentPassword)
+        return send(response, 422, { code: "passwordUnchanged" });
     } else {
       const requestedEmail = currentEmail ?? body.email;
       if (!requestedEmail) return send(response, 422, { code: "emailRequired" });
-      if (passwordAccounts.has(requestedEmail) && requestedEmail !== currentEmail) return send(response, 409, { code: "emailAlreadyRegistered" });
+      if (passwordAccounts.has(requestedEmail) && requestedEmail !== currentEmail)
+        return send(response, 409, { code: "emailAlreadyRegistered" });
       state.account.email = requestedEmail;
       state.account.authMethods.password = true;
     }
@@ -969,14 +1088,16 @@ const server = createServer(async (request, response) => {
   }
   if (path === "/me/account-merge-requests" && method === "GET") {
     const pending = state.mergeRequests.filter(
-      (request) => request.status === "pending" && new Date(request.expiresAt) > new Date(),
+      (request) =>
+        request.status === "pending" && new Date(request.expiresAt) > new Date(),
     );
     return send(response, 200, {
       incoming: pending.filter((request) => request.direction === "incoming"),
       outgoing: pending.filter((request) => request.direction === "outgoing"),
     });
   }
-  const mergeMatch = /^\/me\/account-merge-requests\/([^/]+)(?:\/(approve|reject|cancel))?$/.exec(path);
+  const mergeMatch =
+    /^\/me\/account-merge-requests\/([^/]+)(?:\/(approve|reject|cancel))?$/.exec(path);
   if (mergeMatch) {
     const [, id, resolution] = mergeMatch;
     if (!resolution && method === "GET") {
@@ -1145,14 +1266,10 @@ const server = createServer(async (request, response) => {
           fullName: state.profile.fullName,
           bio: state.profile.bio,
           region: state.profile.region,
-          city: state.profile.city,
           school: state.profile.school,
-          gradeYear: state.profile.gradeYear,
           languages: state.profile.languages,
-          skills: state.profile.skills,
           phone: state.profile.phone,
           telegram: state.profile.telegram,
-          links: state.profile.links,
         };
       }
       return send(response, 200, serializeApplication(state, item, true));
@@ -1164,7 +1281,7 @@ const server = createServer(async (request, response) => {
       if (
         item.status === "accepted" &&
         (new Date(opportunity.startsAt) <= new Date() ||
-          (item.attendance && item.attendance.outcome !== "awaiting_confirmation"))
+          item.attendance?.outcome !== "awaiting_confirmation")
       ) {
         return send(response, 409, { code: "applicationCannotBeWithdrawn" });
       }
