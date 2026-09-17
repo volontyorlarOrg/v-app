@@ -844,6 +844,11 @@ test.describe("opportunities", () => {
     page,
   }) => {
     await page.goto("/en/opportunities/remote-translation-support");
+    await page.getByRole("link", { name: "Go to your profile" }).first().click();
+    await page.getByLabel("Bio").fill("I translate community information into Uzbek.");
+    await page.getByRole("button", { name: "Save profile" }).click();
+
+    await page.goto("/en/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
 
@@ -921,6 +926,11 @@ test.describe("opportunities", () => {
     page,
   }) => {
     await page.goto("/en/opportunities/city-marathon-water-stations");
+    await page.getByRole("link", { name: "Go to your profile" }).first().click();
+    await page.getByLabel("Bio").fill("I help coordinate community events in Tashkent.");
+    await page.getByRole("button", { name: "Save profile" }).click();
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(
       /\/en\/applications\/app-city-marathon-water-stations$/,
@@ -929,7 +939,11 @@ test.describe("opportunities", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Check your answers" }),
     ).toBeVisible();
-    await expect(page.getByText("Dilnoza Karimova").first()).toBeVisible();
+    await expect(
+      page
+        .getByRole("region", { name: "Check your answers" })
+        .getByText("Dilnoza Karimova"),
+    ).toBeVisible();
     await expect(page.getByRole("link", { name: /Change/ }).first()).toBeVisible();
 
     await page.getByRole("button", { name: "Submit application" }).click();

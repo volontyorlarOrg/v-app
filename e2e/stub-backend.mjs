@@ -338,7 +338,7 @@ function freshState() {
     },
     profile: {
       fullName: "Dilnoza Karimova",
-      bio: "I read to younger pupils at the library every Saturday.",
+      bio: "",
       school: "Academic lyceum No. 2",
       gradeYear: "2",
       region: "tashkent-city",
