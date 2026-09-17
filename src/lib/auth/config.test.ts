@@ -5,6 +5,7 @@ import {
   AUTH_ROUTE_MAX_DURATION_SECONDS,
   apiBaseUrl,
   isAuthConfigured,
+  proxySecret,
   sessionSecret,
 } from "@/lib/auth/config";
 
@@ -58,6 +59,25 @@ describe("isAuthConfigured", () => {
 describe("auth request budget", () => {
   it("outlasts a cold backend without exceeding the route's own limit", () => {
     expect(AUTH_REQUEST_TIMEOUT_MS).toBeGreaterThan(50_000);
-    expect(AUTH_REQUEST_TIMEOUT_MS).toBeLessThan(AUTH_ROUTE_MAX_DURATION_SECONDS * 1000);
+    expect(AUTH_REQUEST_TIMEOUT_MS).toBeLessThan(
+      AUTH_ROUTE_MAX_DURATION_SECONDS * 1000,
+    );
+  });
+});
+
+describe("proxySecret", () => {
+  it("returns the shared secret the backend uses to trust a visitor address", () => {
+    vi.stubEnv(
+      "VOLONTYORLAR_PROXY_SECRET",
+      "  frontend-proxy-secret-value-at-least-32-characters ",
+    );
+    expect(proxySecret()).toBe("frontend-proxy-secret-value-at-least-32-characters");
+  });
+
+  it("stays off while the secret is missing or too short to trust", () => {
+    for (const value of ["", "short-secret"]) {
+      vi.stubEnv("VOLONTYORLAR_PROXY_SECRET", value);
+      expect(proxySecret(), value).toBeNull();
+    }
   });
 });

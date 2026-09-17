@@ -1,10 +1,13 @@
 import "server-only";
 
+import { headers } from "next/headers";
+import { unstable_rethrow } from "next/navigation";
 import createClient, { type Client, type Middleware } from "openapi-fetch";
 import type { z } from "zod";
 
 import type { paths } from "@/lib/api/generated/schema";
-import { apiBaseUrl } from "@/lib/auth/config";
+import { visitorHeaders } from "@/lib/api/visitor";
+import { apiBaseUrl, proxySecret } from "@/lib/auth/config";
 import {
   ApiError,
   classifyApiError,
@@ -135,6 +138,17 @@ function nextFetch(
     });
 }
 
+async function forwardedVisitor(): Promise<Record<string, string>> {
+  const secret = proxySecret();
+  if (!secret) return {};
+  try {
+    return visitorHeaders(secret, await headers());
+  } catch (error) {
+    unstable_rethrow(error);
+    return {};
+  }
+}
+
 function logFailure(method: string, path: string, error: ApiError) {
   console.error(
     `[api] ${method} ${path} -> ${error.code}` +
@@ -166,6 +180,10 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
   }
 
   const request = clientFor(baseUrl).request as unknown as RawRequest;
+  const outgoingHeaders = {
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    ...(await forwardedVisitor()),
+  };
   const attempts = method === "GET" ? 2 : 1;
   let data: unknown;
   let response: Response;
@@ -175,7 +193,7 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
       ({ data, response } = await request(method, path, {
         params: { query: cleanQuery(query) },
         body,
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+        headers: outgoingHeaders,
         signal: requestSignal(signal, timeoutMs),
         parseAs: "text",
         fetch: nextFetch(init),
