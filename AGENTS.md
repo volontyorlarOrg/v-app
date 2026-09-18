@@ -20,10 +20,11 @@ from there.
 It is not the marketing site's layout. The signed-in product is a **panel**: a
 navy sidebar that carries everything on desktop — the lockup and the
 notification bell, three sections (dashboard, opportunities, leaderboard), and
-at the foot the identity card with profile, settings and sign out — with no top
-bar; a slim header and a four-destination tab bar on a phone; and panels of
-content on a flat workspace. **Every sidebar entry is a plain link — nothing in
-it collapses**, and the bell is the only tray. The theme switch and the
+at the foot the identity card, which is itself the profile's link, above
+settings and sign out — with no top bar; a slim header and a four-destination
+tab bar on a phone; and panels of content on a flat workspace. **Every
+sidebar entry is a plain link — nothing in it collapses**, and the bell is the
+only tray. The theme switch and the
 interface language are a panel on `/settings`, not shell controls.
 Applications and saved items are tabs inside the opportunities section, not
 sections of their own. Only the sign-in pages keep the marketing site's
@@ -257,8 +258,11 @@ docs/                           -> stable project documentation and the plan
   the tab bar, the phone's account menu, the proxy's `guard` and the tests all
   read from it. `navGroup` says where in the sidebar a route lands —
   `"primary"` for the stack under the lockup, `"account"` for the stack at the
-  foot, `null` for a route no navigation surface names. A route that belongs inside a section names it in `section`, which
-  is what keeps the sidebar and the tab bar lit on `/applications` and
+  foot, `null` for a route no sidebar stack lists. The profile is `null`
+  because `IDENTITY_ROUTE` makes the identity card its link, in the sidebar and
+  in the phone's account menu alike, so it is never a second row. A route that
+  belongs inside a section names it in `section`, which is what keeps the
+  sidebar and the tab bar lit on `/applications` and
   `/profile/edit`. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
