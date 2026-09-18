@@ -36,3 +36,9 @@ winning. Two entries for one destination read as two places.
   `shell-muted` edge on the full raised fill) and the focus ring say it is a
   link. The phone menu's name block does keep a chevron: it has the width, and
   a touch screen has no hover to say the block can be tapped.
+- A later polish kept that layout and changed only states: the avatar's orange
+  ring is an outline with a 2px gap, so orange never touches the pale-blue
+  disc, and turns full strength on hover and on the current page; a 1px
+  `shell-ink` top highlight lifts the card the way dark panels are lifted; a
+  pressed state; and the sidebar's focus ring is `shell-ink`, because the
+  global `primary-ink` ring is dark blue by day and nearly vanished on navy.

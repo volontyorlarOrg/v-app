@@ -16,13 +16,19 @@ export function SidebarIdentity({ user, label }: { user: ShellUser; label: strin
       aria-label={`${label}: ${user.name}`}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors",
+        "group flex items-center gap-3 rounded-xl border px-3 py-2.5 inset-shadow-2xs inset-shadow-shell-ink/10 transition-colors",
         active
           ? "border-shell-muted bg-shell-raised"
-          : "border-shell-line bg-shell-raised/60 hover:border-shell-muted/50 hover:bg-shell-raised",
+          : "border-shell-line bg-shell-raised/60 hover:border-shell-muted/50 hover:bg-shell-raised active:bg-shell-raised/40",
       )}
     >
-      <Avatar aria-hidden="true" className="size-10 shrink-0 ring-2 ring-accent/70">
+      <Avatar
+        aria-hidden="true"
+        className={cn(
+          "size-10 shrink-0 outline-2 outline-offset-2 transition-[outline-color]",
+          active ? "outline-accent" : "outline-accent/60 group-hover:outline-accent",
+        )}
+      >
         <AvatarFallback className="bg-primary-muted text-sm text-primary-deep">
           {user.initials}
         </AvatarFallback>
