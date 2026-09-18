@@ -583,7 +583,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the sidebar carries notifications, a flat account group and sign out; the phone header its menu", async ({
+  test("the sidebar carries notifications, the identity card as the profile link, settings and sign out; the phone header its menu", async ({
     page,
   }) => {
     const mobile = await isMobile(page);
@@ -602,10 +602,13 @@ test.describe("the panel", () => {
     await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
 
     const account = page.getByRole("navigation", { name: "Account" });
-    await expect(account.getByRole("link", { name: "Profile" })).toHaveAttribute(
-      "href",
-      "/en/profile",
-    );
+    await expect(account.getByRole("link")).toHaveCount(2);
+    const identity = account.getByRole("link", { name: "Profile: Dilnoza Karimova" });
+    await expect(identity).toHaveAttribute("href", "/en/profile");
+    await expect(identity).toContainText("Dilnoza Karimova");
+    await expect(
+      account.getByRole("link", { name: "Profile", exact: true }),
+    ).toHaveCount(0);
     await expect(account.getByRole("link", { name: "Settings" })).toHaveAttribute(
       "href",
       "/en/settings",
@@ -645,7 +648,10 @@ test.describe("the panel", () => {
     if (mobile) {
       await page.getByRole("button", { name: /Account menu/ }).click();
       const menu = page.getByRole("navigation", { name: "Account menu" });
-      await expect(menu.getByRole("link", { name: "Profile" })).toBeVisible();
+      await expect(menu.getByRole("link")).toHaveCount(2);
+      await expect(
+        menu.getByRole("link", { name: "Profile: Dilnoza Karimova" }),
+      ).toHaveAttribute("href", "/en/profile");
       await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
         "href",
         "/en/settings",
@@ -653,10 +659,15 @@ test.describe("the panel", () => {
       await menu.getByRole("button", { name: "Sign out" }).click();
     } else {
       const account = page.getByRole("navigation", { name: "Account" });
+      const identity = account.getByRole("link", { name: "Profile: Dilnoza Karimova" });
       await account.getByRole("link", { name: "Settings" }).click();
       await expect(page).toHaveURL(/\/en\/settings$/);
-      await account.getByRole("link", { name: "Profile" }).click();
+      await expect(identity).not.toHaveAttribute("aria-current");
+      await identity.click();
       await expect(page).toHaveURL(/\/en\/profile$/);
+      await expect(identity).toHaveAttribute("aria-current", "page");
+      await page.goto("/en/profile/edit");
+      await expect(identity).toHaveAttribute("aria-current", "page");
       await page.getByRole("button", { name: "Sign out" }).click();
     }
     await expect(page).toHaveURL(/\/en\/login$/);

@@ -13,7 +13,7 @@ import type { ShellUser } from "@/components/app/sidebar";
 import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
-import { accountNavRoutes, navHref } from "@/lib/routing/routes";
+import { IDENTITY_ROUTE, accountNavRoutes, navHref } from "@/lib/routing/routes";
 
 function accountMenuItems(t: (key: string) => string): AccountMenuItem[] {
   return accountNavRoutes.map((route) => ({
@@ -24,7 +24,11 @@ function accountMenuItems(t: (key: string) => string): AccountMenuItem[] {
 }
 
 function accountMenuLabels(t: (key: string) => string): AccountMenuLabels {
-  return { menu: t("userMenu.label"), signOut: t("signOut") };
+  return {
+    menu: t("userMenu.label"),
+    profile: t(IDENTITY_ROUTE),
+    signOut: t("signOut"),
+  };
 }
 
 export function MobileHeader({
@@ -63,6 +67,7 @@ export function MobileHeader({
             initials={user.initials}
             handle={user.handle}
             level={user.level}
+            profileHref={navHref(IDENTITY_ROUTE)}
             items={accountMenuItems(t)}
             signOutLocale={signOutLocale}
             loginHref={navHref("login")}

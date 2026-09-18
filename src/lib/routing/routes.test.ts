@@ -6,6 +6,7 @@ import { locales } from "@/i18n/routing";
 import {
   ENTRY_ROUTE,
   HOME_ROUTE,
+  IDENTITY_ROUTE,
   ONBOARDING_ROUTE,
   accountNavRoutes,
   appRoutes,
@@ -48,11 +49,23 @@ describe("app route registry", () => {
     }
   });
 
-  it("puts the profile and settings in the sidebar's account group, at the foot", () => {
-    expect(accountNavRoutes.map((route) => route.key)).toEqual(["profile", "settings"]);
+  it("puts settings in the sidebar's account group, at the foot", () => {
+    expect(accountNavRoutes.map((route) => route.key)).toEqual(["settings"]);
     expect(
       [...primaryNavRoutes, ...accountNavRoutes].map((route) => route.key),
     ).not.toContain("saved");
+  });
+
+  it("opens the profile from the identity card alone, never from a second sidebar row", () => {
+    const profile = getRoute(IDENTITY_ROUTE);
+    expect(profile.key).toBe("profile");
+    expect(profile.area).toBe("volunteer");
+    expect(profile.navGroup).toBeNull();
+    expect(profile.inTabBar).toBe(true);
+    expect([...primaryNavRoutes, ...accountNavRoutes]).not.toContain(profile);
+    expect(isSectionActive("/profile", IDENTITY_ROUTE)).toBe(true);
+    expect(isSectionActive("/en/profile/edit", IDENTITY_ROUTE)).toBe(true);
+    expect(isSectionActive("/en/settings", IDENTITY_ROUTE)).toBe(false);
   });
 
   it("gives every navigation route one group, so nothing needs a collapsible menu", () => {
@@ -63,7 +76,7 @@ describe("app route registry", () => {
     }
     expect(
       appRoutes.filter((route) => route.navGroup !== null).map((route) => route.key),
-    ).toEqual(["dashboard", "opportunities", "leaderboard", "profile", "settings"]);
+    ).toEqual(["dashboard", "opportunities", "leaderboard", "settings"]);
   });
 
   it("puts the leaderboard in the sidebar and the phone tab bar, never the account group", () => {
