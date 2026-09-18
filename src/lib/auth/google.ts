@@ -1,13 +1,43 @@
 import { z } from "zod";
 
 import { isApiError } from "@/lib/api/errors";
+import { isProduction } from "@/lib/auth/config";
 import { hasVerifiedSiteOrigin, siteOrigin } from "@/lib/seo/origin";
 
 export const GOOGLE_AUTHORIZATION_ENDPOINT =
   "https://accounts.google.com/o/oauth2/v2/auth";
 export const GOOGLE_CALLBACK_PATH = "/api/auth/google/callback";
+export const GOOGLE_POST_ORIGIN = "https://accounts.google.com";
 export const GOOGLE_SCOPES = "openid email profile";
 export const GOOGLE_STATE_COOKIE_NAME = "volontyorlar_google_state";
+
+const OPAQUE_ORIGIN = "null";
+const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+export function isAcceptableGooglePostOrigin({
+  origin,
+  host,
+  hostname,
+  protocol,
+}: {
+  origin: string | null;
+  host: string | null;
+  hostname: string;
+  protocol: string;
+}): boolean {
+  if (!origin) return true;
+  if (origin === GOOGLE_POST_ORIGIN) return true;
+  if (host && (origin === `https://${host}` || origin === `http://${host}`)) {
+    return true;
+  }
+
+  return (
+    origin === OPAQUE_ORIGIN &&
+    !isProduction() &&
+    protocol === "http:" &&
+    LOOPBACK_HOSTNAMES.has(hostname)
+  );
+}
 
 export const googleChallengeSchema = z.object({
   state: z.string().min(20).max(300),

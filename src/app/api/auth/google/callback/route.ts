@@ -7,6 +7,7 @@ import {
   GOOGLE_STATE_COOKIE_NAME,
   googleStatusForError,
   googleStatusForProviderError,
+  isAcceptableGooglePostOrigin,
   type GoogleStatus,
 } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
@@ -24,8 +25,6 @@ import { onboardingPath } from "@/lib/onboarding/state";
 import { onboardingStartCookie } from "@/lib/onboarding/state.server";
 import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
 
-const GOOGLE_POST_ORIGIN = "https://accounts.google.com";
-
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
@@ -34,15 +33,6 @@ function clearHandoff(response: NextResponse) {
   response.cookies.delete(RETURN_TO_COOKIE_NAME);
   response.cookies.delete(LOCALE_HINT_COOKIE_NAME);
   return response;
-}
-
-function isAcceptableOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get("origin");
-  if (!origin) return true;
-  if (origin === GOOGLE_POST_ORIGIN) return true;
-
-  const host = request.headers.get("host");
-  return host !== null && (origin === `https://${host}` || origin === `http://${host}`);
 }
 
 function field(form: FormData, name: string): string {
@@ -57,7 +47,14 @@ export async function POST(request: NextRequest) {
   const backToLogin = (status: GoogleStatus) =>
     clearHandoff(relativeRedirect(withQuery(loginPath, { google: status })));
 
-  if (!isAcceptableOrigin(request)) {
+  if (
+    !isAcceptableGooglePostOrigin({
+      origin: request.headers.get("origin"),
+      host: request.headers.get("host"),
+      hostname: request.nextUrl.hostname,
+      protocol: request.nextUrl.protocol,
+    })
+  ) {
     console.warn("[google-auth] refused a callback posted from an unknown origin");
     return backToLogin("expired");
   }

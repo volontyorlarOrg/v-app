@@ -12,13 +12,12 @@ import {
 } from "@/lib/account/types";
 import { completeGoogleConnection } from "@/lib/api/account.server";
 import { isAuthConfigured } from "@/lib/auth/config";
+import { isAcceptableGooglePostOrigin } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 import { PREFERENCE_LOCALE_COOKIE } from "@/lib/preferences";
 import { localePath } from "@/lib/routing/routes";
-
-const GOOGLE_POST_ORIGIN = "https://accounts.google.com";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -28,15 +27,6 @@ function clearHandoff(response: NextResponse) {
   response.cookies.set(CONNECT_GOOGLE_STATE_COOKIE_NAME, "", expired);
   response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, "", expired);
   return response;
-}
-
-function isAcceptableOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get("origin");
-  if (!origin) return true;
-  if (origin === GOOGLE_POST_ORIGIN) return true;
-
-  const host = request.headers.get("host");
-  return host !== null && (origin === `https://${host}` || origin === `http://${host}`);
 }
 
 function field(form: FormData, name: string): string {
@@ -58,7 +48,14 @@ export async function POST(request: NextRequest) {
     return clearHandoff(relativeRedirect(localePath(locale, "login")));
   }
 
-  if (!isAcceptableOrigin(request)) {
+  if (
+    !isAcceptableGooglePostOrigin({
+      origin: request.headers.get("origin"),
+      host: request.headers.get("host"),
+      hostname: request.nextUrl.hostname,
+      protocol: request.nextUrl.protocol,
+    })
+  ) {
     console.warn("[google-connect] refused a callback posted from an unknown origin");
     return backToSettings("expired");
   }
