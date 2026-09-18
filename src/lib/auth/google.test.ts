@@ -8,6 +8,7 @@ import {
   googleRedirectUri,
   googleStatusForError,
   googleStatusForProviderError,
+  isAcceptableGooglePostOrigin,
   isGoogleStatus,
 } from "@/lib/auth/google";
 
@@ -178,5 +179,70 @@ describe("isGoogleStatus", () => {
     }
     expect(isGoogleStatus("signed-in")).toBe(false);
     expect(isGoogleStatus(undefined)).toBe(false);
+  });
+});
+
+describe("isAcceptableGooglePostOrigin", () => {
+  const deployed = {
+    host: "app.volontyorlar.uz",
+    hostname: "app.volontyorlar.uz",
+    protocol: "https:",
+  };
+  const local = { host: "localhost:3001", hostname: "localhost", protocol: "http:" };
+
+  it("accepts the post Google makes from its own origin", () => {
+    expect(
+      isAcceptableGooglePostOrigin({
+        origin: "https://accounts.google.com",
+        ...deployed,
+      }),
+    ).toBe(true);
+  });
+
+  it("accepts a request that carries no origin at all", () => {
+    expect(isAcceptableGooglePostOrigin({ origin: null, ...deployed })).toBe(true);
+  });
+
+  it("accepts a same-origin post", () => {
+    expect(
+      isAcceptableGooglePostOrigin({
+        origin: "https://app.volontyorlar.uz",
+        ...deployed,
+      }),
+    ).toBe(true);
+  });
+
+  it("accepts the opaque origin Chrome sends to a loopback HTTP callback", () => {
+    expect(isAcceptableGooglePostOrigin({ origin: "null", ...local })).toBe(true);
+    expect(
+      isAcceptableGooglePostOrigin({
+        origin: "null",
+        host: "127.0.0.1:3001",
+        hostname: "127.0.0.1",
+        protocol: "http:",
+      }),
+    ).toBe(true);
+  });
+
+  it("refuses an opaque origin outside non-production loopback HTTP", () => {
+    expect(isAcceptableGooglePostOrigin({ origin: "null", ...deployed })).toBe(false);
+
+    vi.stubEnv("NODE_ENV", "production");
+    expect(isAcceptableGooglePostOrigin({ origin: "null", ...local })).toBe(false);
+  });
+
+  it("refuses unrelated origins", () => {
+    expect(
+      isAcceptableGooglePostOrigin({
+        origin: "https://evil.example",
+        ...deployed,
+      }),
+    ).toBe(false);
+    expect(
+      isAcceptableGooglePostOrigin({
+        origin: "https://evil.example",
+        ...local,
+      }),
+    ).toBe(false);
   });
 });
