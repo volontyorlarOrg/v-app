@@ -5,14 +5,18 @@ import {
   NotificationsMenu,
   type NotificationItem,
 } from "@/components/app/notifications-menu";
+import { SidebarIdentity } from "@/components/app/sidebar-identity";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
 import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
-import { accountNavRoutes, navHref, primaryNavRoutes } from "@/lib/routing/routes";
+import {
+  IDENTITY_ROUTE,
+  accountNavRoutes,
+  navHref,
+  primaryNavRoutes,
+} from "@/lib/routing/routes";
 
 export type ShellUser = {
   name: string;
@@ -33,29 +37,6 @@ function navItems(
     href: navHref(route.key),
     label: t(route.key),
   }));
-}
-
-function Identity({ user }: { user: ShellUser }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-shell-line bg-shell-raised/60 px-3 py-2.5">
-      <Avatar aria-hidden="true" className="size-10 shrink-0 ring-2 ring-accent/70">
-        <AvatarFallback className="bg-primary-muted text-sm text-primary-deep">
-          {user.initials}
-        </AvatarFallback>
-      </Avatar>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-shell-ink">{user.name}</p>
-        <p className="mt-0.5 flex min-w-0 items-center gap-1.5">
-          {user.handle ? (
-            <span className="truncate text-xs text-shell-muted">@{user.handle}</span>
-          ) : null}
-          <Badge variant="achievement" className="shrink-0">
-            {user.level}
-          </Badge>
-        </p>
-      </div>
-    </div>
-  );
 }
 
 export function Sidebar({
@@ -94,28 +75,25 @@ export function Sidebar({
           <SidebarNav items={navItems(primaryNavRoutes, t)} label={t("primaryLabel")} />
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-shell-line px-3 py-3">
-          <Identity user={user} />
-
-          <div className="flex flex-col gap-0.5">
-            <SidebarNav
-              items={navItems(accountNavRoutes, t)}
-              label={t("secondaryLabel")}
+        <div className="flex flex-col gap-0.5 border-t border-shell-line px-3 py-3">
+          <SidebarNav
+            items={navItems(accountNavRoutes, t)}
+            label={t("secondaryLabel")}
+            lead={<SidebarIdentity user={user} label={t(IDENTITY_ROUTE)} />}
+          />
+          {signOutLocale ? (
+            <SignOutForm
+              locale={signOutLocale}
+              label={t("signOut")}
+              className={FOOTER_ROW}
+              iconClassName="size-5"
             />
-            {signOutLocale ? (
-              <SignOutForm
-                locale={signOutLocale}
-                label={t("signOut")}
-                className={FOOTER_ROW}
-                iconClassName="size-5"
-              />
-            ) : (
-              <Link href={navHref("login")} className={FOOTER_ROW}>
-                <LogOut aria-hidden="true" className="size-5 shrink-0" />
-                {t("signOut")}
-              </Link>
-            )}
-          </div>
+          ) : (
+            <Link href={navHref("login")} className={FOOTER_ROW}>
+              <LogOut aria-hidden="true" className="size-5 shrink-0" />
+              {t("signOut")}
+            </Link>
+          )}
         </div>
       </aside>
     </div>

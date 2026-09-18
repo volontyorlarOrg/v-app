@@ -50,6 +50,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/the-sidebar-is-the-whole-shell.md` — why the desktop top bar
   went, the record moved onto the dashboard, the leaderboard gained a podium,
   and the palette gained a navy shell without changing its brand values
+- `decisions/the-identity-card-is-the-profile-link.md` — why the sidebar's
+  identity card replaced the "Profile" row, and how its active state and
+  accessible name were chosen
 - `decisions/onboarding-progress-is-a-readable-cookie.md` — why the welcome
   flow's only browser state is a step name in a cookie, and why every answer
   goes straight to the backend

@@ -142,16 +142,18 @@ request.
 `AppShell` lays out a sidebar and a column. The sidebar is a navy column from
 the large breakpoint, sticky and full height, and absent below it; there is no
 desktop top bar, because the sidebar carries the lockup and the notification
-bell, the sections, and at its foot the identity card, profile, settings and
-sign out. Every entry is a plain link — the bell is the sidebar's only
-popover, and the identity card is static text, not a trigger. The theme and
+bell, the sections, and at its foot the identity card, settings and sign out.
+Every entry is a plain link — the bell is the sidebar's only popover, and the
+identity card is the profile's link (`IDENTITY_ROUTE`, lit on `/profile` and
+`/profile/edit`), never a menu trigger. The theme and
 the interface language are not shell controls at all; they are the Appearance
 panel on `/settings`. The column holds the phone header (lockup, bell, avatar;
 hidden from the large breakpoint), the workspace and the footer, and the tab
 bar carries four essential destinations on a phone. Every navigation reads the
 registry: `primaryNavRoutes` for the stack under the lockup,
 `accountNavRoutes` for the stack at the foot (and for the phone's account
-menu), `tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. Saved and record remain registered compatibility
+menu, whose name block is the same profile link), `IDENTITY_ROUTE` for the
+identity card, `tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. Saved and record remain registered compatibility
 routes that redirect (`/saved` to the saved view, `/record` to
 `/dashboard#history`) and are intentionally absent from navigation.
 

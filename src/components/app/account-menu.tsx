@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 
 import { routeIcon } from "@/components/app/route-icons";
@@ -19,6 +19,7 @@ export type AccountMenuItem = {
 
 export type AccountMenuLabels = {
   menu: string;
+  profile: string;
   signOut: string;
 };
 
@@ -31,6 +32,7 @@ export function AccountMenu({
   initials,
   handle,
   level,
+  profileHref,
   items,
   signOutLocale,
   loginHref,
@@ -40,6 +42,7 @@ export function AccountMenu({
   initials: string;
   handle: string | null;
   level: string;
+  profileHref: string;
   items: readonly AccountMenuItem[];
   signOutLocale: string | null;
   loginHref: string;
@@ -62,16 +65,29 @@ export function AccountMenu({
       </PopoverTrigger>
 
       <PopoverContent side="bottom" align="end" sideOffset={8} className="w-64 p-1.5">
-        <div className="px-3 pt-2 pb-2.5">
-          <p className="truncate text-sm font-semibold text-ink">{name}</p>
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
-            {handle ? <span className="truncate">@{handle}</span> : null}
-            <Badge variant="achievement">{level}</Badge>
-          </p>
-        </div>
+        <nav aria-label={labels.menu}>
+          <Link
+            href={profileHref}
+            onClick={close}
+            aria-label={`${labels.profile}: ${name}`}
+            className="group flex items-center gap-3 rounded-lg px-3 pt-2 pb-2.5 transition-colors hover:bg-surface-soft focus-visible:bg-surface-soft"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink group-hover:text-primary-ink">
+                {name}
+              </p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
+                {handle ? <span className="truncate">@{handle}</span> : null}
+                <Badge variant="achievement">{level}</Badge>
+              </p>
+            </div>
+            <ChevronRight
+              aria-hidden="true"
+              className="size-4 shrink-0 text-ink-muted transition-colors group-hover:text-primary-ink"
+            />
+          </Link>
 
-        <nav aria-label={labels.menu} className="border-t border-border pt-1.5">
-          <ul className="flex flex-col">
+          <ul className="mt-1.5 flex flex-col border-t border-border pt-1.5">
             {items.map((item) => {
               const Icon = routeIcon(item.key);
               return (

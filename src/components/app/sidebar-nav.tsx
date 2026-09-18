@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { routeIcon } from "@/components/app/route-icons";
 import { Link, usePathname } from "@/i18n/navigation";
 import { isSectionActive, type RouteKey } from "@/lib/routing/routes";
@@ -10,14 +12,17 @@ export type SidebarItem = { key: RouteKey; href: string; label: string };
 export function SidebarNav({
   items,
   label,
+  lead,
 }: {
   items: readonly SidebarItem[];
   label: string;
+  lead?: ReactNode;
 }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label={label}>
+    <nav aria-label={label} className="flex flex-col gap-2">
+      {lead}
       <ul className="flex flex-col gap-1">
         {items.map((item) => {
           const Icon = routeIcon(item.key);

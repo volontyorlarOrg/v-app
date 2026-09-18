@@ -146,14 +146,14 @@ components:
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
 a navy sidebar that names three sections — dashboard, opportunities,
-leaderboard — at the top and the account — who you are, profile, settings,
-sign out — at the foot, and a flat workspace carrying panels of content, with
+leaderboard — at the top and the account — who you are, which opens the
+profile, then settings and sign out — at the foot, and a flat workspace carrying panels of content, with
 no top bar between them. Every entry in the sidebar is a plain link: nothing
 in it expands, and the only tray is the notification bell beside the lockup.
-What used to hide inside the user card now has a place — profile and settings
-are links at the foot, the theme switch and the interface language are a panel
-on `/settings`. Anything that belongs to a section is a tab under
-that section's header, never a fourth sidebar entry. It shares every
+What used to hide inside the user card now has a place — the card itself is
+the link to the profile, settings is a link beneath it, the theme switch and
+the interface language are a panel on `/settings`. Anything that belongs to a
+section is a tab under that section's header, never a fourth sidebar entry. It shares every
 token, both typefaces, the two brand colours and their rules, the theme and the
 motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
 institution's blue is used as a field on the left, not only as an accent; the
@@ -170,9 +170,9 @@ volunteer into the room.
 **Key characteristics**
 
 - A 16.5rem navy sidebar (`shell`) with three sections at the top, the
-  identity card and the account links at the foot, and no top bar on
-  desktop; a 56px header and a four-tab bar (dashboard, opportunities,
-  leaderboard, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
+  identity card (the profile's link) above settings and sign out at the foot,
+  and no top bar on desktop; a 56px header and a four-tab bar (dashboard,
+  opportunities, leaderboard, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
   `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
   after dark. The workspace is `surface-sunk` under two faint radial washes
   (blue top-right, orange bottom-left), the panels are `surface`.
@@ -204,8 +204,8 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card, profile, settings and sign out — all plain links | Absent                                                                    |
-| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: profile, settings, sign out) |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card as the profile's link, settings and sign out — all plain links | Absent                                                                    |
+| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings, sign out) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
 | Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
 

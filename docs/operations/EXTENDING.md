@@ -15,7 +15,9 @@ inside the source. Compiler and linter directives are not comments and stay.
 
 1. **Register the route** in `src/lib/routing/routes.ts` with its area, where
    it sits in the sidebar (`navGroup`: `"primary"` for the stack under the
-   lockup, `"account"` for the stack at the foot, `null` for neither) and
+   lockup, `"account"` for the stack at the foot, `null` for neither — the
+   profile is `null` because `IDENTITY_ROUTE` makes the identity card its
+   link) and
    whether it belongs in the phone tab bar (`inTabBar`). A volunteer route in
    none of them is reachable by URL only, like the two redirects. The
    sidebar, the tab bar, the phone's account menu and
