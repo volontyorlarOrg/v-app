@@ -108,7 +108,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/profile",
     area: "volunteer",
     guard: "session",
-    navGroup: "account",
+    navGroup: null,
     inTabBar: true,
     section: null,
   },
@@ -144,6 +144,7 @@ export const appRoutes: readonly AppRoute[] = [
 export const ENTRY_ROUTE: RouteKey = "login";
 export const HOME_ROUTE: RouteKey = "dashboard";
 export const ONBOARDING_ROUTE: RouteKey = "welcome";
+export const IDENTITY_ROUTE: RouteKey = "profile";
 
 export const authRoutes = appRoutes.filter((route) => route.area === "auth");
 export const volunteerRoutes = appRoutes.filter((route) => route.area === "volunteer");
