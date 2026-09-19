@@ -47,6 +47,17 @@ accepted), `isTerminal` (rejected, withdrawn, closed). An accepted application
 whose event is still ahead is an **upcoming commitment**, which is what the
 dashboard's first block shows. → `src/lib/applications/status.ts`
 
+**Applying is one step when the profile is the whole application.** An
+opportunity that asks no questions is applied to by `applyAction`, which
+starts the application and sends it at once, so the volunteer lands on a
+submitted application; there is no draft to find again or forget. An
+opportunity that still carries questions keeps the draft step, because the
+answers need a page of their own. A draft that exists anyway (sending failed
+because the profile was incomplete, or an older application) is sent by the
+same Apply button. A draft belongs to the volunteer alone: the coordinator and
+administrator portals never list, count or open one.
+→ `src/lib/opportunities/actions.ts`
+
 ## VolunteerRecord and AttendanceRecord
 
 Counts come from the backend — attended, accepted-and-resolved,

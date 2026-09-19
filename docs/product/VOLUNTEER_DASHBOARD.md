@@ -55,13 +55,20 @@ actionable instead of making it another catalogue.
   changes when the block is reliability or a recognition the team grants.
 - **Deadlines are chips with words.** "Closes in 2 days" and "Closing soon"
   carry the urgency; there is no red.
-- **Drafts are the most useful row.** A draft shows its deadline and a
+- **Drafts are rare, and still the most useful row.** Applying to an
+  opportunity without questions sends the profile at once, so a draft only
+  exists for an opportunity that asks questions. It shows its deadline and a
   "continue draft" link, because an unsent application is the most common way
   a volunteer loses a place.
 - **Orange marks what the person did** — the level, an acceptance, a
   confirmation, the record's figures, a complete profile — and nothing else.
-- **Empty states say what fills them.** "An accepted application appears here
-  with its date and place", with a link to browse.
+- **A block with nothing in it is not drawn.** A volunteer with no
+  applications and no history sees one panel, "Start with your first
+  opportunity", that explains the loop in three steps (apply with the profile,
+  get the place confirmed, attend and build the record) with a link to browse,
+  instead of three panels that each say "nothing yet". After that, Next up
+  appears only while an accepted event is ahead, and the history only once it
+  has a row; Your applications then takes the full width.
 - **Sample data says it is sample data**, in the hero and in the shell, and it
   never names a real partner or opportunity source as an organiser.
 

@@ -1,7 +1,8 @@
-import { BadgeCheck } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
+import { deadlineState } from "@/lib/opportunities/deadline";
+import { eventSchedule, momentOf } from "@/lib/opportunities/schedule";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
 
 export function OpportunityFacts({
@@ -14,48 +15,24 @@ export function OpportunityFacts({
   const t = useTranslations("opportunities");
   const format = useFormatter();
 
-  const starts = new Date(opportunity.startsAt);
-  const ends = opportunity.endsAt ? new Date(opportunity.endsAt) : null;
-  const sameDay = ends
-    ? format.dateTime(starts, "day") === format.dateTime(ends, "day")
-    : true;
-  const remote = opportunity.format === "remote";
-  const place = remote
-    ? t(`format.${opportunity.format}`)
-    : [
-        opportunity.locationName ? opportunity.locationName : null,
-        opportunity.city ? opportunity.city : null,
-        t(`regions.${opportunity.region}`),
-      ]
-        .filter(Boolean)
-        .join(", ");
+  const place =
+    opportunity.format === "remote"
+      ? (opportunity.locationName ?? t(`format.${opportunity.format}`))
+      : [
+          opportunity.locationName ? opportunity.locationName : null,
+          opportunity.city ? opportunity.city : null,
+          t(`regions.${opportunity.region}`),
+        ]
+          .filter(Boolean)
+          .join(", ");
+  const deadlineIsNear =
+    deadlineState(opportunity.applicationDeadline, now).kind !== "later";
 
   const facts = [
     {
-      key: "organiser",
-      label: t("detail.organiser"),
-      value: (
-        <span className="inline-flex items-center gap-1.5">
-          {opportunity.organization.name}
-          {opportunity.organization.verified ? (
-            <BadgeCheck aria-label={t("verified")} className="size-4 text-primary" />
-          ) : null}
-        </span>
-      ),
-    },
-    {
       key: "date",
       label: t("detail.date"),
-      value: (
-        <span className="tabular">
-          {format.dateTime(starts, "date")}, {format.dateTime(starts, "time")}
-          {ends
-            ? sameDay
-              ? `–${format.dateTime(ends, "time")}`
-              : ` – ${format.dateTime(ends, "date")}`
-            : null}
-        </span>
-      ),
+      value: <span className="tabular">{eventSchedule(opportunity, format)}</span>,
     },
     { key: "location", label: t("detail.location"), value: place },
     {
@@ -63,8 +40,13 @@ export function OpportunityFacts({
       label: t("detail.deadline"),
       value: (
         <span className="tabular">
-          <DeadlineText deadline={opportunity.applicationDeadline} now={now} /> ·{" "}
-          {format.dateTime(new Date(opportunity.applicationDeadline), "date")}
+          {deadlineIsNear ? (
+            <>
+              <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
+              {" · "}
+            </>
+          ) : null}
+          {momentOf(opportunity.applicationDeadline, format)}
         </span>
       ),
     },

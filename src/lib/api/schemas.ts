@@ -210,6 +210,7 @@ export const notificationSchema = z
     kind: z.string().default(""),
     title: z.string(),
     body: z.string().default(""),
+    data: z.record(z.string(), z.unknown()).nullish(),
     readAt: optional(isoDate),
     createdAt: isoDate,
   })
@@ -218,6 +219,7 @@ export const notificationSchema = z
     kind: notification.kind,
     title: notification.title,
     body: notification.body,
+    data: notification.data ?? null,
     at: notification.createdAt,
     unread: notification.readAt === undefined,
   }));
