@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  hasParticipation,
   isReliabilityMeaningful,
   levelFor,
   levelProgress,
@@ -113,5 +114,35 @@ describe("reachedLevels", () => {
   it("lists the current level and every one below it, in order", () => {
     expect(reachedLevels("newcomer")).toEqual(["newcomer"]);
     expect(reachedLevels("trusted")).toEqual(["newcomer", "active", "trusted"]);
+  });
+});
+
+describe("hasParticipation", () => {
+  const empty = {
+    counts: {
+      attended: 0,
+      acceptedResolved: 0,
+      acceptedUnconfirmed: 0,
+      standoutReviews: false,
+    },
+    hoursVerified: true,
+  };
+
+  it("is false for a volunteer with nothing on the record yet", () => {
+    expect(hasParticipation(empty)).toBe(false);
+    expect(hasParticipation({ ...empty, hours: 0 })).toBe(false);
+  });
+
+  it("is true once any event is accepted, resolved or attended", () => {
+    expect(
+      hasParticipation({
+        ...empty,
+        counts: { ...empty.counts, acceptedUnconfirmed: 1 },
+      }),
+    ).toBe(true);
+    expect(
+      hasParticipation({ ...empty, counts: { ...empty.counts, acceptedResolved: 1 } }),
+    ).toBe(true);
+    expect(hasParticipation({ ...empty, hours: 2 })).toBe(true);
   });
 });

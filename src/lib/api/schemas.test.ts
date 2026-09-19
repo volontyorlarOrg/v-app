@@ -57,6 +57,8 @@ describe("opportunity schemas", () => {
     });
     expect(parsed.items[0]?.organization.logoUrl).toBeUndefined();
     expect(parsed.items[0]?.city).toBeUndefined();
+    expect(parsed.items[0]?.acceptanceMode).toBe("manual");
+    expect(parsed.items[0]).not.toHaveProperty("summary");
     expect(parsed.total).toBe(1);
   });
 

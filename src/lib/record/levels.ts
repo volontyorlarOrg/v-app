@@ -32,6 +32,15 @@ export function isReliabilityMeaningful(counts: RecordCounts): boolean {
   return counts.acceptedResolved >= MIN_EVENTS_FOR_RELIABILITY;
 }
 
+export function hasParticipation(record: VolunteerRecord): boolean {
+  return (
+    record.counts.attended > 0 ||
+    record.counts.acceptedResolved > 0 ||
+    record.counts.acceptedUnconfirmed > 0 ||
+    (record.hours ?? 0) > 0
+  );
+}
+
 export function reliabilityPercent(counts: RecordCounts): number | null {
   const ratio = reliability(counts);
   return ratio === null ? null : Math.round(ratio * 100);

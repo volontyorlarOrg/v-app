@@ -29,6 +29,7 @@ import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
+  hasParticipation,
   isReliabilityMeaningful,
   levelFor,
   reliabilityPercent,
@@ -121,23 +122,27 @@ function Profile({
   const percent = reliabilityPercent(record.counts);
   const meaningful = isReliabilityMeaningful(record.counts);
 
-  const stats: IdentityStat[] = [
-    {
-      id: "events",
-      label: t("stats.events"),
-      value: format.number(record.counts.attended),
-    },
-    {
-      id: "reliability",
-      label: t("stats.reliability"),
-      value: meaningful && percent !== null ? `${percent}%` : "—",
-    },
-    {
-      id: "hours",
-      label: t("stats.hours"),
-      value: record.hours === undefined ? "—" : format.number(record.hours),
-    },
-  ];
+  const stats: IdentityStat[] = hasParticipation(record)
+    ? [
+        {
+          id: "events",
+          label: t("stats.events"),
+          value: format.number(record.counts.attended),
+        },
+        ...(meaningful && percent !== null
+          ? [{ id: "reliability", label: t("stats.reliability"), value: `${percent}%` }]
+          : []),
+        ...(record.hours === undefined
+          ? []
+          : [
+              {
+                id: "hours",
+                label: t("stats.hours"),
+                value: format.number(record.hours),
+              },
+            ]),
+      ]
+    : [];
 
   const facts: IdentityFact[] = [
     { id: "education" as const, value: join([values.school, values.gradeYear]) },
@@ -161,36 +166,30 @@ function Profile({
       label: t("fields.telegram"),
       value: values.telegram.trim() ? `@${values.telegram.trim()}` : "",
     },
-  ];
+  ].filter((row) => row.value.length > 0);
 
-  const contactPanel = (
-    <Panel
-      id="contact"
-      title={t("overview.contactTitle")}
-      description={t("overview.contactHelp")}
-      padding="none"
-      className="enter-rise order-2 [--enter-delay:120ms] xl:order-1"
-    >
-      <dl>
-        {contact.map((row) => (
-          <div
-            key={row.id}
-            className="flex flex-col gap-1 border-t border-border px-5 py-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-          >
-            <dt className="text-sm font-semibold text-ink">{row.label}</dt>
-            <dd
-              className={cn(
-                "text-sm",
-                row.value ? "tabular text-ink" : "text-ink-muted",
-              )}
+  const contactPanel =
+    contact.length === 0 ? null : (
+      <Panel
+        id="contact"
+        title={t("overview.contactTitle")}
+        description={t("overview.contactHelp")}
+        padding="none"
+        className="enter-rise order-2 [--enter-delay:120ms] xl:order-1"
+      >
+        <dl>
+          {contact.map((row) => (
+            <div
+              key={row.id}
+              className="flex flex-col gap-1 border-t border-border px-5 py-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
-              {row.value || t("overview.empty")}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </Panel>
-  );
+              <dt className="text-sm font-semibold text-ink">{row.label}</dt>
+              <dd className="tabular text-sm text-ink">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Panel>
+    );
 
   return (
     <div className="flex flex-col gap-6">
@@ -220,7 +219,12 @@ function Profile({
       {completion.complete ? (
         contactPanel
       ) : (
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
+        <div
+          className={cn(
+            "grid gap-6",
+            contactPanel && "xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start",
+          )}
+        >
           {contactPanel}
           <Panel
             id="completeness"
