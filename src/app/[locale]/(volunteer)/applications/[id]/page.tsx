@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -24,6 +24,7 @@ import {
   type ApplicationDetail,
   type ProfileSnapshot,
 } from "@/lib/applications/status";
+import { canApply } from "@/lib/opportunities/deadline";
 import { isRegion, type ApplicationQuestion } from "@/lib/opportunities/types";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { localePath, navHref, opportunityHref } from "@/lib/routing/routes";
@@ -67,6 +68,7 @@ export default async function ApplicationPage({
     <Application
       application={application}
       questions={opportunity?.questions ?? null}
+      open={opportunity ? canApply(opportunity, now) : false}
       snapshot={snapshot}
       now={now}
     />
@@ -91,11 +93,13 @@ function answerText(
 function Application({
   application,
   questions,
+  open,
   snapshot,
   now,
 }: {
   application: ApplicationDetail;
   questions: readonly ApplicationQuestion[] | null;
+  open: boolean;
   snapshot: ProfileSnapshot;
   now: Date;
 }) {
@@ -103,11 +107,15 @@ function Application({
   const profileT = useTranslations("profile");
   const opportunitiesT = useTranslations("opportunities");
   const locale = useLocale() as Locale;
+  const format = useFormatter();
 
   const questionById = new Map(
     (questions ?? []).map((question) => [question.id, question]),
   );
   const draft = isEditable(application.status);
+  const sendable = draft && open && questions !== null;
+  const profileOnly = questions !== null && questions.length === 0;
+  const confirmedHours = application.attendance?.confirmedHours;
   const answers = Object.fromEntries(
     application.answers
       .filter((answer): answer is typeof answer & { questionId: string } =>
@@ -195,31 +203,30 @@ function Application({
             <ApplicationTimeline application={application} />
           </Panel>
 
-          <Panel id="answers" title={t("detail.answers")}>
-            {draft && questions ? (
-              fields.length === 0 ? (
-                <div className="flex flex-col gap-5">
-                  <p className="text-sm text-ink-muted">{t("detail.noQuestions")}</p>
-                  <AnswersForm
-                    applicationId={application.id}
-                    questions={fields}
-                    answers={answers}
-                    labels={answersLabels(t, localePath(locale, "profile"))}
-                  />
-                </div>
-              ) : (
-                <AnswersForm
-                  applicationId={application.id}
-                  questions={fields}
-                  answers={answers}
-                  labels={answersLabels(t, localePath(locale, "profile"))}
-                />
-              )
-            ) : application.answers.length === 0 ? (
-              <p className="text-sm text-ink-muted">
-                {draft ? t("detail.answersEmpty") : t("detail.noQuestions")}
-              </p>
-            ) : (
+          {sendable && profileOnly ? (
+            <Panel
+              id="send"
+              title={t("detail.send.title")}
+              description={t("detail.send.description")}
+            >
+              <AnswersForm
+                applicationId={application.id}
+                questions={fields}
+                answers={answers}
+                labels={answersLabels(t, localePath(locale, "profileEdit"))}
+              />
+            </Panel>
+          ) : sendable ? (
+            <Panel id="answers" title={t("detail.answers")}>
+              <AnswersForm
+                applicationId={application.id}
+                questions={fields}
+                answers={answers}
+                labels={answersLabels(t, localePath(locale, "profileEdit"))}
+              />
+            </Panel>
+          ) : application.answers.length > 0 ? (
+            <Panel id="answers" title={t("detail.answers")}>
               <dl className="flex flex-col gap-5">
                 {application.answers.map((answer, index) => {
                   const question = answer.questionId
@@ -239,8 +246,16 @@ function Application({
                   );
                 })}
               </dl>
-            )}
-          </Panel>
+            </Panel>
+          ) : null}
+
+          {draft && !sendable ? (
+            <Panel id="closed">
+              <p className="text-sm leading-relaxed text-ink-muted">
+                {t("detail.draftClosed")}
+              </p>
+            </Panel>
+          ) : null}
 
           {application.reviewerNote ? (
             <Panel id="reviewer-note" title={t("detail.reviewerNote")}>
@@ -254,7 +269,9 @@ function Application({
             <Panel
               id="attendance"
               title={t("attendance.title")}
-              description={t("attendance.description")}
+              description={
+                confirmedHours === undefined ? t("attendance.description") : undefined
+              }
             >
               <dl className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -267,16 +284,16 @@ function Application({
                     )}
                   </dd>
                 </div>
-                <div>
-                  <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-                    {t("attendance.hours")}
-                  </dt>
-                  <dd className="mt-1 text-sm font-semibold text-ink">
-                    {application.attendance?.confirmedHours === undefined
-                      ? "—"
-                      : application.attendance.confirmedHours}
-                  </dd>
-                </div>
+                {confirmedHours === undefined ? null : (
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                      {t("attendance.hours")}
+                    </dt>
+                    <dd className="tabular mt-1 text-sm font-semibold text-accent-ink">
+                      {format.number(confirmedHours)}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </Panel>
           ) : null}
@@ -284,7 +301,9 @@ function Application({
           <Panel
             id="snapshot"
             title={t("detail.fromProfile")}
-            description={t("detail.fromProfileHelp")}
+            description={
+              draft ? t("detail.fromProfileDraft") : t("detail.fromProfileHelp")
+            }
           >
             <dl className="grid gap-4 sm:grid-cols-2">
               {rows.map((item) => (
@@ -302,16 +321,18 @@ function Application({
         <div className="flex min-w-0 flex-col gap-6">
           <Panel id="opportunity" title={opportunitiesT("detail.facts")}>
             <OpportunityFacts opportunity={application.opportunity} now={now} />
-            <Link
-              href={opportunityHref(application.opportunity.slug)}
-              className={buttonClass({
-                variant: "outline",
-                size: "sm",
-                className: "mt-5 w-full",
-              })}
-            >
-              {t("detail.viewOpportunity")}
-            </Link>
+            {questions === null ? null : (
+              <Link
+                href={opportunityHref(application.opportunity.slug)}
+                className={buttonClass({
+                  variant: "outline",
+                  size: "sm",
+                  className: "mt-5 w-full",
+                })}
+              >
+                {t("detail.viewOpportunity")}
+              </Link>
+            )}
           </Panel>
 
           {canWithdrawApplication(application, now) ? (

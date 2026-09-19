@@ -9,9 +9,13 @@ import { applyFormSchema } from "@/lib/opportunities/apply";
 export type ApplyLabels = {
   apply: string;
   applying: string;
+  hint: string;
   errors: Record<string, string>;
   fallback: string;
+  profileLink: { href: string; label: string };
 };
+
+const PROFILE_ERRORS = new Set(["profileRequired", "profileIncomplete"]);
 
 export function ApplyForm({
   opportunityId,
@@ -27,7 +31,7 @@ export function ApplyForm({
   });
 
   return (
-    <form {...formProps} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-3">
       <input
         type="hidden"
         {...form.register("opportunityId")}
@@ -43,8 +47,21 @@ export function ApplyForm({
       {result.status === "error" ? (
         <ActionStatus tone="error">
           {labels.errors[result.code] ?? labels.fallback}
+          {PROFILE_ERRORS.has(result.code) ? (
+            <>
+              {" "}
+              <a
+                href={labels.profileLink.href}
+                className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+              >
+                {labels.profileLink.label}
+              </a>
+            </>
+          ) : null}
         </ActionStatus>
-      ) : null}
+      ) : (
+        <p className="text-sm leading-relaxed text-ink-muted">{labels.hint}</p>
+      )}
     </form>
   );
 }

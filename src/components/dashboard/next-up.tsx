@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/app/empty-state";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ApplicationSummary } from "@/lib/applications/status";
+import { eventSchedule } from "@/lib/opportunities/schedule";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { navHref, opportunityHref } from "@/lib/routing/routes";
 
@@ -45,7 +46,6 @@ export function NextUp({
     <ol>
       {commitments.map(({ id, opportunity }) => {
         const starts = new Date(opportunity.startsAt);
-        const ends = opportunity.endsAt ? new Date(opportunity.endsAt) : null;
 
         return (
           <li
@@ -76,8 +76,7 @@ export function NextUp({
                 {opportunity.organization.name} · {placeOf(opportunity, opportunities)}
               </p>
               <p className="tabular mt-1 text-sm text-ink-muted">
-                {format.dateTime(starts, "weekday")}, {format.dateTime(starts, "time")}
-                {ends ? `–${format.dateTime(ends, "time")}` : null}
+                {eventSchedule(opportunity, format, "weekday")}
               </p>
             </div>
           </li>
