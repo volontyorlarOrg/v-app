@@ -14,6 +14,7 @@ import {
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
 import { issuedSessionSchema } from "@/lib/auth/session";
 import {
+  ACCEPTANCE_MODES,
   OPPORTUNITY_FORMATS,
   OPPORTUNITY_STATUSES,
   QUESTION_TYPES,
@@ -45,7 +46,6 @@ export const opportunitySummarySchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
   title: z.string(),
-  summary: z.string().default(""),
   organization: organizationSchema,
   region: z.enum(REGIONS),
   city: optional(z.string()),
@@ -59,6 +59,7 @@ export const opportunitySummarySchema = z.object({
   capacity: optional(z.number().int()),
   estimatedTotalHours: optional(z.number()),
   spotsRemaining: optional(z.number().int()),
+  acceptanceMode: z.enum(ACCEPTANCE_MODES).default("manual"),
 });
 
 export const applicationAttendanceSchema = z.object({
@@ -210,6 +211,7 @@ export const notificationSchema = z
     kind: z.string().default(""),
     title: z.string(),
     body: z.string().default(""),
+    data: z.record(z.string(), z.unknown()).nullish(),
     readAt: optional(isoDate),
     createdAt: isoDate,
   })
@@ -218,6 +220,7 @@ export const notificationSchema = z
     kind: notification.kind,
     title: notification.title,
     body: notification.body,
+    data: notification.data ?? null,
     at: notification.createdAt,
     unread: notification.readAt === undefined,
   }));

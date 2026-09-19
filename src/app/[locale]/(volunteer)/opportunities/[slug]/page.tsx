@@ -1,11 +1,12 @@
 import { ArrowLeft, BadgeCheck } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
+import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { OpportunityStatusChip } from "@/components/dashboard/opportunity-status";
 import { StateChip } from "@/components/dashboard/state-chip";
 import { ApplyForm } from "@/components/opportunities/apply-form";
@@ -13,6 +14,7 @@ import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
@@ -25,7 +27,7 @@ import {
   profileCompletion,
   type ProfileCompletion,
 } from "@/lib/profile/completion";
-import { applicationHref, navHref } from "@/lib/routing/routes";
+import { applicationHref, localePath, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +60,13 @@ export default async function OpportunityPage({
       opportunity={opportunity}
       saved={savedIds(saved).has(opportunity.id)}
       application={
-        application ? { id: application.id, status: application.status } : null
+        application
+          ? {
+              id: application.id,
+              status: application.status,
+              submittedAt: application.submittedAt,
+            }
+          : null
       }
       profileCompletion={profileCompletion(profile ?? EMPTY_PROFILE)}
       now={now}
@@ -75,13 +83,21 @@ function Opportunity({
 }: {
   opportunity: OpportunityDetail;
   saved: boolean;
-  application: { id: string; status: ApplicationStatus } | null;
+  application: {
+    id: string;
+    status: ApplicationStatus;
+    submittedAt?: string | undefined;
+  } | null;
   profileCompletion: ProfileCompletion;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
   const applicationsT = useTranslations("applications");
+  const format = useFormatter();
+  const locale = useLocale() as Locale;
   const applicable = canApply(opportunity, now);
+  const asksQuestions = opportunity.questions.length > 0;
+  const sendable = application?.status === "draft" && !asksQuestions;
 
   return (
     <>
@@ -140,16 +156,14 @@ function Opportunity({
             </Panel>
           ) : null}
 
-          <Panel
-            id="questions"
-            title={t("detail.questions")}
-            description={t("detail.questionCount", {
-              count: opportunity.questions.length,
-            })}
-          >
-            {opportunity.questions.length === 0 ? (
-              <p className="text-sm text-ink-muted">{t("detail.noQuestions")}</p>
-            ) : (
+          {asksQuestions ? (
+            <Panel
+              id="questions"
+              title={t("detail.questions")}
+              description={t("detail.questionCount", {
+                count: opportunity.questions.length,
+              })}
+            >
               <ol className="flex flex-col gap-5">
                 {opportunity.questions.map((question, index) => (
                   <li key={question.id} className="grid grid-cols-[2rem_1fr] gap-x-3">
@@ -178,8 +192,8 @@ function Opportunity({
                   </li>
                 ))}
               </ol>
-            )}
-          </Panel>
+            </Panel>
+          ) : null}
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">
@@ -188,29 +202,56 @@ function Opportunity({
           </Panel>
 
           <Panel id="apply">
-            {application ? (
-              <Link
-                href={applicationHref(application.id)}
-                className={buttonClass({ className: "w-full" })}
-              >
-                {application.status === "draft"
-                  ? applicationsT("continueDraft")
-                  : t("detail.viewApplication")}
-              </Link>
+            {application && !sendable ? (
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
+                  <ApplicationStatusChip status={application.status} />
+                  {application.submittedAt ? (
+                    <span>
+                      {applicationsT("appliedOn", {
+                        date: format.dateTime(new Date(application.submittedAt), "day"),
+                      })}
+                    </span>
+                  ) : null}
+                </div>
+                <Link
+                  href={applicationHref(application.id)}
+                  className={buttonClass({ className: "w-full" })}
+                >
+                  {application.status === "draft"
+                    ? applicationsT("continueDraft")
+                    : t("detail.viewApplication")}
+                </Link>
+              </div>
             ) : applicable ? (
               completion.complete ? (
                 <ApplyForm
                   opportunityId={opportunity.id}
                   labels={{
                     apply: t("detail.apply"),
-                    applying: t("detail.applying"),
+                    applying: asksQuestions
+                      ? t("detail.starting")
+                      : t("detail.applying"),
+                    hint: asksQuestions
+                      ? t("detail.applyHintQuestions", {
+                          count: opportunity.questions.length,
+                        })
+                      : opportunity.acceptanceMode === "automatic"
+                        ? t("detail.applyHintAutomatic")
+                        : t("detail.applyHint"),
                     errors: {
                       opportunityUnavailable: t(
                         "detail.applyErrors.opportunityUnavailable",
                       ),
                       opportunityNotFound: t("detail.applyErrors.opportunityNotFound"),
+                      profileRequired: t("detail.applyErrors.profileIncomplete"),
+                      profileIncomplete: t("detail.applyErrors.profileIncomplete"),
                     },
                     fallback: t("detail.applyErrors.fallback"),
+                    profileLink: {
+                      href: localePath(locale, "profileEdit"),
+                      label: t("detail.completeProfile"),
+                    },
                   }}
                 />
               ) : (

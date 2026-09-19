@@ -58,9 +58,10 @@ the display name is the primary label and the username has a `source`:
 | `custom`    | chosen by the volunteer                           | yes        |
 | `telegram`  | imported from the connected Telegram account      | no         |
 
-A Telegram-managed handle is read-only in the interface: it is shown with a
-lock and a sentence saying it comes from Telegram and changes with it. No
-disabled input, no button that looks live and does nothing.
+A Telegram-managed handle is read-only in the interface: the leaderboard shows
+it with a lock and a sentence saying it comes from Telegram and changes with
+it, and the account page leaves its handle panel out, because there is nothing
+to do there. No disabled input, no button that looks live and does nothing.
 
 A generated or custom handle can be renamed in two places, both the same
 component:

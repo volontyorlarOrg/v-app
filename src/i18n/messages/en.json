@@ -46,7 +46,41 @@
       "label": "Notifications",
       "title": "Notifications",
       "empty": "Nothing new.",
-      "markAllRead": "Mark all as read"
+      "markAllRead": "Mark all as read",
+      "activity": {
+        "submitted": {
+          "title": "Application sent",
+          "body": "The organiser will review your profile."
+        },
+        "under_review": {
+          "title": "Your application is being reviewed",
+          "body": "The organiser is looking at your profile."
+        },
+        "accepted": {
+          "title": "You were accepted",
+          "body": "Open your application for the date and place."
+        },
+        "rejected": {
+          "title": "Not selected this time",
+          "body": "Thank you for applying. Other opportunities are waiting."
+        },
+        "closed": {
+          "title": "Application closed",
+          "body": "This opportunity is no longer taking volunteers."
+        },
+        "attended": {
+          "title": "Attendance confirmed",
+          "body": "Your hours and experience were added to your record."
+        },
+        "excused": {
+          "title": "Marked as excused",
+          "body": "The organiser recorded an excused absence."
+        },
+        "cancelled": {
+          "title": "Marked as cancelled",
+          "body": "The organiser recorded your place as cancelled."
+        }
+      }
     },
     "userMenu": {
       "label": "Account menu"
@@ -158,6 +192,25 @@
       "title": "Next up",
       "description": "Accepted applications with the event still ahead.",
       "empty": "Nothing scheduled yet. An accepted application appears here with its date and place.",
+      "cta": "Browse opportunities"
+    },
+    "start": {
+      "title": "Start with your first opportunity",
+      "description": "This is how volunteering works on Volontyorlar.",
+      "steps": {
+        "apply": {
+          "title": "Apply with your profile",
+          "body": "One tap sends your profile to the organiser."
+        },
+        "accepted": {
+          "title": "Get your place confirmed",
+          "body": "Some opportunities accept you the moment you apply; for the rest, the organiser reviews your profile before the event."
+        },
+        "record": {
+          "title": "Attend and build your record",
+          "body": "After the event, confirmed hours and experience appear here and on the leaderboard."
+        }
+      },
       "cta": "Browse opportunities"
     },
     "applications": {
@@ -391,11 +444,18 @@
       },
       "inProgress": "In progress",
       "pending": "Not yet",
+      "afterEvent": "After the event",
+      "awaitingConfirmation": "Awaiting confirmation",
+      "acceptedInstantly": "Accepted instantly",
       "answers": "Your answers",
-      "answersEmpty": "Nothing written yet. The draft is empty.",
-      "noQuestions": "This opportunity asked no questions.",
+      "send": {
+        "title": "Send your application",
+        "description": "Your profile below is your application. Check it, then send it to the organiser."
+      },
+      "draftClosed": "This opportunity is no longer taking applications, so this draft wasn't sent.",
       "fromProfile": "From your profile",
-      "fromProfileHelp": "What the organiser sees alongside your answers.",
+      "fromProfileHelp": "The profile you applied with. Later edits to your profile don't change it.",
+      "fromProfileDraft": "What the organiser will see when you send your application.",
       "withdraw": "Withdraw application",
       "viewOpportunity": "View opportunity",
       "withdrawConfirm": "Withdraw this application? This can't be undone.",
@@ -419,7 +479,6 @@
     },
     "attendance": {
       "title": "Attendance",
-      "description": "After the event, the coordinator confirms your outcome and hours.",
       "state": "Outcome",
       "hours": "Confirmed hours",
       "outcome": {
@@ -497,25 +556,34 @@
       "format": "Format",
       "capacity": "Volunteers needed",
       "estimatedTotalHours": "Estimated effort",
+      "acceptance": "Approval",
+      "acceptanceMode": {
+        "manual": "The organiser reviews each application",
+        "automatic": "Instant: you're in as soon as you apply"
+      },
       "spotsOf": "{spots} of {capacity} spots left",
       "requirements": "What you need",
       "description": "About this opportunity",
       "questions": "What you will be asked",
       "questionCount": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
-      "noQuestions": "This opportunity asks no questions. Your profile is the application.",
       "required": "Required",
       "optional": "Optional",
       "maxLength": "up to {count} characters",
       "apply": "Apply",
       "applyClosed": "Applications are closed",
-      "applying": "Starting…",
+      "applying": "Sending…",
+      "starting": "Starting…",
+      "applyHint": "Your profile is your application. The organiser sees it as soon as you apply, and you can withdraw before the event starts.",
+      "applyHintAutomatic": "Your profile is your application. While places remain, you're accepted as soon as you apply, and you can withdraw before the event starts.",
+      "applyHintQuestions": "{count, plural, one {You answer # question} other {You answer # questions}} on the next page, then send your application.",
       "viewApplication": "View your application",
       "profileRequired": "Complete the core profile fields and add a phone number or Telegram username before applying.",
       "completeProfile": "Complete profile",
       "applyErrors": {
         "opportunityUnavailable": "This opportunity isn't taking applications right now.",
         "opportunityNotFound": "This opportunity is no longer available.",
-        "fallback": "Couldn't start your application. Please try again."
+        "profileIncomplete": "Finish your profile first: it is what the organiser reads.",
+        "fallback": "Couldn't send your application. Please try again."
       }
     },
     "status": {
@@ -659,8 +727,7 @@
     },
     "overview": {
       "contactTitle": "How organisers reach you",
-      "contactHelp": "Shared with an organiser only after you apply.",
-      "empty": "Not added yet"
+      "contactHelp": "Shared with an organiser only after you apply."
     }
   },
   "languages": {

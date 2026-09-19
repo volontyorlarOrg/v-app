@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { okResult, resultFromError, type ActionResult } from "@/lib/api/action-result";
-import { startApplication } from "@/lib/api/applications.server";
+import { startApplication, submitApplication } from "@/lib/api/applications.server";
+import { isApiError } from "@/lib/api/errors";
+import { getOpportunity } from "@/lib/api/opportunities.server";
 import { saveOpportunity, unsaveOpportunity } from "@/lib/api/saved.server";
 import { applicationHref } from "@/lib/routing/routes";
 
@@ -24,6 +26,20 @@ export async function setSavedAction(
   return okResult;
 }
 
+async function asksNoQuestions(slug: string): Promise<boolean> {
+  const opportunity = await getOpportunity(slug);
+  return opportunity !== null && opportunity.questions.length === 0;
+}
+
+async function send(applicationId: string): Promise<void> {
+  try {
+    await submitApplication(applicationId, {});
+  } catch (error) {
+    if (isApiError(error) && error.backendCode === "applicationNotEditable") return;
+    throw error;
+  }
+}
+
 export async function applyAction(
   _previous: ActionResult,
   formData: FormData,
@@ -32,7 +48,14 @@ export async function applyAction(
   let applicationId: string;
 
   try {
-    applicationId = (await startApplication(opportunityId)).id;
+    const application = await startApplication(opportunityId);
+    applicationId = application.id;
+    if (
+      application.status === "draft" &&
+      (await asksNoQuestions(application.opportunity.slug))
+    ) {
+      await send(application.id);
+    }
   } catch (error) {
     return resultFromError(error);
   }
