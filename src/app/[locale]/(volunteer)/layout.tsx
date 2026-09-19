@@ -10,10 +10,10 @@ import { failureOf, type LoadFailure } from "@/lib/api/load.server";
 import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
-import { mergeNotificationName } from "@/lib/notifications/types";
+import { activityNotification, mergeNotificationName } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
 import { levelFor } from "@/lib/record/levels";
-import { navHref } from "@/lib/routing/routes";
+import { applicationHref, historyHref, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -26,10 +26,11 @@ export default async function VolunteerLayout({
   setRequestLocale(locale);
 
   const session = await requireSession();
-  const [record, common, settings, format] = await Promise.all([
+  const [record, common, settings, nav, format] = await Promise.all([
     getTranslations({ locale, namespace: "record" }),
     getTranslations({ locale, namespace: "common" }),
     getTranslations({ locale, namespace: "settings" }),
+    getTranslations({ locale, namespace: "nav" }),
     getFormatter({ locale }),
   ]);
   const errorLabels = loadErrorLabels(common);
@@ -48,14 +49,42 @@ export default async function VolunteerLayout({
     me.displayName?.trim() || session.displayName?.trim() || common("volunteer");
   const now = new Date();
   const notifications: NotificationItem[] = notificationList.items.map((item) => {
+    const time = format.relativeTime(new Date(item.at), now);
     const merge = mergeNotificationName(item.kind);
+    if (merge) {
+      return {
+        id: item.id,
+        title: settings(`mergeNotifications.${merge}`),
+        body: settings("mergeNotifications.body"),
+        time,
+        unread: item.unread,
+        href: navHref("settings"),
+      };
+    }
+
+    const activity = activityNotification(item.kind, item.data);
+    if (activity) {
+      const href = activity.applicationId
+        ? applicationHref(activity.applicationId)
+        : item.kind === "attendance.resolved"
+          ? historyHref()
+          : undefined;
+      return {
+        id: item.id,
+        title: nav(`notifications.activity.${activity.name}.title`),
+        body: nav(`notifications.activity.${activity.name}.body`),
+        time,
+        unread: item.unread,
+        ...(href ? { href } : {}),
+      };
+    }
+
     return {
       id: item.id,
-      title: merge ? settings(`mergeNotifications.${merge}`) : item.title,
-      body: merge ? settings("mergeNotifications.body") : item.body,
-      time: format.relativeTime(new Date(item.at), now),
+      title: item.title,
+      body: item.body,
+      time,
       unread: item.unread,
-      ...(merge ? { href: navHref("settings") } : {}),
     };
   });
 

@@ -27,6 +27,9 @@ export type OpportunityFormat = (typeof OPPORTUNITY_FORMATS)[number];
 export const OPPORTUNITY_STATUSES = ["open", "closed", "full"] as const;
 export type OpportunityStatus = (typeof OPPORTUNITY_STATUSES)[number];
 
+export const ACCEPTANCE_MODES = ["manual", "automatic"] as const;
+export type AcceptanceMode = (typeof ACCEPTANCE_MODES)[number];
+
 export type Organization = {
   id: string;
   name: string;
@@ -39,7 +42,6 @@ export type OpportunitySummary = {
   id: string;
   slug: string;
   title: string;
-  summary: string;
   organization: Organization;
   region: Region;
   city?: string;
@@ -53,6 +55,7 @@ export type OpportunitySummary = {
   capacity?: number;
   estimatedTotalHours?: number;
   spotsRemaining?: number;
+  acceptanceMode: AcceptanceMode;
 };
 
 export const QUESTION_TYPES = [

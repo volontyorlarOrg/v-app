@@ -54,7 +54,6 @@ const opportunities = [
     id: "opp-book-drive",
     slug: "winter-book-drive",
     title: "Winter book drive",
-    summary: "Collect and sort books for neighbourhood reading corners.",
     description:
       "Sort donated books, label them and pack them for the reading corners.",
     requirements: ["Be 15 or older", "Free on the collection day"],
@@ -87,7 +86,6 @@ const opportunities = [
     id: "opp-riverbank",
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
-    summary: "A morning clearing the riverbank with the Green Corridor Group.",
     description: "Gloves and bags are provided. Wear shoes you can get muddy.",
     requirements: [],
     organization: organizations.green,
@@ -109,7 +107,6 @@ const opportunities = [
     id: "opp-translation",
     slug: "remote-translation-support",
     title: "Remote translation support",
-    summary: "Translate short volunteer guides between Uzbek, Russian and English.",
     description: "Work from home in your own time over two weeks.",
     requirements: ["Comfortable writing in two of the three languages"],
     organization: organizations.desk,
@@ -157,7 +154,6 @@ const opportunities = [
     id: "opp-marathon",
     slug: "city-marathon-water-stations",
     title: "City marathon water stations",
-    summary: "Hand out water along the marathon route.",
     description: "Shifts of three hours. Breakfast provided.",
     requirements: ["Arrive by 6:30"],
     organization: organizations.sport,
@@ -172,6 +168,7 @@ const opportunities = [
     capacity: 60,
     estimatedTotalHours: 4,
     accepted: 12,
+    acceptanceMode: "automatic",
     questions: [],
     sourcedByYvc: true,
   },
@@ -179,7 +176,6 @@ const opportunities = [
     id: "opp-read-aloud",
     slug: "read-aloud-day",
     title: "Read-aloud day",
-    summary: "Read to primary school pupils for a morning.",
     description: "Books are provided.",
     requirements: [],
     organization: organizations.reading,
@@ -206,7 +202,6 @@ function serializeOpportunity(item, detail) {
     id: item.id,
     slug: item.slug,
     title: item.title,
-    summary: item.summary,
     organization: item.organization,
     region: item.region,
     city: item.city ?? undefined,
@@ -224,6 +219,7 @@ function serializeOpportunity(item, detail) {
     capacity: item.capacity ?? undefined,
     estimatedTotalHours: item.estimatedTotalHours ?? undefined,
     spotsRemaining,
+    acceptanceMode: item.acceptanceMode ?? "manual",
   };
   if (!detail) return base;
   return {
@@ -424,10 +420,14 @@ function freshState() {
     notifications: [
       {
         id: "n-accepted",
-        kind: "application.accepted",
-        title: "You were accepted to Riverbank clean-up",
-        body: "See you on the day.",
-        data: null,
+        kind: "application.reviewed",
+        title: "Application update",
+        body: "Your application status is now accepted.",
+        data: {
+          applicationId: "app-riverbank",
+          userId: "user-dilnoza",
+          status: "accepted",
+        },
         readAt: null,
         createdAt: at(-4, 11),
       },
@@ -435,10 +435,23 @@ function freshState() {
         id: "n-received",
         kind: "application.submitted",
         title: "Application received",
-        body: "",
-        data: null,
+        body: "Your application was submitted successfully.",
+        data: { applicationId: "app-riverbank", volunteerId: "user-dilnoza" },
         readAt: at(-6, 20),
         createdAt: at(-6, 19),
+      },
+      {
+        id: "n-archive",
+        kind: "attendance.resolved",
+        title: "Attendance update",
+        body: "Your attendance was marked attended.",
+        data: {
+          attendanceId: "h-archive",
+          userId: "user-dilnoza",
+          outcome: "attended",
+        },
+        readAt: at(-19, 12),
+        createdAt: at(-19, 12),
       },
       {
         id: "n-merge",
@@ -770,7 +783,7 @@ function listOpportunities(query) {
   let items = opportunities.filter(
     (item) =>
       (!q ||
-        `${item.title} ${item.summary} ${item.organization.name}`
+        `${item.title} ${item.description} ${item.organization.name}`
           .toLowerCase()
           .includes(q)) &&
       (!region || item.region === region) &&
@@ -1196,8 +1209,26 @@ const server = createServer(async (request, response) => {
       });
       item.updatedAt = new Date().toISOString();
       if (action === "submit") {
-        item.status = "submitted";
+        const automatic = opportunity.acceptanceMode === "automatic";
+        if (
+          automatic &&
+          opportunity.capacity !== null &&
+          opportunity.accepted >= opportunity.capacity
+        ) {
+          return send(response, 409, { code: "opportunityUnavailable" });
+        }
+        item.status = automatic ? "accepted" : "submitted";
         item.submittedAt = item.updatedAt;
+        if (automatic) {
+          item.reviewedAt = item.updatedAt;
+          item.attendance = {
+            id: `attendance-${opportunity.slug}`,
+            outcome: "awaiting_confirmation",
+            scheduledHours: opportunity.estimatedTotalHours,
+            confirmedHours: null,
+            resolvedAt: null,
+          };
+        }
         item.profileSnapshot = {
           fullName: state.profile.fullName,
           bio: state.profile.bio,

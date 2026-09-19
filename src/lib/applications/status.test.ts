@@ -24,7 +24,6 @@ function opportunity(startsAt: string): OpportunitySummary {
     id: "riverbank",
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
-    summary: "",
     organization: {
       id: "green",
       name: "Green Corridor Group",
@@ -36,6 +35,7 @@ function opportunity(startsAt: string): OpportunitySummary {
     status: "open",
     startsAt,
     applicationDeadline: startsAt,
+    acceptanceMode: "manual",
   };
 }
 
@@ -217,5 +217,35 @@ describe("canWithdrawApplication", () => {
         NOW,
       ),
     ).toBe(false);
+  });
+});
+
+describe("applicationTimeline for an opportunity that accepts automatically", () => {
+  it("has no review step, because nobody reviews the application", () => {
+    expect(
+      applicationTimeline(
+        {
+          status: "accepted",
+          submittedAt: "2026-06-04T10:00:00.000Z",
+          reviewedAt: "2026-06-04T10:00:00.000Z",
+          updatedAt: "2026-06-04T10:00:00.000Z",
+          attendance: { id: "attendance-1", outcome: "awaiting_confirmation" },
+        },
+        { automatic: true },
+      ).map((entry) => [entry.step, entry.state]),
+    ).toEqual([
+      ["submitted", "done"],
+      ["decided", "done"],
+      ["attendance", "current"],
+    ]);
+  });
+
+  it("still shows a later rejection by the organiser as the decision", () => {
+    expect(
+      applicationTimeline(
+        { status: "rejected", updatedAt: "2026-06-05T10:00:00.000Z" },
+        { automatic: true },
+      ).map((entry) => entry.step),
+    ).toEqual(["submitted", "decided"]);
   });
 });

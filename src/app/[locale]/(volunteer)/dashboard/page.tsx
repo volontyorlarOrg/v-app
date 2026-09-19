@@ -15,6 +15,7 @@ import {
   ConnectTelegram,
   type ConnectTelegramLabels,
 } from "@/components/dashboard/connect-telegram";
+import { GettingStarted } from "@/components/dashboard/getting-started";
 import { NextUp } from "@/components/dashboard/next-up";
 import { VolunteerPassBadge } from "@/components/onboarding/volunteer-pass-badge";
 import {
@@ -48,6 +49,7 @@ import {
 import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
+  hasParticipation,
   isReliabilityMeaningful,
   levelProgress,
   reliabilityPercent,
@@ -231,6 +233,12 @@ function Dashboard({
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, APPLICATIONS_SHOWN);
 
+  const historyCount = history.status === "loaded" ? history.data.items.length : null;
+  const fresh =
+    loadedApplications.status === "loaded" && all.length === 0 && historyCount === 0;
+  const showNextUp = loadedApplications.status === "failed" || commitments.length > 0;
+  const showHistory = historyCount !== 0;
+
   const resumeLabels: OnboardingResumeLabels = {
     title: onboarding("resume.title"),
     bodyByDone: Array.from({ length: FORM_STEP_COUNT + 1 }, (_, done) =>
@@ -317,56 +325,73 @@ function Dashboard({
         />
       ) : null}
 
-      <StatTiles stats={stats} className="mt-6" />
+      {hasParticipation(volunteerRecord) ? (
+        <StatTiles stats={stats} className="mt-6" />
+      ) : null}
 
-      <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-2">
-        <Panel
-          id="next-up"
-          title={t("nextUp.title")}
-          description={t("nextUp.description")}
-          padding="none"
-        >
-          {loadedApplications.status === "failed" ? (
-            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
-          ) : (
-            <NextUp commitments={commitments} />
-          )}
-        </Panel>
+      {fresh ? (
+        <GettingStarted id={HISTORY_ANCHOR} className="mt-6 scroll-mt-20" />
+      ) : (
+        <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-2">
+          {showNextUp ? (
+            <Panel
+              id="next-up"
+              title={t("nextUp.title")}
+              description={t("nextUp.description")}
+              padding="none"
+            >
+              {loadedApplications.status === "failed" ? (
+                <LoadErrorRows
+                  failure={loadedApplications.failure}
+                  labels={errorLabels}
+                />
+              ) : (
+                <NextUp commitments={commitments} />
+              )}
+            </Panel>
+          ) : null}
 
-        <Panel
-          id="applications"
-          title={t("applications.title")}
-          action={{ href: navHref("applications"), label: t("applications.viewAll") }}
-          padding="none"
-        >
-          {loadedApplications.status === "failed" ? (
-            <LoadErrorRows failure={loadedApplications.failure} labels={errorLabels} />
-          ) : (
-            <ApplicationRows
-              applications={applications}
-              now={now}
-              empty={{
-                title: applicationsT("empty.title"),
-                body: applicationsT("empty.body"),
-              }}
-            />
-          )}
-        </Panel>
+          <Panel
+            id="applications"
+            title={t("applications.title")}
+            action={{ href: navHref("applications"), label: t("applications.viewAll") }}
+            padding="none"
+            className={showNextUp ? undefined : "xl:col-span-2"}
+          >
+            {loadedApplications.status === "failed" ? (
+              <LoadErrorRows
+                failure={loadedApplications.failure}
+                labels={errorLabels}
+              />
+            ) : (
+              <ApplicationRows
+                applications={applications}
+                now={now}
+                empty={{
+                  title: applicationsT("empty.title"),
+                  body: applicationsT("empty.body"),
+                }}
+              />
+            )}
+          </Panel>
 
-        <Panel
-          id={HISTORY_ANCHOR}
-          title={record("history.title")}
-          description={record("history.description")}
-          padding="none"
-          className="scroll-mt-20 xl:col-span-2"
-        >
-          {history.status === "failed" ? (
-            <LoadErrorRows failure={history.failure} labels={errorLabels} />
-          ) : (
-            <HistoryTable entries={history.data.items} />
-          )}
-        </Panel>
-      </div>
+          {showHistory ? (
+            <Panel
+              id={HISTORY_ANCHOR}
+              title={record("history.title")}
+              description={record("history.description")}
+              padding="none"
+              className="scroll-mt-20 xl:col-span-2"
+            >
+              {history.status === "failed" ? (
+                <LoadErrorRows failure={history.failure} labels={errorLabels} />
+              ) : (
+                <HistoryTable entries={history.data.items} />
+              )}
+            </Panel>
+          ) : null}
+        </div>
+      )}
     </>
   );
 }

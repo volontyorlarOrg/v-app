@@ -78,9 +78,9 @@ describe("activeFilterCount and filtersToQuery", () => {
 
 describe("filterOpportunities", () => {
   const base = {
-    summary: "",
     format: "onsite" as const,
     status: "open" as const,
+    acceptanceMode: "manual" as const,
   };
   const green = { id: "green", name: "Green Corridor Group", slug: "green", verified: false };
   const reading = { id: "reading", name: "Chilonzor Reading Corners", slug: "reading", verified: true };

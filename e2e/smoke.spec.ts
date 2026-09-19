@@ -131,6 +131,24 @@ async function createAccount(page: Page, email: string) {
 }
 
 test.describe("welcome flow", () => {
+  test("a new volunteer's dashboard explains the first steps instead of empty panels", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `fresh-${info.project.name}@example.org`);
+    await page.goto("/en/dashboard");
+    const start = page.getByRole("region", {
+      name: "Start with your first opportunity",
+    });
+    await expect(start).toBeVisible();
+    await expect(start.getByText("Apply with your profile")).toBeVisible();
+    await expect(
+      start.getByRole("link", { name: "Browse opportunities" }),
+    ).toHaveAttribute("href", "/en/opportunities");
+    for (const name of ["Next up", "Your applications", "Participation history"]) {
+      await expect(page.getByRole("heading", { level: 2, name })).toHaveCount(0);
+    }
+  });
+
   test("saves every step to the profile and ends on the first opportunity", async ({
     page,
   }, info) => {
@@ -621,9 +639,17 @@ test.describe("the panel", () => {
   }) => {
     const bell = page.getByRole("button", { name: "Notifications (1)" });
     await bell.click();
+    await expect(page.getByRole("link", { name: "You were accepted" })).toHaveAttribute(
+      "href",
+      "/en/applications/app-riverbank",
+    );
     await expect(
-      page.getByText("You were accepted to Riverbank clean-up"),
+      page.getByText("Open your application for the date and place."),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Attendance confirmed" }),
+    ).toHaveAttribute("href", "/en/dashboard#history");
+    await expect(page.getByText(/status is now/)).toHaveCount(0);
     await expect(page.getByText("An account asked to join yours")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "An account asked to join yours" }),
@@ -876,6 +902,55 @@ test.describe("opportunities", () => {
     await expect(page.getByText("Uzbek and English")).toBeVisible();
   });
 
+  test("applying to an opportunity that accepts automatically is accepted in one step", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await page.getByRole("link", { name: "Complete profile" }).click();
+    await page.getByLabel("Bio").fill("I help at city events.");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "What you will be asked" }),
+    ).toHaveCount(0);
+    const facts = page.getByRole("region", { name: "At a glance" });
+    await expect(facts.getByText("Organiser")).toHaveCount(0);
+    await expect(facts.getByText(/^Closes tomorrow · /)).toBeVisible();
+    await expect(
+      facts.getByText("Instant: you're in as soon as you apply"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/^Your profile is your application\. While places remain/),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(
+      /\/en\/applications\/app-city-marathon-water-stations$/,
+    );
+    const timeline = page.getByRole("region", { name: "Progress", exact: true });
+    await expect(timeline.getByText("Accepted instantly")).toBeVisible();
+    await expect(timeline.getByText("Under review")).toHaveCount(0);
+    await expect(page.getByText("Accepted", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("button", { name: "Save draft" })).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your answers" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("The profile you applied with.", { exact: false }),
+    ).toBeVisible();
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await expect(
+      page.getByRole("link", { name: "View your application" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
+  });
+
   test("a closed opportunity cannot be applied to", async ({ page }) => {
     await page.goto("/en/opportunities/read-aloud-day");
     await expect(
@@ -930,8 +1005,10 @@ test.describe("applications, record, profile and settings", () => {
     await page.goto("/en/applications/app-riverbank");
     await expect(
       page.getByRole("heading", { level: 2, name: "Attendance" }),
-    ).toBeVisible();
-    await expect(page.getByText("Awaiting coordinator confirmation")).toBeVisible();
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Progress", exact: true }),
+    ).toContainText("After the event");
     await page.getByRole("button", { name: "Withdraw application" }).click();
     await page.getByRole("button", { name: "Yes, withdraw" }).click();
     await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
@@ -1123,7 +1200,7 @@ test.describe("account connections and merges", () => {
     await expect(row).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for the other account" }),
-    ).toContainText("Nothing is waiting.");
+    ).toHaveCount(0);
   });
 
   test("a callback whose state is not the one this browser started is refused", async ({
@@ -1287,7 +1364,7 @@ test.describe("account connections and merges", () => {
     await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for your approval" }),
-    ).toContainText("Nothing is waiting.");
+    ).toHaveCount(0);
   });
 
   test("an expired request recovers by refetching the list", async ({ page }) => {
@@ -1428,14 +1505,15 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard handle", () => {
-  test("a Telegram account is told its handle is managed there", async ({ page }) => {
+  test("a Telegram account is told on the leaderboard that its handle is managed there", async ({
+    page,
+  }) => {
     await signIn(page);
     await page.goto("/en/settings");
+    await expect(page.getByRole("region", { name: "Your handle" })).toHaveCount(0);
 
-    const panel = page.getByRole("region", { name: "Your handle" });
-    await expect(panel).toContainText("@dilnoza_k");
-    await expect(panel).toContainText("comes from your Telegram account");
-    await expect(panel.getByRole("button", { name: "Save handle" })).toHaveCount(0);
+    await page.goto("/en/leaderboard");
+    await expect(page.getByText("comes from your Telegram account")).toBeVisible();
   });
 
   test("an email account renames itself and the leaderboard follows", async ({
