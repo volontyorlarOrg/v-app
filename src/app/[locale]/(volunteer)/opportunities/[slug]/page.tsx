@@ -229,12 +229,16 @@ function Opportunity({
                   opportunityId={opportunity.id}
                   labels={{
                     apply: t("detail.apply"),
-                    applying: asksQuestions ? t("detail.starting") : t("detail.applying"),
+                    applying: asksQuestions
+                      ? t("detail.starting")
+                      : t("detail.applying"),
                     hint: asksQuestions
                       ? t("detail.applyHintQuestions", {
                           count: opportunity.questions.length,
                         })
-                      : t("detail.applyHint"),
+                      : opportunity.acceptanceMode === "automatic"
+                        ? t("detail.applyHintAutomatic")
+                        : t("detail.applyHint"),
                     errors: {
                       opportunityUnavailable: t(
                         "detail.applyErrors.opportunityUnavailable",

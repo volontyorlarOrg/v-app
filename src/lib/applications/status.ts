@@ -164,6 +164,17 @@ export function applicationTimeline(
     ApplicationSummary,
     "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt" | "attendance"
   >,
+  { automatic = false }: { automatic?: boolean } = {},
+): TimelineEntry[] {
+  const entries = timelineEntries(application);
+  return automatic ? entries.filter((entry) => entry.step !== "under_review") : entries;
+}
+
+function timelineEntries(
+  application: Pick<
+    ApplicationSummary,
+    "status" | "submittedAt" | "reviewedAt" | "withdrawnAt" | "updatedAt" | "attendance"
+  >,
 ): TimelineEntry[] {
   const submitted: TimelineEntry = {
     step: "submitted",

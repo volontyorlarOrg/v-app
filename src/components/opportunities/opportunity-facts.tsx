@@ -1,16 +1,28 @@
 import { useFormatter, useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
 import { deadlineState } from "@/lib/opportunities/deadline";
 import { eventSchedule, momentOf } from "@/lib/opportunities/schedule";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
 
+export type OpportunityFactKey =
+  | "date"
+  | "location"
+  | "deadline"
+  | "format"
+  | "acceptance"
+  | "estimatedTotalHours"
+  | "capacity";
+
 export function OpportunityFacts({
   opportunity,
   now,
+  omit = [],
 }: {
   opportunity: OpportunitySummary;
   now: Date;
+  omit?: readonly OpportunityFactKey[];
 }) {
   const t = useTranslations("opportunities");
   const format = useFormatter();
@@ -27,8 +39,9 @@ export function OpportunityFacts({
           .join(", ");
   const deadlineIsNear =
     deadlineState(opportunity.applicationDeadline, now).kind !== "later";
+  const formatLabel = t(`format.${opportunity.format}`);
 
-  const facts = [
+  const facts: { key: OpportunityFactKey; label: string; value: ReactNode }[] = [
     {
       key: "date",
       label: t("detail.date"),
@@ -50,15 +63,18 @@ export function OpportunityFacts({
         </span>
       ),
     },
+    ...(place === formatLabel
+      ? []
+      : [{ key: "format" as const, label: t("detail.format"), value: formatLabel }]),
     {
-      key: "format",
-      label: t("detail.format"),
-      value: t(`format.${opportunity.format}`),
+      key: "acceptance",
+      label: t("detail.acceptance"),
+      value: t(`detail.acceptanceMode.${opportunity.acceptanceMode}`),
     },
     ...(opportunity.estimatedTotalHours !== undefined
       ? [
           {
-            key: "estimatedTotalHours",
+            key: "estimatedTotalHours" as const,
             label: t("detail.estimatedTotalHours"),
             value: t("estimatedHours", {
               hours: opportunity.estimatedTotalHours,
@@ -69,7 +85,7 @@ export function OpportunityFacts({
     ...(opportunity.capacity !== undefined
       ? [
           {
-            key: "capacity",
+            key: "capacity" as const,
             label: t("detail.capacity"),
             value: (
               <span className="tabular">
@@ -88,14 +104,16 @@ export function OpportunityFacts({
 
   return (
     <dl className="divide-y divide-border">
-      {facts.map((fact) => (
-        <div key={fact.key} className="grid gap-1 py-3 first:pt-0 last:pb-0">
-          <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-            {fact.label}
-          </dt>
-          <dd className="text-sm font-semibold text-ink">{fact.value}</dd>
-        </div>
-      ))}
+      {facts
+        .filter((fact) => !omit.includes(fact.key))
+        .map((fact) => (
+          <div key={fact.key} className="grid gap-1 py-3 first:pt-0 last:pb-0">
+            <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              {fact.label}
+            </dt>
+            <dd className="text-sm font-semibold text-ink">{fact.value}</dd>
+          </div>
+        ))}
     </dl>
   );
 }

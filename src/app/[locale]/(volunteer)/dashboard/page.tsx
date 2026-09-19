@@ -49,6 +49,7 @@ import {
 import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import {
   LEVEL_THRESHOLDS,
+  hasParticipation,
   isReliabilityMeaningful,
   levelProgress,
   reliabilityPercent,
@@ -324,7 +325,9 @@ function Dashboard({
         />
       ) : null}
 
-      <StatTiles stats={stats} className="mt-6" />
+      {hasParticipation(volunteerRecord) ? (
+        <StatTiles stats={stats} className="mt-6" />
+      ) : null}
 
       {fresh ? (
         <GettingStarted id={HISTORY_ANCHOR} className="mt-6 scroll-mt-20" />

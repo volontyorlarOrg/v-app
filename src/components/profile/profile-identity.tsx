@@ -117,20 +117,24 @@ export function ProfileIdentity({
         </div>
       </div>
 
-      <div className="mt-5 border-y border-border bg-surface-sunk/60 px-5 py-4 sm:px-7">
-        <dl className="grid grid-cols-3 gap-x-4 sm:max-w-lg">
-          {stats.map((stat) => (
-            <div key={stat.id} className="grid min-w-0">
-              <dt className="row-start-2 mt-1.5 text-xs font-semibold tracking-normal text-ink-muted uppercase sm:tracking-[0.12em]">
-                {stat.label}
-              </dt>
-              <dd className="display-face tabular row-start-1 text-2xl leading-none text-accent-ink sm:text-3xl">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      {stats.length > 0 ? (
+        <div className="mt-5 border-y border-border bg-surface-sunk/60 px-5 py-4 sm:px-7">
+          <dl className="grid grid-cols-3 gap-x-4 sm:max-w-lg">
+            {stats.map((stat) => (
+              <div key={stat.id} className="grid min-w-0">
+                <dt className="row-start-2 mt-1.5 text-xs font-semibold tracking-normal text-ink-muted uppercase sm:tracking-[0.12em]">
+                  {stat.label}
+                </dt>
+                <dd className="display-face tabular row-start-1 text-2xl leading-none text-accent-ink sm:text-3xl">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : (
+        <div className="mt-5 border-t border-border" />
+      )}
 
       <div className="flex flex-col gap-5 px-5 py-6 sm:px-7">
         <p

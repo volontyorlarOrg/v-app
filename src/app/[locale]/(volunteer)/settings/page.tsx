@@ -214,16 +214,16 @@ function Settings({
     errors,
   };
 
+  const waiting = incoming.length + outgoing.length;
+
   const index = [
     { id: "account", label: t("account.title") },
     { id: "appearance", label: t("appearance.title") },
     { id: "connections", label: t("connections.title") },
     { id: "password", label: t("password.label") },
-    { id: "username", label: t("username.title") },
-    { id: "requests", label: t("merge.title") },
+    ...(username.editable ? [{ id: "username", label: t("username.title") }] : []),
+    ...(waiting > 0 ? [{ id: "requests", label: t("merge.title") }] : []),
   ];
-
-  const waiting = incoming.length + outgoing.length;
 
   return (
     <>
@@ -313,57 +313,71 @@ function Settings({
             />
           </Panel>
 
-          <Panel
-            id="username"
-            title={t("username.title")}
-            description={t("username.description")}
-            className="scroll-mt-20"
-          >
-            <UsernameSection
-              locale={locale}
-              identity={username}
-              labels={usernameLabels}
-              headed={false}
-            />
-          </Panel>
+          {username.editable ? (
+            <Panel
+              id="username"
+              title={t("username.title")}
+              description={t("username.description")}
+              className="scroll-mt-20"
+            >
+              <UsernameSection
+                locale={locale}
+                identity={username}
+                labels={usernameLabels}
+                headed={false}
+              />
+            </Panel>
+          ) : null}
 
-          <div id="requests" className="scroll-mt-20">
-            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
-              <h2 className="font-sans text-base font-semibold text-ink">
-                {t("merge.title")}
-              </h2>
-              <p className="text-sm text-ink-muted">
-                {t("merge.waitingCount", { count: waiting })}
-              </p>
-            </div>
-            <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
-              <Panel
-                id="incoming-requests"
-                title={t("merge.incomingTitle")}
-                description={t("merge.incomingDescription")}
+          {waiting > 0 ? (
+            <div id="requests" className="scroll-mt-20">
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
+                <h2 className="font-sans text-base font-semibold text-ink">
+                  {t("merge.title")}
+                </h2>
+                <p className="text-sm text-ink-muted">
+                  {t("merge.waitingCount", { count: waiting })}
+                </p>
+              </div>
+              <div
+                className={
+                  incoming.length > 0 && outgoing.length > 0
+                    ? "grid gap-6 xl:grid-cols-2 xl:items-start"
+                    : "grid gap-6"
+                }
               >
-                <MergeRequestList
-                  direction="incoming"
-                  items={incoming}
-                  locale={locale}
-                  labels={mergeLabels}
-                />
-              </Panel>
+                {incoming.length > 0 ? (
+                  <Panel
+                    id="incoming-requests"
+                    title={t("merge.incomingTitle")}
+                    description={t("merge.incomingDescription")}
+                  >
+                    <MergeRequestList
+                      direction="incoming"
+                      items={incoming}
+                      locale={locale}
+                      labels={mergeLabels}
+                    />
+                  </Panel>
+                ) : null}
 
-              <Panel
-                id="outgoing-requests"
-                title={t("merge.outgoingTitle")}
-                description={t("merge.outgoingDescription")}
-              >
-                <MergeRequestList
-                  direction="outgoing"
-                  items={outgoing}
-                  locale={locale}
-                  labels={mergeLabels}
-                />
-              </Panel>
+                {outgoing.length > 0 ? (
+                  <Panel
+                    id="outgoing-requests"
+                    title={t("merge.outgoingTitle")}
+                    description={t("merge.outgoingDescription")}
+                  >
+                    <MergeRequestList
+                      direction="outgoing"
+                      items={outgoing}
+                      locale={locale}
+                      labels={mergeLabels}
+                    />
+                  </Panel>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </>

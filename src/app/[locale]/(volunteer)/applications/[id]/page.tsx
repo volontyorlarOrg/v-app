@@ -200,7 +200,7 @@ function Application({
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
           <Panel id="timeline" title={t("detail.timeline")}>
-            <ApplicationTimeline application={application} />
+            <ApplicationTimeline application={application} now={now} />
           </Panel>
 
           {sendable && profileOnly ? (
@@ -265,23 +265,17 @@ function Application({
             </Panel>
           ) : null}
 
-          {application.status === "accepted" ? (
-            <Panel
-              id="attendance"
-              title={t("attendance.title")}
-              description={
-                confirmedHours === undefined ? t("attendance.description") : undefined
-              }
-            >
+          {application.status === "accepted" &&
+          application.attendance &&
+          application.attendance.outcome !== "awaiting_confirmation" ? (
+            <Panel id="attendance" title={t("attendance.title")}>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                     {t("attendance.state")}
                   </dt>
                   <dd className="mt-1 text-sm font-semibold text-ink">
-                    {t(
-                      `attendance.outcome.${application.attendance?.outcome ?? "awaiting_confirmation"}`,
-                    )}
+                    {t(`attendance.outcome.${application.attendance.outcome}`)}
                   </dd>
                 </div>
                 {confirmedHours === undefined ? null : (
@@ -320,7 +314,11 @@ function Application({
 
         <div className="flex min-w-0 flex-col gap-6">
           <Panel id="opportunity" title={opportunitiesT("detail.facts")}>
-            <OpportunityFacts opportunity={application.opportunity} now={now} />
+            <OpportunityFacts
+              opportunity={application.opportunity}
+              now={now}
+              omit={draft ? [] : ["deadline", "capacity", "acceptance"]}
+            />
             {questions === null ? null : (
               <Link
                 href={opportunityHref(application.opportunity.slug)}

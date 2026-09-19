@@ -902,7 +902,7 @@ test.describe("opportunities", () => {
     await expect(page.getByText("Uzbek and English")).toBeVisible();
   });
 
-  test("applying to an opportunity that asks no questions sends the profile in one step", async ({
+  test("applying to an opportunity that accepts automatically is accepted in one step", async ({
     page,
   }) => {
     await page.goto("/en/opportunities/city-marathon-water-stations");
@@ -918,13 +918,21 @@ test.describe("opportunities", () => {
     const facts = page.getByRole("region", { name: "At a glance" });
     await expect(facts.getByText("Organiser")).toHaveCount(0);
     await expect(facts.getByText(/^Closes tomorrow · /)).toBeVisible();
-    await expect(page.getByText(/^Your profile is your application\./)).toBeVisible();
+    await expect(
+      facts.getByText("Instant: you're in as soon as you apply"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/^Your profile is your application\. While places remain/),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(
       /\/en\/applications\/app-city-marathon-water-stations$/,
     );
-    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+    const timeline = page.getByRole("region", { name: "Progress", exact: true });
+    await expect(timeline.getByText("Accepted instantly")).toBeVisible();
+    await expect(timeline.getByText("Under review")).toHaveCount(0);
+    await expect(page.getByText("Accepted", { exact: true }).first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(
       0,
     );
@@ -997,8 +1005,10 @@ test.describe("applications, record, profile and settings", () => {
     await page.goto("/en/applications/app-riverbank");
     await expect(
       page.getByRole("heading", { level: 2, name: "Attendance" }),
-    ).toBeVisible();
-    await expect(page.getByText("Awaiting coordinator confirmation")).toBeVisible();
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Progress", exact: true }),
+    ).toContainText("After the event");
     await page.getByRole("button", { name: "Withdraw application" }).click();
     await page.getByRole("button", { name: "Yes, withdraw" }).click();
     await expect(page.getByText("Withdrawn", { exact: true }).first()).toBeVisible();
@@ -1190,7 +1200,7 @@ test.describe("account connections and merges", () => {
     await expect(row).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for the other account" }),
-    ).toContainText("Nothing is waiting.");
+    ).toHaveCount(0);
   });
 
   test("a callback whose state is not the one this browser started is refused", async ({
@@ -1354,7 +1364,7 @@ test.describe("account connections and merges", () => {
     await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
     await expect(
       page.getByRole("region", { name: "Waiting for your approval" }),
-    ).toContainText("Nothing is waiting.");
+    ).toHaveCount(0);
   });
 
   test("an expired request recovers by refetching the list", async ({ page }) => {
@@ -1495,14 +1505,15 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard handle", () => {
-  test("a Telegram account is told its handle is managed there", async ({ page }) => {
+  test("a Telegram account is told on the leaderboard that its handle is managed there", async ({
+    page,
+  }) => {
     await signIn(page);
     await page.goto("/en/settings");
+    await expect(page.getByRole("region", { name: "Your handle" })).toHaveCount(0);
 
-    const panel = page.getByRole("region", { name: "Your handle" });
-    await expect(panel).toContainText("@dilnoza_k");
-    await expect(panel).toContainText("comes from your Telegram account");
-    await expect(panel.getByRole("button", { name: "Save handle" })).toHaveCount(0);
+    await page.goto("/en/leaderboard");
+    await expect(page.getByText("comes from your Telegram account")).toBeVisible();
   });
 
   test("an email account renames itself and the leaderboard follows", async ({

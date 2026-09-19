@@ -93,7 +93,9 @@ function Applications({
     active: key === group,
     count: sorted.filter((application) => inApplicationGroup(application.status, key))
       .length,
-  }));
+  })).filter((item) => item.key === "all" || item.active || item.count > 0);
+  const filterable =
+    group !== "all" || items.filter((item) => item.key !== "all").length > 1;
 
   return (
     <>
@@ -111,9 +113,11 @@ function Applications({
           <LoadErrorRows failure={applications.failure} labels={errorLabels} />
         ) : (
           <>
-            <div className="border-b border-border px-5 py-4">
-              <Segmented label={t("groups.label")} items={items} />
-            </div>
+            {filterable ? (
+              <div className="border-b border-border px-5 py-4">
+                <Segmented label={t("groups.label")} items={items} />
+              </div>
+            ) : null}
             <ApplicationRows
               applications={shown}
               now={now}

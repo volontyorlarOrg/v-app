@@ -6,19 +6,26 @@ import { cn } from "@/lib/utils";
 
 export function ApplicationTimeline({
   application,
+  now,
 }: {
   application: ApplicationDetail;
+  now: Date;
 }) {
   const t = useTranslations("applications");
   const format = useFormatter();
-  const entries = applicationTimeline(application);
+  const automatic = application.opportunity.acceptanceMode === "automatic";
+  const entries = applicationTimeline(application, { automatic });
+  const eventOver =
+    new Date(application.opportunity.endsAt ?? application.opportunity.startsAt) <= now;
 
   return (
     <ol className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {entries.map((entry) => {
         const decidedDone = entry.step === "decided" && entry.state === "done";
         const label = decidedDone
-          ? t(`status.${application.status}`)
+          ? automatic && application.status === "accepted"
+            ? t("detail.acceptedInstantly")
+            : t(`status.${application.status}`)
           : entry.step === "attendance" && entry.state === "done"
             ? t(`attendance.outcome.${application.attendance?.outcome}`)
             : t(`detail.steps.${entry.step}`);
@@ -54,9 +61,13 @@ export function ApplicationTimeline({
               <p className="tabular mt-0.5 text-xs text-ink-muted">
                 {entry.at
                   ? format.dateTime(new Date(entry.at), "day")
-                  : entry.state === "current"
-                    ? t("detail.inProgress")
-                    : t("detail.pending")}
+                  : entry.step === "attendance"
+                    ? eventOver
+                      ? t("detail.awaitingConfirmation")
+                      : t("detail.afterEvent")
+                    : entry.state === "current"
+                      ? t("detail.inProgress")
+                      : t("detail.pending")}
               </p>
             </div>
           </li>

@@ -14,6 +14,7 @@ import {
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
 import { issuedSessionSchema } from "@/lib/auth/session";
 import {
+  ACCEPTANCE_MODES,
   OPPORTUNITY_FORMATS,
   OPPORTUNITY_STATUSES,
   QUESTION_TYPES,
@@ -45,7 +46,6 @@ export const opportunitySummarySchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
   title: z.string(),
-  summary: z.string().default(""),
   organization: organizationSchema,
   region: z.enum(REGIONS),
   city: optional(z.string()),
@@ -59,6 +59,7 @@ export const opportunitySummarySchema = z.object({
   capacity: optional(z.number().int()),
   estimatedTotalHours: optional(z.number()),
   spotsRemaining: optional(z.number().int()),
+  acceptanceMode: z.enum(ACCEPTANCE_MODES).default("manual"),
 });
 
 export const applicationAttendanceSchema = z.object({
