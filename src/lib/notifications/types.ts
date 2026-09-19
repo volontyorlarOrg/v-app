@@ -3,6 +3,7 @@ export type Notification = {
   kind: string;
   title: string;
   body: string;
+  data: Readonly<Record<string, unknown>> | null;
   at: string;
   unread: boolean;
 };
@@ -39,4 +40,68 @@ export function mergeNotificationName(kind: string): MergeNotificationName | nul
 
   const name = kind.slice(MERGE_KIND_PREFIX.length).replace(/^\./, "");
   return MERGE_NOTIFICATION_NAMES.find((candidate) => candidate === name) ?? "other";
+}
+
+export const ACTIVITY_NOTIFICATION_NAMES = [
+  "submitted",
+  "under_review",
+  "accepted",
+  "rejected",
+  "closed",
+  "attended",
+  "excused",
+  "cancelled",
+] as const;
+
+export type ActivityNotificationName = (typeof ACTIVITY_NOTIFICATION_NAMES)[number];
+
+export type ActivityNotification = {
+  name: ActivityNotificationName;
+  applicationId: string | null;
+};
+
+const REVIEW_NAMES: readonly ActivityNotificationName[] = [
+  "under_review",
+  "accepted",
+  "rejected",
+  "closed",
+];
+
+const ATTENDANCE_NAMES: readonly ActivityNotificationName[] = [
+  "attended",
+  "excused",
+  "cancelled",
+];
+
+function textOf(data: Notification["data"], key: string): string | null {
+  const value = data?.[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function nameIn(
+  names: readonly ActivityNotificationName[],
+  value: string | null,
+): ActivityNotificationName | null {
+  return names.find((name) => name === value) ?? null;
+}
+
+export function activityNotification(
+  kind: string,
+  data: Notification["data"],
+): ActivityNotification | null {
+  const applicationId = textOf(data, "applicationId");
+
+  if (kind === "application.submitted") return { name: "submitted", applicationId };
+
+  if (kind === "application.reviewed") {
+    const name = nameIn(REVIEW_NAMES, textOf(data, "status"));
+    return name ? { name, applicationId } : null;
+  }
+
+  if (kind === "attendance.resolved") {
+    const name = nameIn(ATTENDANCE_NAMES, textOf(data, "outcome"));
+    return name ? { name, applicationId: null } : null;
+  }
+
+  return null;
 }

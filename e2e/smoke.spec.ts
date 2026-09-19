@@ -131,6 +131,24 @@ async function createAccount(page: Page, email: string) {
 }
 
 test.describe("welcome flow", () => {
+  test("a new volunteer's dashboard explains the first steps instead of empty panels", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `fresh-${info.project.name}@example.org`);
+    await page.goto("/en/dashboard");
+    const start = page.getByRole("region", {
+      name: "Start with your first opportunity",
+    });
+    await expect(start).toBeVisible();
+    await expect(start.getByText("Apply with your profile")).toBeVisible();
+    await expect(
+      start.getByRole("link", { name: "Browse opportunities" }),
+    ).toHaveAttribute("href", "/en/opportunities");
+    for (const name of ["Next up", "Your applications", "Participation history"]) {
+      await expect(page.getByRole("heading", { level: 2, name })).toHaveCount(0);
+    }
+  });
+
   test("saves every step to the profile and ends on the first opportunity", async ({
     page,
   }, info) => {
@@ -621,9 +639,17 @@ test.describe("the panel", () => {
   }) => {
     const bell = page.getByRole("button", { name: "Notifications (1)" });
     await bell.click();
+    await expect(page.getByRole("link", { name: "You were accepted" })).toHaveAttribute(
+      "href",
+      "/en/applications/app-riverbank",
+    );
     await expect(
-      page.getByText("You were accepted to Riverbank clean-up"),
+      page.getByText("Open your application for the date and place."),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Attendance confirmed" }),
+    ).toHaveAttribute("href", "/en/dashboard#history");
+    await expect(page.getByText(/status is now/)).toHaveCount(0);
     await expect(page.getByText("An account asked to join yours")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "An account asked to join yours" }),
@@ -874,6 +900,47 @@ test.describe("opportunities", () => {
       0,
     );
     await expect(page.getByText("Uzbek and English")).toBeVisible();
+  });
+
+  test("applying to an opportunity that asks no questions sends the profile in one step", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await page.getByRole("link", { name: "Complete profile" }).click();
+    await page.getByLabel("Bio").fill("I help at city events.");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "What you will be asked" }),
+    ).toHaveCount(0);
+    const facts = page.getByRole("region", { name: "At a glance" });
+    await expect(facts.getByText("Organiser")).toHaveCount(0);
+    await expect(facts.getByText(/^Closes tomorrow · /)).toBeVisible();
+    await expect(page.getByText(/^Your profile is your application\./)).toBeVisible();
+
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(
+      /\/en\/applications\/app-city-marathon-water-stations$/,
+    );
+    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("button", { name: "Save draft" })).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your answers" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("The profile you applied with.", { exact: false }),
+    ).toBeVisible();
+
+    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await expect(
+      page.getByRole("link", { name: "View your application" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {

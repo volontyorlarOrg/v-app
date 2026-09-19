@@ -46,7 +46,41 @@
       "label": "Bildirishnomalar",
       "title": "Bildirishnomalar",
       "empty": "Yangilik yoʻq.",
-      "markAllRead": "Hammasini oʻqilgan deb belgilash"
+      "markAllRead": "Hammasini oʻqilgan deb belgilash",
+      "activity": {
+        "submitted": {
+          "title": "Ariza yuborildi",
+          "body": "Tashkilotchi profilingizni koʻrib chiqadi."
+        },
+        "under_review": {
+          "title": "Arizangiz koʻrib chiqilmoqda",
+          "body": "Tashkilotchi profilingizni koʻrmoqda."
+        },
+        "accepted": {
+          "title": "Siz qabul qilindingiz",
+          "body": "Sana va joy arizangizda koʻrsatilgan."
+        },
+        "rejected": {
+          "title": "Bu safar tanlanmadingiz",
+          "body": "Ariza berganingiz uchun rahmat. Boshqa imkoniyatlar sizni kutmoqda."
+        },
+        "closed": {
+          "title": "Ariza yopildi",
+          "body": "Bu imkoniyat endi volontyor qabul qilmaydi."
+        },
+        "attended": {
+          "title": "Ishtirokingiz tasdiqlandi",
+          "body": "Soatlar va tajriba ishtirok tarixingizga qoʻshildi."
+        },
+        "excused": {
+          "title": "Sababli deb belgilandi",
+          "body": "Tashkilotchi sababli qatnashmaganingizni belgiladi."
+        },
+        "cancelled": {
+          "title": "Bekor qilindi deb belgilandi",
+          "body": "Tashkilotchi ishtirokingizni bekor qilingan deb belgiladi."
+        }
+      }
     },
     "userMenu": {
       "label": "Hisob menyusi"
@@ -158,6 +192,25 @@
       "title": "Navbatdagi",
       "description": "Tadbiri hali oldinda boʻlgan qabul qilingan arizalar.",
       "empty": "Hali rejalashtirilgan tadbir yoʻq. Qabul qilingan ariza bu yerda sanasi va joyi bilan koʻrinadi.",
+      "cta": "Imkoniyatlarni koʻrish"
+    },
+    "start": {
+      "title": "Birinchi imkoniyatingizdan boshlang",
+      "description": "Volontyorlarda volontyorlik shunday ishlaydi.",
+      "steps": {
+        "apply": {
+          "title": "Profilingiz bilan ariza bering",
+          "body": "Bir bosishda profilingiz tashkilotchiga yuboriladi."
+        },
+        "accepted": {
+          "title": "Joyingiz tasdiqlanadi",
+          "body": "Tashkilotchi profilingizni koʻrib chiqadi va tadbirdan oldin sizni qabul qiladi."
+        },
+        "record": {
+          "title": "Qatnashing va tarixingizni boyiting",
+          "body": "Tadbirdan soʻng tasdiqlangan soatlar va tajriba shu yerda hamda reytingda koʻrinadi."
+        }
+      },
       "cta": "Imkoniyatlarni koʻrish"
     },
     "applications": {
@@ -392,10 +445,14 @@
       "inProgress": "Jarayonda",
       "pending": "Hali emas",
       "answers": "Javoblaringiz",
-      "answersEmpty": "Hali hech narsa yozilmagan. Qoralama boʻsh.",
-      "noQuestions": "Bu imkoniyat savol bermagan.",
+      "send": {
+        "title": "Arizani yuboring",
+        "description": "Quyidagi profilingiz — arizangiz. Uni tekshirib, tashkilotchiga yuboring."
+      },
+      "draftClosed": "Bu imkoniyat endi ariza qabul qilmaydi, shuning uchun qoralama yuborilmadi.",
       "fromProfile": "Profilingizdan",
-      "fromProfileHelp": "Tashkilotchi javoblaringiz bilan birga koʻradigan maʼlumot.",
+      "fromProfileHelp": "Ariza bergan paytingizdagi profil. Keyinroq profilga kiritilgan oʻzgarishlar unga taʼsir qilmaydi.",
+      "fromProfileDraft": "Arizani yuborganingizda tashkilotchi koʻradigan maʼlumot.",
       "withdraw": "Arizani qaytarib olish",
       "viewOpportunity": "Imkoniyatni koʻrish",
       "withdrawConfirm": "Arizani qaytarib olasizmi? Buni bekor qilib boʻlmaydi.",
@@ -502,20 +559,23 @@
       "description": "Bu imkoniyat haqida",
       "questions": "Sizdan nima soʻraladi",
       "questionCount": "{count, plural, =0 {Savol yoʻq} other {# ta savol}}",
-      "noQuestions": "Bu imkoniyat savol bermaydi. Profilingiz — arizangiz.",
       "required": "Majburiy",
       "optional": "Ixtiyoriy",
       "maxLength": "{count} tagacha belgi",
       "apply": "Ariza berish",
       "applyClosed": "Arizalar yopilgan",
-      "applying": "Boshlanmoqda…",
+      "applying": "Yuborilmoqda…",
+      "starting": "Boshlanmoqda…",
+      "applyHint": "Profilingiz — arizangiz. Ariza berishingiz bilan tashkilotchi uni koʻradi, tadbir boshlanguncha arizani qaytarib olishingiz mumkin.",
+      "applyHintQuestions": "{count, plural, other {Keyingi sahifada # ta savolga javob berasiz}}, soʻng arizani yuborasiz.",
       "viewApplication": "Arizani koʻrish",
       "profileRequired": "Ariza berishdan oldin profilning asosiy maydonlarini toʻldiring va telefon yoki Telegram nomini qoʻshing.",
       "completeProfile": "Profilni toʻldirish",
       "applyErrors": {
         "opportunityUnavailable": "Bu imkoniyat hozir ariza qabul qilmayapti.",
         "opportunityNotFound": "Bu imkoniyat endi mavjud emas.",
-        "fallback": "Arizani boshlab boʻlmadi. Qayta urinib koʻring."
+        "profileIncomplete": "Avval profilingizni toʻldiring: tashkilotchi aynan uni oʻqiydi.",
+        "fallback": "Arizani yuborib boʻlmadi. Qayta urinib koʻring."
       }
     },
     "status": {
