@@ -52,7 +52,7 @@ export function Sidebar({
 
   return (
     <div className="hidden lg:block lg:w-[16.5rem] lg:shrink-0 lg:border-r lg:border-shell-line lg:bg-shell">
-      <aside className="sticky top-0 flex h-dvh flex-col text-shell-ink">
+      <aside className="sticky top-0 flex h-dvh flex-col text-shell-ink [&_:focus-visible]:outline-shell-ink">
         <div className="shell-glow flex items-center gap-2 px-4 pt-5 pb-4">
           <Link
             href={navHref("dashboard")}
