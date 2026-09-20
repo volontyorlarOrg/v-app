@@ -135,7 +135,14 @@ test.describe("welcome flow", () => {
     page,
   }, info) => {
     await createAccount(page, `fresh-${info.project.name}@example.org`);
-    await page.goto("/en/dashboard");
+    await page.getByRole("button", { name: "Skip for now" }).click();
+    await page
+      .getByLabel("New handle")
+      .fill(`fresh_${info.project.name.replaceAll("-", "_")}`);
+    await page.getByRole("button", { name: "Save handle" }).click();
+    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
+    await page.getByRole("link", { name: "Go to the dashboard" }).click();
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
     const start = page.getByRole("region", {
       name: "Start with your first opportunity",
     });
@@ -191,6 +198,9 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByText("Your profile is complete.", { exact: false }),
     ).toBeVisible();
+    await page.getByLabel("New handle").fill("malika_reads");
+    await page.getByRole("button", { name: "Save handle" }).click();
+    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
 
@@ -211,36 +221,31 @@ test.describe("welcome flow", () => {
     );
   });
 
-  test("skipping keeps a way back, remembers the step, and can be dismissed", async ({
-    page,
-  }, info) => {
+  test("a generated handle cannot bypass onboarding", async ({ page }, info) => {
     await createAccount(page, `skip-${info.project.name}@example.org`);
-    await page.getByRole("link", { name: "Skip for now" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
-
-    const resume = page.getByRole("region", { name: "Finish your pass" });
-    await expect(resume).toBeVisible();
-    await resume.getByRole("link", { name: "Continue setup" }).click();
+    await page.goto("/en/dashboard");
     await expect(page).toHaveURL(/\/en\/welcome$/);
-
-    await page.getByRole("button", { name: "Start" }).click();
-    await page.getByRole("button", { name: "Skip this step" }).click();
+    await expect(page.getByRole("button", { name: "Skip for now" })).toBeVisible();
+    await page.getByRole("button", { name: "Skip for now" }).click();
     await expect(
-      page.getByRole("heading", { level: 2, name: "Where you study" }),
+      page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
     ).toBeVisible();
-    await expect(page.getByText("Step 2 of 3")).toBeVisible();
-
-    await page.reload();
     await expect(
-      page.getByRole("heading", { level: 2, name: "Where you study" }),
+      page.getByText("Choose and save your Volontyorlar username to continue."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Find your first opportunity" }),
+    ).toHaveCount(0);
+
+    await page.getByLabel("New handle").fill("malika_skips");
+    await page.getByRole("button", { name: "Save handle" }).click();
+    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
+    await expect(
+      page.getByRole("link", { name: "Find your first opportunity" }),
     ).toBeVisible();
 
     await page.goto("/en/dashboard");
-    await expect(page.getByText("1 of 3 steps done", { exact: false })).toBeVisible();
-    await page.getByRole("button", { name: "Not now" }).click();
-    await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
-    await page.reload();
-    await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
   });
 
   test("a returning volunteer is not interrupted", async ({ page }) => {
@@ -1052,6 +1057,47 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page).toHaveURL(/\/en\/profile$/);
   });
 
+  test("a profile picture can be cropped, saved and removed", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/profile/edit");
+
+    const editor = page.getByRole("region", { name: "Profile picture" });
+    const chooser = page.waitForEvent("filechooser");
+    await editor.getByRole("button", { name: "Choose picture" }).click();
+    await (await chooser).setFiles("public/opengraph-image.png");
+
+    await expect(
+      editor.getByRole("application", {
+        name: "Drag the picture or use the arrow keys to position it.",
+      }),
+    ).toBeVisible();
+    await editor.getByRole("button", { name: "Save picture" }).click();
+    await expect(editor.getByRole("status")).toContainText(
+      "Your profile picture is saved.",
+    );
+
+    await page.reload();
+    await editor.getByRole("button", { name: "Remove picture" }).click();
+    await expect(editor.getByRole("status")).toContainText(
+      "Your profile picture was removed.",
+    );
+  });
+
+  test("the public profile can be hidden from settings", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/settings");
+
+    const toggle = page.getByRole("switch", {
+      name: "Show my public profile",
+    });
+    await expect(toggle).toBeChecked();
+    await toggle.click();
+    await expect(toggle).not.toBeChecked();
+    await expect(page.getByRole("status")).toContainText(
+      "Your public profile is hidden.",
+    );
+  });
+
   test("the profile form saves to the backend and completes the profile", async ({
     page,
   }) => {
@@ -1505,15 +1551,16 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard handle", () => {
-  test("a Telegram account is told on the leaderboard that its handle is managed there", async ({
-    page,
-  }) => {
+  test("a Telegram account can replace its imported handle", async ({ page }) => {
     await signIn(page);
     await page.goto("/en/settings");
-    await expect(page.getByRole("region", { name: "Your handle" })).toHaveCount(0);
 
-    await page.goto("/en/leaderboard");
-    await expect(page.getByText("comes from your Telegram account")).toBeVisible();
+    const panel = page.getByRole("region", { name: "Your handle" });
+    await expect(panel).toContainText("@dilnoza_k");
+    await panel.getByLabel("New handle").fill("dilnoza_custom");
+    await panel.getByRole("button", { name: "Save handle" }).click();
+    await expect(panel.getByRole("status")).toContainText("Your handle is saved.");
+    await expect(panel).toContainText("@dilnoza_custom");
   });
 
   test("an email account renames itself and the leaderboard follows", async ({

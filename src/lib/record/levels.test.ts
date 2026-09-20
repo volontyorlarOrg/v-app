@@ -119,6 +119,7 @@ describe("reachedLevels", () => {
 
 describe("hasParticipation", () => {
   const empty = {
+    level: "newcomer" as const,
     counts: {
       attended: 0,
       acceptedResolved: 0,

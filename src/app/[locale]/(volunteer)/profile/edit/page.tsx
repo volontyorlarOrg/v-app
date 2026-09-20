@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/app/page-header";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { AvatarEditor } from "@/components/profile/avatar-editor";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
@@ -13,6 +14,7 @@ import { requireSession } from "@/lib/api/session.server";
 import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, type VolunteerProfile } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
+import { initialsOf } from "@/lib/profile/initials";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -73,15 +75,19 @@ export default async function ProfileEditPage({
     languages: languageDirectory.canonicalList(stored.languages),
   };
 
-  return <ProfileEditor values={values} locale={locale as Locale} />;
+  return (
+    <ProfileEditor values={values} locale={locale as Locale} avatarUrl={me.avatarUrl} />
+  );
 }
 
 function ProfileEditor({
   values,
   locale,
+  avatarUrl,
 }: {
   values: VolunteerProfile;
   locale: Locale;
+  avatarUrl?: string;
 }) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
@@ -102,6 +108,35 @@ function ProfileEditor({
           className="mt-3"
         />
       </div>
+
+      <AvatarEditor
+        currentUrl={avatarUrl}
+        initials={initialsOf(values.fullName)}
+        labels={{
+          title: t("avatar.title"),
+          description: t("avatar.description"),
+          choose: t("avatar.choose"),
+          replace: t("avatar.replace"),
+          remove: t("avatar.remove"),
+          removing: t("avatar.removing"),
+          zoom: t("avatar.zoom"),
+          position: t("avatar.position"),
+          upload: t("avatar.upload"),
+          uploading: t("avatar.uploading"),
+          saved: t("avatar.saved"),
+          removed: t("avatar.removed"),
+          errors: {
+            avatarTooLarge: t("avatar.errors.tooLarge"),
+            avatarFormatUnsupported: t("avatar.errors.unsupported"),
+            avatarDimensions: t("avatar.errors.dimensions"),
+            avatarTooSmall: t("avatar.errors.dimensions"),
+            avatarInvalid: t("avatar.errors.invalid"),
+            avatarUploadUnavailable: t("avatar.errors.unavailable"),
+            network: t("avatar.errors.network"),
+            unknown: t("avatar.errors.unknown"),
+          },
+        }}
+      />
 
       <ProfileForm
         values={values}

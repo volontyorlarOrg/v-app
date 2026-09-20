@@ -1,7 +1,7 @@
 "use client";
 
 import type { ShellUser } from "@/components/app/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Link, usePathname } from "@/i18n/navigation";
 import { IDENTITY_ROUTE, isSectionActive, navHref } from "@/lib/routing/routes";
@@ -29,6 +29,7 @@ export function SidebarIdentity({ user, label }: { user: ShellUser; label: strin
           active ? "outline-accent" : "outline-accent/60 group-hover:outline-accent",
         )}
       >
+        {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
         <AvatarFallback className="bg-primary-muted text-sm text-primary-deep">
           {user.initials}
         </AvatarFallback>

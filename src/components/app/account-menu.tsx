@@ -4,7 +4,7 @@ import { ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 
 import { routeIcon } from "@/components/app/route-icons";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link } from "@/i18n/navigation";
@@ -30,6 +30,7 @@ export function AccountMenu({
   labels,
   name,
   initials,
+  avatarUrl,
   handle,
   level,
   profileHref,
@@ -40,6 +41,7 @@ export function AccountMenu({
   labels: AccountMenuLabels;
   name: string;
   initials: string;
+  avatarUrl?: string;
   handle: string | null;
   level: string;
   profileHref: string;
@@ -59,6 +61,7 @@ export function AccountMenu({
           className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface transition-colors hover:border-primary data-[state=open]:border-primary"
         >
           <Avatar aria-hidden="true" className="size-9">
+            {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
         </button>

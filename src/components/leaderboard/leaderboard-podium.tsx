@@ -1,10 +1,11 @@
 import { Crown } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
 import { initialsOf } from "@/lib/profile/initials";
+import { publicProfileHref } from "@/lib/seo/origin";
 import { cn } from "@/lib/utils";
 
 export const PODIUM_SIZE = 3;
@@ -31,6 +32,9 @@ export function LeaderboardPodium({
       <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-12 sm:gap-5 sm:px-8">
         {entries.map((entry) => {
           const first = entry.rank === 1;
+          const profileHref = entry.profileVisible
+            ? publicProfileHref(entry.username)
+            : null;
           return (
             <li
               key={entry.username}
@@ -56,6 +60,9 @@ export function LeaderboardPodium({
                     first ? "size-20 sm:size-24" : "size-16 sm:size-20",
                   )}
                 >
+                  {entry.avatarUrl ? (
+                    <AvatarImage src={entry.avatarUrl} alt="" />
+                  ) : null}
                   <AvatarFallback
                     className={cn(
                       "medal-disc medal-ink",
@@ -74,7 +81,18 @@ export function LeaderboardPodium({
               </div>
               <div className="flex max-w-full flex-col items-center gap-0.5">
                 <p className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
-                  {entry.displayName}
+                  {profileHref ? (
+                    <a
+                      href={profileHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-4 hover:underline"
+                    >
+                      {entry.displayName}
+                    </a>
+                  ) : (
+                    entry.displayName
+                  )}
                 </p>
                 <div className="flex max-w-full items-center gap-1.5">
                   <p className="max-w-full truncate text-xs text-ink-muted sm:text-sm">

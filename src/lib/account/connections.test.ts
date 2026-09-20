@@ -168,7 +168,7 @@ describe("connection state", () => {
     createdAt: "2026-01-01T00:00:00.000Z",
     username: "dilnoza_k",
     usernameSource: "telegram",
-    usernameEditable: false,
+    usernameEditable: true,
     email: "dilnoza@example.org",
     emailVerified: true,
     telegramIdentity: { username: "dilnoza_k" },

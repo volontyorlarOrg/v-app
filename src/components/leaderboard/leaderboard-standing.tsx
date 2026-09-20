@@ -2,7 +2,7 @@ import { Lock } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { PODIUM_SIZE } from "@/components/leaderboard/leaderboard-podium";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { navHref } from "@/lib/routing/routes";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 export function LeaderboardStanding({
   name,
   initials,
+  avatarUrl,
   username,
   rank,
   xp,
@@ -20,6 +21,7 @@ export function LeaderboardStanding({
 }: {
   name: string;
   initials: string;
+  avatarUrl?: string;
   username: string;
   rank: number;
   xp: number;
@@ -39,6 +41,7 @@ export function LeaderboardStanding({
       <div className="flex flex-col gap-5 px-5 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Avatar aria-hidden="true" className="size-14 shrink-0 ring-2 ring-accent/70">
+            {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
             <AvatarFallback className="text-base">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">

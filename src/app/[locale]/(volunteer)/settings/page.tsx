@@ -22,6 +22,7 @@ import {
   type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
 import { SettingsIndex } from "@/components/settings/settings-index";
+import { PublicProfileSection } from "@/components/settings/public-profile-section";
 import type { Locale } from "@/i18n/routing";
 import {
   connectionStates,
@@ -41,7 +42,7 @@ import type { MergeRequest } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { isGoogleConfigured } from "@/lib/auth/config";
 import { initialsOf } from "@/lib/profile/initials";
-import { levelFor, type Level } from "@/lib/record/levels";
+import type { Level } from "@/lib/record/levels";
 
 export const dynamic = "force-dynamic";
 
@@ -102,9 +103,11 @@ export default async function SettingsPage({
     <Settings
       locale={locale as Locale}
       name={me.displayName?.trim() || session.displayName?.trim() || ""}
-      level={levelFor(volunteerRecord.counts)}
+      avatarUrl={me.avatarUrl}
+      level={volunteerRecord.level}
       states={connectionStates(me)}
       username={usernameIdentity(me)}
+      publicProfileEnabled={me.publicProfileEnabled}
       email={me.email ?? null}
       hasPassword={me.authMethods.password}
       googleConfigured={isGoogleConfigured()}
@@ -125,9 +128,11 @@ function toneFor(status: ConnectStatus): ActionTone {
 function Settings({
   locale,
   name,
+  avatarUrl,
   level,
   states,
   username,
+  publicProfileEnabled,
   email,
   hasPassword,
   googleConfigured,
@@ -138,9 +143,11 @@ function Settings({
 }: {
   locale: Locale;
   name: string;
+  avatarUrl?: string;
   level: Level;
   states: readonly ConnectionState[];
   username: UsernameIdentity;
+  publicProfileEnabled: boolean;
   email: string | null;
   hasPassword: boolean;
   googleConfigured: boolean;
@@ -219,6 +226,7 @@ function Settings({
   const index = [
     { id: "account", label: t("account.title") },
     { id: "appearance", label: t("appearance.title") },
+    { id: "privacy", label: t("privacy.title") },
     { id: "connections", label: t("connections.title") },
     { id: "password", label: t("password.label") },
     ...(username.editable ? [{ id: "username", label: t("username.title") }] : []),
@@ -249,6 +257,7 @@ function Settings({
             id="account"
             name={displayName}
             initials={initialsOf(displayName)}
+            avatarUrl={avatarUrl}
             email={email}
             username={username.username}
             connected={states
@@ -277,6 +286,24 @@ function Settings({
                 darkThemeHelp: t("appearance.darkThemeHelp"),
                 language: t("appearance.language"),
                 languageHelp: t("appearance.languageHelp"),
+              }}
+            />
+          </Panel>
+
+          <Panel
+            id="privacy"
+            title={t("privacy.title")}
+            description={t("privacy.description")}
+            className="scroll-mt-20"
+          >
+            <PublicProfileSection
+              initialEnabled={publicProfileEnabled}
+              labels={{
+                label: t("privacy.publicProfile"),
+                description: t("privacy.publicProfileHelp"),
+                visible: t("privacy.publicProfileVisible"),
+                hidden: t("privacy.publicProfileHidden"),
+                error: t("preferences.saveError"),
               }}
             />
           </Panel>

@@ -10,6 +10,7 @@ export type RecordCounts = {
 
 export type VolunteerRecord = {
   counts: RecordCounts;
+  level: Level;
   hours?: number;
   hoursVerified: boolean;
 };
@@ -78,8 +79,10 @@ export type LevelProgress = {
   blockedByReview: boolean;
 };
 
-export function levelProgress(counts: RecordCounts): LevelProgress {
-  const current = levelFor(counts);
+export function levelProgress(
+  counts: RecordCounts,
+  current: Level = levelFor(counts),
+): LevelProgress {
   const next = LEVELS[LEVELS.indexOf(current) + 1] ?? null;
 
   if (!next) {

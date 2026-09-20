@@ -148,6 +148,7 @@ function Leaderboard({
         <LeaderboardStanding
           name={viewer.displayName}
           initials={initialsOf(viewer.displayName)}
+          avatarUrl={viewer.avatarUrl}
           username={viewer.username}
           rank={viewer.rank}
           xp={viewer.xp}

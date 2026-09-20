@@ -1,7 +1,7 @@
 import { CircleCheck, GraduationCap, Languages, Link2, MapPin } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ProfileLink } from "@/lib/profile/links";
@@ -25,6 +25,7 @@ export type ProfileIdentityLabels = {
   bioEmpty: string;
   edit: string;
   record: string;
+  publicProfile: string;
 };
 
 const FACT_ICONS = {
@@ -36,7 +37,9 @@ const FACT_ICONS = {
 export function ProfileIdentity({
   name,
   initials,
+  avatarUrl,
   handle,
+  publicHref,
   stats,
   bio,
   facts,
@@ -46,7 +49,9 @@ export function ProfileIdentity({
 }: {
   name: string;
   initials: string;
+  avatarUrl?: string;
   handle: string | null;
+  publicHref: string | null;
   stats: readonly IdentityStat[];
   bio: string;
   facts: readonly IdentityFact[];
@@ -69,6 +74,7 @@ export function ProfileIdentity({
                 aria-hidden="true"
                 className="size-20 shrink-0 ring-4 ring-surface sm:size-24"
               >
+                {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
                 <AvatarFallback className="text-2xl sm:text-3xl">
                   {initials}
                 </AvatarFallback>
@@ -104,6 +110,16 @@ export function ProfileIdentity({
           </div>
 
           <div className="flex flex-wrap gap-2 sm:shrink-0 sm:pb-0.5">
+            {publicHref ? (
+              <a
+                href={publicHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClass({ variant: "outline", size: "sm" })}
+              >
+                {labels.publicProfile}
+              </a>
+            ) : null}
             <Link href={navHref("profileEdit")} className={buttonClass({ size: "sm" })}>
               {labels.edit}
             </Link>

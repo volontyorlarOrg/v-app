@@ -252,6 +252,7 @@ function freshAccount() {
     username: "dilnoza_k",
     usernameSource: "generated",
     usernameEditable: true,
+    avatarUrl: null,
     authMethods: { telegram: false, google: false, password: false },
   };
 }
@@ -299,7 +300,7 @@ function seededMergeRequests() {
 
 function freshState() {
   return {
-    account: freshAccount(),
+    account: { ...freshAccount(), usernameSource: "custom" },
     mergeRequests: seededMergeRequests(),
     connectStates: new Set(),
     googleConnectStates: new Set(),
@@ -331,6 +332,7 @@ function freshState() {
       notifyDecisions: true,
       profileToOrganisers: true,
       levelPublic: false,
+      publicProfileEnabled: true,
     },
     applications: [
       {
@@ -388,6 +390,7 @@ function freshState() {
         acceptedUnconfirmed: 1,
         standoutReviews: false,
       },
+      level: "active",
       hours: 22,
       hoursVerified: true,
     },
@@ -492,6 +495,7 @@ function newAccountState(email, fullName) {
       acceptedUnconfirmed: 0,
       standoutReviews: false,
     },
+    level: "newcomer",
     hours: 0,
     hoursVerified: true,
   };
@@ -555,7 +559,8 @@ function requesterState() {
     telegramIdentity: { username: "bekzod_r", linkedAt: at(-60) },
     username: "bekzod_r",
     usernameSource: "telegram",
-    usernameEditable: false,
+    usernameEditable: true,
+    avatarUrl: null,
     authMethods: { telegram: true, google: true, password: false },
   };
   state.mergeRequests = [];
@@ -710,6 +715,8 @@ function validateAnswers(opportunity, answers, requireComplete) {
 const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
   displayName: `Volunteer ${String(index + 1).padStart(2, "0")}`,
   username: `volunteer_${String(index + 1).padStart(2, "0")}`,
+  avatarUrl: null,
+  profileVisible: true,
   xp: 3000 - index * 90,
 }));
 
@@ -721,6 +728,8 @@ function leaderboard(state, query) {
     {
       displayName: state.user.displayName,
       username: state.account.username,
+      avatarUrl: state.account.avatarUrl,
+      profileVisible: state.preferences.publicProfileEnabled,
       xp: VIEWER_XP,
     },
   ]
@@ -747,6 +756,8 @@ function leaderboard(state, query) {
             rank: row.rank,
             displayName: row.displayName,
             username: row.username,
+            avatarUrl: row.avatarUrl,
+            profileVisible: row.profileVisible,
             xp: row.xp,
           }
         : null;
@@ -812,7 +823,12 @@ const server = createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://127.0.0.1:${PORT}`);
   const method = request.method ?? "GET";
   const path = url.pathname.replace(/\/+$/, "") || "/";
-  const body = ["POST", "PUT", "PATCH"].includes(method) ? await readJson(request) : {};
+  const writes = ["POST", "PUT", "PATCH"].includes(method);
+  const json = request.headers["content-type"]?.startsWith("application/json");
+  const body = writes && json ? await readJson(request) : {};
+  if (writes && !json) {
+    for await (const _chunk of request) void _chunk;
+  }
 
   if (path === "/" || path === "/health/live")
     return send(response, 200, { status: "ok" });
@@ -843,7 +859,7 @@ const server = createServer(async (request, response) => {
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
     opened.account.usernameSource = "telegram";
-    opened.account.usernameEditable = false;
+    opened.account.usernameEditable = true;
     return send(response, 201, issueSession(opened));
   }
   if (path === "/oauth/connect" && method === "GET") {
@@ -941,9 +957,6 @@ const server = createServer(async (request, response) => {
     return send(response, 200, leaderboard(state, url.searchParams));
   }
   if (path === "/me/username" && method === "PUT") {
-    if (state.account.usernameSource === "telegram") {
-      return send(response, 409, { code: "usernameManagedByTelegram" });
-    }
     const requested = String(body.username ?? "");
     if (!/^[a-z0-9_]{5,32}$/.test(requested)) {
       return send(response, 422, {
@@ -953,6 +966,9 @@ const server = createServer(async (request, response) => {
     }
     if (leaderboardRoster.some((row) => row.username === requested)) {
       return send(response, 409, { code: "usernameUnavailable" });
+    }
+    if (["leaderboard", "settings", "profile", "admin"].includes(requested)) {
+      return send(response, 409, { code: "usernameReserved" });
     }
     state.account.username = requested;
     state.account.usernameSource = "custom";
@@ -971,6 +987,8 @@ const server = createServer(async (request, response) => {
       username: state.account.username,
       usernameSource: state.account.usernameSource,
       usernameEditable: state.account.usernameEditable,
+      avatarUrl: state.account.avatarUrl,
+      publicProfileEnabled: state.preferences.publicProfileEnabled,
       authMethods: state.account.authMethods,
       telegramIdentity: state.account.telegramIdentity,
       preferences: state.preferences,
@@ -1061,6 +1079,14 @@ const server = createServer(async (request, response) => {
   if (path === "/me/preferences" && method === "PUT") {
     Object.assign(state.preferences, body);
     return send(response, 200, state.preferences);
+  }
+  if (path === "/me/avatar" && method === "PUT") {
+    state.account.avatarUrl = `http://127.0.0.1:${PORT}/avatar.webp`;
+    return send(response, 200, { avatarUrl: state.account.avatarUrl });
+  }
+  if (path === "/me/avatar" && method === "DELETE") {
+    state.account.avatarUrl = null;
+    return send(response, 200, { avatarUrl: null });
   }
   if (path === "/profile" && method === "GET") {
     return state.profile

@@ -303,6 +303,7 @@
         "attend": "Attend. Arrive on time and do the work.",
         "confirm": "The organiser confirms you were there. Your record grows, and so does your level."
       },
+      "usernameRequired": "Choose and save your Volontyorlar username to continue.",
       "cta": "Find your first opportunity",
       "dashboard": "Go to the dashboard"
     },
@@ -648,12 +649,36 @@
       "joined": "Joined {date}",
       "bioEmpty": "No bio yet. A few sentences are what an organiser reads first.",
       "edit": "Edit profile",
-      "record": "My record"
+      "record": "My record",
+      "publicProfile": "View public profile"
     },
     "stats": {
       "events": "Events",
       "reliability": "Reliability",
       "hours": "Hours"
+    },
+    "avatar": {
+      "title": "Profile picture",
+      "description": "Choose a JPEG, PNG or WebP up to 10 MB. Move and zoom it before saving.",
+      "choose": "Choose picture",
+      "replace": "Choose another",
+      "remove": "Remove picture",
+      "removing": "Removing…",
+      "zoom": "Zoom",
+      "position": "Drag the picture or use the arrow keys to position it.",
+      "upload": "Save picture",
+      "uploading": "Saving…",
+      "saved": "Your profile picture is saved.",
+      "removed": "Your profile picture was removed.",
+      "errors": {
+        "tooLarge": "That file is larger than 10 MB. Choose a smaller image.",
+        "unsupported": "Choose a JPEG, PNG or WebP image.",
+        "dimensions": "Choose an image at least 128 × 128 pixels and no larger than 20 megapixels.",
+        "invalid": "That image could not be processed. Choose another file.",
+        "unavailable": "Picture uploads are unavailable right now. Try again later.",
+        "network": "We could not reach the server. Check your connection and try again.",
+        "unknown": "The picture was not saved. Try again."
+      }
     },
     "form": {
       "title": "Edit your profile",
@@ -818,7 +843,11 @@
       "profileToOrganisers": "Share my profile with organisers I apply to",
       "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
       "levelPublic": "Show my level on the community list",
-      "levelPublicHelp": "Off by default. Your record stays private either way."
+      "levelPublicHelp": "Off by default. Your record stays private either way.",
+      "publicProfile": "Show my public profile",
+      "publicProfileHelp": "Lets people open volontyorlar.uz/your_username. Contact details, school, city and participation history stay private.",
+      "publicProfileVisible": "Your public profile is visible.",
+      "publicProfileHidden": "Your public profile is hidden. Its address now returns not found."
     },
     "appearance": {
       "title": "Appearance",
@@ -871,12 +900,12 @@
     },
     "username": {
       "title": "Your handle",
-      "description": "The name you appear under on the leaderboard. Every signed-in volunteer can see it.",
+      "description": "Your Volontyorlar username appears on the leaderboard and in your public profile address.",
       "current": "You appear as",
       "field": "New handle",
       "hint": "{min} to {max} characters: lowercase letters, numbers and underscores.",
       "generated": "We made this one up when your account was created. Choose one you would rather be known by.",
-      "managed": "This handle comes from your Telegram account and changes with it.",
+      "managed": "Telegram keeps this username current until you choose your own.",
       "save": "Save handle",
       "saving": "Saving…",
       "saved": "Your handle is saved."
@@ -952,7 +981,7 @@
       "network": "We could not reach the server. Check your connection and try again.",
       "unknown": "Something went wrong. Try again in a moment.",
       "usernameUnavailable": "That handle is taken. Try another one.",
-      "usernameManagedByTelegram": "This handle comes from Telegram and cannot be changed here.",
+      "usernameReserved": "That username is reserved by Volontyorlar. Try another one.",
       "usernameRequired": "Choose a handle.",
       "usernameShort": "A handle needs at least 5 characters.",
       "usernameLong": "A handle can be 32 characters at most.",

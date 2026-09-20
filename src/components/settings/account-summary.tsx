@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { GoogleMark, TelegramMark } from "@/components/brand/provider-marks";
 import { StateChip } from "@/components/dashboard/state-chip";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { ConnectionProvider } from "@/lib/account/types";
 
@@ -24,6 +24,7 @@ export function AccountSummary({
   id,
   name,
   initials,
+  avatarUrl,
   email,
   username,
   connected,
@@ -32,6 +33,7 @@ export function AccountSummary({
   id: string;
   name: string;
   initials: string;
+  avatarUrl?: string;
   email: string | null;
   username: string;
   connected: readonly { provider: ConnectionProvider; label: string }[];
@@ -49,6 +51,7 @@ export function AccountSummary({
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Avatar aria-hidden="true" className="size-14 shrink-0 ring-2 ring-accent/70">
+            {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
             <AvatarFallback className="text-base">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">

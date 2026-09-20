@@ -41,16 +41,19 @@ export function UsernameForm({
   locale,
   identity,
   labels,
+  onSaved,
 }: {
   locale: string;
   identity: UsernameIdentity;
   labels: UsernameLabels;
+  onSaved?: () => void;
 }) {
   const id = useId();
   const { form, result, pending, formProps } = useActionForm({
     schema: usernameFormSchema,
     defaultValues: { username: identity.username },
     action: updateUsernameAction,
+    onSuccess: onSaved,
   });
   const { register, formState } = form;
 

@@ -44,6 +44,7 @@ export type OnboardingLabels = {
     finishOnProfile: string;
     nextTitle: string;
     next: { apply: string; attend: string; confirm: string };
+    usernameRequired: string;
     cta: string;
     dashboard: string;
   };

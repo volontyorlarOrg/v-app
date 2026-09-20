@@ -196,6 +196,7 @@ describe("record and notification schemas", () => {
           acceptedUnconfirmed: 1,
           standoutReviews: false,
         },
+        level: "active",
         hours: undefined,
         hoursVerified: true,
       }).hours,
@@ -255,7 +256,7 @@ const account = {
 const username = {
   username: "dilnoza_k",
   usernameSource: "telegram" as const,
-  usernameEditable: false,
+  usernameEditable: true,
 };
 
 const pendingRequest = {
@@ -322,7 +323,7 @@ describe("the account schema", () => {
       createdAt: "2026-01-01T00:00:00.000Z",
       username: "dilnoza_k",
       usernameSource: "telegram",
-      usernameEditable: false,
+      usernameEditable: true,
     });
 
     expect(parsed.username).toBe("dilnoza_k");
@@ -377,6 +378,8 @@ describe("the leaderboard schema", () => {
     rank: 1,
     displayName: "Dilnoza Karimova",
     username: "dilnoza_k",
+    avatarUrl: null,
+    profileVisible: true,
     xp: 1200,
     isCurrentUser: true,
   };
@@ -391,6 +394,8 @@ describe("the leaderboard schema", () => {
       rank: 1,
       displayName: "Dilnoza Karimova",
       username: "dilnoza_k",
+      avatarUrl: null,
+      profileVisible: true,
       xp: 1200,
     },
     page: 1,
@@ -407,6 +412,8 @@ describe("the leaderboard schema", () => {
           rank: 2,
           displayName: "Bekzod Rustamov",
           username: "bekzod_r",
+          avatarUrl: null,
+          profileVisible: true,
           xp: 0,
           isCurrentUser: true,
         },
@@ -418,6 +425,8 @@ describe("the leaderboard schema", () => {
         rank: 57,
         displayName: "Bekzod Rustamov",
         username: "bekzod_r",
+        avatarUrl: null,
+        profileVisible: true,
         xp: 0,
       },
       scoring,
