@@ -89,10 +89,20 @@ languages, and reduced motion.
 
 ## CI
 
-GitHub Actions installs from the lockfile, then runs ESLint, typegen plus
-TypeScript, Vitest, a production build, and a high-severity dependency audit.
-The browser job installs Chromium, Firefox, and WebKit before running the
-smoke suite. CI deliberately supplies no environment variables.
+GitHub Actions runs on Ubuntu 24.04 for every push and pull request targeting
+`main`, and can also be started manually. It installs from the lockfile, then
+runs ESLint,
+typegen plus TypeScript, Vitest, a high-severity dependency audit, and a
+production build. A parallel browser job installs
+Chromium, Firefox, and WebKit before running the smoke suite and retains its
+Playwright report and test results when it fails. Pull requests also receive a
+dependency-diff review.
+
+CodeQL scans both JavaScript/TypeScript and GitHub Actions workflows on `main`,
+pull requests, and a staggered weekly schedule. Dependabot checks npm and
+GitHub Actions weekly. Every third-party action is pinned to an immutable commit
+and checked out without persisted Git credentials. CI deliberately supplies no
+application environment variables.
 
 ## Deployment
 
