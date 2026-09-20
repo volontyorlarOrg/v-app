@@ -1,6 +1,6 @@
 import { useFormatter, useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
 import { initialsOf } from "@/lib/profile/initials";
+import { publicProfileHref } from "@/lib/seo/origin";
 import { cn } from "@/lib/utils";
 
 const CELL = "px-4 sm:px-5";
@@ -42,6 +43,30 @@ export function LeaderboardTable({
       <TableBody>
         {entries.map((entry) => {
           const isViewer = entry.isCurrentUser;
+          const profileHref = entry.profileVisible
+            ? publicProfileHref(entry.username)
+            : null;
+          const identity = (
+            <span className="flex items-center gap-3">
+              <Avatar aria-hidden="true" className="size-9">
+                {entry.avatarUrl ? <AvatarImage src={entry.avatarUrl} alt="" /> : null}
+                <AvatarFallback className="text-xs">
+                  {initialsOf(entry.displayName)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="min-w-0">
+                <span className="block text-base leading-tight font-semibold break-words text-ink">
+                  {entry.displayName}
+                </span>
+                <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="text-xs break-words text-ink-muted">
+                    @{entry.username}
+                  </span>
+                  {isViewer ? <Badge variant="structure">{t("you")}</Badge> : null}
+                </span>
+              </span>
+            </span>
+          );
           return (
             <TableRow
               key={entry.username}
@@ -61,24 +86,18 @@ export function LeaderboardTable({
                 </span>
               </TableCell>
               <TableCell className={cn(CELL, "py-2.5")}>
-                <span className="flex items-center gap-3">
-                  <Avatar aria-hidden="true" className="size-9">
-                    <AvatarFallback className="text-xs">
-                      {initialsOf(entry.displayName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="min-w-0">
-                    <span className="block text-base leading-tight font-semibold break-words text-ink">
-                      {entry.displayName}
-                    </span>
-                    <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="text-xs break-words text-ink-muted">
-                        @{entry.username}
-                      </span>
-                      {isViewer ? <Badge variant="structure">{t("you")}</Badge> : null}
-                    </span>
-                  </span>
-                </span>
+                {profileHref ? (
+                  <a
+                    href={profileHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-lg underline-offset-4 hover:underline"
+                  >
+                    {identity}
+                  </a>
+                ) : (
+                  identity
+                )}
               </TableCell>
               <TableCell
                 className={cn(

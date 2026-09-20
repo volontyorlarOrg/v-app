@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 export function RecordProgress({ record }: { record: VolunteerRecord }) {
   const t = useTranslations("record");
-  const progress = levelProgress(record.counts);
+  const progress = levelProgress(record.counts, record.level);
   const reached = new Set(reachedLevels(progress.current));
 
   const needed = progress.next ? LEVEL_THRESHOLDS[progress.next].events : null;

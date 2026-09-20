@@ -36,14 +36,14 @@ describe("username input", () => {
 });
 
 describe("username identity", () => {
-  it("treats a Telegram-managed handle as read-only", () => {
+  it("uses the backend decision when an imported Telegram handle is editable", () => {
     expect(
       usernameIdentity({
         username: "dilnoza_k",
         usernameSource: "telegram",
-        usernameEditable: false,
+        usernameEditable: true,
       }),
-    ).toEqual({ username: "dilnoza_k", source: "telegram", editable: false });
+    ).toEqual({ username: "dilnoza_k", source: "telegram", editable: true });
   });
 
   it("uses the backend's editability decision", () => {

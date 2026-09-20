@@ -114,9 +114,10 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   computed here, pagination is rendered from the response's own `page`,
   `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
   place even from a page they are not on. Each account has a public `username`
-  with a `source`: a `generated` or `custom` one is renamed through
+  with a `source`: every username is renamed through
   `PUT /me/username` from `/settings` and from the end of the welcome flow,
-  and a `telegram` one is read-only because Telegram owns it. It is all
+  while a valid Telegram username is only the initial value and stops syncing
+  after the volunteer chooses a custom one. It is all
   described in [`docs/product/LEADERBOARD.md`](docs/product/LEADERBOARD.md),
   and what was known about the contract when it was written is in
   `.agent-memory/decisions/leaderboard-contract-is-built-blind.md`;

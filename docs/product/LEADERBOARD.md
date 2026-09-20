@@ -33,10 +33,10 @@ of 30" line never contradicts an empty table.
 ## Nothing is calculated here
 
 **The frontend never computes experience or a rank.** Both arrive on every
-entry and on `viewer`; the page renders them. This is the same rule the record
-follows for levels in reverse: a level is derived in one place on the frontend
-because the thresholds are ours, while experience and rank are the backend's
-and are only displayed. → `src/lib/api/schemas.ts`
+entry and on `viewer`; the page renders them. The current volunteer level also
+arrives from the backend with the record. The frontend retains the thresholds
+only to explain progress toward the next level; it does not substitute a
+locally calculated current level. → `src/lib/api/schemas.ts`
 
 The one thing the frontend does compute is which page is which — page count,
 the clamped current page, the window of page numbers, and the "showing
@@ -56,37 +56,37 @@ the display name is the primary label and the username has a `source`:
 | ----------- | ------------------------------------------------- | ---------- |
 | `generated` | invented by the backend when the account was made | yes        |
 | `custom`    | chosen by the volunteer                           | yes        |
-| `telegram`  | imported from the connected Telegram account      | no         |
+| `telegram`  | synchronized from Telegram until a custom choice  | yes        |
 
-A Telegram-managed handle is read-only in the interface: the leaderboard shows
-it with a lock and a sentence saying it comes from Telegram and changes with
-it, and the account page leaves its handle panel out, because there is nothing
-to do there. No disabled input, no button that looks live and does nothing.
+A valid available Telegram handle seeds the username and follows later Telegram
+changes. Choosing any username in Volontyorlar changes the source to `custom`
+and permanently stops that synchronization. A provider collision never takes a
+name from its current owner.
 
-A generated or custom handle can be renamed in two places, both the same
-component:
+Every handle can be renamed in two places, both the same component:
 
 - **the account page** (`/settings`), in its own panel under the connections;
 - **the end of the welcome flow**, on the "your pass is ready" step, where a
-  new account is told the handle was invented for it and can choose its own
-  before leaving.
+  generated account must choose its own before leaving.
 
 Placement and treatment are frontend decisions; what a source means is not.
 
 ## The contract
 
 Read: `GET /leaderboard?page&pageSize` → `{ items, viewer, page, pageSize,
-total, scoring }`. Each item is `{ rank, displayName, username, xp,
-isCurrentUser }`; the viewer is `{ rank, displayName, username, xp }`. Write:
-`PUT /me/username` with `{ username
-}` → `{ username, usernameSource, usernameEditable }`. Those same username
+total, scoring }`. Each item is `{ rank, displayName, username, avatarUrl,
+profileVisible, xp, isCurrentUser }`; the viewer carries the same public
+identity fields without `isCurrentUser`. Generated usernames are excluded.
+Rows link to `volontyorlar.uz/<username>` only while `profileVisible` is true.
+Write: `PUT /me/username` with `{ username }` →
+`{ username, usernameSource, usernameEditable }`. Those same username
 fields are required on `GET /me`.
 
 Both are parsed by `src/lib/api/schemas.ts` and read through
 `src/lib/api/leaderboard.server.ts` and `src/lib/api/account.server.ts`. The
 rename is a Server Action in `src/lib/account/actions.ts` returning the usual
 `ActionResult`; its backend codes are `usernameUnavailable`,
-`usernameManagedByTelegram` and `validationFailed`, translated in all three
+`usernameReserved` and `validationFailed`, translated in all three
 catalogs under `settings.errors`, alongside the four field messages the shared
 Zod rules produce.
 

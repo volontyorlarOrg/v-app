@@ -237,3 +237,63 @@ export function authedApi<TSchema extends z.ZodType | undefined = undefined>(
 ): Promise<ApiResult<TSchema>> {
   return api(path, { ...init, accessToken });
 }
+
+export async function apiMultipart<TSchema extends z.ZodType>(
+  path: ApiPath,
+  accessToken: string,
+  body: FormData,
+  schema: TSchema,
+): Promise<z.infer<TSchema>> {
+  const baseUrl = apiBaseUrl();
+  if (!baseUrl) {
+    throw new ApiError("notConfigured", {
+      message: "VOLONTYORLAR_API_URL is not set.",
+    });
+  }
+
+  const requestId = crypto.randomUUID();
+  const request = new Request(new URL(path, `${baseUrl}/`), {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      [REQUEST_ID_HEADER]: requestId,
+      ...(await forwardedVisitor()),
+    },
+    body,
+    signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+  });
+
+  let response: Response;
+  try {
+    response = await fetch(request, { cache: "no-store" });
+  } catch (cause) {
+    const error = classifyApiError(cause);
+    logFailure("PUT", path, error);
+    throw error;
+  }
+
+  const responseText = await response.text();
+  const payload = responseText ? parseJson(responseText) : null;
+  if (!response.ok) {
+    const error = new ApiError(codeForStatus(response.status), {
+      status: response.status,
+      requestId,
+      details: payload,
+    });
+    logFailure("PUT", path, error);
+    throw error;
+  }
+
+  const parsed = schema.safeParse(payload);
+  if (!parsed.success) {
+    const error = new ApiError("invalidResponse", {
+      status: response.status,
+      requestId,
+      cause: parsed.error,
+    });
+    logFailure("PUT", path, error);
+    throw error;
+  }
+  return parsed.data;
+}

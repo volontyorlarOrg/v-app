@@ -303,6 +303,7 @@
         "attend": "Qatnashing. Oʻz vaqtida keling va ishni oxirigacha bajaring.",
         "confirm": "Tashkilotchi qatnashganingizni tasdiqlaydi. Tarixingiz oʻsadi, darajangiz ham."
       },
+      "usernameRequired": "Davom etish uchun Volontyorlar nomingizni tanlang va saqlang.",
       "cta": "Birinchi imkoniyatni topish",
       "dashboard": "Bosh panelga oʻtish"
     },
@@ -648,12 +649,36 @@
       "joined": "Qoʻshilgan: {date}",
       "bioEmpty": "Hozircha bio yoʻq. Tashkilotchi birinchi navbatda bir necha jumlani oʻqiydi.",
       "edit": "Profilni tahrirlash",
-      "record": "Mening tarixim"
+      "record": "Mening tarixim",
+      "publicProfile": "Ochiq profilni koʻrish"
     },
     "stats": {
       "events": "Tadbirlar",
       "reliability": "Ishonchlilik",
       "hours": "Soatlar"
+    },
+    "avatar": {
+      "title": "Profil rasmi",
+      "description": "10 MB gacha JPEG, PNG yoki WebP tanlang. Saqlashdan oldin joyini va kattaligini sozlang.",
+      "choose": "Rasm tanlash",
+      "replace": "Boshqa rasm tanlash",
+      "remove": "Rasmni olib tashlash",
+      "removing": "Olib tashlanmoqda…",
+      "zoom": "Kattalashtirish",
+      "position": "Rasmni suring yoki joylashtirish uchun strelka tugmalaridan foydalaning.",
+      "upload": "Rasmni saqlash",
+      "uploading": "Saqlanmoqda…",
+      "saved": "Profil rasmingiz saqlandi.",
+      "removed": "Profil rasmingiz olib tashlandi.",
+      "errors": {
+        "tooLarge": "Fayl 10 MB dan katta. Kichikroq rasm tanlang.",
+        "unsupported": "JPEG, PNG yoki WebP rasm tanlang.",
+        "dimensions": "Kamida 128 × 128 pikselli va 20 megapikseldan oshmaydigan rasm tanlang.",
+        "invalid": "Rasmni qayta ishlab boʻlmadi. Boshqa fayl tanlang.",
+        "unavailable": "Rasm yuklash hozir mavjud emas. Keyinroq urinib koʻring.",
+        "network": "Serverga ulana olmadik. Aloqani tekshirib, qayta urinib koʻring.",
+        "unknown": "Rasm saqlanmadi. Qayta urinib koʻring."
+      }
     },
     "form": {
       "title": "Profilingizni tahrirlang",
@@ -818,7 +843,11 @@
       "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
       "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
       "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
-      "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi."
+      "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi.",
+      "publicProfile": "Ochiq profilimni koʻrsatish",
+      "publicProfileHelp": "Odamlar volontyorlar.uz/sizning_nomingiz manzilini ochishi mumkin. Aloqa maʼlumotlari, taʼlim joyi, shahar va qatnashuv tarixi maxfiy qoladi.",
+      "publicProfileVisible": "Ochiq profilingiz koʻrinib turibdi.",
+      "publicProfileHidden": "Ochiq profilingiz yashirildi. Uning manzili endi topilmadi javobini beradi."
     },
     "appearance": {
       "title": "Koʻrinish",
@@ -871,12 +900,12 @@
     },
     "username": {
       "title": "Sizning nomingiz",
-      "description": "Reytingda shu nom bilan koʻrinasiz. Uni tizimga kirgan har bir koʻngilli koʻradi.",
+      "description": "Volontyorlar nomingiz reytingda va ochiq profilingiz manzilida koʻrinadi.",
       "current": "Siz shunday koʻrinasiz",
       "field": "Yangi nom",
       "hint": "{min} tadan {max} tagacha belgi: kichik lotin harflari, raqamlar va pastki chiziq.",
       "generated": "Bu nomni hisob yaratilganda biz oʻylab topdik. Oʻzingizga maʼqul nomni tanlang.",
-      "managed": "Bu nom Telegram hisobingizdan olinadi va u bilan birga oʻzgaradi.",
+      "managed": "Oʻz nomingizni tanlamaguningizcha Telegram bu nomni yangilab turadi.",
       "save": "Nomni saqlash",
       "saving": "Saqlanmoqda…",
       "saved": "Nomingiz saqlandi."
@@ -952,7 +981,7 @@
       "network": "Serverga ulana olmadik. Aloqani tekshirib, qayta urinib koʻring.",
       "unknown": "Nimadir notoʻgʻri ketdi. Birozdan soʻng urinib koʻring.",
       "usernameUnavailable": "Bu nom band. Boshqasini tanlang.",
-      "usernameManagedByTelegram": "Bu nom Telegramdan olinadi, uni bu yerda oʻzgartirib boʻlmaydi.",
+      "usernameReserved": "Bu nom Volontyorlar tomonidan band qilingan. Boshqasini tanlang.",
       "usernameRequired": "Nom tanlang.",
       "usernameShort": "Nomda kamida 5 ta belgi boʻlishi kerak.",
       "usernameLong": "Nomda koʻpi bilan 32 ta belgi boʻladi.",

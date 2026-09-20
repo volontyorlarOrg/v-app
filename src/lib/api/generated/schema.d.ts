@@ -217,7 +217,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Rotate a refresh token and issue a new session */
+        /** Exchange a legacy refresh token for a single session token */
         post: operations["AuthController_refresh"];
         delete?: never;
         options?: never;
@@ -251,7 +251,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Revoke the supplied refresh token */
+        /** Revoke the session behind the bearer token */
         post: operations["AuthController_logout"];
         delete?: never;
         options?: never;
@@ -463,6 +463,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload or replace the current account avatar */
+        put: operations["UsersController_avatar"];
+        post?: never;
+        /** Remove the current account avatar */
+        delete: operations["UsersController_removeAvatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/preferences": {
         parameters: {
             query?: never;
@@ -630,7 +648,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Approve and publish a pending opportunity */
+        /** Publish a complete administrator opportunity */
         post: operations["AdminOpportunitiesController_publish"];
         delete?: never;
         options?: never;
@@ -1496,6 +1514,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/profiles/{username}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a privacy-filtered public volunteer profile */
+        get: operations["PublicProfilesController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1529,9 +1564,6 @@ export interface components {
         RefreshAuthDto: {
             refreshToken: string;
         };
-        LogoutDto: {
-            refreshToken?: string;
-        };
         VerifyPasswordConnectionDto: {
             email: string;
             password: string;
@@ -1547,6 +1579,8 @@ export interface components {
             notifyDecisions?: boolean;
             profileToOrganisers?: boolean;
             levelPublic?: boolean;
+            /** @default true */
+            publicProfileEnabled: boolean;
         };
         UpdateProfileDto: {
             fullName: string;
@@ -1593,7 +1627,11 @@ export interface components {
         CreateOpportunityDto: {
             slug: string;
             title: string;
-            summary: string;
+            /**
+             * @deprecated
+             * @description Ignored by every client; kept so older portal builds still validate.
+             */
+            summary?: string;
             description: string;
             requirements?: string[];
             /** @enum {string} */
@@ -1613,6 +1651,12 @@ export interface components {
             imageUrl?: string;
             capacity?: number;
             estimatedTotalHours?: number;
+            /**
+             * @description manual: a coordinator reviews each application. automatic: a submitted application is accepted at once while places remain.
+             * @default manual
+             * @enum {string}
+             */
+            acceptanceMode: "manual" | "automatic";
             /** @default false */
             sourcedByYvc: boolean;
             organizationId: string;
@@ -1620,6 +1664,10 @@ export interface components {
         UpdateOpportunityDto: {
             slug?: string;
             title?: string;
+            /**
+             * @deprecated
+             * @description Ignored by every client; kept so older portal builds still validate.
+             */
             summary?: string;
             description?: string;
             requirements?: string[];
@@ -1640,6 +1688,12 @@ export interface components {
             imageUrl?: string;
             capacity?: number;
             estimatedTotalHours?: number;
+            /**
+             * @description manual: a coordinator reviews each application. automatic: a submitted application is accepted at once while places remain.
+             * @default manual
+             * @enum {string}
+             */
+            acceptanceMode: "manual" | "automatic";
             /** @default false */
             sourcedByYvc: boolean;
             organizationId?: string;
@@ -1701,6 +1755,9 @@ export interface components {
             displayName: string;
             /** @example aziza_uz */
             username: string;
+            /** Format: uri */
+            avatarUrl?: Record<string, never> | null;
+            profileVisible: boolean;
             /** @example 365 */
             xp: number;
             isCurrentUser: boolean;
@@ -1712,6 +1769,9 @@ export interface components {
             displayName: string;
             /** @example dilnoza_k */
             username: string;
+            /** Format: uri */
+            avatarUrl?: Record<string, never> | null;
+            profileVisible: boolean;
             /** @example 0 */
             xp: number;
         };
@@ -1733,6 +1793,28 @@ export interface components {
             /** @example 240 */
             total: number;
             scoring: components["schemas"]["LeaderboardScoringDto"];
+        };
+        PublicProfileStatsDto: {
+            attendedEvents: number;
+            confirmedHours: number;
+        };
+        PublicProfileDto: {
+            /** @example Aziza Karimova */
+            displayName: string;
+            /** @example aziza_volunteer */
+            username: string;
+            /** Format: uri */
+            avatarUrl?: Record<string, never> | null;
+            /** @example I care about education and my community. */
+            bio: string;
+            /** @enum {string|null} */
+            region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan" | null;
+            languages: string[];
+            links: string[];
+            /** @enum {string} */
+            level: "newcomer" | "active" | "trusted" | "core";
+            xp: number;
+            stats: components["schemas"]["PublicProfileStatsDto"];
         };
     };
     responses: never;
@@ -2163,11 +2245,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LogoutDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
             201: {
                 headers: {
@@ -2400,6 +2478,47 @@ export interface operations {
                 "application/json": components["schemas"]["UpdateUsernameDto"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    avatar: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_removeAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -3899,6 +4018,34 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LeaderboardResponseDto"];
                 };
+            };
+        };
+    };
+    PublicProfilesController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProfileDto"];
+                };
+            };
+            /** @description Profile is unavailable or not public */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

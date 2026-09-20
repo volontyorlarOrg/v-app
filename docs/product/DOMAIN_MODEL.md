@@ -69,9 +69,9 @@ description: `description` is the only text.
 
 ## VolunteerRecord and AttendanceRecord
 
-Counts come from the backend — attended, accepted-and-resolved,
-accepted-but-unconfirmed, and a standout flag — and the level is derived here
-so exactly one formula exists. Attendance has four outcomes (`attended`,
+Counts and the resulting level come from the backend — attended,
+accepted-and-resolved, accepted-but-unconfirmed, and a standout flag — so
+exactly one formula exists. Attendance has four outcomes (`attended`,
 `excused`, `cancelled`, `awaiting_confirmation`), and the fourth is excluded
 from reliability entirely. Hours are shown as recorded, not verified, until the
 backend says otherwise. → `src/lib/record/levels.ts`
@@ -81,8 +81,11 @@ backend says otherwise. → `src/lib/record/levels.ts`
 Every account carries a public `username` — lowercase letters, digits and
 underscores, 5 to 32 characters, unique — and the `source` that says where it
 came from: `generated` by the backend, `custom` by the volunteer, or
-`telegram`, imported from the connected identity and therefore read-only here.
-It is the only name the leaderboard shows. → `src/lib/account/username.ts`
+`telegram`, imported from the connected identity. The Telegram value seeds the
+username until the volunteer chooses a custom
+one; after that, Telegram sign-ins do not overwrite it. The leaderboard shows
+the public display name first and the platform username beneath it. →
+`src/lib/account/username.ts`
 
 `xp` is the experience a confirmed attendance earns. Its formula belongs to the
 backend and appears nowhere on the frontend; so does a rank. Both are read from

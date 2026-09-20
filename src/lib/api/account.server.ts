@@ -2,16 +2,18 @@ import "server-only";
 
 import { cache } from "react";
 
-import { api, authedApi } from "@/lib/api/client.server";
+import { api, apiMultipart, authedApi } from "@/lib/api/client.server";
 import { isApiError } from "@/lib/api/errors";
-import { authed } from "@/lib/api/session.server";
+import { authed, requireSession } from "@/lib/api/session.server";
 import {
+  avatarResultSchema,
   connectionOutcomeSchema,
   meSchema,
   mergeApprovalSchema,
   mergeRequestListSchema,
   mergeRequestSchema,
   mergeResolutionSchema,
+  publicProfilePreferenceSchema,
   usernameSummarySchema,
   type ConnectionOutcome,
   type MergeApproval,
@@ -90,6 +92,25 @@ export function updateUsername(username: string) {
     method: "PUT",
     body: { username },
     schema: usernameSummarySchema,
+  });
+}
+
+export async function uploadAvatar(file: File) {
+  const session = await requireSession();
+  const body = new FormData();
+  body.set("avatar", file);
+  return apiMultipart("/me/avatar", session.accessToken, body, avatarResultSchema);
+}
+
+export function removeAvatar() {
+  return authed("/me/avatar", { method: "DELETE", schema: avatarResultSchema });
+}
+
+export function updatePublicProfilePreference(publicProfileEnabled: boolean) {
+  return authed("/me/preferences", {
+    method: "PUT",
+    body: { publicProfileEnabled },
+    schema: publicProfilePreferenceSchema,
   });
 }
 

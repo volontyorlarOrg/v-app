@@ -44,3 +44,9 @@ export function marketingHref(locale: Locale, page: MarketingPage): string | nul
   if (!origin) return null;
   return new URL(`/${locale}${MARKETING_PATHS[page]}`, `${origin}/`).toString();
 }
+
+export function publicProfileHref(username: string): string | null {
+  const origin = marketingOrigin();
+  if (!origin) return null;
+  return new URL(`/${encodeURIComponent(username)}`, `${origin}/`).toString();
+}

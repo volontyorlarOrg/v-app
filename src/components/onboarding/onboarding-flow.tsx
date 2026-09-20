@@ -76,6 +76,9 @@ export function OnboardingFlow({
   const [saved, setSaved] = useState<VolunteerProfile>(
     profileSaved ? initialValues : EMPTY_PROFILE,
   );
+  const [usernameRequired, setUsernameRequired] = useState(
+    username.source === "generated",
+  );
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -116,7 +119,15 @@ export function OnboardingFlow({
       stepIndex(key) < stepIndex(step) ? "done" : key === step ? "current" : "upcoming",
   }));
 
-  const skipLink = (
+  const skipLink = usernameRequired ? (
+    <button
+      type="button"
+      onClick={() => go("done", "forward")}
+      className="inline-flex min-h-8 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+    >
+      {labels.skipForNow}
+    </button>
+  ) : (
     <a
       href={exitHref}
       onClick={skipForNow}
@@ -210,6 +221,8 @@ export function OnboardingFlow({
               percent={completion.percent}
               missing={completion.missing.map((field) => completionFields[field])}
               username={username}
+              usernameRequired={usernameRequired}
+              onUsernameSaved={() => setUsernameRequired(false)}
               ctaHref={ctaHref}
             />
           ) : null}
@@ -259,6 +272,8 @@ function DoneBody({
   percent,
   missing,
   username,
+  usernameRequired,
+  onUsernameSaved,
   ctaHref,
 }: {
   locale: Locale;
@@ -267,6 +282,8 @@ function DoneBody({
   percent: number;
   missing: readonly string[];
   username: UsernameIdentity;
+  usernameRequired: boolean;
+  onUsernameSaved: () => void;
   ctaHref: string;
 }) {
   return (
@@ -289,8 +306,19 @@ function DoneBody({
       )}
 
       <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
-        <UsernameSection locale={locale} identity={username} labels={labels.username} />
+        <UsernameSection
+          locale={locale}
+          identity={username}
+          labels={labels.username}
+          onSaved={onUsernameSaved}
+        />
       </div>
+
+      {usernameRequired ? (
+        <p className="mt-4 text-sm font-semibold text-primary-ink" role="status">
+          {labels.done.usernameRequired}
+        </p>
+      ) : null}
 
       <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
         {labels.done.nextTitle}
@@ -316,21 +344,23 @@ function DoneBody({
         ))}
       </ol>
 
-      <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
-        <a
-          href={ctaHref}
-          className={buttonClass({ size: "sm", className: "min-w-44" })}
-        >
-          {labels.done.cta}
-          <ArrowRight aria-hidden="true" className="size-4" />
-        </a>
-        <Link
-          href={navHref("dashboard")}
-          className={buttonClass({ variant: "ghost", size: "sm" })}
-        >
-          {labels.done.dashboard}
-        </Link>
-      </div>
+      {usernameRequired ? null : (
+        <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
+          <a
+            href={ctaHref}
+            className={buttonClass({ size: "sm", className: "min-w-44" })}
+          >
+            {labels.done.cta}
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </a>
+          <Link
+            href={navHref("dashboard")}
+            className={buttonClass({ variant: "ghost", size: "sm" })}
+          >
+            {labels.done.dashboard}
+          </Link>
+        </div>
+      )}
     </>
   );
 }

@@ -149,7 +149,7 @@ function Dashboard({
   const format = useFormatter();
 
   const now = new Date();
-  const progress = levelProgress(volunteerRecord.counts);
+  const progress = levelProgress(volunteerRecord.counts, volunteerRecord.level);
   const percent = reliabilityPercent(volunteerRecord.counts);
   const meaningful = isReliabilityMeaningful(volunteerRecord.counts);
   const completion =

@@ -14,8 +14,8 @@ every response, built by `src/lib/security/headers.ts`:
   browsing-topics
 - `Strict-Transport-Security` and `upgrade-insecure-requests` only when
   `NEXT_PUBLIC_SITE_URL` is an HTTPS origin
-- a first-party-only Content Security Policy, identical to the marketing
-  site's
+- a Content Security Policy that keeps executable resources first-party and
+  permits HTTPS images for backend-issued avatar URLs
 
 The root layout also sends `robots: noindex` in the document, and
 `robots.txt` disallows everything.

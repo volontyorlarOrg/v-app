@@ -1,4 +1,5 @@
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app/app-shell";
 import { LoadErrorPanel, loadErrorLabels } from "@/components/app/load-error";
@@ -10,10 +11,15 @@ import { failureOf, type LoadFailure } from "@/lib/api/load.server";
 import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
+import type { Locale } from "@/i18n/routing";
 import { activityNotification, mergeNotificationName } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
-import { levelFor } from "@/lib/record/levels";
-import { applicationHref, historyHref, navHref } from "@/lib/routing/routes";
+import {
+  applicationHref,
+  historyHref,
+  localePath,
+  navHref,
+} from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -45,6 +51,9 @@ export default async function VolunteerLayout({
   }
 
   const [me, volunteerRecord, notificationList] = shell;
+  if (me.usernameSource === "generated") {
+    redirect(localePath(locale as Locale, "welcome"));
+  }
   const name =
     me.displayName?.trim() || session.displayName?.trim() || common("volunteer");
   const now = new Date();
@@ -93,7 +102,8 @@ export default async function VolunteerLayout({
       user={{
         name,
         initials: initialsOf(name),
-        level: record(`level.${levelFor(volunteerRecord.counts)}`),
+        avatarUrl: me.avatarUrl,
+        level: record(`level.${volunteerRecord.level}`),
         handle: me.username,
       }}
       notifications={notifications}

@@ -65,6 +65,7 @@ export function MobileHeader({
             labels={accountMenuLabels(t)}
             name={user.name}
             initials={user.initials}
+            avatarUrl={user.avatarUrl}
             handle={user.handle}
             level={user.level}
             profileHref={navHref(IDENTITY_ROUTE)}

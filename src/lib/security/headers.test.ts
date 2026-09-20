@@ -29,6 +29,7 @@ describe("security headers", () => {
       expect(policy).toContain("object-src 'none'");
       expect(policy).toContain("frame-ancestors 'none'");
       expect(policy).toContain("form-action 'self'");
+      expect(policy).toContain("img-src 'self' data: blob: https:");
       expect(find(secureTransport, "X-Frame-Options")?.value).toBe("DENY");
       expect(find(secureTransport, "X-Content-Type-Options")?.value).toBe("nosniff");
     }

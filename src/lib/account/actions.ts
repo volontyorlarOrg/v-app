@@ -15,9 +15,12 @@ import {
 import {
   approveMergeRequest,
   cancelMergeRequest,
+  removeAvatar,
   rejectMergeRequest,
   updatePassword,
+  updatePublicProfilePreference,
   updateUsername,
+  uploadAvatar,
 } from "@/lib/api/account.server";
 import {
   fieldErrorsOf,
@@ -72,6 +75,44 @@ export async function updateUsernameAction(
   }
 
   revalidateAccount(locale);
+  return okResult;
+}
+
+export async function uploadAvatarAction(formData: FormData): Promise<ActionResult> {
+  const avatar = formData.get("avatar");
+  if (!(avatar instanceof File) || avatar.size === 0) {
+    return failedResult("avatarInvalid");
+  }
+
+  try {
+    await uploadAvatar(avatar);
+  } catch (error) {
+    unstable_rethrow(error);
+    return resultFromError(error);
+  }
+  revalidatePath("/", "layout");
+  return okResult;
+}
+
+export async function removeAvatarAction(): Promise<ActionResult> {
+  try {
+    await removeAvatar();
+  } catch (error) {
+    unstable_rethrow(error);
+    return resultFromError(error);
+  }
+  revalidatePath("/", "layout");
+  return okResult;
+}
+
+export async function setPublicProfileAction(enabled: boolean): Promise<ActionResult> {
+  try {
+    await updatePublicProfilePreference(enabled);
+  } catch (error) {
+    unstable_rethrow(error);
+    return resultFromError(error);
+  }
+  revalidatePath("/", "layout");
   return okResult;
 }
 

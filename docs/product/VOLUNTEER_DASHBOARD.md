@@ -77,9 +77,8 @@ actionable instead of making it another catalogue.
   sent application's facts drop the deadline and the places, a remote
   opportunity does not repeat "Online" as its format, the application filters
   appear only when they can narrow the list, the profile's contact panel and
-  figures show only what exists, and the account page hides the handle panel
-  for a Telegram-managed handle and the joining-accounts section while nothing
-  waits.
+  figures show only what exists, and the account page hides the joining-accounts
+  section while nothing waits.
 - **Sample data says it is sample data**, in the hero and in the shell, and it
   never names a real partner or opportunity source as an organiser.
 
@@ -99,14 +98,14 @@ actionable instead of making it another catalogue.
 The dashboard is a summary; every section behind it is built on the same mock
 data so the panel can be judged as a product:
 
-| Section       | What it shows                                                           | Real-panel behaviour on mock data                                                                                                                              |
-| ------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Opportunities | Ten opportunities across seven regions and three formats                | URL-backed search, region, format, sort and an open-only switch; cards with save toggles; a detail page with facts, requirements and the organiser's questions |
-| Applications  | Five applications from draft to rejected                                | Status groups in the URL; a detail page with a timeline, the answers, the profile snapshot, and the disabled continue or withdraw action                       |
-| Saved         | A view inside Opportunities                                             | The same cards with the save toggle on; `/saved` redirects here                                                                                                |
-| Record        | Lives on the dashboard: four figures, the level rail, the next-level meter and the history panel (`#history`); `/record` redirects there | Outcomes as chips, with the awaiting-confirmation rule stated                                                                          |
-| Profile       | The full profile in three panels                                        | An editor that reports "saved in this preview only"                                                                                                            |
-| Settings      | Notifications, privacy and appearance, account and access               | Three grouped panels with the real theme switch, language control, linked identities, and disabled destructive actions                                         |
+| Section       | What it shows                                                                                                                            | Real-panel behaviour on mock data                                                                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Opportunities | Ten opportunities across seven regions and three formats                                                                                 | URL-backed search, region, format, sort and an open-only switch; cards with save toggles; a detail page with facts, requirements and the organiser's questions |
+| Applications  | Five applications from draft to rejected                                                                                                 | Status groups in the URL; a detail page with a timeline, the answers, the profile snapshot, and the disabled continue or withdraw action                       |
+| Saved         | A view inside Opportunities                                                                                                              | The same cards with the save toggle on; `/saved` redirects here                                                                                                |
+| Record        | Lives on the dashboard: four figures, the level rail, the next-level meter and the history panel (`#history`); `/record` redirects there | Outcomes as chips, with the awaiting-confirmation rule stated                                                                                                  |
+| Profile       | The full profile in three panels                                                                                                         | An editor that reports "saved in this preview only"                                                                                                            |
+| Settings      | Notifications, privacy and appearance, account and access                                                                                | Three grouped panels with the real theme switch, language control, linked identities, and disabled destructive actions                                         |
 
 ## Where the data will come from
 

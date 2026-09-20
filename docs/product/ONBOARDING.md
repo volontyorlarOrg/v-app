@@ -63,13 +63,12 @@ gains a part once the backend has accepted the save, so the object never
 claims more than the profile holds.
 
 The Ready step shows completeness, what happens next, and the call to action.
-It also carries the handle the volunteer appears under on the leaderboard:
-a `generated` or `custom` handle gets the rename form from
-`src/components/account/`, the same one the account page uses, and a
-Telegram-managed handle is shown read-only with the reason. An account whose
-backend does not send a handle sees no card at all. It is the fourth step's
-only write, it goes to `PUT /me/username` rather than to the profile, and it is
-optional: nothing blocks the call to action. →
+It also carries the shared rename form from `src/components/account/`. This is
+the fourth step's only write and goes to `PUT /me/username` rather than to the
+profile. A generated username blocks the exit actions until the volunteer saves
+an available platform username. The volunteer layout repeats that gate for
+existing generated accounts on their next visit. Telegram-provided usernames
+do not block entry and remain editable. →
 [`LEADERBOARD.md`](LEADERBOARD.md)
 
 Contact is asked for even though it stopped counting toward completeness when
@@ -82,8 +81,9 @@ profile without it.
 ## Skipping
 
 - **Skip for now** sits on the welcome screen and in the header of every
-  step. It records the current step and leaves for the return path, or the
-  dashboard.
+  step. For an account that already has a public username it records the current
+  step and leaves. For a generated account it jumps to the Ready step so the
+  required username can be chosen without forcing profile completion.
 - **Skip this step** advances without saving.
 - **Back** returns one step; the welcome screen is reachable from the first.
 - The dashboard shows a "Finish your pass" row while the flow is open, with

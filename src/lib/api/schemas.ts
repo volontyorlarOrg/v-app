@@ -20,7 +20,7 @@ import {
   QUESTION_TYPES,
   REGIONS,
 } from "@/lib/opportunities/types";
-import { ATTENDANCE_OUTCOMES } from "@/lib/record/levels";
+import { ATTENDANCE_OUTCOMES, LEVELS } from "@/lib/record/levels";
 
 function optional<T extends z.ZodTypeAny>(schema: T) {
   return schema.nullish().transform((value) => value ?? undefined);
@@ -187,6 +187,7 @@ export const recordSchema = z.object({
     acceptedUnconfirmed: z.number().int().nonnegative(),
     standoutReviews: z.boolean().default(false),
   }),
+  level: z.enum(LEVELS),
   hours: optional(z.number()),
   hoursVerified: z.boolean().default(true),
 });
@@ -235,6 +236,8 @@ export const leaderboardEntrySchema = z
     rank: z.number().int().positive(),
     displayName: z.string().min(1),
     username: usernameField,
+    avatarUrl: optional(z.url()),
+    profileVisible: z.boolean(),
     xp: z.number().int().nonnegative(),
     isCurrentUser: z.boolean(),
   })
@@ -245,6 +248,8 @@ const leaderboardViewerSchema = z
     rank: z.number().int().positive(),
     displayName: z.string().min(1),
     username: usernameField,
+    avatarUrl: optional(z.url()),
+    profileVisible: z.boolean(),
     xp: z.number().int().nonnegative(),
   })
   .strict();
@@ -296,6 +301,8 @@ export const meSchema = z
     username: usernameField,
     usernameSource: z.enum(USERNAME_SOURCES),
     usernameEditable: z.boolean(),
+    avatarUrl: optional(z.url()),
+    publicProfileEnabled: z.boolean().default(true),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),
@@ -355,6 +362,12 @@ export const mergeApprovalSchema = z.object({
 });
 
 export const mergeResolutionSchema = z.object({ request: mergeRequestSchema });
+
+export const avatarResultSchema = z.object({ avatarUrl: optional(z.url()) });
+
+export const publicProfilePreferenceSchema = z.object({
+  publicProfileEnabled: z.boolean(),
+});
 
 export const acknowledgementSchema = z.looseObject({});
 

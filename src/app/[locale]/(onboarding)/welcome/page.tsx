@@ -177,6 +177,7 @@ function Welcome({
         attend: t("done.next.attend"),
         confirm: t("done.next.confirm"),
       },
+      usernameRequired: t("done.usernameRequired"),
       cta: t("done.cta"),
       dashboard: t("done.dashboard"),
     },

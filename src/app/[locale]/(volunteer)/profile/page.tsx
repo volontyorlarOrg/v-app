@@ -31,11 +31,11 @@ import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
   hasParticipation,
   isReliabilityMeaningful,
-  levelFor,
   reliabilityPercent,
   type VolunteerRecord,
 } from "@/lib/record/levels";
 import { cn } from "@/lib/utils";
+import { publicProfileHref } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +74,9 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
     <Profile
       values={values}
       record={volunteerRecord}
-      handle={me.telegramIdentity?.username?.trim() || null}
+      handle={me.username}
+      avatarUrl={me.avatarUrl}
+      publicHref={me.publicProfileEnabled ? publicProfileHref(me.username) : null}
       joinedAt={me.createdAt}
     />
   );
@@ -101,11 +103,15 @@ function Profile({
   values,
   record,
   handle,
+  avatarUrl,
+  publicHref,
   joinedAt,
 }: {
   values: VolunteerProfile;
   record: VolunteerRecord;
   handle: string | null;
+  avatarUrl?: string;
+  publicHref: string | null;
   joinedAt: string;
 }) {
   const t = useTranslations("profile");
@@ -196,14 +202,16 @@ function Profile({
       <ProfileIdentity
         name={name}
         initials={initials}
+        avatarUrl={avatarUrl}
         handle={handle}
+        publicHref={publicHref}
         stats={stats}
         bio={values.bio}
         facts={facts}
         links={profileLinks(values.links)}
         complete={completion.complete}
         labels={{
-          level: recordLabels(`level.${levelFor(record.counts)}`),
+          level: recordLabels(`level.${record.level}`),
           complete: t("identity.complete"),
           joined: Number.isNaN(joinedOn.getTime())
             ? null
@@ -213,6 +221,7 @@ function Profile({
           bioEmpty: t("identity.bioEmpty"),
           edit: t("identity.edit"),
           record: recordLabels("history.title"),
+          publicProfile: t("identity.publicProfile"),
         }}
       />
 
