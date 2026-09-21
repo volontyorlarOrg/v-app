@@ -367,11 +367,11 @@
   "leaderboard": {
     "metaTitle": "Leaderboard",
     "title": "Leaderboard",
-    "description": "Every volunteer, ordered by the experience their confirmed attendance has earned.",
+    "description": "Volunteers who have chosen a handle, ordered by the experience their confirmed attendance has earned.",
     "you": "You",
     "standing": {
       "rank": "Your place",
-      "of": "of {total} volunteers",
+      "of": "of {total} on the leaderboard",
       "xp": "Experience",
       "xpHelp": "Earned from confirmed attendance.",
       "appearAs": "You appear as",

@@ -1549,7 +1549,8 @@ test.describe("the leaderboard", () => {
     await expect(fourth).toContainText("@volunteer_04");
     await expect(fourth).toContainText("2,730 XP");
     await expect(page.getByRole("row")).toHaveCount(23);
-    await expect(page.getByText("30 volunteers")).toBeVisible();
+    await expect(page.getByText(/^42\s*volunteers$/)).toBeVisible();
+    await expect(page.getByRole("status")).toContainText("Showing 1\u201325 of 30");
   });
 
   test("shows the signed-in volunteer even from a page they are not on", async ({
@@ -1557,7 +1558,7 @@ test.describe("the leaderboard", () => {
   }) => {
     const standing = page.getByRole("region", { name: "Dilnoza Karimova" });
     await expect(standing.getByRole("definition").first()).toHaveText("#30");
-    await expect(standing).toContainText("of 30 volunteers");
+    await expect(standing).toContainText("of 30 on the leaderboard");
     await expect(standing).toContainText("@dilnoza_k");
     await expect(standing).toContainText("50 XP for every confirmed event");
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);

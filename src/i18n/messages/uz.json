@@ -367,11 +367,11 @@
   "leaderboard": {
     "metaTitle": "Reyting",
     "title": "Reyting",
-    "description": "Barcha koʻngillilar tasdiqlangan ishtirok uchun toʻplangan tajriba boʻyicha saralangan.",
+    "description": "Nom tanlagan koʻngillilar tasdiqlangan ishtirok uchun toʻplangan tajriba boʻyicha saralangan.",
     "you": "Siz",
     "standing": {
       "rank": "Sizning oʻrningiz",
-      "of": "{total} koʻngillidan",
+      "of": "reytingdagi {total} koʻngillidan",
       "xp": "Tajriba",
       "xpHelp": "Tasdiqlangan ishtirok uchun beriladi.",
       "appearAs": "Siz shunday koʻrinasiz",

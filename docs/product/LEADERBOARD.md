@@ -11,10 +11,15 @@ desktop sidebar, and the third of the four thumbs in the phone tab bar
 applications used to hold once applications became a tab inside the
 opportunities section.
 
+Beside the title, the page states the size of the whole community: the
+response's `volunteerTotal`, every active volunteer, including those who have
+not chosen a handle yet and so are not ranked. The board itself lists only
+chosen handles, which is why its own count, `total`, can be smaller.
+
 The page has three parts:
 
 1. **Your standing** — two figures read straight from the response's `viewer`:
-   the place and the experience, with the total volunteers as the place's note.
+   the place and the experience, with the ranked total as the place's note.
    Beneath them, the handle the volunteer appears under and a link to the
    account page, which is where a handle is changed.
 2. **Standings** — one page of the board: place, public display name, public
@@ -44,6 +49,10 @@ first–last of total" range. → `src/lib/leaderboard/pagination.ts`
 
 The backend marks the reader's row with `isCurrentUser`; the frontend does not
 infer identity from another field.
+
+`volunteerTotal` is optional in the schema only so this app can ship before the
+backend that adds it: until then the schema reads it as `total`, the headline
+the page showed before. Make it required once every backend serves it.
 
 ## The handle
 
