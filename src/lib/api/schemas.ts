@@ -269,9 +269,14 @@ export const leaderboardSchema = z
     page: z.number().int().positive(),
     pageSize: z.number().int().min(1).max(100),
     total: z.number().int().nonnegative(),
+    volunteerTotal: z.number().int().nonnegative().optional(),
     scoring: leaderboardScoringSchema,
   })
-  .strict();
+  .strict()
+  .transform(({ volunteerTotal, ...board }) => ({
+    ...board,
+    volunteerTotal: volunteerTotal ?? board.total,
+  }));
 
 export const usernameSummarySchema = z
   .object({

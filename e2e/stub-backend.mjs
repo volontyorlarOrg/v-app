@@ -721,6 +721,7 @@ const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
 }));
 
 const VIEWER_XP = 320;
+const VOLUNTEERS_WITHOUT_HANDLE = 12;
 
 function leaderboard(state, query) {
   const rows = [
@@ -749,6 +750,7 @@ function leaderboard(state, query) {
     page,
     pageSize,
     total: rows.length,
+    volunteerTotal: rows.length + VOLUNTEERS_WITHOUT_HANDLE,
     viewer: (() => {
       const row = rows.find((candidate) => candidate.isCurrentUser);
       return row
