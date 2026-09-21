@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
@@ -7,13 +8,15 @@ import {
   loadErrorLabels,
   type LoadErrorLabels,
 } from "@/components/app/load-error";
-import { Panel } from "@/components/app/panel";
-import { ProfileMeter } from "@/components/dashboard/profile-meter";
 import {
-  ProfileIdentity,
-  type IdentityFact,
-  type IdentityStat,
-} from "@/components/profile/profile-identity";
+  ProfileFigureNumber,
+  ProfileLinkList,
+  ProfileSheet,
+  type ProfileFigure,
+  type ProfileRow,
+} from "@/components/profile/profile-sheet";
+import { PublicPageLink } from "@/components/profile/public-page-link";
+import { Link } from "@/i18n/navigation";
 import { getMe } from "@/lib/api/account.server";
 import { settle, type LoadFailure } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
@@ -34,7 +37,7 @@ import {
   reliabilityPercent,
   type VolunteerRecord,
 } from "@/lib/record/levels";
-import { cn } from "@/lib/utils";
+import { navHref } from "@/lib/routing/routes";
 import { publicProfileHref } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
@@ -76,10 +79,18 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       record={volunteerRecord}
       handle={me.username}
       avatarUrl={me.avatarUrl}
-      publicHref={me.publicProfileEnabled ? publicProfileHref(me.username) : null}
+      publicPage={publicPage(me.username, me.publicProfileEnabled)}
       joinedAt={me.createdAt}
     />
   );
+}
+
+type PublicPage = { state: "shown"; href: string } | { state: "hidden" } | null;
+
+function publicPage(username: string | null, enabled: boolean): PublicPage {
+  const href = username ? publicProfileHref(username) : null;
+  if (!href) return null;
+  return enabled ? { state: "shown", href } : { state: "hidden" };
 }
 
 function ProfileUnavailable({
@@ -104,152 +115,152 @@ function Profile({
   record,
   handle,
   avatarUrl,
-  publicHref,
+  publicPage,
   joinedAt,
 }: {
   values: VolunteerProfile;
   record: VolunteerRecord;
   handle: string | null;
   avatarUrl?: string;
-  publicHref: string | null;
+  publicPage: PublicPage;
   joinedAt: string;
 }) {
   const t = useTranslations("profile");
   const common = useTranslations("common");
+  const dashboard = useTranslations("dashboard.profile");
   const opportunities = useTranslations("opportunities");
   const recordLabels = useTranslations("record");
   const format = useFormatter();
   const locale = useLocale() as Locale;
 
   const completion = profileCompletion(values);
-  const joinedOn = new Date(joinedAt);
   const name = values.fullName.trim() || common("volunteer");
-  const initials = initialsOf(name);
+  const joinedOn = new Date(joinedAt);
   const percent = reliabilityPercent(record.counts);
-  const meaningful = isReliabilityMeaningful(record.counts);
+  const number = (chunks: ReactNode) => <ProfileFigureNumber chunks={chunks} />;
 
-  const stats: IdentityStat[] = hasParticipation(record)
+  const figures: ProfileFigure[] = hasParticipation(record)
     ? [
         {
           id: "events",
-          label: t("stats.events"),
-          value: format.number(record.counts.attended),
+          content: t.rich("sheet.events", {
+            count: record.counts.attended,
+            value: format.number(record.counts.attended),
+            n: number,
+          }),
         },
-        ...(meaningful && percent !== null
-          ? [{ id: "reliability", label: t("stats.reliability"), value: `${percent}%` }]
-          : []),
         ...(record.hours === undefined
           ? []
           : [
               {
                 id: "hours",
-                label: t("stats.hours"),
-                value: format.number(record.hours),
+                content: t.rich("sheet.hours", {
+                  count: record.hours,
+                  value: format.number(record.hours),
+                  n: number,
+                }),
               },
             ]),
+        ...(isReliabilityMeaningful(record.counts) && percent !== null
+          ? [
+              {
+                id: "reliability",
+                content: t.rich("sheet.reliability", {
+                  value: format.number(percent / 100, { style: "percent" }),
+                  n: number,
+                }),
+              },
+            ]
+          : []),
       ]
     : [];
 
-  const facts: IdentityFact[] = [
-    { id: "education" as const, value: join([values.school, values.gradeYear]) },
-    {
-      id: "place" as const,
-      value: join([
-        values.region ? opportunities(`regions.${values.region}`) : "",
-        values.city,
-      ]),
-    },
-    {
-      id: "languages" as const,
-      value: languageDirectory.format(values.languages, locale),
-    },
-  ].filter((fact) => fact.value.length > 0);
+  const text = (id: string, value: string): ProfileRow | null =>
+    value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
+  const languages = languageDirectory.format(values.languages, locale);
+  const links = profileLinks(values.links);
 
-  const contact = [
-    { id: "phone", label: t("fields.phone"), value: values.phone.trim() },
-    {
-      id: "telegram",
-      label: t("fields.telegram"),
-      value: values.telegram.trim() ? `@${values.telegram.trim()}` : "",
-    },
-  ].filter((row) => row.value.length > 0);
-
-  const contactPanel =
-    contact.length === 0 ? null : (
-      <Panel
-        id="contact"
-        title={t("overview.contactTitle")}
-        description={t("overview.contactHelp")}
-        padding="none"
-        className="enter-rise order-2 [--enter-delay:120ms] xl:order-1"
-      >
-        <dl>
-          {contact.map((row) => (
-            <div
-              key={row.id}
-              className="flex flex-col gap-1 border-t border-border px-5 py-4 first:border-t-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-            >
-              <dt className="text-sm font-semibold text-ink">{row.label}</dt>
-              <dd className="tabular text-sm text-ink">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </Panel>
-    );
+  const rows = [
+    values.region
+      ? {
+          id: "region",
+          label: t("sheet.rows.region"),
+          value: opportunities(`regions.${values.region}`),
+        }
+      : null,
+    text("city", values.city),
+    text("school", values.school),
+    text("gradeYear", values.gradeYear),
+    text("languages", languages),
+    text("phone", values.phone),
+    text("telegram", values.telegram.trim() ? `@${values.telegram.trim()}` : ""),
+    links.length > 0
+      ? {
+          id: "links",
+          label: t("sheet.rows.links"),
+          value: <ProfileLinkList links={links} />,
+        }
+      : null,
+    publicPage
+      ? {
+          id: "publicPage",
+          label: t("sheet.rows.publicPage"),
+          value:
+            publicPage.state === "shown" ? (
+              <PublicPageLink
+                href={publicPage.href}
+                labels={{ copy: t("sheet.copy"), copied: t("sheet.copied") }}
+              />
+            ) : (
+              <span className="flex flex-wrap items-baseline gap-x-2">
+                <span className="text-ink-muted">{t("sheet.publicHidden")}</span>
+                <Link
+                  href={`${navHref("settings")}#privacy`}
+                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                >
+                  {t("sheet.publicShow")}
+                </Link>
+              </span>
+            ),
+        }
+      : null,
+    Number.isNaN(joinedOn.getTime())
+      ? null
+      : {
+          id: "joined",
+          label: t("sheet.rows.joined"),
+          value: format.dateTime(joinedOn, "monthYear"),
+        },
+  ].filter((row): row is ProfileRow => row !== null);
 
   return (
-    <div className="flex flex-col gap-6">
-      <ProfileIdentity
-        name={name}
-        initials={initials}
-        avatarUrl={avatarUrl}
-        handle={handle}
-        publicHref={publicHref}
-        stats={stats}
-        bio={values.bio}
-        facts={facts}
-        links={profileLinks(values.links)}
-        complete={completion.complete}
-        labels={{
-          level: recordLabels(`level.${record.level}`),
-          complete: t("identity.complete"),
-          joined: Number.isNaN(joinedOn.getTime())
-            ? null
-            : t("identity.joined", {
-                date: format.dateTime(joinedOn, "monthYear"),
+    <ProfileSheet
+      name={name}
+      initials={initialsOf(name)}
+      avatarUrl={avatarUrl}
+      handle={handle}
+      level={recordLabels(`level.${record.level}`)}
+      bio={values.bio.trim()}
+      figures={figures}
+      rows={rows}
+      completion={
+        completion.complete
+          ? null
+          : {
+              percent: completion.percent,
+              value: t("completion.value", { percent: completion.percent }),
+              missing: t("completion.missing", {
+                fields: completion.missing
+                  .map((field) => t(`completionFields.${field}`))
+                  .join(", "),
               }),
-          bioEmpty: t("identity.bioEmpty"),
-          edit: t("identity.edit"),
-          record: recordLabels("history.title"),
-          publicProfile: t("identity.publicProfile"),
-        }}
-      />
-
-      {completion.complete ? (
-        contactPanel
-      ) : (
-        <div
-          className={cn(
-            "grid gap-6",
-            contactPanel && "xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start",
-          )}
-        >
-          {contactPanel}
-          <Panel
-            id="completeness"
-            className="enter-rise order-1 [--enter-delay:60ms] xl:sticky xl:top-8 xl:order-2"
-          >
-            <ProfileMeter completion={completion} />
-          </Panel>
-        </div>
-      )}
-    </div>
+              label: t("completion.label"),
+            }
+      }
+      labels={{
+        action: completion.complete ? t("sheet.edit") : dashboard("cta"),
+        figures: t("sheet.figures"),
+      }}
+    />
   );
-}
-
-function join(parts: readonly string[]): string {
-  return parts
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .join(", ");
 }

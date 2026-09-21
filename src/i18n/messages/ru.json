@@ -644,18 +644,28 @@
   },
   "profile": {
     "metaTitle": "Профиль",
-    "identity": {
-      "complete": "Профиль заполнен",
-      "joined": "С нами: {date}",
-      "bioEmpty": "Био пока нет. Организатор первым делом читает несколько предложений.",
+    "sheet": {
       "edit": "Редактировать профиль",
-      "record": "Моя история",
-      "publicProfile": "Открыть публичный профиль"
-    },
-    "stats": {
-      "events": "События",
-      "reliability": "Надёжность",
-      "hours": "Часы"
+      "figures": "Участие",
+      "events": "{count, plural, one {<n>{value}</n> мероприятие} few {<n>{value}</n> мероприятия} many {<n>{value}</n> мероприятий} other {<n>{value}</n> мероприятия}}",
+      "hours": "{count, plural, one {<n>{value}</n> час} few {<n>{value}</n> часа} many {<n>{value}</n> часов} other {<n>{value}</n> часа}}",
+      "reliability": "надёжность <n>{value}</n>",
+      "rows": {
+        "region": "Регион",
+        "city": "Город",
+        "school": "Место учёбы",
+        "gradeYear": "Класс или курс",
+        "languages": "Языки",
+        "phone": "Телефон",
+        "telegram": "Telegram",
+        "links": "Ссылки",
+        "publicPage": "Публичная страница",
+        "joined": "Регистрация"
+      },
+      "publicHidden": "Скрыта",
+      "publicShow": "Включить в настройках",
+      "copy": "Скопировать ссылку",
+      "copied": "Ссылка скопирована"
     },
     "avatar": {
       "title": "Фото профиля",
@@ -735,7 +745,6 @@
       "value": "Заполнено на {percent}%",
       "complete": "Профиль заполнен. Заявка займёт меньше минуты.",
       "missing": "Ещё не хватает: {fields}",
-      "why": "Полный профиль — организатор может оценить вас с одного взгляда.",
       "filled": "заполнено",
       "empty": "не заполнено"
     },
@@ -749,10 +758,6 @@
     "edit": {
       "back": "Назад к профилю",
       "cancel": "Отмена"
-    },
-    "overview": {
-      "contactTitle": "Как с вами связаться организаторам",
-      "contactHelp": "Организатор увидит это только после вашей заявки."
     }
   },
   "languages": {

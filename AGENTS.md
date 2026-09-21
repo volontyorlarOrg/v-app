@@ -130,9 +130,15 @@ Do not invent a contract or claim a behaviour works because the code was
 written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
-opens on `ProfileIdentity` — the avatar, the name as the `h1`, the level, a
-band of three figures read from the record, the bio, the facts and the links —
-followed by the contact details and the completeness meter, all read-only.
+opens on `ProfileSheet` — one read-only sheet: the avatar, the name as the
+`h1`, the handle and the level, the bio, one line of figures from the record,
+and then every detail the volunteer entered (region, city, school, year,
+languages, phone, Telegram, links, the public page address with a copy button,
+the month they joined) as plain ruled rows. There is no cover, no stat band and
+no second panel; completeness is a thin meter along the sheet's top edge with
+one sentence, and it disappears once nothing is missing. It is the same sheet
+the public page at `volontyorlar.uz/<username>` (in `../v-web`) draws from the
+public contract.
 Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
 and the welcome flow's "finish on your profile" all lead there, and a saved
 form returns to `/profile`. The profile carries nothing else: the
@@ -178,8 +184,15 @@ authorisation.
 
 There is no theme or general animation library. Light and dark are one token
 set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
-CSS, and `three` is isolated to one lazy object: the welcome flow's pass. The
-dashboard draws the same pass as an SVG. Panels and task content never depend on
+CSS — the profile's rolling figures included (`RollingNumber` in
+`src/components/motion/`) — and `three` is isolated to one lazy object: the
+welcome flow's pass. The dashboard draws the same pass as an SVG. The one
+shared-element transition, the profile photo travelling into the editor and
+back, is React's `<ViewTransition>` behind `SharedElement`: the App Router
+ships the React canary that exports it, `src/types/react-canary.d.ts` brings
+its types, and the wrapper renders its children unchanged where the component
+is missing (the unit tests' stable React). `motion` stays out: nothing on the
+profile needs springs or drag. Panels and task content never depend on
 JavaScript for visibility or scrolling.
 
 Sign-in added `jose` (the encrypted session cookie), `zod` (parsing every

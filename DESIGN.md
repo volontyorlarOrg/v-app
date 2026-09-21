@@ -73,6 +73,36 @@ typography:
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: "0.14em"
+  small:
+    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.45
+    letterSpacing: "normal"
+  lead:
+    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)"
+    fontWeight: 400
+    lineHeight: 1.6
+    letterSpacing: "-0.008em"
+  profile-name:
+    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
+    fontSize: "clamp(2.25rem, 8cqi, 3.75rem)"
+    fontWeight: 400
+    lineHeight: 1.03
+    letterSpacing: "-0.03em"
+  profile-name-long:
+    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
+    fontSize: "clamp(1.75rem, 6cqi, 2.75rem)"
+    fontWeight: 400
+    lineHeight: 1.03
+    letterSpacing: "-0.03em"
+  figure-inline:
+    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
+    fontSize: "1.75rem"
+    fontWeight: 400
+    lineHeight: 1
+    letterSpacing: "-0.02em"
 rounded:
   sm: "6px"
   md: "10px"
@@ -187,8 +217,7 @@ volunteer into the room.
   section has more than one listing: All, Saved and Applications under
   Opportunities.
 - Washes of the two hues where a surface is the volunteer's own: the dashboard
-  hero, the profile's identity cover, the leaderboard's standing card and the
-  podium stage. A wash never carries text contrast; the tokens beneath do.
+  hero, the leaderboard's standing card and the podium stage. A wash never carries text contrast; the tokens beneath do.
 - Panels, stat tiles and cards with a `border` edge and a 20px radius. Content
   inside a panel is ruled rows, never nested boxes.
 - A serif page title at 30 to 36px, sans panel titles at 16px, and serif
@@ -220,9 +249,9 @@ editor. The opportunities section holds three tabs — All, Saved and
 Applications — under one header, and the applications tab keeps its pill
 filter inside its panel. The leaderboard opens on the viewer's standing card,
 the top three on a podium stage, and the ranked table from fourth place. The
-profile is the volunteer's own page: an identity card under a washed cover,
-then the contact details and the completeness meter, all read-only; editing is
-its own page, `/profile/edit`, a page header over the editor in titled sections
+profile is the volunteer's own page: one read-only profile sheet, the same
+object the public page at `volontyorlar.uz/<username>` shows, with the
+volunteer's private details as more rows of it; editing is its own page, `/profile/edit`, a page header over the editor in titled sections
 with Save and Cancel, returning to the profile once saved. Settings opens on an
 account summary and an anchor index to its panels. Every other
 section opens with the same `PageHeader` and composes the
@@ -275,12 +304,21 @@ disabled, not a red one.
   an optional action link, then content. Lists inside use `padding="none"` and
   rows separated by hairlines with their own 20px padding. The `id` a panel is
   given is a real DOM id, so a panel can be an anchor target.
-- **Identity card** — the profile only. The same box, divided into ruled bands
-  instead of a header: the avatar disc beside the name, then the level and the
-  handle; a band of three serif figures from the record; then the bio, the
-  facts and the links, and the two actions. A profile that is not complete
-  gains a last band with the meter and what is still missing; a complete one
-  drops that band and gains a tick beside the level.
+- **Profile sheet** — the profile only, and the public page draws the same
+  sheet. One `surface` box at most 46rem wide, centred in the workspace, with
+  no cover, no stat band and no second panel: the avatar in its orange ring
+  with the one action beside it ("Complete profile" while fields are missing,
+  "Edit profile" once none are), the name as the `h1` at `profile-name` size,
+  the handle and the level pill, the bio as `lead` text, one line of inline
+  figures (serif `figure-inline` numerals in `accent-ink`, the words in
+  `ink-muted`), and then every detail the volunteer entered as a ruled row —
+  a `small` label in a 7rem column (10rem from a 34rem sheet) and its value at
+  body size. Empty details have no row; an empty bio, a record with nothing in
+  it, and a complete profile draw nothing at all. While the profile is
+  incomplete, the sheet's top edge is a 3px meter with one sentence beneath it:
+  the percentage and what is still missing. The public page row carries the
+  address, broken after the host on a narrow sheet, and a copy button whose
+  glyph turns into a tick.
 - **Podium** — the leaderboard's top three: each place is an avatar in its
   metal ring, the handle, the experience figure, and a podium step in that
   metal, the three steps at three heights so the silhouette reads before a
@@ -328,11 +366,29 @@ nudges it on its lanyard, the last screen stamps it with the orange seal, and
 each step panel slides in the direction the volunteer moved. Menus open and
 close without transition. No JavaScript and print see the full page.
 
+The profile sheet has one entrance, played once on arrival and complete at
+rest: the avatar's orange ring settles outward, the name rises out of its mask
+word by word, the handle, bio and figures follow, and each ruled row draws its
+hairline in from the left a beat after the one above. The figures roll like an
+odometer: every digit is its real value in the flow of the text, with a strip
+of the ten digits laid over it that runs from 0 to that value and then gives
+way to it, so the number is correct before, during and after the roll, and
+nothing but CSS runs. Screen readers get the number once, from a visually
+hidden copy. "Edit profile" carries the photo into the editor, and "Back to
+profile" and Cancel carry it back: the two avatars share a `<ViewTransition>`
+name, so the circle glides between the sheet and the editor over 460ms instead
+of one disappearing and another appearing. The pair forms only when the new
+page commits in the same frame, which is why those links are prefetched, and
+only while the photo is on screen — React leaves out a shared element that has
+scrolled away, so Cancel at the foot of a long form cross-fades the page
+instead. Reduced motion and print drop all of it, including the view
+transition.
+
 ## Do's and don'ts
 
 - **Do** open every section with `PageHeader` and compose it from `Panel`s. The
   profile is the one exception: the volunteer's own name is the `h1`, carried
-  by the identity card, because the page is a person rather than a section.
+  by the profile sheet, because the page is a person rather than a section.
 - **Do** carry a state with an icon and a word before a colour.
 - **Do** keep orange for a person's own action; a deadline is urgent, not an
   achievement, and stays blue or neutral.

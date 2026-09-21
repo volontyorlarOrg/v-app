@@ -1043,9 +1043,21 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
-    await expect(page.getByText("Events")).toBeVisible();
+    await expect(page.getByRole("list", { name: "Participation" }))
+      .toMatchAriaSnapshot(`
+      - list "Participation":
+        - listitem: 5 events
+        - listitem: 22 hours
+        - listitem: 83% reliability
+    `);
+    await expect(
+      page.getByRole("definition").filter({ hasText: "Academic lyceum No. 2" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("definition").filter({ hasText: "@dilnoza_k" }),
+    ).toBeVisible();
     await expect(page.getByLabel("Bio")).toHaveCount(0);
-    const edit = page.getByRole("link", { name: "Edit profile" }).first();
+    const edit = page.getByRole("link", { name: "Complete profile" });
     await expect(edit).toHaveAttribute("href", "/en/profile/edit");
     await edit.click();
     await expect(page).toHaveURL(/\/en\/profile\/edit$/);
@@ -1111,7 +1123,8 @@ test.describe("applications, record, profile and settings", () => {
     await page.getByRole("button", { name: "Save profile" }).click();
 
     await expect(page).toHaveURL(/\/en\/profile$/);
-    await expect(page.getByText("Profile complete", { exact: true })).toBeVisible();
+    await expect(page.getByText("Second-year student.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveCount(0);

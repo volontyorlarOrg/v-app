@@ -56,6 +56,9 @@ folder. Never store secrets or unverified external claims.
 - `decisions/onboarding-progress-is-a-readable-cookie.md` — why the welcome
   flow's only browser state is a step name in a cookie, and why every answer
   goes straight to the backend
+- `decisions/the-profile-is-one-sheet.md` — why `/profile` became one sheet
+  with every detail as a plain row, what was removed, and how its motion and
+  the photo's view transition work
 - `discoveries/backend-has-a-schema-but-no-endpoints.md` — the endpoints
   `v-backend` serves and the error bodies they return
 - `discoveries/onest-covers-all-three-locales.md` — the typeface and the Uzbek

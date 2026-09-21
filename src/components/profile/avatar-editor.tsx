@@ -13,6 +13,8 @@ import {
 } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
+import { SharedElement } from "@/components/motion/shared-element";
+import { PROFILE_AVATAR_TRANSITION } from "@/components/profile/transitions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonClass } from "@/components/ui/button";
 import { removeAvatarAction, uploadAvatarAction } from "@/lib/account/actions";
@@ -316,10 +318,17 @@ export function AvatarEditor({
         </div>
       ) : (
         <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Avatar aria-hidden="true" className="size-24 shrink-0 ring-2 ring-accent/70">
-            {currentUrl ? <AvatarImage src={currentUrl} alt="" /> : null}
-            <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
-          </Avatar>
+          <SharedElement name={PROFILE_AVATAR_TRANSITION}>
+            <Avatar
+              aria-hidden="true"
+              className="size-24 shrink-0 outline-2 outline-offset-4 outline-accent"
+            >
+              {currentUrl ? <AvatarImage src={currentUrl} alt="" /> : null}
+              <AvatarFallback className="bg-primary-muted font-serif text-4xl font-normal tracking-[-0.02em] text-primary-deep">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </SharedElement>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
