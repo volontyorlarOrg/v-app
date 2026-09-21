@@ -10,13 +10,11 @@ export function UsernameSection({
   identity,
   labels,
   headed = true,
-  onSaved,
 }: {
   locale: string;
   identity: UsernameIdentity;
   labels: UsernameLabels;
   headed?: boolean;
-  onSaved?: () => void;
 }) {
   return (
     <div>
@@ -46,12 +44,7 @@ export function UsernameSection({
             </p>
           ) : null}
           <div className="mt-4 border-t border-border pt-4">
-            <UsernameForm
-              locale={locale}
-              identity={identity}
-              labels={labels}
-              onSaved={onSaved}
-            />
+            <UsernameForm locale={locale} identity={identity} labels={labels} />
           </div>
         </>
       ) : (

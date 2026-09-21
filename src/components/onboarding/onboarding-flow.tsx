@@ -76,9 +76,7 @@ export function OnboardingFlow({
   const [saved, setSaved] = useState<VolunteerProfile>(
     profileSaved ? initialValues : EMPTY_PROFILE,
   );
-  const [usernameRequired, setUsernameRequired] = useState(
-    username.source === "generated",
-  );
+  const usernameRequired = username.source === "generated";
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -222,7 +220,6 @@ export function OnboardingFlow({
               missing={completion.missing.map((field) => completionFields[field])}
               username={username}
               usernameRequired={usernameRequired}
-              onUsernameSaved={() => setUsernameRequired(false)}
               ctaHref={ctaHref}
             />
           ) : null}
@@ -273,7 +270,6 @@ function DoneBody({
   missing,
   username,
   usernameRequired,
-  onUsernameSaved,
   ctaHref,
 }: {
   locale: Locale;
@@ -283,7 +279,6 @@ function DoneBody({
   missing: readonly string[];
   username: UsernameIdentity;
   usernameRequired: boolean;
-  onUsernameSaved: () => void;
   ctaHref: string;
 }) {
   return (
@@ -306,12 +301,7 @@ function DoneBody({
       )}
 
       <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
-        <UsernameSection
-          locale={locale}
-          identity={username}
-          labels={labels.username}
-          onSaved={onUsernameSaved}
-        />
+        <UsernameSection locale={locale} identity={username} labels={labels.username} />
       </div>
 
       {usernameRequired ? (
