@@ -49,7 +49,9 @@ export function UsernameForm({
   const id = useId();
   const { form, result, pending, formProps } = useActionForm({
     schema: usernameFormSchema,
-    defaultValues: { username: identity.username },
+    defaultValues: {
+      username: identity.source === "generated" ? "" : identity.username,
+    },
     action: updateUsernameAction,
   });
   const { register, formState } = form;
