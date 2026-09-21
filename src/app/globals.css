@@ -450,21 +450,6 @@
     min-width: 0;
   }
 
-  .identity-cover {
-    background:
-      radial-gradient(
-        30rem 14rem at 0% 0%,
-        color-mix(in srgb, var(--color-primary) 26%, transparent),
-        transparent 70%
-      ),
-      radial-gradient(
-        24rem 12rem at 100% 100%,
-        color-mix(in srgb, var(--color-accent) 18%, transparent),
-        transparent 72%
-      ),
-      var(--color-surface-soft);
-  }
-
   .podium-stage {
     background:
       radial-gradient(
@@ -613,21 +598,6 @@
         transparent 72%
       ),
       var(--color-surface);
-  }
-
-  :root[data-theme="dark"] .identity-cover {
-    background:
-      radial-gradient(
-        30rem 14rem at 0% 0%,
-        color-mix(in srgb, var(--color-primary) 34%, transparent),
-        transparent 70%
-      ),
-      radial-gradient(
-        20rem 10rem at 96% 110%,
-        color-mix(in srgb, var(--color-accent) 14%, transparent),
-        transparent 70%
-      ),
-      var(--color-surface-soft);
   }
 
   :root[data-theme="dark"] .podium-stage {
@@ -815,6 +785,268 @@
   .medal .medal-ink,
   .medal.medal-ink {
     color: var(--metal-ink);
+  }
+}
+
+@layer components {
+  .profile-sheet {
+    container-type: inline-size;
+  }
+
+  .profile-avatar {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    animation: profile-ring 900ms var(--ease-scene) 120ms both;
+  }
+
+  @keyframes profile-ring {
+    from {
+      outline-color: transparent;
+      outline-offset: 0;
+    }
+  }
+
+  .profile-name {
+    font-size: clamp(2.25rem, 8cqi, 3.75rem);
+    line-height: 1.03;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .profile-name[data-long] {
+    font-size: clamp(1.75rem, 6cqi, 2.75rem);
+  }
+
+  .profile-bio {
+    max-width: 62ch;
+    font-size: var(--text-lead);
+    line-height: 1.6;
+    letter-spacing: var(--text-lead--letter-spacing);
+    white-space: pre-line;
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+    color: var(--color-ink);
+  }
+
+  .profile-figures {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+  }
+
+  .profile-figures > li {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.375rem;
+  }
+
+  .profile-figure-number {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--color-accent-ink);
+  }
+
+  .rolling-number-track {
+    display: inline-flex;
+    user-select: none;
+  }
+
+  .rolling-digit {
+    position: relative;
+    display: inline-block;
+    clip-path: inset(0 -0.25em);
+  }
+
+  .rolling-digit-strip {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    visibility: hidden;
+    translate: 0 calc(var(--digit, 0) * -10%);
+  }
+
+  .rolling-digit-strip,
+  .rolling-digit-final {
+    animation-delay: calc(var(--enter-delay, 0ms) + 140ms + var(--order, 0) * 60ms);
+  }
+
+  .rolling-digit-strip {
+    animation-name: rolling-digit-roll, rolling-digit-show;
+    animation-duration: 900ms;
+    animation-timing-function: var(--ease-scene), linear;
+    animation-fill-mode: backwards;
+  }
+
+  .rolling-digit-final {
+    animation-name: rolling-digit-hold;
+    animation-duration: 900ms;
+    animation-fill-mode: backwards;
+  }
+
+  @keyframes rolling-digit-roll {
+    from {
+      translate: 0 0;
+    }
+  }
+
+  @keyframes rolling-digit-show {
+    from,
+    to {
+      visibility: visible;
+    }
+  }
+
+  @keyframes rolling-digit-hold {
+    from,
+    to {
+      color: transparent;
+    }
+  }
+
+  .profile-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 1rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+
+  .profile-row::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: var(--color-border);
+    transform-origin: left center;
+    animation: profile-rule 900ms var(--ease-scene) both;
+    animation-delay: calc(420ms + var(--row, 0) * 45ms);
+  }
+
+  .profile-row > dt {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--color-ink-muted);
+  }
+
+  .profile-row > dd {
+    min-width: 0;
+    font-weight: 500;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    color: var(--color-ink);
+  }
+
+  .profile-row > * {
+    animation: profile-row-in 700ms var(--ease-scene) both;
+    animation-delay: calc(480ms + var(--row, 0) * 45ms);
+  }
+
+  @keyframes profile-rule {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  @keyframes profile-row-in {
+    from {
+      opacity: 0;
+      translate: 0 0.375rem;
+    }
+  }
+
+  .profile-link svg {
+    transition: translate 220ms var(--ease-scene);
+  }
+
+  .profile-link:hover svg {
+    translate: 2px -2px;
+  }
+
+  .profile-completion-meter {
+    height: 0.1875rem;
+    border-radius: 0;
+  }
+
+  .profile-completion-meter .meter-fill {
+    border-radius: 0;
+    animation: profile-meter 1100ms var(--ease-scene) 200ms both;
+  }
+
+  @keyframes profile-meter {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .copy-toggle > svg {
+    grid-area: 1 / 1;
+    transition:
+      opacity 180ms var(--ease-scene),
+      scale 260ms var(--ease-scene),
+      rotate 260ms var(--ease-scene);
+  }
+
+  .copy-toggle-done {
+    opacity: 0;
+    scale: 0.5;
+    rotate: -45deg;
+  }
+
+  .copy-toggle[data-copied] .copy-toggle-idle {
+    opacity: 0;
+    scale: 0.5;
+    rotate: 45deg;
+  }
+
+  .copy-toggle[data-copied] .copy-toggle-done {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+    color: var(--color-primary-ink);
+  }
+
+  ::view-transition-group(.shared-element) {
+    animation-duration: 460ms;
+    animation-timing-function: var(--ease-scene);
+  }
+
+  @container (width >= 34rem) {
+    .profile-figures {
+      column-gap: 1.75rem;
+    }
+
+    .profile-row {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      padding-inline: 2rem;
+    }
+  }
+
+  @media print, (prefers-reduced-motion: reduce) {
+    .profile-avatar,
+    .profile-row::before,
+    .profile-row > *,
+    .profile-completion-meter .meter-fill,
+    .rolling-digit-strip,
+    .rolling-digit-final {
+      animation: none !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
   }
 }
 

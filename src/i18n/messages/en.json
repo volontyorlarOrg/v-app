@@ -644,18 +644,28 @@
   },
   "profile": {
     "metaTitle": "Profile",
-    "identity": {
-      "complete": "Profile complete",
-      "joined": "Joined {date}",
-      "bioEmpty": "No bio yet. A few sentences are what an organiser reads first.",
+    "sheet": {
       "edit": "Edit profile",
-      "record": "My record",
-      "publicProfile": "View public profile"
-    },
-    "stats": {
-      "events": "Events",
-      "reliability": "Reliability",
-      "hours": "Hours"
+      "figures": "Participation",
+      "events": "{count, plural, one {<n>{value}</n> event} other {<n>{value}</n> events}}",
+      "hours": "{count, plural, one {<n>{value}</n> hour} other {<n>{value}</n> hours}}",
+      "reliability": "<n>{value}</n> reliability",
+      "rows": {
+        "region": "Region",
+        "city": "City",
+        "school": "School",
+        "gradeYear": "Year or grade",
+        "languages": "Languages",
+        "phone": "Phone",
+        "telegram": "Telegram",
+        "links": "Links",
+        "publicPage": "Public page",
+        "joined": "Joined"
+      },
+      "publicHidden": "Hidden",
+      "publicShow": "Show it in settings",
+      "copy": "Copy link",
+      "copied": "Link copied"
     },
     "avatar": {
       "title": "Profile picture",
@@ -735,7 +745,6 @@
       "value": "{percent}% complete",
       "complete": "Your profile is complete. Applications take under a minute.",
       "missing": "Still missing: {fields}",
-      "why": "A complete profile means an organiser can evaluate you at a glance.",
       "filled": "filled in",
       "empty": "missing"
     },
@@ -749,10 +758,6 @@
     "edit": {
       "back": "Back to profile",
       "cancel": "Cancel"
-    },
-    "overview": {
-      "contactTitle": "How organisers reach you",
-      "contactHelp": "Shared with an organiser only after you apply."
     }
   },
   "languages": {

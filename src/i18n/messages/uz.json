@@ -644,18 +644,28 @@
   },
   "profile": {
     "metaTitle": "Profil",
-    "identity": {
-      "complete": "Profil toʻliq",
-      "joined": "Qoʻshilgan: {date}",
-      "bioEmpty": "Hozircha bio yoʻq. Tashkilotchi birinchi navbatda bir necha jumlani oʻqiydi.",
+    "sheet": {
       "edit": "Profilni tahrirlash",
-      "record": "Mening tarixim",
-      "publicProfile": "Ochiq profilni koʻrish"
-    },
-    "stats": {
-      "events": "Tadbirlar",
-      "reliability": "Ishonchlilik",
-      "hours": "Soatlar"
+      "figures": "Ishtirok",
+      "events": "{count, plural, other {<n>{value}</n> ta tadbir}}",
+      "hours": "{count, plural, other {<n>{value}</n> soat}}",
+      "reliability": "<n>{value}</n> ishonchlilik",
+      "rows": {
+        "region": "Hudud",
+        "city": "Shahar",
+        "school": "Oʻqish joyi",
+        "gradeYear": "Sinf yoki kurs",
+        "languages": "Tillar",
+        "phone": "Telefon",
+        "telegram": "Telegram",
+        "links": "Havolalar",
+        "publicPage": "Ochiq sahifa",
+        "joined": "Qoʻshilgan"
+      },
+      "publicHidden": "Yashirin",
+      "publicShow": "Sozlamalarda yoqish",
+      "copy": "Havolani nusxalash",
+      "copied": "Havola nusxalandi"
     },
     "avatar": {
       "title": "Profil rasmi",
@@ -735,7 +745,6 @@
       "value": "{percent}% toʻldirilgan",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
       "missing": "Hali yetishmayapti: {fields}",
-      "why": "Toʻliq profil — tashkilotchi sizni bir qarashda baholay oladi.",
       "filled": "toʻldirilgan",
       "empty": "toʻldirilmagan"
     },
@@ -749,10 +758,6 @@
     "edit": {
       "back": "Profilga qaytish",
       "cancel": "Bekor qilish"
-    },
-    "overview": {
-      "contactTitle": "Tashkilotchilar siz bilan qanday bogʻlanadi",
-      "contactHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi."
     }
   },
   "languages": {

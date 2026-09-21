@@ -346,7 +346,11 @@ export function ProfileForm({
             {pending ? labels.saving : labels.save}
           </Button>
           {cancelHref && labels.cancel ? (
-            <Link href={cancelHref} className={buttonClass({ variant: "outline" })}>
+            <Link
+              href={cancelHref}
+              prefetch
+              className={buttonClass({ variant: "outline" })}
+            >
               {labels.cancel}
             </Link>
           ) : null}
