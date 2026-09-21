@@ -207,7 +207,10 @@ schema's output; the two renames the backend needs (`sourcedByYvc`,
 `readAt`) happen in the schema, nowhere else. Public opportunity reads use the
 plain client. Detail reads are wrapped in React `cache()` so `generateMetadata`
 and the page share one request. A `404` from a detail read becomes the panel's
-404 through `notFound()`.
+not-found panel through `notFound()`. The HTTP status stays `200`: the
+`(volunteer)` loading boundary makes every panel page stream, and Next.js
+cannot change a status once streaming has begun, so it adds `noindex` to the
+streamed page instead (every screen is already `noindex`).
 
 ## Entry scenes and smooth scrolling
 
