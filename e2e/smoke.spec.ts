@@ -243,6 +243,7 @@ test.describe("welcome flow", () => {
       page.getByRole("link", { name: "Find your first opportunity" }),
     ).toHaveCount(0);
 
+    await expect(page.getByLabel("New handle")).toHaveValue("");
     await page.getByLabel("New handle").fill("malika_skips");
     await page.getByRole("button", { name: "Save handle" }).click();
     await expect(page.getByRole("status")).toContainText("Your handle is saved.");
@@ -1665,6 +1666,26 @@ test.describe("the leaderboard handle", () => {
       page.getByRole("heading", { level: 3, name: "Your leaderboard handle" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Save handle" })).toBeVisible();
+  });
+
+  test("a generated-looking handle is refused, so the gate stays closed", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `random-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Skip for now" }).click();
+
+    const ready = page.getByRole("region", { name: "Your pass is ready." });
+    await ready.getByLabel("New handle").fill("user_8fec48d1f08341c6a779");
+    await ready.getByRole("button", { name: "Save handle" }).click();
+    await expect(ready.getByRole("alert")).toContainText(
+      "That username is reserved by Volontyorlar.",
+    );
+    await expect(
+      page.getByText("Choose and save your Volontyorlar username to continue."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Find your first opportunity" }),
+    ).toHaveCount(0);
   });
 });
 

@@ -722,6 +722,7 @@ const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
 
 const VIEWER_XP = 320;
 const VOLUNTEERS_WITHOUT_HANDLE = 12;
+const GENERATED_USERNAME = /^user_[0-9a-f]{20}$/;
 
 function leaderboard(state, query) {
   const rows = [
@@ -965,6 +966,9 @@ const server = createServer(async (request, response) => {
         code: "validationFailed",
         errors: { username: ["usernameCharacters"] },
       });
+    }
+    if (GENERATED_USERNAME.test(requested)) {
+      return send(response, 409, { code: "usernameReserved" });
     }
     if (leaderboardRoster.some((row) => row.username === requested)) {
       return send(response, 409, { code: "usernameUnavailable" });

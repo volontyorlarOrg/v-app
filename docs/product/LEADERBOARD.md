@@ -78,6 +78,12 @@ Every handle can be renamed in two places, both the same component:
 - **the end of the welcome flow**, on the "your pass is ready" step, where a
   generated account must choose its own before leaving.
 
+A generated handle is never offered back as a choice. The rename form starts
+empty for a generated account, and the backend refuses the generated form —
+`user_` and twenty hexadecimal characters — as `usernameReserved`, so the
+welcome flow's gate opens only for a name the volunteer chose, and only chosen
+names are ranked.
+
 Placement and treatment are frontend decisions; what a source means is not.
 
 ## The contract
