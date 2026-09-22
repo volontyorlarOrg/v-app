@@ -86,7 +86,8 @@
       "label": "Account menu"
     },
     "menuLabel": "Menu",
-    "profileEdit": "Edit profile"
+    "profileEdit": "Edit profile",
+    "memberProfile": "Volunteer profile"
   },
   "auth": {
     "providers": {
@@ -275,8 +276,8 @@
         "lead": "Organisers pick volunteers close to the event."
       },
       "contact": {
-        "title": "How organisers reach you",
-        "lead": "Shared with an organiser only after you apply. One of the two is enough."
+        "title": "Contact and public links",
+        "lead": "These details appear to anyone who opens your public profile. Phone or Telegram completes the contact step."
       }
     },
     "rail": {
@@ -647,6 +648,7 @@
     "sheet": {
       "edit": "Edit profile",
       "figures": "Participation",
+      "socials": "Social profiles",
       "events": "{count, plural, one {<n>{value}</n> event} other {<n>{value}</n> events}}",
       "hours": "{count, plural, one {<n>{value}</n> hour} other {<n>{value}</n> hours}}",
       "reliability": "<n>{value}</n> reliability",
@@ -658,7 +660,7 @@
         "languages": "Languages",
         "phone": "Phone",
         "telegram": "Telegram",
-        "links": "Links",
+        "links": "Portfolio",
         "publicPage": "Public page",
         "joined": "Joined"
       },
@@ -666,6 +668,14 @@
       "publicShow": "Show it in settings",
       "copy": "Copy link",
       "copied": "Link copied"
+    },
+    "visitor": {
+      "metaTitle": "{name}'s profile",
+      "unavailable": "Profile unavailable",
+      "back": "Back to leaderboard",
+      "events": "{count, plural, one {<n>{value}</n> event} other {<n>{value}</n> events}}",
+      "hours": "{count, plural, one {<n>{value}</n> hour} other {<n>{value}</n> hours}}",
+      "xp": "<n>{value}</n> XP"
     },
     "avatar": {
       "title": "Profile picture",
@@ -697,8 +707,8 @@
     "sections": {
       "education": "Education",
       "location": "Where you are",
-      "contact": "How organisers reach you",
-      "links": "Links",
+      "contact": "Contact details",
+      "links": "Public links",
       "about": "About you"
     },
     "fields": {
@@ -719,11 +729,15 @@
       "languagesRemove": "Remove",
       "languagesLimit": "That is ten. Remove one to add another.",
       "phone": "Phone number",
-      "phoneHelp": "Shared with an organiser only after you apply.",
+      "phoneHelp": "Visible to everyone when your public profile is on.",
       "telegram": "Telegram username",
-      "telegramHelp": "Without the @.",
-      "links": "Portfolio, CV, or social link",
-      "linksHelp": "Separate with commas. Up to three.",
+      "telegramHelp": "Without the @. Visible on your public profile.",
+      "instagram": "Instagram username",
+      "instagramHelp": "Without the @. Visible on your public profile.",
+      "linkedin": "LinkedIn profile",
+      "linkedinHelp": "Your username or full linkedin.com/in link.",
+      "links": "Portfolio links",
+      "linksHelp": "Separate full links with commas. Up to three.",
       "contact": "A way to reach you"
     },
     "completionFields": {
@@ -752,8 +766,8 @@
       "about": "Your name and a few lines an organiser reads first.",
       "education": "Where you study, so an organiser knows who is applying.",
       "location": "Organisers pick volunteers close to the event.",
-      "contact": "Shared with an organiser only after you apply.",
-      "links": "Anything that shows your work. Optional."
+      "contact": "Your phone and Telegram are visible to everyone when your public profile is on.",
+      "links": "Social profiles and work you want anyone with your profile link to open."
     },
     "edit": {
       "back": "Back to profile",
@@ -850,7 +864,7 @@
       "levelPublic": "Show my level on the community list",
       "levelPublicHelp": "Off by default. Your record stays private either way.",
       "publicProfile": "Show my public profile",
-      "publicProfileHelp": "Lets people open volontyorlar.uz/your_username. Contact details, school, city and participation history stay private.",
+      "publicProfileHelp": "Lets anyone open volontyorlar.uz/your_username and see your contact details, education, location, social profiles, portfolio and participation totals.",
       "publicProfileVisible": "Your public profile is visible.",
       "publicProfileHidden": "Your public profile is hidden. Its address now returns not found."
     },

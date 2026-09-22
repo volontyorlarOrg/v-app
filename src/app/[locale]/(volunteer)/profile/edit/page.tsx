@@ -40,6 +40,10 @@ const FIELD_KEYS = [
   "phoneHelp",
   "telegram",
   "telegramHelp",
+  "instagram",
+  "instagramHelp",
+  "linkedin",
+  "linkedinHelp",
   "links",
   "linksHelp",
 ] as const;

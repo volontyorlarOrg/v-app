@@ -21,7 +21,7 @@ export const FORM_STEP_COUNT = FORM_STEPS.length;
 export const PROFILE_STEP_FIELDS = {
   about: ["fullName", "bio"],
   place: ["school", "region", "languages"],
-  contact: ["phone", "telegram"],
+  contact: ["phone", "telegram", "instagram", "linkedin", "links"],
 } as const satisfies Record<ProfileStep, readonly (keyof ProfileFormValues)[]>;
 
 export type StepDirection = "forward" | "back";

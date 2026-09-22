@@ -1608,6 +1608,16 @@ export interface components {
              * @example volunteer_uz
              */
             telegram: string;
+            /**
+             * @default
+             * @example volunteer.uz
+             */
+            instagram: string;
+            /**
+             * @default
+             * @example https://www.linkedin.com/in/volunteer-uz
+             */
+            linkedin: string;
             /** @default [] */
             links: string[];
         };
@@ -1809,8 +1819,24 @@ export interface components {
             bio: string;
             /** @enum {string|null} */
             region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan" | null;
+            /** @example Tashkent */
+            city: string;
+            /** @example School 110 */
+            school: string;
+            /** @example 11 */
+            gradeYear: string;
             languages: string[];
+            /** @example +998901234567 */
+            phone: string;
+            /** @example volunteer_uz */
+            telegram: string;
+            /** @example volunteer.uz */
+            instagram: string;
+            /** @example https://www.linkedin.com/in/volunteer-uz */
+            linkedin: string;
             links: string[];
+            /** Format: date-time */
+            joinedAt: string;
             /** @enum {string} */
             level: "newcomer" | "active" | "trusted" | "core";
             xp: number;
