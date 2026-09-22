@@ -322,7 +322,9 @@ function freshState() {
       phone: "",
       phoneVerified: false,
       telegram: "dilnoza_k",
-      links: [],
+      instagram: "dilnoza.codes",
+      linkedin: "https://www.linkedin.com/in/dilnoza-k",
+      links: ["https://portfolio.example/dilnoza"],
       updatedAt: at(-3),
     },
     preferences: {
@@ -956,6 +958,42 @@ const server = createServer(async (request, response) => {
   if (path === "/leaderboard" && method === "GET") {
     return send(response, 200, leaderboard(state, url.searchParams));
   }
+  const publicProfileMatch = /^\/public\/profiles\/([^/]+)$/.exec(path);
+  if (publicProfileMatch && method === "GET") {
+    const username = decodeURIComponent(publicProfileMatch[1]).toLowerCase();
+    const rosterEntry = leaderboardRoster.find((row) => row.username === username);
+    const isViewer = username === state.account.username;
+    if (!rosterEntry && !isViewer) {
+      return send(response, 404, { code: "publicProfileNotFound" });
+    }
+    if (isViewer && !state.preferences.publicProfileEnabled) {
+      return send(response, 404, { code: "publicProfileNotFound" });
+    }
+    const profile = isViewer ? state.profile : null;
+    return send(response, 200, {
+      displayName: profile?.fullName ?? rosterEntry.displayName,
+      username,
+      avatarUrl: isViewer ? state.account.avatarUrl : rosterEntry.avatarUrl,
+      bio: profile?.bio ?? "Community volunteer and student.",
+      region: profile?.region ?? "tashkent-city",
+      city: profile?.city ?? "Tashkent",
+      school: profile?.school ?? "Academic lyceum No. 2",
+      gradeYear: profile?.gradeYear ?? "2",
+      languages: profile?.languages ?? ["uz", "ru", "en"],
+      phone: profile?.phone || "+998 90 123 45 67",
+      telegram: profile?.telegram ?? username,
+      instagram: profile?.instagram ?? "volontyorlar.uz",
+      linkedin: profile?.linkedin ?? "https://www.linkedin.com/in/volontyorlar-uz",
+      links: profile?.links ?? ["https://portfolio.example/volunteer"],
+      joinedAt: state.user.createdAt,
+      level: isViewer ? state.record.level : "active",
+      xp: isViewer ? VIEWER_XP : rosterEntry.xp,
+      stats: {
+        attendedEvents: isViewer ? state.record.counts.attended : 5,
+        confirmedHours: isViewer ? (state.record.hours ?? 0) : 18,
+      },
+    });
+  }
   if (path === "/me/username" && method === "PUT") {
     const requested = String(body.username ?? "");
     if (!/^[a-z0-9_]{5,32}$/.test(requested)) {
@@ -967,7 +1005,9 @@ const server = createServer(async (request, response) => {
     if (leaderboardRoster.some((row) => row.username === requested)) {
       return send(response, 409, { code: "usernameUnavailable" });
     }
-    if (["leaderboard", "settings", "profile", "admin"].includes(requested)) {
+    if (
+      ["leaderboard", "settings", "profile", "profiles", "admin"].includes(requested)
+    ) {
       return send(response, 409, { code: "usernameReserved" });
     }
     state.account.username = requested;

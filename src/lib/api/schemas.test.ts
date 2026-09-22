@@ -16,6 +16,7 @@ import {
   opportunityDetailSchema,
   opportunityListSchema,
   profileSchema,
+  publicProfileSchema,
   recordSchema,
   savedListSchema,
   usernameSummarySchema,
@@ -163,10 +164,38 @@ describe("account schemas", () => {
       phone: "",
       phoneVerified: false,
       telegram: "dilnoza",
+      instagram: "dilnoza.codes",
+      linkedin: "https://www.linkedin.com/in/dilnoza-k",
       links: [],
       updatedAt: "2026-09-01T10:00:00.000Z",
     });
     expect(parsed.region).toBeNull();
+  });
+
+  it("reads the complete public profile contract", () => {
+    const parsed = publicProfileSchema.parse({
+      displayName: "Dilnoza Karimova",
+      username: "dilnoza_k",
+      avatarUrl: "https://cdn.example/dilnoza.jpg",
+      bio: "Volunteer and student.",
+      region: "tashkent-city",
+      city: "Tashkent",
+      school: "Academic Lyceum",
+      gradeYear: "2",
+      languages: ["uz", "ru", "en"],
+      phone: "+998901234567",
+      telegram: "dilnoza_k",
+      instagram: "dilnoza.codes",
+      linkedin: "https://www.linkedin.com/in/dilnoza-k",
+      links: ["https://portfolio.example/dilnoza"],
+      joinedAt: "2026-09-01T10:00:00.000Z",
+      level: "active",
+      xp: 240,
+      stats: { attendedEvents: 5, confirmedHours: 18 },
+    });
+    expect(parsed.phone).toBe("+998901234567");
+    expect(parsed.instagram).toBe("dilnoza.codes");
+    expect(parsed.links).toEqual(["https://portfolio.example/dilnoza"]);
   });
 
   it("reads /me and ignores the fields it does not use", () => {

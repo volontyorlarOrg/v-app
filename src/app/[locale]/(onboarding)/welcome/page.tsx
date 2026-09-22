@@ -114,6 +114,12 @@ function Welcome({
     "phoneHelp",
     "telegram",
     "telegramHelp",
+    "instagram",
+    "instagramHelp",
+    "linkedin",
+    "linkedinHelp",
+    "links",
+    "linksHelp",
   ] as const;
 
   const labels: OnboardingLabels = {

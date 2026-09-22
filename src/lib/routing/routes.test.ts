@@ -128,6 +128,17 @@ describe("app route registry", () => {
     expect(guardFor("/uz/profile/edit")).toBe("session");
   });
 
+  it("keeps another volunteer's profile inside the signed-in leaderboard section", () => {
+    const memberProfile = getRoute("memberProfile");
+    expect(memberProfile.path).toBe("/profiles");
+    expect(memberProfile.guard).toBe("session");
+    expect(memberProfile.section).toBe("leaderboard");
+    expect(memberProfile.navGroup).toBeNull();
+    expect(memberProfile.inTabBar).toBe(false);
+    expect(sectionKeyFor("/en/profiles/dilnoza_k")).toBe("leaderboard");
+    expect(guardFor("/en/profiles/dilnoza_k")).toBe("session");
+  });
+
   it("keeps the record reachable by URL but out of every navigation surface", () => {
     const record = getRoute("record");
     expect(record.area).toBe("volunteer");

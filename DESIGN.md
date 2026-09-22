@@ -231,12 +231,12 @@ volunteer into the room.
 
 ## Layout
 
-| Region    | Desktop (≥ 64rem)                                                                                                            | Phone                                                                     |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card as the profile's link, settings and sign out — all plain links | Absent                                                                    |
-| Header    | Absent                                                                                                                       | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings, sign out) |
-| Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                    | 16px gutters, one column, the aside stacks after the main column          |
-| Tab bar   | Absent                                                                                                                       | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile |
+| Region    | Desktop (≥ 64rem)                                                                                                                                                                          | Phone                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the three sections, then at the foot the identity card as the profile's link, settings and sign out — all plain links | Absent                                                                                                                      |
+| Header    | Absent                                                                                                                                                                                     | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings, sign out) |
+| Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                  | 16px gutters, one column, the aside stacks after the main column                                                            |
+| Tab bar   | Absent                                                                                                                                                                                     | Fixed, 56px, four thumbs: dashboard, opportunities, leaderboard, profile                                                    |
 
 The dashboard is the decision screen and the record: a hero that greets the
 volunteer beside their pass and carries their progress in a ruled band, four
@@ -251,7 +251,9 @@ filter inside its panel. The leaderboard opens on the viewer's standing card,
 the top three on a podium stage, and the ranked table from fourth place. The
 profile is the volunteer's own page: one read-only profile sheet, the same
 object the public page at `volontyorlar.uz/<username>` shows, with the
-volunteer's private details as more rows of it; editing is its own page, `/profile/edit`, a page header over the editor in titled sections
+volunteer's public profile details as more rows of it. Another volunteer's
+visible leaderboard identity opens that sheet inside the app at `/<username>`;
+editing is its own page, `/profile/edit`, a page header over the editor in titled sections
 with Save and Cancel, returning to the profile once saved. Settings opens on an
 account summary and an anchor index to its panels. Every other
 section opens with the same `PageHeader` and composes the
@@ -274,15 +276,15 @@ things the institution did.
 
 **Orange** appears where a person did something, and nowhere else:
 
-| Surface                                                               | Treatment                          |
-| --------------------------------------------------------------------- | ---------------------------------- |
+| Surface                                                                   | Treatment                          |
+| ------------------------------------------------------------------------- | ---------------------------------- |
 | The level in the sidebar identity card, the dashboard tile and the record | `text-accent-ink`                  |
-| Events completed, hours, reliability on the record                    | `text-accent-ink` at figure size   |
-| Reached nodes and labels on the level rail                            | `bg-accent` / `text-accent-ink`    |
-| The "accepted" chip and the "attended" outcome                        | `border-accent/50 text-accent-ink` |
-| The decision node on an accepted application's timeline               | `bg-accent`                        |
-| A completed profile, and the preview "saved" status                   | `text-accent-ink`                  |
-| Activity dots for a confirmation, an acceptance, a level              | `bg-accent`                        |
+| Events completed, hours, reliability on the record                        | `text-accent-ink` at figure size   |
+| Reached nodes and labels on the level rail                                | `bg-accent` / `text-accent-ink`    |
+| The "accepted" chip and the "attended" outcome                            | `border-accent/50 text-accent-ink` |
+| The decision node on an accepted application's timeline                   | `bg-accent`                        |
+| A completed profile, and the preview "saved" status                       | `text-accent-ink`                  |
+| Activity dots for a confirmation, an acceptance, a level                  | `bg-accent`                        |
 
 **Gold, silver and bronze** appear in exactly one place: the top three on the
 leaderboard. Each place owns a metal (`gold`, `silver`, `bronze`) for its

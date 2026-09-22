@@ -48,13 +48,13 @@ fills them.
 
 ## The steps
 
-| Step            | Saves                                                         | Counts toward completeness |
-| --------------- | ------------------------------------------------------------- | -------------------------- |
-| Welcome         | Nothing                                                       |                            |
-| About you       | `fullName`, `bio` through `updateProfileAction`               | name, bio                  |
-| Where you study | `school`, `region`, `languages` through `updateProfileAction` | school, region, languages  |
-| Contact         | `phone`, `telegram` through `updateProfileAction`             | neither, by design         |
-| Ready           | The leaderboard handle, if the account may rename it          |                            |
+| Step            | Saves                                                                               | Counts toward completeness |
+| --------------- | ----------------------------------------------------------------------------------- | -------------------------- |
+| Welcome         | Nothing                                                                             |                            |
+| About you       | `fullName`, `bio` through `updateProfileAction`                                     | name, bio                  |
+| Where you study | `school`, `region`, `languages` through `updateProfileAction`                       | school, region, languages  |
+| Contact         | `phone`, `telegram`, `instagram`, `linkedin`, `links` through `updateProfileAction` | contact channel            |
+| Ready           | The leaderboard handle, if the account may rename it                                |                            |
 
 Every profile step posts the whole profile: the fields the step does not show
 travel as hidden inputs, because `PUT /profile` replaces the record. A step
@@ -71,10 +71,10 @@ existing generated accounts on their next visit. Telegram-provided usernames
 do not block entry and remain editable. →
 [`LEADERBOARD.md`](LEADERBOARD.md)
 
-Contact is asked for even though it stopped counting toward completeness when
-the profile redesign landed, because an organiser who cannot reach a
-volunteer cannot accept one. The fields the flow leaves to the profile page
-are `gradeYear`, `city` and `links`. The name is the one field
+Contact is asked for because an organiser who cannot reach a volunteer cannot
+accept one; the step also makes the public Instagram, LinkedIn, and portfolio
+fields available during welcome. The fields the flow leaves to the profile page
+are `gradeYear` and `city`. The name is the one field
 that cannot be skipped while it is empty, because the backend refuses a
 profile without it.
 

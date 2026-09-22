@@ -133,12 +133,15 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 opens on `ProfileSheet` — one read-only sheet: the avatar, the name as the
 `h1`, the handle and the level, the bio, one line of figures from the record,
 and then every detail the volunteer entered (region, city, school, year,
-languages, phone, Telegram, links, the public page address with a copy button,
-the month they joined) as plain ruled rows. There is no cover, no stat band and
+languages, phone, Telegram, Instagram, LinkedIn, portfolio links, the public
+page address with a copy button, the month they joined) as plain ruled rows.
+There is no cover, no stat band and
 no second panel; completeness is a thin meter along the sheet's top edge with
 one sentence, and it disappears once nothing is missing. It is the same sheet
 the public page at `volontyorlar.uz/<username>` (in `../v-web`) draws from the
-public contract.
+public contract. A visible leaderboard identity opens the same public contract
+inside the signed-in shell at `/<username>` without opening another tab; the
+share address remains `volontyorlar.uz/<username>`.
 Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
 and the welcome flow's "finish on your profile" all lead there, and a saved
 form returns to `/profile`. The profile carries nothing else: the

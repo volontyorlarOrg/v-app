@@ -41,6 +41,8 @@ const ALL_FIELDS = [
   "languages",
   "phone",
   "telegram",
+  "instagram",
+  "linkedin",
   "links",
 ] as const satisfies readonly (keyof ProfileFormValues)[];
 
@@ -205,32 +207,75 @@ export function ProfileStepForm({
         ) : null}
 
         {step === "contact" ? (
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <StepField
+                id={fieldId("phone")}
+                label={labels.fields.phone}
+                help={labels.fields.phoneHelp}
+                error={errorFor("phone")}
+              >
+                <Input
+                  {...control("phone", labels.fields.phoneHelp)}
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  defaultValue={defaults.phone}
+                />
+              </StepField>
+              <StepField
+                id={fieldId("telegram")}
+                label={labels.fields.telegram}
+                help={labels.fields.telegramHelp}
+                error={errorFor("telegram")}
+              >
+                <Input
+                  {...control("telegram", labels.fields.telegramHelp)}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  defaultValue={defaults.telegram}
+                />
+              </StepField>
+            </div>
+            <div className="grid gap-5 border-t border-border pt-6 sm:grid-cols-2">
+              <StepField
+                id={fieldId("instagram")}
+                label={labels.fields.instagram}
+                help={labels.fields.instagramHelp}
+                error={errorFor("instagram")}
+              >
+                <Input
+                  {...control("instagram", labels.fields.instagramHelp)}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  defaultValue={defaults.instagram}
+                />
+              </StepField>
+              <StepField
+                id={fieldId("linkedin")}
+                label={labels.fields.linkedin}
+                help={labels.fields.linkedinHelp}
+                error={errorFor("linkedin")}
+              >
+                <Input
+                  {...control("linkedin", labels.fields.linkedinHelp)}
+                  inputMode="url"
+                  autoCapitalize="none"
+                  defaultValue={defaults.linkedin}
+                />
+              </StepField>
+            </div>
             <StepField
-              id={fieldId("phone")}
-              label={labels.fields.phone}
-              help={labels.fields.phoneHelp}
-              error={errorFor("phone")}
+              id={fieldId("links")}
+              label={labels.fields.links}
+              help={labels.fields.linksHelp}
+              error={errorFor("links")}
             >
               <Input
-                {...control("phone", labels.fields.phoneHelp)}
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                defaultValue={defaults.phone}
-              />
-            </StepField>
-            <StepField
-              id={fieldId("telegram")}
-              label={labels.fields.telegram}
-              help={labels.fields.telegramHelp}
-              error={errorFor("telegram")}
-            >
-              <Input
-                {...control("telegram", labels.fields.telegramHelp)}
-                autoComplete="username"
+                {...control("links", labels.fields.linksHelp)}
+                inputMode="url"
                 autoCapitalize="none"
-                defaultValue={defaults.telegram}
+                defaultValue={defaults.links}
               />
             </StepField>
           </div>

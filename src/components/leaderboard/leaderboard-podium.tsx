@@ -1,11 +1,12 @@
 import { Crown } from "lucide-react";
+import Link from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
 import { initialsOf } from "@/lib/profile/initials";
-import { publicProfileHref } from "@/lib/seo/origin";
+import { memberProfileHref } from "@/lib/profile/public-routing";
 import { cn } from "@/lib/utils";
 
 export const PODIUM_SIZE = 3;
@@ -33,7 +34,7 @@ export function LeaderboardPodium({
         {entries.map((entry) => {
           const first = entry.rank === 1;
           const profileHref = entry.profileVisible
-            ? publicProfileHref(entry.username)
+            ? memberProfileHref(entry.username)
             : null;
           return (
             <li
@@ -82,14 +83,12 @@ export function LeaderboardPodium({
               <div className="flex max-w-full flex-col items-center gap-0.5">
                 <p className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
                   {profileHref ? (
-                    <a
+                    <Link
                       href={profileHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="underline-offset-4 hover:underline"
                     >
                       {entry.displayName}
-                    </a>
+                    </Link>
                   ) : (
                     entry.displayName
                   )}

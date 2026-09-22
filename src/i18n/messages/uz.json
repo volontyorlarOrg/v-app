@@ -86,7 +86,8 @@
       "label": "Hisob menyusi"
     },
     "menuLabel": "Menyu",
-    "profileEdit": "Profilni tahrirlash"
+    "profileEdit": "Profilni tahrirlash",
+    "memberProfile": "Koʻngilli profili"
   },
   "auth": {
     "providers": {
@@ -275,8 +276,8 @@
         "lead": "Tashkilotchilar tadbirga yaqin volontyorlarni tanlaydi."
       },
       "contact": {
-        "title": "Tashkilotchilar siz bilan qanday bogʻlanadi",
-        "lead": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi. Ikkitadan bittasi yetarli."
+        "title": "Aloqa va ochiq havolalar",
+        "lead": "Bu maʼlumotlar ochiq profilingizni ochgan har kimga koʻrinadi. Telefon yoki Telegram bu qadam uchun yetarli."
       }
     },
     "rail": {
@@ -647,6 +648,7 @@
     "sheet": {
       "edit": "Profilni tahrirlash",
       "figures": "Ishtirok",
+      "socials": "Ijtimoiy tarmoq profillari",
       "events": "{count, plural, other {<n>{value}</n> ta tadbir}}",
       "hours": "{count, plural, other {<n>{value}</n> soat}}",
       "reliability": "<n>{value}</n> ishonchlilik",
@@ -658,7 +660,7 @@
         "languages": "Tillar",
         "phone": "Telefon",
         "telegram": "Telegram",
-        "links": "Havolalar",
+        "links": "Portfolio",
         "publicPage": "Ochiq sahifa",
         "joined": "Qoʻshilgan"
       },
@@ -666,6 +668,14 @@
       "publicShow": "Sozlamalarda yoqish",
       "copy": "Havolani nusxalash",
       "copied": "Havola nusxalandi"
+    },
+    "visitor": {
+      "metaTitle": "{name} profili",
+      "unavailable": "Profil mavjud emas",
+      "back": "Reytingga qaytish",
+      "events": "{count, plural, other {<n>{value}</n> ta tadbir}}",
+      "hours": "{count, plural, other {<n>{value}</n> soat}}",
+      "xp": "<n>{value}</n> XP"
     },
     "avatar": {
       "title": "Profil rasmi",
@@ -697,8 +707,8 @@
     "sections": {
       "education": "Taʼlim",
       "location": "Qayerdasiz",
-      "contact": "Tashkilotchilar siz bilan qanday bogʻlanadi",
-      "links": "Havolalar",
+      "contact": "Aloqa maʼlumotlari",
+      "links": "Ochiq havolalar",
       "about": "Siz haqingizda"
     },
     "fields": {
@@ -719,11 +729,15 @@
       "languagesRemove": "Olib tashlash",
       "languagesLimit": "Oʻnta tanlandi. Boshqasini qoʻshish uchun bittasini olib tashlang.",
       "phone": "Telefon raqami",
-      "phoneHelp": "Faqat ariza berganingizdan keyin tashkilotchiga koʻrsatiladi.",
+      "phoneHelp": "Ochiq profilingiz yoqilganida hammaga koʻrinadi.",
       "telegram": "Telegram foydalanuvchi nomi",
-      "telegramHelp": "@ belgisisiz.",
-      "links": "Portfolio, CV yoki ijtimoiy tarmoq havolasi",
-      "linksHelp": "Vergul bilan ajrating. Uchtagacha.",
+      "telegramHelp": "@ belgisisiz. Ochiq profilingizda koʻrinadi.",
+      "instagram": "Instagram foydalanuvchi nomi",
+      "instagramHelp": "@ belgisisiz. Ochiq profilingizda koʻrinadi.",
+      "linkedin": "LinkedIn profili",
+      "linkedinHelp": "Foydalanuvchi nomi yoki toʻliq linkedin.com/in havolasi.",
+      "links": "Portfolio havolalari",
+      "linksHelp": "Toʻliq havolalarni vergul bilan ajrating. Uchtagacha.",
       "contact": "Siz bilan bogʻlanish usuli"
     },
     "completionFields": {
@@ -752,8 +766,8 @@
       "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
       "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
-      "contact": "Faqat ariza berganingizdan soʻng tashkilotchiga koʻrsatiladi.",
-      "links": "Ishingizni koʻrsatadigan har qanday havola. Ixtiyoriy."
+      "contact": "Ochiq profilingiz yoqilganida telefon va Telegram hammaga koʻrinadi.",
+      "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar."
     },
     "edit": {
       "back": "Profilga qaytish",
@@ -850,7 +864,7 @@
       "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
       "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi.",
       "publicProfile": "Ochiq profilimni koʻrsatish",
-      "publicProfileHelp": "Odamlar volontyorlar.uz/sizning_nomingiz manzilini ochishi mumkin. Aloqa maʼlumotlari, taʼlim joyi, shahar va qatnashuv tarixi maxfiy qoladi.",
+      "publicProfileHelp": "Har kim volontyorlar.uz/sizning_nomingiz manzilini ochib, aloqa maʼlumotlari, taʼlim joyi, shahar, ijtimoiy tarmoqlar, portfolio va ishtirok natijalarini koʻrishi mumkin.",
       "publicProfileVisible": "Ochiq profilingiz koʻrinib turibdi.",
       "publicProfileHidden": "Ochiq profilingiz yashirildi. Uning manzili endi topilmadi javobini beradi."
     },

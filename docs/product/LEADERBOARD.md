@@ -77,7 +77,9 @@ Read: `GET /leaderboard?page&pageSize` → `{ items, viewer, page, pageSize,
 total, scoring }`. Each item is `{ rank, displayName, username, avatarUrl,
 profileVisible, xp, isCurrentUser }`; the viewer carries the same public
 identity fields without `isCurrentUser`. Generated usernames are excluded.
-Rows link to `volontyorlar.uz/<username>` only while `profileVisible` is true.
+Rows link in the same app tab to `/<username>` only while `profileVisible` is
+true. The app route renders the full public-profile contract inside the signed-in
+shell; `volontyorlar.uz/<username>` remains the external share address.
 Write: `PUT /me/username` with `{ username }` →
 `{ username, usernameSource, usernameEditable }`. Those same username
 fields are required on `GET /me`.

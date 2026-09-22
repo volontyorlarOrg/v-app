@@ -1552,6 +1552,40 @@ test.describe("the leaderboard", () => {
     await expect(page.getByText("30 volunteers")).toBeVisible();
   });
 
+  test("opens another volunteer in the same app tab with their full public details", async ({
+    page,
+    context,
+  }) => {
+    const profileLink = page.getByRole("link", { name: "Volunteer 01" });
+    await expect(profileLink).toHaveAttribute("href", "/volunteer_01");
+    await expect(profileLink).not.toHaveAttribute("target", "_blank");
+
+    await profileLink.click();
+
+    await expect(page).toHaveURL(/\/volunteer_01$/);
+    await expect(context.pages()).toHaveLength(1);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Volunteer 01" }),
+    ).toBeVisible();
+    await expect(page.getByText("+998 90 123 45 67")).toBeVisible();
+    await expect(page.getByText("Academic lyceum No. 2")).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: "Instagram username: @volontyorlar.uz",
+      }),
+    ).toHaveAttribute("href", "https://www.instagram.com/volontyorlar.uz/");
+    await expect(
+      page.getByRole("link", { name: "portfolio.example/volunteer" }),
+    ).toBeVisible();
+    await expect(page.getByRole("list", { name: "Participation" }))
+      .toMatchAriaSnapshot(`
+      - list "Participation":
+        - listitem: 5 events
+        - listitem: 18 hours
+        - listitem: 3,000 XP
+    `);
+  });
+
   test("shows the signed-in volunteer even from a page they are not on", async ({
     page,
   }) => {
