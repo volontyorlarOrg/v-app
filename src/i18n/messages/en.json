@@ -450,6 +450,7 @@
       "awaitingConfirmation": "Awaiting confirmation",
       "acceptedInstantly": "Accepted instantly",
       "answers": "Your answers",
+      "essay": "Your essay",
       "send": {
         "title": "Send your application",
         "description": "Your profile below is your application. Check it, then send it to the organiser."
@@ -499,6 +500,8 @@
       "choose": "Choose",
       "fieldRequired": "This answer is required.",
       "fieldInvalid": "Check this answer.",
+      "essayLabel": "Why do you want to join?",
+      "essayHelp": "Write your essay in your own words. Up to 5,000 characters.",
       "errors": {
         "profileRequired": "Complete your profile before submitting.",
         "profileIncomplete": "Complete the required profile fields and add a contact method before submitting.",
@@ -567,6 +570,8 @@
       "requirements": "What you need",
       "description": "About this opportunity",
       "questions": "What you will be asked",
+      "essayTitle": "Application essay",
+      "essayDescription": "You will write one essay explaining why you want to join before submitting your application.",
       "questionCount": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
       "required": "Required",
       "optional": "Optional",
@@ -578,6 +583,8 @@
       "applyHint": "Your profile is your application. The organiser sees it as soon as you apply, and you can withdraw before the event starts.",
       "applyHintAutomatic": "Your profile is your application. While places remain, you're accepted as soon as you apply, and you can withdraw before the event starts.",
       "applyHintQuestions": "{count, plural, one {You answer # question} other {You answer # questions}} on the next page, then send your application.",
+      "applyHintEssay": "Write your essay on the next page, then submit your application.",
+      "applyHintEssayAndQuestions": "Write your essay and answer {count, plural, one {# question} other {# questions}} on the next page, then submit your application.",
       "viewApplication": "View your application",
       "profileRequired": "Complete the core profile fields and add a phone number or Telegram username before applying.",
       "completeProfile": "Complete profile",

@@ -60,6 +60,7 @@ export const opportunitySummarySchema = z.object({
   estimatedTotalHours: optional(z.number()),
   spotsRemaining: optional(z.number().int()),
   acceptanceMode: z.enum(ACCEPTANCE_MODES).default("manual"),
+  essayRequired: z.boolean().default(false),
 });
 
 export const applicationAttendanceSchema = z.object({
@@ -144,6 +145,7 @@ export const profileSnapshotSchema = z.object({
 });
 
 export const applicationDetailSchema = applicationSummarySchema.extend({
+  essay: optional(z.string()),
   answers: z.array(applicationAnswerSchema).default([]),
   profileSnapshot: optional(profileSnapshotSchema),
   reviewerNote: optional(z.string()),

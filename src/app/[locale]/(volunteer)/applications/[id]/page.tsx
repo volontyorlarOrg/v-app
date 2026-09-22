@@ -68,6 +68,7 @@ export default async function ApplicationPage({
     <Application
       application={application}
       questions={opportunity?.questions ?? null}
+      essayRequired={opportunity?.essayRequired ?? null}
       open={opportunity ? canApply(opportunity, now) : false}
       snapshot={snapshot}
       now={now}
@@ -93,12 +94,14 @@ function answerText(
 function Application({
   application,
   questions,
+  essayRequired,
   open,
   snapshot,
   now,
 }: {
   application: ApplicationDetail;
   questions: readonly ApplicationQuestion[] | null;
+  essayRequired: boolean | null;
   open: boolean;
   snapshot: ProfileSnapshot;
   now: Date;
@@ -113,8 +116,9 @@ function Application({
     (questions ?? []).map((question) => [question.id, question]),
   );
   const draft = isEditable(application.status);
-  const sendable = draft && open && questions !== null;
-  const profileOnly = questions !== null && questions.length === 0;
+  const sendable = draft && open && questions !== null && essayRequired !== null;
+  const profileOnly =
+    questions !== null && essayRequired === false && questions.length === 0;
   const confirmedHours = application.attendance?.confirmedHours;
   const answers = Object.fromEntries(
     application.answers
@@ -211,6 +215,8 @@ function Application({
             >
               <AnswersForm
                 applicationId={application.id}
+                essayRequired={false}
+                essay={application.essay ?? ""}
                 questions={fields}
                 answers={answers}
                 labels={answersLabels(t, localePath(locale, "profileEdit"))}
@@ -220,32 +226,46 @@ function Application({
             <Panel id="answers" title={t("detail.answers")}>
               <AnswersForm
                 applicationId={application.id}
+                essayRequired={essayRequired ?? false}
+                essay={application.essay ?? ""}
                 questions={fields}
                 answers={answers}
                 labels={answersLabels(t, localePath(locale, "profileEdit"))}
               />
             </Panel>
-          ) : application.answers.length > 0 ? (
+          ) : application.essay || application.answers.length > 0 ? (
             <Panel id="answers" title={t("detail.answers")}>
-              <dl className="flex flex-col gap-5">
-                {application.answers.map((answer, index) => {
-                  const question = answer.questionId
-                    ? questionById.get(answer.questionId)
-                    : undefined;
-                  return (
-                    <div key={answer.questionId ?? index}>
-                      <dt className="font-semibold text-ink">
-                        {answer.prompt ??
-                          question?.prompt ??
-                          t("detail.question", { number: index + 1 })}
-                      </dt>
-                      <dd className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
-                        {answerText(answer.value, question)}
-                      </dd>
-                    </div>
-                  );
-                })}
-              </dl>
+              {application.essay ? (
+                <div className={application.answers.length > 0 ? "mb-6" : undefined}>
+                  <h3 className="text-sm font-semibold text-ink">
+                    {t("detail.essay")}
+                  </h3>
+                  <p className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
+                    {application.essay}
+                  </p>
+                </div>
+              ) : null}
+              {application.answers.length > 0 ? (
+                <dl className="flex flex-col gap-5">
+                  {application.answers.map((answer, index) => {
+                    const question = answer.questionId
+                      ? questionById.get(answer.questionId)
+                      : undefined;
+                    return (
+                      <div key={answer.questionId ?? index}>
+                        <dt className="font-semibold text-ink">
+                          {answer.prompt ??
+                            question?.prompt ??
+                            t("detail.question", { number: index + 1 })}
+                        </dt>
+                        <dd className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
+                          {answerText(answer.value, question)}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              ) : null}
             </Panel>
           ) : null}
 
@@ -372,6 +392,8 @@ function answersLabels(
     choose: t("form.choose"),
     fieldRequired: t("form.fieldRequired"),
     fieldInvalid: t("form.fieldInvalid"),
+    essayLabel: t("form.essayLabel"),
+    essayHelp: t("form.essayHelp"),
     errors: {
       profileRequired: t("form.errors.profileRequired"),
       profileIncomplete: t("form.errors.profileIncomplete"),
