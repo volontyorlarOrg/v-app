@@ -6,10 +6,7 @@ import {
   OnboardingResume,
   type OnboardingResumeLabels,
 } from "@/components/onboarding/onboarding-resume";
-import {
-  ONBOARDING_COOKIE_NAME,
-  ONBOARDING_STORAGE_KEY,
-} from "@/lib/onboarding/state";
+import { ONBOARDING_COOKIE_NAME, ONBOARDING_STORAGE_KEY } from "@/lib/onboarding/state";
 
 const refresh = vi.fn();
 
@@ -22,11 +19,16 @@ vi.mock("@/i18n/navigation", () => ({
 
 const labels: OnboardingResumeLabels = {
   title: "Finish your pass",
-  bodyByDone: ["none done", "1 of 3 done", "2 of 3 done", "all done"],
+  bodyByDone: ["none done", "1 of 4 done", "2 of 4 done", "3 of 4 done", "all done"],
   continue: "Continue setup",
   dismiss: "Not now",
   rail: "Setup steps",
-  steps: { about: "About you", place: "Where you study", contact: "Contact" },
+  steps: {
+    username: "Username",
+    about: "About you",
+    place: "Where you study",
+    contact: "Contact",
+  },
   states: { done: "done", current: "current step", upcoming: "not yet" },
 };
 
@@ -51,7 +53,7 @@ describe("OnboardingResume", () => {
     render(<OnboardingResume serverState={null} labels={labels} />);
 
     expect(screen.getByText("Finish your pass")).toBeInTheDocument();
-    expect(screen.getByText("1 of 3 done")).toBeInTheDocument();
+    expect(screen.getByText("2 of 4 done")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Continue setup" })).toHaveAttribute(
       "href",
       "/welcome",

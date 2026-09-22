@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/routing";
+import type { UsernameSource } from "@/lib/account/username";
 import {
   isOnboardingStep,
   stepIndex,
@@ -40,6 +41,16 @@ export function serializeOnboardingState(state: OnboardingState): string {
 export function resumeStep(state: OnboardingState | null): OnboardingStep {
   if (!state || state.status === "done" || state.step === "done") return "welcome";
   return state.step;
+}
+
+export function welcomeStep(
+  state: OnboardingState | null,
+  usernameSource: UsernameSource,
+): OnboardingStep {
+  const step = resumeStep(state);
+  return usernameSource === "generated" && stepIndex(step) > stepIndex("username")
+    ? "username"
+    : step;
 }
 
 export function isOnboardingOpen(state: OnboardingState | null): boolean {
@@ -95,7 +106,10 @@ export function readOnboardingStateFromStorage(): OnboardingState | null {
 
 export function writeOnboardingStateToStorage(state: OnboardingState) {
   try {
-    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, serializeOnboardingState(state));
+    window.localStorage.setItem(
+      ONBOARDING_STORAGE_KEY,
+      serializeOnboardingState(state),
+    );
   } catch {}
 }
 
