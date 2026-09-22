@@ -72,7 +72,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   reset and no email verification — the backend has neither — so nothing on
   screen offers one and `/forgot-password` is a 404. A **new** account (the
   email sign-up, or Telegram and Google when the backend says `isNewUser`)
-  lands on `/welcome`, the three-step welcome flow described in
+  lands on `/welcome`, the four-step welcome flow described in
   [`docs/product/ONBOARDING.md`](docs/product/ONBOARDING.md); its only state
   is a readable, app-only progress cookie, and every step saves through the
   existing profile action;
@@ -115,7 +115,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
   place even from a page they are not on. Each account has a public `username`
   with a `source`: every username is renamed through
-  `PUT /me/username` from `/settings` and from the end of the welcome flow,
+  `PUT /me/username` from `/settings` and from the welcome flow's first step,
   while a valid Telegram username is only the initial value and stops syncing
   after the volunteer chooses a custom one. It is all
   described in [`docs/product/LEADERBOARD.md`](docs/product/LEADERBOARD.md),
@@ -131,7 +131,7 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileSheet` — one read-only sheet: the avatar, the name as the
-`h1`, the handle and the level, the bio, one line of figures from the record,
+`h1`, the username and the level, the bio, one line of figures from the record,
 and then every detail the volunteer entered (region, city, school, year,
 languages, phone, Telegram, Instagram, LinkedIn, portfolio links, the public
 page address with a copy button, the month they joined) as plain ruled rows.
@@ -234,7 +234,7 @@ src/lib/api/                    -> the server-only client on openapi-fetch, the 
                                    per-domain reads, the Zod schemas, error codes, ActionResult
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
                                    around the Server Actions
-src/app/[locale]/(onboarding)/  -> welcome: the three-step flow a new account lands on
+src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
                                    applications[/id], saved and record (redirects),
                                    leaderboard, profile, profile/edit, settings

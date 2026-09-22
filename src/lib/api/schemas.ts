@@ -134,13 +134,19 @@ export const applicationAnswerSchema = z.object({
 });
 
 export const profileSnapshotSchema = z.object({
+  username: optional(z.string()),
   fullName: optional(z.string()),
   bio: optional(z.string()),
   region: optional(z.string()),
+  city: optional(z.string()),
   school: optional(z.string()),
+  gradeYear: optional(z.string()),
   languages: optional(z.array(z.string())),
   phone: optional(z.string()),
   telegram: optional(z.string()),
+  instagram: optional(z.string()),
+  linkedin: optional(z.string()),
+  links: optional(z.array(z.string())),
 });
 
 export const applicationDetailSchema = applicationSummarySchema.extend({

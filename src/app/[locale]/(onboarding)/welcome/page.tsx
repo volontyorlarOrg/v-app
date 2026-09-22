@@ -16,7 +16,7 @@ import { getMe } from "@/lib/api/account.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
 import { safeReturnPath } from "@/lib/auth/session";
-import { resumeStep } from "@/lib/onboarding/state";
+import { welcomeStep } from "@/lib/onboarding/state";
 import { readOnboardingState } from "@/lib/onboarding/state.server";
 import { FORM_STEPS, type OnboardingStep } from "@/lib/onboarding/steps";
 import { REGIONS } from "@/lib/opportunities/types";
@@ -27,6 +27,7 @@ import {
   type VolunteerProfile,
 } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
+import { marketingOrigin } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,8 @@ export default async function WelcomePage({
     ...stored,
     languages: languageDirectory.canonicalList(stored.languages),
   };
+  const username = usernameIdentity(me);
+  const origin = marketingOrigin();
 
   return (
     <Welcome
@@ -68,8 +71,9 @@ export default async function WelcomePage({
       values={values}
       profileSaved={profile !== null}
       next={safeReturnPath(typeof next === "string" ? next : null)}
-      initialStep={resumeStep(state)}
-      username={usernameIdentity(me)}
+      initialStep={welcomeStep(state, username.source)}
+      username={username}
+      addressPrefix={origin ? `${new URL(origin).host}/` : null}
     />
   );
 }
@@ -81,6 +85,7 @@ function Welcome({
   next,
   initialStep,
   username,
+  addressPrefix,
 }: {
   locale: Locale;
   values: VolunteerProfile;
@@ -88,6 +93,7 @@ function Welcome({
   next: string | null;
   initialStep: OnboardingStep;
   username: UsernameIdentity;
+  addressPrefix: string | null;
 }) {
   const t = useTranslations("onboarding");
   const profile = useTranslations("profile");
@@ -100,8 +106,10 @@ function Welcome({
     "bio",
     "bioHelp",
     "school",
+    "gradeYear",
     "region",
     "regionAny",
+    "city",
     "languages",
     "languagesHelp",
     "languagesSearch",
@@ -154,20 +162,16 @@ function Welcome({
     fields: Object.fromEntries(
       fieldKeys.map((key) => [key, profile(`fields.${key}`)]),
     ) as OnboardingLabels["fields"],
-    username: {
-      legend: t("username.title"),
-      description: t("username.description"),
-      field: settings("username.field"),
+    optional: profile("optional"),
+    usernameStep: {
+      field: t("usernameStep.field"),
       hint: settings("username.hint", {
         min: USERNAME_MIN_LENGTH,
         max: USERNAME_MAX_LENGTH,
       }),
-      current: settings("username.current"),
-      generated: settings("username.generated"),
-      managed: settings("username.managed"),
-      save: settings("username.save"),
-      saving: settings("username.saving"),
-      saved: settings("username.saved"),
+      fromTelegram: t("usernameStep.fromTelegram"),
+      address: t("usernameStep.address"),
+      addressPlaceholder: t("usernameStep.addressPlaceholder"),
       errors: Object.fromEntries(
         ACCOUNT_ERROR_KEYS.map((key) => [key, settings(`errors.${key}`)]),
       ),
@@ -183,7 +187,6 @@ function Welcome({
         attend: t("done.next.attend"),
         confirm: t("done.next.confirm"),
       },
-      usernameRequired: t("done.usernameRequired"),
       cta: t("done.cta"),
       dashboard: t("done.dashboard"),
     },
@@ -208,6 +211,7 @@ function Welcome({
       }))}
       languageOptions={languageDirectory.options(locale, values.languages)}
       username={username}
+      addressPrefix={addressPrefix}
       labels={labels}
       completionFields={completionFields}
     />

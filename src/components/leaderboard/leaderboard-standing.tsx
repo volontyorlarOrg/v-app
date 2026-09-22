@@ -96,7 +96,7 @@ export function LeaderboardStanding({
             href={navHref("settings")}
             className={buttonClass({ variant: "outline", size: "sm" })}
           >
-            {t("standing.changeHandle")}
+            {t("standing.changeUsername")}
           </Link>
         ) : (
           <p className="flex items-start gap-2 text-sm leading-relaxed text-ink-muted">
