@@ -135,16 +135,15 @@ test.describe("welcome flow", () => {
     page,
   }, info) => {
     await createAccount(page, `fresh-${info.project.name}@example.org`);
-    await page.getByRole("button", { name: "Skip for now" }).click();
+    await page.getByRole("button", { name: "Start" }).click();
     await page
-      .getByLabel("New handle")
+      .getByLabel("Username", { exact: true })
       .fill(`fresh_${info.project.name.replaceAll("-", "_")}`);
-    await page.getByRole("button", { name: "Save handle" }).click();
-    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(
-      page.getByText("Choose and save your Volontyorlar username to continue."),
-    ).toHaveCount(0);
-    await page.getByRole("link", { name: "Go to the dashboard" }).click();
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Skip for now" }).click();
     await expect(page).toHaveURL(/\/en\/dashboard$/);
     const start = page.getByRole("region", {
       name: "Start with your first opportunity",
@@ -164,7 +163,22 @@ test.describe("welcome flow", () => {
   }, info) => {
     await createAccount(page, `flow-${info.project.name}@example.org`);
     await expect(page.getByRole("list", { name: "Setup steps" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 2,
+        name: "Four short steps, about two minutes.",
+      }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Start" }).click();
+
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Choose your username" }),
+    ).toBeVisible();
+    await expect(page.getByText("Step 1 of 4")).toBeVisible();
+    const username = page.getByLabel("Username", { exact: true });
+    await expect(username).toHaveValue("");
+    await username.fill("Malika_Reads");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
       page.getByRole("heading", { level: 2, name: "About you" }),
@@ -179,7 +193,9 @@ test.describe("welcome flow", () => {
     await page
       .getByLabel("School, college, or university")
       .fill("Academic lyceum No. 1");
+    await page.getByLabel("Year or grade").fill("10");
     await page.getByLabel("Region").selectOption("tashkent-city");
+    await page.getByLabel("City or district").fill("Chilonzor");
     const languages = page.getByRole("combobox", { name: "Languages you speak" });
     await languages.fill("uzb");
     await languages.press("Enter");
@@ -190,8 +206,10 @@ test.describe("welcome flow", () => {
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
-      page.getByRole("heading", { level: 2, name: "How organisers reach you" }),
+      page.getByRole("heading", { level: 2, name: "Contact and public links" }),
     ).toBeVisible();
+    await expect(page.getByLabel("Instagram username")).toBeVisible();
+    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByLabel("Telegram username").fill("malika_k");
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
@@ -201,12 +219,6 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByText("Your profile is complete.", { exact: false }),
     ).toBeVisible();
-    await page.getByLabel("New handle").fill("malika_reads");
-    await page.getByRole("button", { name: "Save handle" }).click();
-    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
-    await expect(
-      page.getByText("Choose and save your Volontyorlar username to continue."),
-    ).toHaveCount(0);
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
 
@@ -214,6 +226,9 @@ test.describe("welcome flow", () => {
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
+    await expect(page.getByLabel("Year or grade")).toHaveValue("10");
+    await expect(page.getByLabel("City or district")).toHaveValue("Chilonzor");
+    await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
     await expect(page.getByLabel("Bio")).toHaveValue(
       "I read to younger pupils on Saturdays.",
@@ -221,41 +236,75 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Remove: English" })).toBeVisible();
 
+    await page.goto("/en/settings");
+    await expect(page.getByRole("region", { name: "Your username" })).toContainText(
+      "@malika_reads",
+    );
+
     await page.goto("/en/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
       0,
     );
   });
 
-  test("a generated handle cannot bypass onboarding", async ({ page }, info) => {
+  test("a generated username cannot bypass onboarding", async ({ page }, info) => {
     await createAccount(page, `skip-${info.project.name}@example.org`);
     await page.goto("/en/dashboard");
     await expect(page).toHaveURL(/\/en\/welcome$/);
-    await expect(page.getByRole("button", { name: "Skip for now" })).toBeVisible();
-    await page.getByRole("button", { name: "Skip for now" }).click();
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Choose and save your Volontyorlar username to continue."),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Find your first opportunity" }),
-    ).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Start" }).click();
 
-    await expect(page.getByLabel("New handle")).toHaveValue("");
-    await page.getByLabel("New handle").fill("malika_skips");
-    await page.getByRole("button", { name: "Save handle" }).click();
-    await expect(page.getByRole("status")).toContainText("Your handle is saved.");
     await expect(
-      page.getByText("Choose and save your Volontyorlar username to continue."),
-    ).toHaveCount(0);
+      page.getByRole("heading", { level: 2, name: "Choose your username" }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Skip this step" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page.getByText("Choose a username.")).toBeVisible();
+
+    await page.context().addCookies([
+      {
+        name: "volontyorlar_onboarding",
+        value: "skipped:contact",
+        url: page.url(),
+      },
+    ]);
+    await page.evaluate(() =>
+      window.localStorage.setItem("volontyorlar_onboarding", "skipped:contact"),
+    );
+    await page.goto("/en/welcome");
     await expect(
-      page.getByRole("link", { name: "Find your first opportunity" }),
+      page.getByRole("heading", { level: 2, name: "Choose your username" }),
     ).toBeVisible();
 
-    await page.goto("/en/dashboard");
+    await page.getByLabel("Username", { exact: true }).fill("malika_skips");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Skip for now" }).click();
     await expect(page).toHaveURL(/\/en\/dashboard$/);
+  });
+
+  test("a Telegram username is kept with one tap", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/welcome");
+    await page.getByRole("button", { name: "Start" }).click();
+
+    const username = page.getByLabel("Username", { exact: true });
+    await expect(username).toHaveValue("dilnoza_k");
+    await expect(
+      page.getByText("This is your Telegram username.", { exact: false }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+
+    await page.goto("/en/settings");
+    await expect(page.getByRole("region", { name: "Your username" })).toContainText(
+      "@dilnoza_k",
+    );
   });
 
   test("a returning volunteer is not interrupted", async ({ page }) => {
@@ -581,7 +630,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "83");
+    ).toHaveAttribute("aria-valuenow", "78");
   });
 
   test("reaches every section from the shell, with an h1 on each", async ({ page }) => {
@@ -908,10 +957,24 @@ test.describe("opportunities", () => {
     page,
   }) => {
     await page.goto("/en/opportunities/remote-translation-support");
-    await expect(page.getByRole("link", { name: "Complete profile" })).toBeVisible();
+    await expect(
+      page.getByText(
+        "Complete your profile before applying. Still missing: Bio, Phone.",
+      ),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
+    await page.goto("/en/opportunities/remote-translation-support");
+    await expect(
+      page.getByText("Still missing: Phone.", { exact: false }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
+    await page.getByRole("link", { name: "Complete profile" }).click();
+    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
     await page.goto("/en/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
@@ -935,6 +998,7 @@ test.describe("opportunities", () => {
     await page.goto("/en/opportunities/city-marathon-water-stations");
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I help at city events.");
+    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
 
@@ -1147,10 +1211,11 @@ test.describe("applications, record, profile and settings", () => {
     await page.goto("/en/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "83");
+    ).toHaveAttribute("aria-valuenow", "78");
 
     await page.goto("/en/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
     await expect(page).toHaveURL(/\/en\/profile$/);
@@ -1164,19 +1229,30 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
-  test("either contact method satisfies readiness without requiring both inputs", async ({
+  test("applying needs both phone and Telegram, yet a partial profile still saves", async ({
     page,
   }) => {
     await page.goto("/en/profile/edit");
-    await expect(page.getByLabel("Phone number")).not.toHaveAttribute("required", "");
-    await expect(page.getByLabel("Phone number")).toHaveValue("");
-    await expect(page.getByLabel("Telegram username")).not.toHaveAttribute(
-      "required",
-      "",
-    );
+    const phone = page.getByLabel("Phone number");
+    await expect(phone).not.toHaveAttribute("required", "");
+    await expect(phone).toHaveValue("");
+    await expect(page.getByText("Phone number", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Telegram username")).toHaveValue("dilnoza_k");
-    await expect(page.getByLabel("Bio")).toBeVisible();
+    await expect(page.getByText("Optional", { exact: true })).toHaveCount(3);
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
+
+    await page.getByLabel("Bio").fill("Second-year student.");
+    await phone.fill("90 123 45 67");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(phone).toHaveAttribute("aria-invalid", "true");
+    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+
+    await phone.fill("");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(
+      page.getByText("Still missing: Phone", { exact: false }),
+    ).toBeVisible();
   });
 
   test("the profile carries no settings of its own", async ({ page }) => {
@@ -1629,16 +1705,16 @@ test.describe("the leaderboard", () => {
   });
 });
 
-test.describe("the leaderboard handle", () => {
-  test("a Telegram account can replace its imported handle", async ({ page }) => {
+test.describe("the leaderboard username", () => {
+  test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);
     await page.goto("/en/settings");
 
-    const panel = page.getByRole("region", { name: "Your handle" });
+    const panel = page.getByRole("region", { name: "Your username" });
     await expect(panel).toContainText("@dilnoza_k");
-    await panel.getByLabel("New handle").fill("dilnoza_custom");
-    await panel.getByRole("button", { name: "Save handle" }).click();
-    await expect(panel.getByRole("status")).toContainText("Your handle is saved.");
+    await panel.getByLabel("New username").fill("dilnoza_custom");
+    await panel.getByRole("button", { name: "Save username" }).click();
+    await expect(panel.getByRole("status")).toContainText("Your username is saved.");
     await expect(panel).toContainText("@dilnoza_custom");
   });
 
@@ -1648,10 +1724,10 @@ test.describe("the leaderboard handle", () => {
     await signInWithPassword(page);
     await page.goto("/en/settings");
 
-    const panel = page.getByRole("region", { name: "Your handle" });
-    await panel.getByLabel("New handle").fill("Chilonzor_Reader");
-    await panel.getByRole("button", { name: "Save handle" }).click();
-    await expect(panel.getByRole("status")).toContainText("Your handle is saved.");
+    const panel = page.getByRole("region", { name: "Your username" });
+    await panel.getByLabel("New username").fill("Chilonzor_Reader");
+    await panel.getByRole("button", { name: "Save username" }).click();
+    await expect(panel.getByRole("status")).toContainText("Your username is saved.");
     await expect(panel).toContainText("@chilonzor_reader");
 
     await page.goto("/en/leaderboard?page=2");
@@ -1660,65 +1736,63 @@ test.describe("the leaderboard handle", () => {
     ).toContainText("You");
   });
 
-  test("a handle another volunteer holds is refused by name", async ({ page }) => {
+  test("a username another volunteer holds is refused by name", async ({ page }) => {
     await signInWithPassword(page);
     await page.goto("/en/settings");
 
-    const panel = page.getByRole("region", { name: "Your handle" });
-    await panel.getByLabel("New handle").fill("volunteer_01");
-    await panel.getByRole("button", { name: "Save handle" }).click();
-    await expect(panel.getByRole("alert")).toContainText("That handle is taken.");
+    const panel = page.getByRole("region", { name: "Your username" });
+    await panel.getByLabel("New username").fill("volunteer_01");
+    await panel.getByRole("button", { name: "Save username" }).click();
+    await expect(panel.getByRole("alert")).toContainText("That username is taken.");
   });
 
-  test("a handle that breaks the rule is named before it is sent", async ({ page }) => {
+  test("a username that breaks the rule is named before it is sent", async ({
+    page,
+  }) => {
     await signInWithPassword(page);
     await page.goto("/en/settings");
 
-    const panel = page.getByRole("region", { name: "Your handle" });
-    const field = panel.getByLabel("New handle");
+    const panel = page.getByRole("region", { name: "Your username" });
+    const field = panel.getByLabel("New username");
     await field.fill("no");
-    await panel.getByRole("button", { name: "Save handle" }).click();
+    await panel.getByRole("button", { name: "Save username" }).click();
     await expect(
-      panel.getByText("A handle needs at least 5 characters."),
+      panel.getByText("A username needs at least 5 characters."),
     ).toBeVisible();
     await expect(field).toHaveAttribute("aria-invalid", "true");
   });
 
-  test("a new account is offered a handle at the end of the welcome flow", async ({
+  test("a new account chooses its username first in the welcome flow", async ({
     page,
   }, info) => {
     await createAccount(page, `handle-${info.project.name}@example.org`);
     await page.getByRole("button", { name: "Start" }).click();
-    await page.getByRole("button", { name: "Skip this step" }).click();
-    await page.getByRole("button", { name: "Skip this step" }).click();
-    await page.getByRole("button", { name: "Skip this step" }).click();
 
     await expect(
-      page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
+      page.getByRole("heading", { level: 2, name: "Choose your username" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 3, name: "Your leaderboard handle" }),
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Save handle" })).toBeVisible();
+    await expect(page.getByText("Step 1 of 4")).toBeVisible();
+    await expect(page.getByText("handle", { exact: false })).toHaveCount(0);
   });
 
-  test("a generated-looking handle is refused, so the gate stays closed", async ({
+  test("a generated-looking username is refused, so the gate stays closed", async ({
     page,
   }, info) => {
     await createAccount(page, `random-${info.project.name}@example.org`);
-    await page.getByRole("button", { name: "Skip for now" }).click();
+    await page.getByRole("button", { name: "Start" }).click();
 
-    const ready = page.getByRole("region", { name: "Your pass is ready." });
-    await ready.getByLabel("New handle").fill("user_8fec48d1f08341c6a779");
-    await ready.getByRole("button", { name: "Save handle" }).click();
-    await expect(ready.getByRole("alert")).toContainText(
-      "That username is reserved by Volontyorlar.",
-    );
+    await page
+      .getByLabel("Username", { exact: true })
+      .fill("user_8fec48d1f08341c6a779");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(
-      page.getByText("Choose and save your Volontyorlar username to continue."),
+      page.getByRole("region", { name: "Choose your username" }).getByRole("alert"),
+    ).toContainText("That username is reserved by Volontyorlar.");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Choose your username" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Find your first opportunity" }),
+      page.getByRole("heading", { level: 2, name: "About you" }),
     ).toHaveCount(0);
   });
 });

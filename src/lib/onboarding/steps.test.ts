@@ -21,48 +21,58 @@ describe("onboarding steps", () => {
   it("opens with a welcome, ends with done, and walks forward one step at a time", () => {
     expect(ONBOARDING_STEPS[0]).toBe("welcome");
     expect(ONBOARDING_STEPS.at(-1)).toBe("done");
-    expect(nextStep("welcome")).toBe("about");
+    expect(nextStep("welcome")).toBe("username");
+    expect(nextStep("username")).toBe("about");
     expect(nextStep("contact")).toBe("done");
     expect(nextStep("done")).toBe("done");
   });
 
   it("walks back inside the form steps only", () => {
-    expect(previousStep("about")).toBe("welcome");
+    expect(previousStep("username")).toBe("welcome");
+    expect(previousStep("about")).toBe("username");
     expect(previousStep("place")).toBe("about");
     expect(previousStep("welcome")).toBeNull();
     expect(previousStep("done")).toBeNull();
   });
 
   it("numbers the form steps from one and counts the completed ones", () => {
-    expect(FORM_STEP_COUNT).toBe(3);
-    expect(FORM_STEPS.map(formStepNumber)).toEqual([1, 2, 3]);
+    expect(FORM_STEP_COUNT).toBe(4);
+    expect(FORM_STEPS).toEqual(["username", "about", "place", "contact"]);
+    expect(FORM_STEPS.map(formStepNumber)).toEqual([1, 2, 3, 4]);
     expect(completedFormSteps("welcome")).toBe(0);
-    expect(completedFormSteps("about")).toBe(0);
-    expect(completedFormSteps("contact")).toBe(2);
-    expect(completedFormSteps("done")).toBe(3);
+    expect(completedFormSteps("username")).toBe(0);
+    expect(completedFormSteps("about")).toBe(1);
+    expect(completedFormSteps("contact")).toBe(3);
+    expect(completedFormSteps("done")).toBe(4);
   });
 
   it("recognises the step kinds", () => {
     expect(isOnboardingStep("place")).toBe(true);
     expect(isOnboardingStep("finish")).toBe(false);
     expect(isFormStep("contact")).toBe(true);
+    expect(isFormStep("username")).toBe(true);
     expect(isFormStep("welcome")).toBe(false);
     expect(isProfileStep("contact")).toBe(true);
+    expect(isProfileStep("username")).toBe(false);
     expect(isProfileStep("done")).toBe(false);
     expect(stepIndex("done")).toBe(ONBOARDING_STEPS.length - 1);
   });
 
-  it("covers every field that counts toward profile completeness", () => {
+  it("asks for every field that counts toward profile completeness", () => {
     const covered = new Set<string>(Object.values(PROFILE_STEP_FIELDS).flat());
     for (const field of COMPLETION_FIELDS) {
-      expect(
-        field === "contact"
-          ? covered.has("phone") && covered.has("telegram")
-          : covered.has(field),
-        field,
-      ).toBe(true);
+      expect(covered.has(field), field).toBe(true);
     }
-    expect(covered.has("phone") && covered.has("telegram")).toBe(true);
+  });
+
+  it("asks where the volunteer studies in one step, grade and city included", () => {
+    expect(PROFILE_STEP_FIELDS.place).toEqual([
+      "school",
+      "gradeYear",
+      "region",
+      "city",
+      "languages",
+    ]);
   });
 
   it("derives the pass parts from saved data, not from the step alone", () => {

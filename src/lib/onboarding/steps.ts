@@ -3,6 +3,7 @@ import type { ProfileFormValues } from "@/lib/profile/input";
 
 export const ONBOARDING_STEPS = [
   "welcome",
+  "username",
   "about",
   "place",
   "contact",
@@ -14,13 +15,13 @@ export type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 export const PROFILE_STEPS = ["about", "place", "contact"] as const;
 export type ProfileStep = (typeof PROFILE_STEPS)[number];
 
-export const FORM_STEPS = ["about", "place", "contact"] as const;
+export const FORM_STEPS = ["username", "about", "place", "contact"] as const;
 export type FormStep = (typeof FORM_STEPS)[number];
 export const FORM_STEP_COUNT = FORM_STEPS.length;
 
 export const PROFILE_STEP_FIELDS = {
   about: ["fullName", "bio"],
-  place: ["school", "region", "languages"],
+  place: ["school", "gradeYear", "region", "city", "languages"],
   contact: ["phone", "telegram", "instagram", "linkedin", "links"],
 } as const satisfies Record<ProfileStep, readonly (keyof ProfileFormValues)[]>;
 

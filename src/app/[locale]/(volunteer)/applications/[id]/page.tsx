@@ -161,11 +161,29 @@ function Application({
         ? opportunitiesT(`regions.${snapshot.region}`)
         : "—",
     },
+    ...(snapshot.city === undefined
+      ? []
+      : [
+          {
+            key: "city",
+            label: profileT("fields.city"),
+            value: snapshot.city.trim() || "—",
+          },
+        ]),
     {
       key: "school",
       label: profileT("fields.school"),
       value: snapshot.school?.trim() || "—",
     },
+    ...(snapshot.gradeYear === undefined
+      ? []
+      : [
+          {
+            key: "gradeYear",
+            label: profileT("fields.gradeYear"),
+            value: snapshot.gradeYear.trim() || "—",
+          },
+        ]),
     {
       key: "languages",
       label: t("detail.snapshot.languages"),

@@ -302,7 +302,6 @@ export function ProfileForm({
               <ProfileField
                 id={fieldId("phone")}
                 label={labels.fields.phone}
-                optional={labels.optional}
                 help={labels.fields.phoneHelp}
                 error={errorFor("phone")}
               >
@@ -317,7 +316,6 @@ export function ProfileForm({
               <ProfileField
                 id={fieldId("telegram")}
                 label={labels.fields.telegram}
-                optional={labels.optional}
                 help={labels.fields.telegramHelp}
                 error={errorFor("telegram")}
               >
