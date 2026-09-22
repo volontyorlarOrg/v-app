@@ -56,6 +56,7 @@ export type OpportunitySummary = {
   estimatedTotalHours?: number;
   spotsRemaining?: number;
   acceptanceMode: AcceptanceMode;
+  essayRequired: boolean;
 };
 
 export const QUESTION_TYPES = [

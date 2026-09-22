@@ -456,6 +456,7 @@
       "awaitingConfirmation": "Tasdiqlanishi kutilmoqda",
       "acceptedInstantly": "Darhol qabul qilindi",
       "answers": "Javoblaringiz",
+      "essay": "Essengiz",
       "send": {
         "title": "Arizani yuboring",
         "description": "Quyidagi profilingiz — arizangiz. Uni tekshirib, tashkilotchiga yuboring."
@@ -505,6 +506,8 @@
       "choose": "Tanlang",
       "fieldRequired": "Bu javob majburiy.",
       "fieldInvalid": "Bu javobni tekshiring.",
+      "essayLabel": "Nega ishtirok etmoqchisiz?",
+      "essayHelp": "Esseni oʻz soʻzlaringiz bilan yozing. 5 000 tagacha belgi.",
       "errors": {
         "profileRequired": "Yuborishdan oldin profilingizni toʻldiring.",
         "profileIncomplete": "Yuborishdan oldin profilning barcha majburiy maydonlarini toʻldiring.",
@@ -573,6 +576,8 @@
       "requirements": "Nima kerak",
       "description": "Bu imkoniyat haqida",
       "questions": "Sizdan nima soʻraladi",
+      "essayTitle": "Ariza essesi",
+      "essayDescription": "Arizani yuborishdan oldin nega ishtirok etmoqchi ekaningiz haqida esse yozasiz.",
       "questionCount": "{count, plural, =0 {Savol yoʻq} other {# ta savol}}",
       "required": "Majburiy",
       "optional": "Ixtiyoriy",
@@ -584,6 +589,8 @@
       "applyHint": "Profilingiz — arizangiz. Ariza berishingiz bilan tashkilotchi uni koʻradi, tadbir boshlanguncha arizani qaytarib olishingiz mumkin.",
       "applyHintAutomatic": "Profilingiz — arizangiz. Joy bor ekan, uni yuborishingiz bilan qabul qilinasiz, tadbir boshlanguncha arizani qaytarib olishingiz mumkin.",
       "applyHintQuestions": "{count, plural, other {Keyingi sahifada # ta savolga javob berasiz}}, soʻng arizani yuborasiz.",
+      "applyHintEssay": "Keyingi sahifada esse yozing, soʻng arizani yuboring.",
+      "applyHintEssayAndQuestions": "Keyingi sahifada esse yozing va {count} ta savolga javob bering, soʻng arizani yuboring.",
       "viewApplication": "Arizani koʻrish",
       "profileRequired": "Ariza berishdan oldin profilingizni toʻldiring. Hali yetishmayapti: {fields}.",
       "completeProfile": "Profilni toʻldirish",

@@ -81,9 +81,20 @@ describe("filterOpportunities", () => {
     format: "onsite" as const,
     status: "open" as const,
     acceptanceMode: "manual" as const,
+    essayRequired: false,
   };
-  const green = { id: "green", name: "Green Corridor Group", slug: "green", verified: false };
-  const reading = { id: "reading", name: "Chilonzor Reading Corners", slug: "reading", verified: true };
+  const green = {
+    id: "green",
+    name: "Green Corridor Group",
+    slug: "green",
+    verified: false,
+  };
+  const reading = {
+    id: "reading",
+    name: "Chilonzor Reading Corners",
+    slug: "reading",
+    verified: true,
+  };
   const list: OpportunitySummary[] = [
     {
       ...base,
@@ -129,15 +140,23 @@ describe("filterOpportunities", () => {
   ];
 
   it("narrows by region", () => {
-    const result = filterOpportunities(list, { ...DEFAULT_FILTERS, region: "samarkand" }, NOW);
+    const result = filterOpportunities(
+      list,
+      { ...DEFAULT_FILTERS, region: "samarkand" },
+      NOW,
+    );
     expect(result.map((o) => o.slug)).toEqual(["riverbank-clean-up"]);
   });
 
   it("matches the query against the title and the organiser", () => {
     expect(
-      filterOpportunities(list, { ...DEFAULT_FILTERS, q: "book" }, NOW).map((o) => o.slug),
+      filterOpportunities(list, { ...DEFAULT_FILTERS, q: "book" }, NOW).map(
+        (o) => o.slug,
+      ),
     ).toEqual(["winter-book-drive"]);
-    expect(filterOpportunities(list, { ...DEFAULT_FILTERS, q: "Zzzz" }, NOW)).toEqual([]);
+    expect(filterOpportunities(list, { ...DEFAULT_FILTERS, q: "Zzzz" }, NOW)).toEqual(
+      [],
+    );
     expect(
       filterOpportunities(list, { ...DEFAULT_FILTERS, q: "corridor" }, NOW).every(
         (o) => o.organization.name === "Green Corridor Group",
@@ -146,8 +165,15 @@ describe("filterOpportunities", () => {
   });
 
   it("keeps only applicable opportunities when open-only is set", () => {
-    const result = filterOpportunities(list, { ...DEFAULT_FILTERS, openOnly: true }, NOW);
-    expect(result.map((o) => o.slug)).toEqual(["riverbank-clean-up", "winter-book-drive"]);
+    const result = filterOpportunities(
+      list,
+      { ...DEFAULT_FILTERS, openOnly: true },
+      NOW,
+    );
+    expect(result.map((o) => o.slug)).toEqual([
+      "riverbank-clean-up",
+      "winter-book-drive",
+    ]);
   });
 
   it("puts applicable opportunities first whatever the sort", () => {

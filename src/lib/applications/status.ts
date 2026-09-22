@@ -57,6 +57,7 @@ export type ProfileSnapshot = {
 };
 
 export type ApplicationDetail = ApplicationSummary & {
+  essay?: string;
   answers: ApplicationAnswer[];
   profileSnapshot?: ProfileSnapshot;
   reviewerNote?: string;

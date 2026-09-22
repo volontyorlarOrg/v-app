@@ -98,7 +98,9 @@ function Opportunity({
   const locale = useLocale() as Locale;
   const applicable = canApply(opportunity, now);
   const asksQuestions = opportunity.questions.length > 0;
-  const sendable = application?.status === "draft" && !asksQuestions;
+  const asksEssay = opportunity.essayRequired;
+  const needsApplicationForm = asksQuestions || asksEssay;
+  const sendable = application?.status === "draft" && !needsApplicationForm;
 
   return (
     <>
@@ -154,6 +156,14 @@ function Opportunity({
                   </li>
                 ))}
               </ul>
+            </Panel>
+          ) : null}
+
+          {asksEssay ? (
+            <Panel id="essay" title={t("detail.essayTitle")}>
+              <p className="max-w-prose text-sm leading-relaxed text-ink-muted">
+                {t("detail.essayDescription")}
+              </p>
             </Panel>
           ) : null}
 
@@ -230,16 +240,22 @@ function Opportunity({
                   opportunityId={opportunity.id}
                   labels={{
                     apply: t("detail.apply"),
-                    applying: asksQuestions
+                    applying: needsApplicationForm
                       ? t("detail.starting")
                       : t("detail.applying"),
-                    hint: asksQuestions
-                      ? t("detail.applyHintQuestions", {
-                          count: opportunity.questions.length,
-                        })
-                      : opportunity.acceptanceMode === "automatic"
-                        ? t("detail.applyHintAutomatic")
-                        : t("detail.applyHint"),
+                    hint: asksEssay
+                      ? asksQuestions
+                        ? t("detail.applyHintEssayAndQuestions", {
+                            count: opportunity.questions.length,
+                          })
+                        : t("detail.applyHintEssay")
+                      : asksQuestions
+                        ? t("detail.applyHintQuestions", {
+                            count: opportunity.questions.length,
+                          })
+                        : opportunity.acceptanceMode === "automatic"
+                          ? t("detail.applyHintAutomatic")
+                          : t("detail.applyHint"),
                     errors: {
                       opportunityUnavailable: t(
                         "detail.applyErrors.opportunityUnavailable",

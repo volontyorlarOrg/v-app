@@ -36,6 +36,7 @@ function opportunity(startsAt: string): OpportunitySummary {
     startsAt,
     applicationDeadline: startsAt,
     acceptanceMode: "manual",
+    essayRequired: false,
   };
 }
 
