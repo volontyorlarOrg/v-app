@@ -20,6 +20,7 @@ import { useValidatedSubmit } from "@/hooks/use-action-form";
 import { idleResult, type ActionResult } from "@/lib/api/action-result";
 import { saveDraftAction, submitApplicationAction } from "@/lib/applications/actions";
 import {
+  MAX_ESSAY_LENGTH,
   answerFieldName,
   answersFormSchema,
   answersFormValues,
@@ -38,6 +39,8 @@ export type AnswersFormLabels = {
   choose: string;
   fieldRequired: string;
   fieldInvalid: string;
+  essayLabel: string;
+  essayHelp: string;
   errors: Record<string, string>;
   fallback: string;
   profileLink: { href: string; label: string };
@@ -56,20 +59,27 @@ function isRequiredError(messages: readonly string[]): boolean {
 
 export function AnswersForm({
   applicationId,
+  essayRequired,
+  essay,
   questions,
   answers,
   labels,
 }: {
   applicationId: string;
+  essayRequired: boolean;
+  essay: string;
   questions: readonly AnswerField[];
   answers: Readonly<Record<string, AnswerValue>>;
   labels: AnswersFormLabels;
 }) {
   const id = useId();
-  const schema = useMemo(() => answersFormSchema(questions), [questions]);
+  const schema = useMemo(
+    () => answersFormSchema(questions, essayRequired),
+    [essayRequired, questions],
+  );
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: answersFormValues(questions, answers),
+    defaultValues: answersFormValues(questions, answers, essay),
   });
   const [saveResult, save, saving] = useActionState(saveDraftAction, idleResult);
   const [submitResult, submit, submitting] = useActionState(
@@ -79,7 +89,7 @@ export function AnswersForm({
   const formRef = useRef<HTMLFormElement>(null);
   const submitWith = useValidatedSubmit(form, formRef);
   const busy = saving || submitting;
-  const hasQuestions = questions.length > 0;
+  const hasDraftContent = essayRequired || questions.length > 0;
   const latest = submitResult.status !== "idle" ? submitResult : saveResult;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -103,8 +113,36 @@ export function AnswersForm({
     >
       <input type="hidden" name="applicationId" value={applicationId} />
 
-      {hasQuestions ? (
+      {hasDraftContent ? (
         <FieldGroup className="gap-6">
+          {essayRequired ? (
+            <Field invalid={Boolean(formState.errors.essay)}>
+              <FieldLabel htmlFor={`${id}-essay`}>{labels.essayLabel}</FieldLabel>
+              <Textarea
+                {...register("essay")}
+                id={`${id}-essay`}
+                required
+                maxLength={MAX_ESSAY_LENGTH}
+                rows={10}
+                aria-invalid={formState.errors.essay ? true : undefined}
+                aria-describedby={`${id}-essay-help`}
+              />
+              <FieldDescription id={`${id}-essay-help`}>
+                {labels.essayHelp}
+              </FieldDescription>
+              <FieldError>
+                {formState.errors.essay?.message === "required"
+                  ? labels.fieldRequired
+                  : formState.errors.essay
+                    ? labels.fieldInvalid
+                    : latest.status === "error" && latest.fields.essay
+                      ? isRequiredError(latest.fields.essay)
+                        ? labels.fieldRequired
+                        : labels.fieldInvalid
+                      : undefined}
+              </FieldError>
+            </Field>
+          ) : null}
           {questions.map((question, index) => {
             const name = answerFieldName(question);
             const path = name.replace(/\[\]$/, "") as `answer.${string}`;
@@ -205,7 +243,7 @@ export function AnswersForm({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
-        {hasQuestions ? (
+        {hasDraftContent ? (
           <Button
             type="submit"
             name="intent"

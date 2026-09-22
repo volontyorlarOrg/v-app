@@ -6,7 +6,13 @@ import type { ApplicationQuestion } from "@/lib/opportunities/types";
 export type AnswerInput = Record<string, AnswerValue>;
 
 export const ANSWER_FIELD_PREFIX = "answer.";
+export const MAX_ESSAY_LENGTH = 5000;
 const MULTI_SUFFIX = "[]";
+
+export function essayFromFormData(formData: FormData): string | undefined {
+  const value = formData.get("essay");
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
 
 export function answersFromFormData(formData: FormData): AnswerInput {
   const answers: AnswerInput = {};
@@ -70,7 +76,10 @@ function selectionsAnswer(question: ApplicationQuestion) {
     : list;
 }
 
-export function answersFormSchema(questions: readonly ApplicationQuestion[]) {
+export function answersFormSchema(
+  questions: readonly ApplicationQuestion[],
+  essayRequired = false,
+) {
   return z.object({
     answer: z.object(
       Object.fromEntries(
@@ -84,13 +93,17 @@ export function answersFormSchema(questions: readonly ApplicationQuestion[]) {
         ]),
       ),
     ),
+    essay: essayRequired
+      ? z.string().trim().min(1, "required").max(MAX_ESSAY_LENGTH, "tooLong")
+      : z.string().trim().max(MAX_ESSAY_LENGTH, "tooLong").optional(),
   });
 }
 
 export function answersFormValues(
   questions: readonly ApplicationQuestion[],
   answers: Readonly<Record<string, AnswerValue>>,
-): { answer: Record<string, string | string[]> } {
+  essay = "",
+): { answer: Record<string, string | string[]>; essay: string } {
   return {
     answer: Object.fromEntries(
       questions.map((question) => {
@@ -107,5 +120,6 @@ export function answersFormValues(
         ];
       }),
     ),
+    essay,
   };
 }

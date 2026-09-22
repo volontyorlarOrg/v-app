@@ -26,9 +26,13 @@ export async function setSavedAction(
   return okResult;
 }
 
-async function asksNoQuestions(slug: string): Promise<boolean> {
+async function canSubmitFromProfile(slug: string): Promise<boolean> {
   const opportunity = await getOpportunity(slug);
-  return opportunity !== null && opportunity.questions.length === 0;
+  return (
+    opportunity !== null &&
+    opportunity.questions.length === 0 &&
+    !opportunity.essayRequired
+  );
 }
 
 async function send(applicationId: string): Promise<void> {
@@ -52,7 +56,7 @@ export async function applyAction(
     applicationId = application.id;
     if (
       application.status === "draft" &&
-      (await asksNoQuestions(application.opportunity.slug))
+      (await canSubmitFromProfile(application.opportunity.slug))
     ) {
       await send(application.id);
     }
