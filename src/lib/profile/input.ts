@@ -30,6 +30,18 @@ export const PROFILE_TEXT_LIMITS = {
 
 export const PROFILE_NAME_MIN_LENGTH = 2;
 
+export const PHONE_PATTERN = /^\+[1-9]\d{7,14}$/;
+export const TELEGRAM_USERNAME_PATTERN = /^[A-Za-z0-9_]{5,32}$/;
+
+export function normalizePhone(value: string): string {
+  const compact = value.trim().replace(/[\s().-]/g, "");
+  return compact.startsWith("00") ? `+${compact.slice(2)}` : compact;
+}
+
+export function normalizeTelegram(value: string): string {
+  return value.trim().replace(/^@+/, "");
+}
+
 const boundedText = (max: number) => z.string().trim().max(max, "tooLong");
 
 export const profileFormSchema = z.object({
@@ -45,8 +57,20 @@ export const profileFormSchema = z.object({
   region: z.union([z.literal(""), z.enum(REGIONS)]),
   city: boundedText(PROFILE_TEXT_LIMITS.city),
   languages: z.array(z.string().trim().min(1).max(35)).max(LIST_LIMITS.languages),
-  phone: z.string().trim(),
-  telegram: z.string().trim(),
+  phone: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || PHONE_PATTERN.test(normalizePhone(value)),
+      "invalidPhone",
+    ),
+  telegram: z
+    .string()
+    .trim()
+    .refine((value) => {
+      const username = normalizeTelegram(value);
+      return username === "" || TELEGRAM_USERNAME_PATTERN.test(username);
+    }, "invalidTelegram"),
   instagram: z
     .string()
     .trim()
@@ -124,8 +148,8 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     region: region(formData),
     city: text(formData, "city"),
     languages: list(formData, "languages"),
-    phone: text(formData, "phone"),
-    telegram: text(formData, "telegram").replace(/^@+/, ""),
+    phone: normalizePhone(text(formData, "phone")),
+    telegram: normalizeTelegram(text(formData, "telegram")),
     instagram: text(formData, "instagram").replace(/^@+/, ""),
     linkedin: linkedinProfileUrl(text(formData, "linkedin")) ?? "",
     links: list(formData, "links"),

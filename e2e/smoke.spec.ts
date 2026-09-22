@@ -228,7 +228,7 @@ test.describe("welcome flow", () => {
     );
     await expect(page.getByLabel("Year or grade")).toHaveValue("10");
     await expect(page.getByLabel("City or district")).toHaveValue("Chilonzor");
-    await expect(page.getByLabel("Phone number")).toHaveValue("+998 90 123 45 67");
+    await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
     await expect(page.getByLabel("Bio")).toHaveValue(
       "I read to younger pupils on Saturdays.",
@@ -1242,6 +1242,12 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
 
     await page.getByLabel("Bio").fill("Second-year student.");
+    await phone.fill("90 123 45 67");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(phone).toHaveAttribute("aria-invalid", "true");
+    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+
+    await phone.fill("");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
     await expect(
