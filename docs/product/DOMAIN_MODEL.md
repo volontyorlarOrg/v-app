@@ -18,8 +18,10 @@ identities are not modelled yet; the implementation plan adds them.
 ## VolunteerProfile
 
 The reusable half of an application: name, short bio, school, year, region,
-city, languages, skills, phone, Telegram username, links. Deliberately absent:
-date of birth, home address, document number, parent contact, gender, photo.
+city, languages, skills, phone, Telegram and Instagram usernames, LinkedIn
+profile, and portfolio links. These profile fields are public while the public
+profile is enabled. Deliberately absent: date of birth, home address, document
+number, parent contact, and gender.
 
 **Completion** counts six fields — `fullName`, `bio`, `region`, `school`,
 `languages`, and _either_ contact channel — because "complete" means an

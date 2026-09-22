@@ -58,6 +58,8 @@ export function profileCompletion(profile: ProfileFields): ProfileCompletion {
 export type VolunteerProfile = ProfileFields & {
   gradeYear: string;
   city: string;
+  instagram: string;
+  linkedin: string;
   links: string[];
 };
 
@@ -71,5 +73,7 @@ export const EMPTY_PROFILE: VolunteerProfile = {
   languages: [],
   phone: "",
   telegram: "",
+  instagram: "",
+  linkedin: "",
   links: [],
 };

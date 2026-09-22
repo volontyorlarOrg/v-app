@@ -58,6 +58,10 @@ export type ProfileFormLabels = {
     | "phoneHelp"
     | "telegram"
     | "telegramHelp"
+    | "instagram"
+    | "instagramHelp"
+    | "linkedin"
+    | "linkedinHelp"
     | "links"
     | "linksHelp",
     string
@@ -326,18 +330,52 @@ export function ProfileForm({
           </FormSection>
 
           <FormSection title={labels.sections.links} help={labels.sectionHelp.links}>
-            <ProfileField
-              id={fieldId("links")}
-              label={labels.fields.links}
-              optional={labels.optional}
-              help={labels.fields.linksHelp}
-              error={errorFor("links")}
-            >
-              <Input
-                {...control("links", labels.fields.linksHelp)}
-                defaultValue={values.links.join(", ")}
-              />
-            </ProfileField>
+            <FieldGroup>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <ProfileField
+                  id={fieldId("instagram")}
+                  label={labels.fields.instagram}
+                  optional={labels.optional}
+                  help={labels.fields.instagramHelp}
+                  error={errorFor("instagram")}
+                >
+                  <Input
+                    {...control("instagram", labels.fields.instagramHelp)}
+                    defaultValue={values.instagram}
+                    autoComplete="username"
+                    autoCapitalize="none"
+                  />
+                </ProfileField>
+                <ProfileField
+                  id={fieldId("linkedin")}
+                  label={labels.fields.linkedin}
+                  optional={labels.optional}
+                  help={labels.fields.linkedinHelp}
+                  error={errorFor("linkedin")}
+                >
+                  <Input
+                    {...control("linkedin", labels.fields.linkedinHelp)}
+                    defaultValue={values.linkedin}
+                    inputMode="url"
+                    autoCapitalize="none"
+                  />
+                </ProfileField>
+              </div>
+              <ProfileField
+                id={fieldId("links")}
+                label={labels.fields.links}
+                optional={labels.optional}
+                help={labels.fields.linksHelp}
+                error={errorFor("links")}
+              >
+                <Input
+                  {...control("links", labels.fields.linksHelp)}
+                  defaultValue={values.links.join(", ")}
+                  inputMode="url"
+                  autoCapitalize="none"
+                />
+              </ProfileField>
+            </FieldGroup>
           </FormSection>
         </div>
 

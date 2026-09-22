@@ -22,7 +22,7 @@ export type OnboardingLabels = {
     items: Record<FormStep, string>;
   };
   fields: Record<
-    | Exclude<keyof ProfileFormValues, "gradeYear" | "city" | "links">
+    | Exclude<keyof ProfileFormValues, "gradeYear" | "city">
     | "bioHelp"
     | "languagesHelp"
     | "languagesSearch"
@@ -33,6 +33,9 @@ export type OnboardingLabels = {
     | "languagesLimit"
     | "phoneHelp"
     | "telegramHelp"
+    | "instagramHelp"
+    | "linkedinHelp"
+    | "linksHelp"
     | "regionAny",
     string
   >;
