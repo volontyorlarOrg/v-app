@@ -88,8 +88,12 @@ claims more than the profile holds.
 **Applying needs every profile field except the photo, Instagram, LinkedIn
 and portfolio links**, so the flow asks for all of them: the grade and the
 city sit beside the school and the region, and the contact step asks for the
-phone number _and_ the Telegram username. The links on the contact step carry
-an "Optional" tag; nothing else does. The steps still save a partial profile —
+phone number _and_ the Telegram username. The phone is sent the way the backend
+stores it — separators dropped, a leading `00` turned into `+`, so
+`+998 90 123 45 67` becomes `+998901234567` — and the form refuses anything the
+backend would (`PHONE_PATTERN` and `TELEGRAM_USERNAME_PATTERN` in
+`src/lib/profile/input.ts`) before it is sent. The links on the contact step
+carry an "Optional" tag; nothing else does. The steps still save a partial profile —
 only applying is gated — and the backend is the rule's owner
 (`../v-backend/src/modules/profiles/profile-completion.ts`), mirrored in
 `src/lib/profile/completion.ts`.

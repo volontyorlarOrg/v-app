@@ -1183,6 +1183,21 @@ const server = createServer(async (request, response) => {
         errors: { fullName: ["fullName must be longer than or equal to 2 characters"] },
       });
     }
+    const malformed = {
+      ...(body.phone && !/^\+[1-9]\d{7,14}$/.test(body.phone)
+        ? { phone: ["phone must match /^$|^\\+[1-9]\\d{7,14}$/ regular expression"] }
+        : {}),
+      ...(body.telegram && !/^[A-Za-z0-9_]{5,32}$/.test(body.telegram)
+        ? {
+            telegram: [
+              "telegram must match /^$|^[A-Za-z0-9_]{5,32}$/ regular expression",
+            ],
+          }
+        : {}),
+    };
+    if (Object.keys(malformed).length > 0) {
+      return send(response, 422, { code: "validationFailed", errors: malformed });
+    }
     state.profile = {
       ...(state.profile ?? {}),
       ...body,

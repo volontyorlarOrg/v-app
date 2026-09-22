@@ -304,7 +304,7 @@
       "title": "Your pass is ready.",
       "complete": "Your profile is complete. Applying takes under a minute.",
       "incomplete": "Your profile is {percent}% complete. Add these before you can apply: {fields}.",
-      "finishOnProfile": "Add it on your profile",
+      "finishOnProfile": "Finish your profile",
       "nextTitle": "What happens next",
       "next": {
         "apply": "Apply with your pass. Nothing to fill in twice.",
@@ -735,7 +735,7 @@
       "languagesRemove": "Remove",
       "languagesLimit": "That is ten. Remove one to add another.",
       "phone": "Phone number",
-      "phoneHelp": "Visible to everyone when your public profile is on.",
+      "phoneHelp": "With the country code, for example +998 90 123 45 67. Visible to everyone when your public profile is on.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @. Visible on your public profile.",
       "instagram": "Instagram username",
