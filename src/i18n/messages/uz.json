@@ -259,14 +259,20 @@
     "saveError": "Saqlab boʻlmadi. Belgilangan maydonlarni tekshirib, qayta urinib koʻring.",
     "nameNeeded": "Tashkilotchiga kerak boʻladigan yagona narsa — ismingiz.",
     "welcome": {
-      "title": "Uchta qisqa qadam, taxminan bir daqiqa.",
-      "body": "Siz kimsiz, qayerda oʻqiysiz va tashkilotchilar siz bilan qanday bogʻlanadi. Hammasini keyin profilingizda oʻzgartirish mumkin."
+      "title": "Toʻrtta qisqa qadam, taxminan ikki daqiqa.",
+      "body": "Foydalanuvchi nomingiz, siz kimsiz, qayerda oʻqiysiz va tashkilotchilar siz bilan qanday bogʻlanadi. Ariza berish uchun bularning barchasi kerak, istalganini keyin profilingizda oʻzgartirishingiz mumkin."
     },
-    "username": {
-      "title": "Reytingdagi nomingiz",
-      "description": "Reytingda shu nom bilan koʻrinasiz. Uni istalgan vaqtda hisob sozlamalarida oʻzgartirish mumkin."
+    "usernameStep": {
+      "field": "Foydalanuvchi nomi",
+      "fromTelegram": "Bu Telegram foydalanuvchi nomingiz. Uni qoldiring yoki boshqasini tanlang.",
+      "address": "Ochiq sahifangiz:",
+      "addressPlaceholder": "foydalanuvchi_nomi"
     },
     "steps": {
+      "username": {
+        "title": "Foydalanuvchi nomingizni tanlang",
+        "lead": "Reytingda shu nom bilan koʻrinasiz, u ochiq profilingiz manzili ham boʻladi. Uni keyinroq sozlamalarda oʻzgartirishingiz mumkin."
+      },
       "about": {
         "title": "Siz haqingizda",
         "lead": "Tashkilotchi birinchi oʻqiydigan narsa."
@@ -277,12 +283,13 @@
       },
       "contact": {
         "title": "Aloqa va ochiq havolalar",
-        "lead": "Bu maʼlumotlar ochiq profilingizni ochgan har kimga koʻrinadi. Telefon yoki Telegram bu qadam uchun yetarli."
+        "lead": "Tashkilotchilarga telefon raqamingiz ham, Telegram foydalanuvchi nomingiz ham kerak. Bu yerdagi hamma maʼlumot ochiq profilingizda koʻrinadi; havolalar ixtiyoriy."
       }
     },
     "rail": {
       "label": "Sozlash qadamlari",
       "welcome": "Xush kelibsiz",
+      "username": "Foydalanuvchi nomi",
       "about": "Siz haqingizda",
       "place": "Qayerda oʻqiysiz",
       "contact": "Aloqa",
@@ -296,7 +303,7 @@
     "done": {
       "title": "Kartangiz tayyor.",
       "complete": "Profilingiz toʻliq. Ariza berish bir daqiqadan kam vaqt oladi.",
-      "incomplete": "Profilingiz {percent}% toʻldirilgan. Hali yetishmayapti: {fields}.",
+      "incomplete": "Profilingiz {percent}% toʻldirilgan. Ariza berishdan oldin qoʻshing: {fields}.",
       "finishOnProfile": "Profilda toʻldirish",
       "nextTitle": "Keyin nima boʻladi",
       "next": {
@@ -304,7 +311,6 @@
         "attend": "Qatnashing. Oʻz vaqtida keling va ishni oxirigacha bajaring.",
         "confirm": "Tashkilotchi qatnashganingizni tasdiqlaydi. Tarixingiz oʻsadi, darajangiz ham."
       },
-      "usernameRequired": "Davom etish uchun Volontyorlar nomingizni tanlang va saqlang.",
       "cta": "Birinchi imkoniyatni topish",
       "dashboard": "Bosh panelga oʻtish"
     },
@@ -368,7 +374,7 @@
   "leaderboard": {
     "metaTitle": "Reyting",
     "title": "Reyting",
-    "description": "Nom tanlagan koʻngillilar tasdiqlangan ishtirok uchun toʻplangan tajriba boʻyicha saralangan.",
+    "description": "Foydalanuvchi nomini tanlagan koʻngillilar tasdiqlangan ishtirok uchun toʻplangan tajriba boʻyicha saralangan.",
     "you": "Siz",
     "standing": {
       "rank": "Sizning oʻrningiz",
@@ -376,7 +382,7 @@
       "xp": "Tajriba",
       "xpHelp": "Tasdiqlangan ishtirok uchun beriladi.",
       "appearAs": "Siz shunday koʻrinasiz",
-      "changeHandle": "Nomni oʻzgartirish"
+      "changeUsername": "Foydalanuvchi nomini oʻzgartirish"
     },
     "table": {
       "title": "Reyting jadvali",
@@ -501,7 +507,7 @@
       "fieldInvalid": "Bu javobni tekshiring.",
       "errors": {
         "profileRequired": "Yuborishdan oldin profilingizni toʻldiring.",
-        "profileIncomplete": "Majburiy profil maydonlarini toʻldiring va aloqa usulini qoʻshing.",
+        "profileIncomplete": "Yuborishdan oldin profilning barcha majburiy maydonlarini toʻldiring.",
         "profileLink": "Profilga oʻtish",
         "opportunityUnavailable": "Bu imkoniyat endi ariza qabul qilmaydi.",
         "invalidAnswers": "Baʼzi javoblarni qayta tekshirish kerak.",
@@ -579,7 +585,7 @@
       "applyHintAutomatic": "Profilingiz — arizangiz. Joy bor ekan, uni yuborishingiz bilan qabul qilinasiz, tadbir boshlanguncha arizani qaytarib olishingiz mumkin.",
       "applyHintQuestions": "{count, plural, other {Keyingi sahifada # ta savolga javob berasiz}}, soʻng arizani yuborasiz.",
       "viewApplication": "Arizani koʻrish",
-      "profileRequired": "Ariza berishdan oldin profilning asosiy maydonlarini toʻldiring va telefon yoki Telegram nomini qoʻshing.",
+      "profileRequired": "Ariza berishdan oldin profilingizni toʻldiring. Hali yetishmayapti: {fields}.",
       "completeProfile": "Profilni toʻldirish",
       "applyErrors": {
         "opportunityUnavailable": "Bu imkoniyat hozir ariza qabul qilmayapti.",
@@ -702,7 +708,7 @@
     },
     "form": {
       "title": "Profilingizni tahrirlang",
-      "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi."
+      "description": "Bir marta toʻldiring. Har bir ariza undan foydalanadi, “Ixtiyoriy” deb belgilanmagan har bir maydon esa ariza berish uchun kerak."
     },
     "sections": {
       "education": "Taʼlim",
@@ -744,9 +750,12 @@
       "fullName": "Toʻliq ism",
       "bio": "Bio",
       "region": "Hudud",
+      "city": "Shahar",
       "school": "Maktab",
+      "gradeYear": "Sinf yoki kurs",
       "languages": "Tillar",
-      "contact": "Telefon yoki Telegram"
+      "phone": "Telefon",
+      "telegram": "Telegram"
     },
     "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",
@@ -766,7 +775,7 @@
       "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
       "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
-      "contact": "Ochiq profilingiz yoqilganida telefon va Telegram hammaga koʻrinadi.",
+      "contact": "Tashkilotchilarga ikkalasi ham kerak. Ochiq profilingiz yoqilganida telefon va Telegram hammaga koʻrinadi.",
       "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar."
     },
     "edit": {
@@ -918,16 +927,16 @@
       "changePasswordDone": "Parol almashtirildi. Boshqa qurilmalardagi seanslar yopildi."
     },
     "username": {
-      "title": "Sizning nomingiz",
-      "description": "Volontyorlar nomingiz reytingda va ochiq profilingiz manzilida koʻrinadi.",
+      "title": "Foydalanuvchi nomingiz",
+      "description": "Volontyorlardagi foydalanuvchi nomingiz reytingda va ochiq profilingiz manzilida koʻrinadi.",
       "current": "Siz shunday koʻrinasiz",
-      "field": "Yangi nom",
+      "field": "Yangi foydalanuvchi nomi",
       "hint": "{min} tadan {max} tagacha belgi: kichik lotin harflari, raqamlar va pastki chiziq.",
-      "generated": "Bu nomni hisob yaratilganda biz oʻylab topdik. Oʻzingizga maʼqul nomni tanlang.",
-      "managed": "Oʻz nomingizni tanlamaguningizcha Telegram bu nomni yangilab turadi.",
-      "save": "Nomni saqlash",
+      "generated": "Bu foydalanuvchi nomini hisob yaratilganda biz oʻylab topdik. Oʻzingizga maʼqulini tanlang.",
+      "managed": "Oʻz foydalanuvchi nomingizni tanlamaguningizcha Telegram uni yangilab turadi.",
+      "save": "Foydalanuvchi nomini saqlash",
       "saving": "Saqlanmoqda…",
-      "saved": "Nomingiz saqlandi."
+      "saved": "Foydalanuvchi nomingiz saqlandi."
     },
     "connectStatus": {
       "linked": "Ulandi. Endi ikkala usul ham shu hisobni ochadi.",
@@ -999,11 +1008,11 @@
       "validationFailed": "Yuqoridagi maydonlarni tekshirib, qayta urinib koʻring.",
       "network": "Serverga ulana olmadik. Aloqani tekshirib, qayta urinib koʻring.",
       "unknown": "Nimadir notoʻgʻri ketdi. Birozdan soʻng urinib koʻring.",
-      "usernameUnavailable": "Bu nom band. Boshqasini tanlang.",
-      "usernameReserved": "Bu nom Volontyorlar tomonidan band qilingan. Boshqasini tanlang.",
-      "usernameRequired": "Nom tanlang.",
-      "usernameShort": "Nomda kamida 5 ta belgi boʻlishi kerak.",
-      "usernameLong": "Nomda koʻpi bilan 32 ta belgi boʻladi.",
+      "usernameUnavailable": "Bu foydalanuvchi nomi band. Boshqasini tanlang.",
+      "usernameReserved": "Bu foydalanuvchi nomi Volontyorlar tomonidan band qilingan. Boshqasini tanlang.",
+      "usernameRequired": "Foydalanuvchi nomini tanlang.",
+      "usernameShort": "Foydalanuvchi nomida kamida 5 ta belgi boʻlishi kerak.",
+      "usernameLong": "Foydalanuvchi nomida koʻpi bilan 32 ta belgi boʻladi.",
       "usernameCharacters": "Faqat kichik lotin harflari, raqamlar va pastki chiziq."
     },
     "mergeNotifications": {

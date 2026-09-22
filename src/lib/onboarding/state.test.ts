@@ -14,6 +14,7 @@ import {
   readOnboardingStateFromStorage,
   resumeStep,
   serializeOnboardingState,
+  welcomeStep,
   writeOnboardingStateToClient,
   writeOnboardingStateToDocument,
   writeOnboardingStateToStorage,
@@ -45,6 +46,28 @@ describe("onboarding state cookie", () => {
     expect(resumeStep({ status: "pending", step: "done" })).toBe("welcome");
     expect(resumeStep({ status: "pending", step: "contact" })).toBe("contact");
     expect(resumeStep({ status: "skipped", step: "place" })).toBe("place");
+  });
+
+  it("resumes on the username step while the account has no chosen username", () => {
+    expect(welcomeStep(null, "generated")).toBe("welcome");
+    expect(welcomeStep({ status: "pending", step: "username" }, "generated")).toBe(
+      "username",
+    );
+    expect(welcomeStep({ status: "skipped", step: "contact" }, "generated")).toBe(
+      "username",
+    );
+    expect(welcomeStep({ status: "done" }, "generated")).toBe("welcome");
+    expect(welcomeStep({ status: "pending", step: "contact" }, "telegram")).toBe(
+      "contact",
+    );
+    expect(welcomeStep({ status: "pending", step: "place" }, "custom")).toBe("place");
+  });
+
+  it("reads a username step from the cookie", () => {
+    expect(parseOnboardingState("pending:username")).toEqual({
+      status: "pending",
+      step: "username",
+    });
   });
 
   it("stays open until it is done", () => {

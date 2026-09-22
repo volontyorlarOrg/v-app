@@ -12,8 +12,8 @@ volunteering, not to fill in forms. The backend already has an empty profile
 for them; nothing about the product is usable until the reusable profile
 exists, because every application snapshots it.
 
-The flow gets them to the profile an organiser can evaluate in three short
-steps and then points them at the first opportunity. It is not a tour of the
+The flow gets them a username and the profile an organiser can evaluate in
+four short steps and then points them at the first opportunity. It is not a tour of the
 panel: the panel explains itself, and the dashboard's empty states say what
 fills them.
 
@@ -34,7 +34,7 @@ fills them.
 - **FIRST VIEWPORT** — desktop: greeting and lead on the left with the pass
   hanging beneath them and the step rail under that; the step panel on the
   right, the primary action at its foot. Phone: greeting, a compact pass,
-  the rail as a strip of three nodes, then the panel.
+  the rail as a strip of four nodes, then the panel.
 - **FORM** — a split stage. No concept roll was run and there is no seed
   key: the brief pinned the structure ("this onboarding must go through the
   profile completion phase and at the end there must be reference to call
@@ -48,13 +48,36 @@ fills them.
 
 ## The steps
 
-| Step            | Saves                                                                               | Counts toward completeness |
-| --------------- | ----------------------------------------------------------------------------------- | -------------------------- |
-| Welcome         | Nothing                                                                             |                            |
-| About you       | `fullName`, `bio` through `updateProfileAction`                                     | name, bio                  |
-| Where you study | `school`, `region`, `languages` through `updateProfileAction`                       | school, region, languages  |
-| Contact         | `phone`, `telegram`, `instagram`, `linkedin`, `links` through `updateProfileAction` | contact channel            |
-| Ready           | The leaderboard handle, if the account may rename it                                |                            |
+| Step            | Saves                                                                               | Counts toward completeness             |
+| --------------- | ----------------------------------------------------------------------------------- | -------------------------------------- |
+| Welcome         | Nothing                                                                             |                                        |
+| Username        | The public username through `PUT /me/username`, unless it is kept as it is          | the username gate for applying         |
+| About you       | `fullName`, `bio` through `updateProfileAction`                                     | name, bio                              |
+| Where you study | `school`, `gradeYear`, `region`, `city`, `languages` through `updateProfileAction`  | school, grade, region, city, languages |
+| Contact         | `phone`, `telegram`, `instagram`, `linkedin`, `links` through `updateProfileAction` | phone, Telegram                        |
+| Ready           | Nothing                                                                             |                                        |
+
+The rail and the step count cover the four middle steps: "Step 1 of 4" is the
+username.
+
+**The username comes first and cannot be skipped.** Every account passes
+through it, because the username is the public address
+(`volontyorlar.uz/<username>`, previewed under the field when the marketing
+origin is configured) and the name on the leaderboard. The field has an `@`
+prefix and the backend's rule (five to thirty-two lowercase letters, digits and
+underscores).
+
+- A **generated** account (`user_…`) starts with an empty field and has no way
+  past the step except saving a username the backend accepts; the backend
+  refuses the generated form itself as `usernameReserved`. The welcome screen
+  and the step carry no "Skip for now", and a resumed flow whose cookie points
+  further along reopens on this step (`welcomeStep` in `state.ts`), so neither
+  the cookie nor the browser can jump past it. The volunteer layout still
+  redirects a generated account to `/welcome`.
+- A **Telegram** username is prefilled with a note saying where it came from;
+  Continue keeps it without a write, so Telegram keeps synchronizing it. Typing
+  a different one saves it as `custom`.
+- A **custom** username is prefilled; Continue keeps it, a change saves it.
 
 Every profile step posts the whole profile: the fields the step does not show
 travel as hidden inputs, because `PUT /profile` replaces the record. A step
@@ -62,30 +85,32 @@ that fails validation stays on screen with the field named; the pass only
 gains a part once the backend has accepted the save, so the object never
 claims more than the profile holds.
 
+**Applying needs every profile field except the photo, Instagram, LinkedIn
+and portfolio links**, so the flow asks for all of them: the grade and the
+city sit beside the school and the region, and the contact step asks for the
+phone number _and_ the Telegram username. The links on the contact step carry
+an "Optional" tag; nothing else does. The steps still save a partial profile —
+only applying is gated — and the backend is the rule's owner
+(`../v-backend/src/modules/profiles/profile-completion.ts`), mirrored in
+`src/lib/profile/completion.ts`.
+
 The Ready step shows completeness, what happens next, and the call to action.
-It also carries the shared rename form from `src/components/account/`. This is
-the fourth step's only write and goes to `PUT /me/username` rather than to the
-profile. A generated username blocks the exit actions until the volunteer saves
-an available platform username. The volunteer layout repeats that gate for
-existing generated accounts on their next visit. Telegram-provided usernames
-do not block entry and remain editable. →
+While anything required is missing it names the fields and says they are
+needed before applying, with a link to the profile editor. →
 [`LEADERBOARD.md`](LEADERBOARD.md)
 
-Contact is asked for because an organiser who cannot reach a volunteer cannot
-accept one; the step also makes the public Instagram, LinkedIn, and portfolio
-fields available during welcome. The fields the flow leaves to the profile page
-are `gradeYear` and `city`. The name is the one field
-that cannot be skipped while it is empty, because the backend refuses a
-profile without it.
+The name is the one field that cannot be skipped while it is empty, because
+the backend refuses a profile without it.
 
 ## Skipping
 
-- **Skip for now** sits on the welcome screen and in the header of every
-  step. For an account that already has a public username it records the current
-  step and leaves. For a generated account it jumps to the Ready step so the
-  required username can be chosen without forcing profile completion.
-- **Skip this step** advances without saving.
-- **Back** returns one step; the welcome screen is reachable from the first.
+- **Skip for now** sits on the welcome screen and in the header of every step
+  for an account that already has a chosen username; it records the current
+  step and leaves. An account with a generated username sees no "Skip for now"
+  until the username step is saved.
+- **Skip this step** advances without saving, on the three profile steps only.
+- **Back** returns one step; the welcome screen is reachable from the username
+  step.
 - The dashboard shows a "Finish your pass" row while the flow is open, with
   the number of steps done, a link back to it, and "Not now", which closes it
   for good. Reaching the last screen closes it too.

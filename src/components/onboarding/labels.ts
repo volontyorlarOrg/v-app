@@ -1,4 +1,3 @@
-import type { UsernameLabels } from "@/components/account/username-section";
 import type { FormStep } from "@/lib/onboarding/steps";
 import type { ProfileFormValues } from "@/lib/profile/input";
 import type { RailState } from "@/components/onboarding/step-rail";
@@ -22,7 +21,7 @@ export type OnboardingLabels = {
     items: Record<FormStep, string>;
   };
   fields: Record<
-    | Exclude<keyof ProfileFormValues, "gradeYear" | "city">
+    | keyof ProfileFormValues
     | "bioHelp"
     | "languagesHelp"
     | "languagesSearch"
@@ -39,7 +38,15 @@ export type OnboardingLabels = {
     | "regionAny",
     string
   >;
-  username: UsernameLabels;
+  optional: string;
+  usernameStep: {
+    field: string;
+    hint: string;
+    fromTelegram: string;
+    address: string;
+    addressPlaceholder: string;
+    errors: Record<string, string>;
+  };
   done: {
     title: string;
     complete: string;
@@ -47,7 +54,6 @@ export type OnboardingLabels = {
     finishOnProfile: string;
     nextTitle: string;
     next: { apply: string; attend: string; confirm: string };
-    usernameRequired: string;
     cta: string;
     dashboard: string;
   };
