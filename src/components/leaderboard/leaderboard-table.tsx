@@ -1,4 +1,5 @@
 import { useFormatter, useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
 import { initialsOf } from "@/lib/profile/initials";
-import { publicProfileHref } from "@/lib/seo/origin";
+import { memberProfileHref } from "@/lib/profile/public-routing";
 import { cn } from "@/lib/utils";
 
 const CELL = "px-4 sm:px-5";
@@ -44,7 +45,7 @@ export function LeaderboardTable({
         {entries.map((entry) => {
           const isViewer = entry.isCurrentUser;
           const profileHref = entry.profileVisible
-            ? publicProfileHref(entry.username)
+            ? memberProfileHref(entry.username)
             : null;
           const identity = (
             <span className="flex items-center gap-3">
@@ -87,14 +88,12 @@ export function LeaderboardTable({
               </TableCell>
               <TableCell className={cn(CELL, "py-2.5")}>
                 {profileHref ? (
-                  <a
+                  <Link
                     href={profileHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="block rounded-lg underline-offset-4 hover:underline"
                   >
                     {identity}
-                  </a>
+                  </Link>
                 ) : (
                   identity
                 )}

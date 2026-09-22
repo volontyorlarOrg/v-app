@@ -11,6 +11,7 @@ export type RouteKey =
   | "leaderboard"
   | "profile"
   | "profileEdit"
+  | "memberProfile"
   | "settings"
   | "welcome";
 
@@ -120,6 +121,15 @@ export const appRoutes: readonly AppRoute[] = [
     navGroup: null,
     inTabBar: false,
     section: "profile",
+  },
+  {
+    key: "memberProfile",
+    path: "/profiles",
+    area: "volunteer",
+    guard: "session",
+    navGroup: null,
+    inTabBar: false,
+    section: "leaderboard",
   },
   {
     key: "settings",

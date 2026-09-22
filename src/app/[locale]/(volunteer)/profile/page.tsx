@@ -30,6 +30,7 @@ import {
 } from "@/lib/profile/completion";
 import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
+import { profileSocialLinks } from "@/lib/profile/social-links";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
   hasParticipation,
@@ -179,6 +180,7 @@ function Profile({
     value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
   const languages = languageDirectory.format(values.languages, locale);
   const links = profileLinks(values.links);
+  const socials = profileSocialLinks(values);
 
   const rows = [
     values.region
@@ -241,6 +243,7 @@ function Profile({
       handle={handle}
       level={recordLabels(`level.${record.level}`)}
       bio={values.bio.trim()}
+      socials={socials}
       figures={figures}
       rows={rows}
       completion={
@@ -260,6 +263,12 @@ function Profile({
       labels={{
         action: completion.complete ? t("sheet.edit") : dashboard("cta"),
         figures: t("sheet.figures"),
+        socials: t("sheet.socials"),
+        socialPlatforms: {
+          telegram: t("fields.telegram"),
+          instagram: t("fields.instagram"),
+          linkedin: t("fields.linkedin"),
+        },
       }}
     />
   );

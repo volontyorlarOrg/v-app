@@ -176,8 +176,34 @@ export const profileSchema = z.object({
   phone: z.string().default(""),
   phoneVerified: z.boolean().default(false),
   telegram: z.string().default(""),
+  instagram: z.string().default(""),
+  linkedin: z.string().default(""),
   links: z.array(z.string()).default([]),
   updatedAt: optional(z.string()),
+});
+
+export const publicProfileSchema = z.object({
+  displayName: z.string().min(1),
+  username: usernameField,
+  avatarUrl: optional(z.url()),
+  bio: z.string().default(""),
+  region: z.enum(REGIONS).nullable().default(null),
+  city: z.string().default(""),
+  school: z.string().default(""),
+  gradeYear: z.string().default(""),
+  languages: z.array(z.string()).default([]),
+  phone: z.string().default(""),
+  telegram: z.string().default(""),
+  instagram: z.string().default(""),
+  linkedin: z.string().default(""),
+  links: z.array(z.url()).default([]),
+  joinedAt: isoDate,
+  level: z.enum(LEVELS),
+  xp: z.number().int().nonnegative(),
+  stats: z.object({
+    attendedEvents: z.number().int().nonnegative(),
+    confirmedHours: z.number().nonnegative(),
+  }),
 });
 
 export const recordSchema = z.object({
@@ -381,6 +407,7 @@ export type ConnectionOutcome = z.infer<typeof connectionOutcomeSchema>;
 export type MergeApproval = z.infer<typeof mergeApprovalSchema>;
 export type MergeCounterparty = z.infer<typeof mergeCounterpartySchema>;
 export type Profile = z.infer<typeof profileSchema>;
+export type PublicProfile = z.infer<typeof publicProfileSchema>;
 export type OpportunityList = z.infer<typeof opportunityListSchema>;
 export type ApplicationList = z.infer<typeof applicationListSchema>;
 export type SavedList = z.infer<typeof savedListSchema>;

@@ -23,12 +23,22 @@ const base = {
   handle: "dilnoza_k",
   level: "Active",
   bio: "Second-year student.",
+  socials: [],
   figures: [{ id: "events", content: "5 events" }],
   rows: [
     { id: "region", label: "Region", value: "Tashkent City" },
     { id: "telegram", label: "Telegram", value: "@dilnoza_k" },
   ],
-  labels: { action: "Edit profile", figures: "Participation" },
+  labels: {
+    action: "Edit profile",
+    figures: "Participation",
+    socials: "Social profiles",
+    socialPlatforms: {
+      telegram: "Telegram",
+      instagram: "Instagram",
+      linkedin: "LinkedIn",
+    },
+  },
 };
 
 describe("ProfileSheet", () => {
@@ -79,6 +89,28 @@ describe("ProfileSheet", () => {
 
     rerender(<ProfileSheet {...base} completion={null} />);
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("renders public social profiles as labelled external links", () => {
+    render(
+      <ProfileSheet
+        {...base}
+        socials={[
+          {
+            platform: "instagram",
+            handle: "dilnoza.codes",
+            href: "https://www.instagram.com/dilnoza.codes/",
+          },
+        ]}
+        completion={null}
+      />,
+    );
+    const social = screen.getByRole("link", {
+      name: "Instagram: @dilnoza.codes",
+    });
+    expect(social).toHaveAttribute("href", "https://www.instagram.com/dilnoza.codes/");
+    expect(social).toHaveAttribute("target", "_blank");
+    expect(social).toHaveAttribute("rel", "noopener noreferrer nofollow");
   });
 
   it("leaves out an empty bio, the figures and the rows rather than drawing blanks", () => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { REGIONS, type Region } from "@/lib/opportunities/types";
+import { linkedinProfileUrl } from "@/lib/profile/social-links";
 
 export type ProfileInput = {
   fullName: string;
@@ -12,6 +13,8 @@ export type ProfileInput = {
   languages: string[];
   phone: string;
   telegram: string;
+  instagram: string;
+  linkedin: string;
   links: string[];
 };
 
@@ -44,6 +47,17 @@ export const profileFormSchema = z.object({
   languages: z.array(z.string().trim().min(1).max(35)).max(LIST_LIMITS.languages),
   phone: z.string().trim(),
   telegram: z.string().trim(),
+  instagram: z
+    .string()
+    .trim()
+    .refine((value) => /^@?[A-Za-z0-9._]{0,30}$/.test(value), "invalidInstagram"),
+  linkedin: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || linkedinProfileUrl(value) !== null,
+      "invalidLinkedin",
+    ),
   links: z.string(),
 });
 
@@ -59,6 +73,8 @@ export function profileFormValues(profile: {
   languages: readonly string[];
   phone: string;
   telegram: string;
+  instagram: string;
+  linkedin: string;
   links: readonly string[];
 }): ProfileFormValues {
   return {
@@ -71,6 +87,8 @@ export function profileFormValues(profile: {
     languages: [...profile.languages],
     phone: profile.phone,
     telegram: profile.telegram,
+    instagram: profile.instagram,
+    linkedin: profile.linkedin,
     links: profile.links.join(", "),
   };
 }
@@ -108,6 +126,8 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     languages: list(formData, "languages"),
     phone: text(formData, "phone"),
     telegram: text(formData, "telegram").replace(/^@+/, ""),
+    instagram: text(formData, "instagram").replace(/^@+/, ""),
+    linkedin: linkedinProfileUrl(text(formData, "linkedin")) ?? "",
     links: list(formData, "links"),
   };
 }

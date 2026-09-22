@@ -4,6 +4,7 @@ import {
   hasVerifiedSiteOrigin,
   marketingHref,
   marketingOrigin,
+  publicProfileHref,
   siteOrigin,
   siteUrl,
 } from "@/lib/seo/origin";
@@ -47,5 +48,8 @@ describe("marketing site origin", () => {
     expect(marketingHref("uz", "home")).toBe("https://example.org/uz");
     expect(marketingHref("ru", "privacy")).toBe("https://example.org/ru/privacy");
     expect(marketingHref("en", "terms")).toBe("https://example.org/en/terms");
+    expect(publicProfileHref("dilnoza_k")).toBe(
+      "https://example.org/dilnoza_k",
+    );
   });
 });

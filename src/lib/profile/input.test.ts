@@ -13,13 +13,15 @@ function form(entries: Record<string, string>): FormData {
 }
 
 describe("profileInputFromFormData", () => {
-  it("trims text, splits lists and strips the Telegram at-sign", () => {
+  it("trims text, splits lists and normalizes social profiles", () => {
     const input = profileInputFromFormData(
       form({
         fullName: "  Dilnoza Karimova ",
         bio: "Hi",
         languages: "uz, ru,,en",
         telegram: "@dilnoza_k",
+        instagram: "@dilnoza.codes",
+        linkedin: "linkedin.com/in/dilnoza-k",
         region: "samarkand",
         links:
           "https://a.example, https://b.example, https://c.example, https://d.example",
@@ -29,6 +31,8 @@ describe("profileInputFromFormData", () => {
     expect(input.fullName).toBe("Dilnoza Karimova");
     expect(input.languages).toEqual(["uz", "ru", "en"]);
     expect(input.telegram).toBe("dilnoza_k");
+    expect(input.instagram).toBe("dilnoza.codes");
+    expect(input.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
     expect(input.region).toBe("samarkand");
     expect(input.links).toHaveLength(3);
   });
@@ -62,6 +66,8 @@ describe("profileFormSchema", () => {
     languages: [],
     phone: "",
     telegram: "",
+    instagram: "",
+    linkedin: "",
     links: "",
   };
 
@@ -86,6 +92,13 @@ describe("profileFormSchema", () => {
       profileFormSchema.safeParse({ ...valid, languages: Array(11).fill("en") })
         .success,
     ).toBe(false);
+    expect(
+      profileFormSchema.safeParse({ ...valid, instagram: "not a handle!" }).success,
+    ).toBe(false);
+    expect(
+      profileFormSchema.safeParse({ ...valid, linkedin: "https://example.com/me" })
+        .success,
+    ).toBe(false);
   });
 
   it("turns a stored profile into the form's default values", () => {
@@ -99,10 +112,14 @@ describe("profileFormSchema", () => {
       languages: ["uz", "ru"],
       phone: "",
       telegram: "dilnoza_k",
+      instagram: "dilnoza.codes",
+      linkedin: "https://www.linkedin.com/in/dilnoza-k",
       links: [],
     });
     expect(values.region).toBe("");
     expect(values.languages).toEqual(["uz", "ru"]);
     expect(values.telegram).toBe("dilnoza_k");
+    expect(values.instagram).toBe("dilnoza.codes");
+    expect(values.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
   });
 });

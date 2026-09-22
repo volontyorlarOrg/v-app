@@ -13,8 +13,17 @@ import {
   type SessionPayload,
 } from "@/lib/auth/session";
 import { ENTRY_ROUTE, HOME_ROUTE, guardFor, localePath } from "@/lib/routing/routes";
+import { LOCALE_COOKIE_NAME } from "@/lib/preferences";
+import {
+  internalMemberProfileHref,
+  internalProfileUsername,
+  memberProfileHref,
+  preferredProfileLocale,
+  publicProfileUsername,
+} from "@/lib/profile/public-routing";
 
 const intl = createMiddleware(routing);
+const PROFILE_REWRITE_MARKER = "_volontyorlar_app_profile";
 
 function localeOf(pathname: string) {
   const segment = pathname.split("/")[1];
@@ -47,8 +56,32 @@ function expireSessionCookie(response: NextResponse) {
 
 export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const guard = guardFor(pathname);
-  const locale = localeOf(pathname);
+  const internalUsername = internalProfileUsername(pathname);
+  if (
+    internalUsername &&
+    request.nextUrl.searchParams.get(PROFILE_REWRITE_MARKER) !== "1"
+  ) {
+    return NextResponse.redirect(
+      new URL(memberProfileHref(internalUsername), request.url),
+      307,
+    );
+  }
+
+  const rootUsername = publicProfileUsername(pathname);
+  if (rootUsername && pathname !== memberProfileHref(rootUsername)) {
+    return NextResponse.redirect(
+      new URL(memberProfileHref(rootUsername), request.url),
+      307,
+    );
+  }
+
+  const guard = rootUsername ? "session" : guardFor(pathname);
+  const locale = rootUsername
+    ? preferredProfileLocale(
+        request.cookies.get(LOCALE_COOKIE_NAME)?.value,
+        request.headers.get("accept-language"),
+      )
+    : localeOf(pathname);
 
   const current = await decryptSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
   let session: SessionPayload | null = current;
@@ -74,7 +107,17 @@ export default async function proxy(request: NextRequest) {
     );
   }
 
-  const response = intl(request);
+  const response = rootUsername
+    ? NextResponse.rewrite(
+        new URL(
+          `${internalMemberProfileHref(locale, rootUsername)}?${new URLSearchParams({
+            ...Object.fromEntries(request.nextUrl.searchParams),
+            [PROFILE_REWRITE_MARKER]: "1",
+          }).toString()}`,
+          request.url,
+        ),
+      )
+    : intl(request);
 
   if (upgraded) {
     const value = await encryptSession(upgraded);

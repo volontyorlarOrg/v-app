@@ -8,10 +8,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { buttonClass } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ProfileSocialLinks } from "@/components/profile/profile-social-links";
 import { PROFILE_AVATAR_TRANSITION } from "@/components/profile/transitions";
 import { Link } from "@/i18n/navigation";
 import type { ProfileLink } from "@/lib/profile/links";
+import type {
+  ProfileSocialLink,
+  ProfileSocialPlatform,
+} from "@/lib/profile/social-links";
 import { navHref } from "@/lib/routing/routes";
+import { cn } from "@/lib/utils";
 
 const LONG_WORD = 13;
 
@@ -40,6 +46,7 @@ export function ProfileSheet({
   handle,
   level,
   bio,
+  socials,
   figures,
   rows,
   completion,
@@ -51,10 +58,16 @@ export function ProfileSheet({
   handle: string | null;
   level: string;
   bio: string;
+  socials: readonly ProfileSocialLink[];
   figures: readonly ProfileFigure[];
   rows: readonly ProfileRow[];
   completion: ProfileCompletionLine | null;
-  labels: { action: string; figures: string };
+  labels: {
+    action?: string;
+    figures: string;
+    socials: string;
+    socialPlatforms: Record<ProfileSocialPlatform, string>;
+  };
 }) {
   const longName = name.split(/\s+/).some((word) => word.length > LONG_WORD);
 
@@ -91,16 +104,18 @@ export function ProfileSheet({
               </AvatarFallback>
             </Avatar>
           </SharedElement>
-          <Link
-            href={navHref("profileEdit")}
-            prefetch
-            className={buttonClass({
-              size: "sm",
-              className: "enter-rise [--enter-delay:140ms]",
-            })}
-          >
-            {labels.action}
-          </Link>
+          {labels.action ? (
+            <Link
+              href={navHref("profileEdit")}
+              prefetch
+              className={buttonClass({
+                size: "sm",
+                className: "enter-rise [--enter-delay:140ms]",
+              })}
+            >
+              {labels.action}
+            </Link>
+          ) : null}
         </div>
 
         <h1
@@ -120,8 +135,22 @@ export function ProfileSheet({
           <Badge variant="achievement">{level}</Badge>
         </p>
 
-        {bio ? (
-          <p className="profile-bio enter-rise mt-5 [--enter-delay:260ms]">{bio}</p>
+        {bio || socials.length > 0 ? (
+          <div
+            className={cn(
+              "enter-rise mt-5 grid gap-5 [--enter-delay:260ms]",
+              bio &&
+                socials.length > 0 &&
+                "sm:grid-cols-[minmax(0,1fr)_minmax(10rem,0.62fr)] sm:gap-8",
+            )}
+          >
+            {bio ? <p className="profile-bio">{bio}</p> : null}
+            <ProfileSocialLinks
+              links={socials}
+              label={labels.socials}
+              platformLabels={labels.socialPlatforms}
+            />
+          </div>
         ) : null}
 
         {figures.length > 0 ? (
