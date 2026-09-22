@@ -13,17 +13,17 @@ opportunities section.
 
 Beside the title, the page states the size of the whole community: the
 response's `volunteerTotal`, every active volunteer, including those who have
-not chosen a handle yet and so are not ranked. The board itself lists only
-chosen handles, which is why its own count, `total`, can be smaller.
+not chosen a username yet and so are not ranked. The board itself lists only
+chosen usernames, which is why its own count, `total`, can be smaller.
 
 The page has three parts:
 
 1. **Your standing** — two figures read straight from the response's `viewer`:
    the place and the experience, with the ranked total as the place's note.
-   Beneath them, the handle the volunteer appears under and a link to the
-   account page, which is where a handle is changed.
+   Beneath them, the username the volunteer appears under and a link to the
+   account page, which is where a username is changed.
 2. **Standings** — one page of the board: place, public display name, public
-   handle and experience. The name is the primary identifier; the `@handle`
+   username and experience. The name is the primary identifier; the `@username`
    sits beneath it in the smaller metadata role.
    The first three places and the volunteer's own row are in orange, the colour
    that belongs to the person; every other experience figure is plain ink so
@@ -54,7 +54,7 @@ infer identity from another field.
 backend that adds it: until then the schema reads it as `total`, the headline
 the page showed before. Make it required once every backend serves it.
 
-## The handle
+## The username
 
 Every account has a `username`: lowercase letters, digits and underscores, 5 to
 32 characters, unique across the service. The leaderboard also shows the
@@ -67,22 +67,26 @@ the display name is the primary label and the username has a `source`:
 | `custom`    | chosen by the volunteer                           | yes        |
 | `telegram`  | synchronized from Telegram until a custom choice  | yes        |
 
-A valid available Telegram handle seeds the username and follows later Telegram
+A valid available Telegram username seeds the username and follows later Telegram
 changes. Choosing any username in Volontyorlar changes the source to `custom`
 and permanently stops that synchronization. A provider collision never takes a
 name from its current owner.
 
-Every handle can be renamed in two places, both the same component:
+Every username can be renamed in two places:
 
-- **the account page** (`/settings`), in its own panel under the connections;
-- **the end of the welcome flow**, on the "your pass is ready" step, where a
-  generated account must choose its own before leaving.
+- **the account page** (`/settings`), in its own panel under the connections
+  (`UsernameSection`);
+- **the first step of the welcome flow** (`UsernameStepForm`), which every new
+  account passes through and a generated account cannot leave without choosing
+  its own. A Telegram or custom username is prefilled there and kept without a
+  write. → [`ONBOARDING.md`](ONBOARDING.md)
 
-A generated handle is never offered back as a choice. The rename form starts
+A generated username is never offered back as a choice. Both forms start
 empty for a generated account, and the backend refuses the generated form —
 `user_` and twenty hexadecimal characters — as `usernameReserved`, so the
 welcome flow's gate opens only for a name the volunteer chose, and only chosen
-names are ranked.
+names are ranked. A chosen username is also one of the requirements for
+applying to an opportunity.
 
 Placement and treatment are frontend decisions; what a source means is not.
 

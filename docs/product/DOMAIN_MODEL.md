@@ -23,9 +23,13 @@ profile, and portfolio links. These profile fields are public while the public
 profile is enabled. Deliberately absent: date of birth, home address, document
 number, parent contact, and gender.
 
-**Completion** counts six fields — `fullName`, `bio`, `region`, `school`,
-`languages`, and _either_ contact channel — because "complete" means an
-organiser can evaluate and contact you. → `src/lib/profile/completion.ts`
+**Completion** counts nine fields — `fullName`, `bio`, `region`, `city`,
+`school`, `gradeYear`, `languages`, `phone` and `telegram` — every field except
+the photo, Instagram, LinkedIn and portfolio links, because "complete" means an
+organiser can evaluate and contact you. Applying needs a complete profile and
+a chosen username; the backend enforces it on starting and on sending an
+application (`profileIncomplete` with the missing `fields`), and this is its
+mirror. → `src/lib/profile/completion.ts`
 
 ## Opportunity
 

@@ -93,6 +93,7 @@ function Opportunity({
 }) {
   const t = useTranslations("opportunities");
   const applicationsT = useTranslations("applications");
+  const profileT = useTranslations("profile");
   const format = useFormatter();
   const locale = useLocale() as Locale;
   const applicable = canApply(opportunity, now);
@@ -257,7 +258,11 @@ function Opportunity({
               ) : (
                 <div>
                   <p className="text-sm leading-relaxed text-ink-muted">
-                    {t("detail.profileRequired")}
+                    {t("detail.profileRequired", {
+                      fields: completion.missing
+                        .map((field) => profileT(`completionFields.${field}`))
+                        .join(", "),
+                    })}
                   </p>
                   <Link
                     href={navHref("profileEdit")}

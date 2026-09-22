@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  normalizePhone,
   profileFormSchema,
   profileFormValues,
   profileInputFromFormData,
@@ -35,6 +36,17 @@ describe("profileInputFromFormData", () => {
     expect(input.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
     expect(input.region).toBe("samarkand");
     expect(input.links).toHaveLength(3);
+  });
+
+  it("sends a phone number the way the backend stores it, whatever the volunteer typed between the digits", () => {
+    expect(profileInputFromFormData(form({ phone: " +998 90 123-45-67 " })).phone).toBe(
+      "+998901234567",
+    );
+    expect(profileInputFromFormData(form({ phone: "(+998) 90.123.45.67" })).phone).toBe(
+      "+998901234567",
+    );
+    expect(normalizePhone("00998901234567")).toBe("+998901234567");
+    expect(normalizePhone("")).toBe("");
   });
 
   it("turns an unknown or empty region into null and missing fields into empty values", () => {
@@ -99,6 +111,20 @@ describe("profileFormSchema", () => {
       profileFormSchema.safeParse({ ...valid, linkedin: "https://example.com/me" })
         .success,
     ).toBe(false);
+  });
+
+  it("accepts the phone and Telegram formats the backend accepts, and nothing else", () => {
+    const accepts = (fields: Partial<typeof valid>) =>
+      profileFormSchema.safeParse({ ...valid, ...fields }).success;
+
+    expect(accepts({ phone: "+998 90 123 45 67" })).toBe(true);
+    expect(accepts({ phone: "+998901234567" })).toBe(true);
+    expect(accepts({ phone: "90 123 45 67" })).toBe(false);
+    expect(accepts({ phone: "+0 123 456 789" })).toBe(false);
+    expect(accepts({ phone: "call me" })).toBe(false);
+    expect(accepts({ telegram: "@dilnoza_k" })).toBe(true);
+    expect(accepts({ telegram: "abc" })).toBe(false);
+    expect(accepts({ telegram: "dilnoza.k" })).toBe(false);
   });
 
   it("turns a stored profile into the form's default values", () => {

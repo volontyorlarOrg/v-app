@@ -244,6 +244,43 @@ function applicable(item) {
   return item.status === "open" && new Date(item.applicationDeadline) > new Date();
 }
 
+const REQUIRED_PROFILE_FIELDS = [
+  "fullName",
+  "bio",
+  "region",
+  "city",
+  "school",
+  "gradeYear",
+  "languages",
+  "phone",
+  "telegram",
+];
+
+function missingForApplying(state) {
+  const profile = state.profile;
+  const filled = (field) => {
+    if (!profile) return false;
+    if (field === "fullName") return profile.fullName.trim().length >= 2;
+    if (field === "region") return Boolean(profile.region);
+    if (field === "languages") return profile.languages.length > 0;
+    return profile[field].trim().length > 0;
+  };
+  return [
+    ...(state.account.usernameSource === "generated" ? ["username"] : []),
+    ...REQUIRED_PROFILE_FIELDS.filter((field) => !filled(field)),
+  ];
+}
+
+function refuseUnready(response, state) {
+  const fields = missingForApplying(state);
+  if (fields.length === 0) return false;
+  send(response, 409, {
+    code: state.profile ? "profileIncomplete" : "profileRequired",
+    fields,
+  });
+  return true;
+}
+
 function freshAccount() {
   return {
     email: null,
@@ -1146,6 +1183,21 @@ const server = createServer(async (request, response) => {
         errors: { fullName: ["fullName must be longer than or equal to 2 characters"] },
       });
     }
+    const malformed = {
+      ...(body.phone && !/^\+[1-9]\d{7,14}$/.test(body.phone)
+        ? { phone: ["phone must match /^$|^\\+[1-9]\\d{7,14}$/ regular expression"] }
+        : {}),
+      ...(body.telegram && !/^[A-Za-z0-9_]{5,32}$/.test(body.telegram)
+        ? {
+            telegram: [
+              "telegram must match /^$|^[A-Za-z0-9_]{5,32}$/ regular expression",
+            ],
+          }
+        : {}),
+    };
+    if (Object.keys(malformed).length > 0) {
+      return send(response, 422, { code: "validationFailed", errors: malformed });
+    }
     state.profile = {
       ...(state.profile ?? {}),
       ...body,
@@ -1224,6 +1276,7 @@ const server = createServer(async (request, response) => {
     if (!opportunity) return send(response, 404, { code: "opportunityNotFound" });
     if (!applicable(opportunity))
       return send(response, 409, { code: "opportunityUnavailable" });
+    if (refuseUnready(response, state)) return;
     const item = {
       id: `app-${opportunity.slug}`,
       status: "draft",
@@ -1261,18 +1314,7 @@ const server = createServer(async (request, response) => {
       const answers = body.answers ?? {};
       const errors = validateAnswers(opportunity, answers, action === "submit");
       if (errors) return send(response, 400, { code: "invalidAnswers", errors });
-      if (action === "submit" && !state.profile)
-        return send(response, 409, { code: "profileRequired" });
-      if (
-        action === "submit" &&
-        (!state.profile.bio.trim() ||
-          !state.profile.region ||
-          !state.profile.school.trim() ||
-          state.profile.languages.length === 0 ||
-          (!state.profile.phone.trim() && !state.profile.telegram.trim()))
-      ) {
-        return send(response, 409, { code: "profileIncomplete" });
-      }
+      if (action === "submit" && refuseUnready(response, state)) return;
       item.answers = Object.entries(answers).map(([questionId, value]) => {
         const question = opportunity.questions.find(
           (candidate) => candidate.id === questionId,
@@ -1302,6 +1344,7 @@ const server = createServer(async (request, response) => {
           };
         }
         item.profileSnapshot = {
+          username: state.account.username,
           fullName: state.profile.fullName,
           bio: state.profile.bio,
           region: state.profile.region,
@@ -1309,9 +1352,10 @@ const server = createServer(async (request, response) => {
           school: state.profile.school,
           gradeYear: state.profile.gradeYear,
           languages: state.profile.languages,
-          skills: state.profile.skills,
           phone: state.profile.phone,
           telegram: state.profile.telegram,
+          instagram: state.profile.instagram,
+          linkedin: state.profile.linkedin,
           links: state.profile.links,
         };
       }
