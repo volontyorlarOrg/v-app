@@ -137,9 +137,9 @@ function Leaderboard({
           <p className="inline-flex min-h-11 items-center gap-2 text-sm text-ink-muted">
             <TrendingUp aria-hidden="true" className="size-4 text-accent" />
             <span className="tabular font-semibold text-accent-ink">
-              {format.number(board.total)}
+              {format.number(board.volunteerTotal)}
             </span>
-            {t("count", { count: board.total })}
+            {t("count", { count: board.volunteerTotal })}
           </p>
         }
       />
