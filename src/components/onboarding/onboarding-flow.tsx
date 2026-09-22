@@ -3,12 +3,12 @@
 import { ArrowRight, BadgeCheck, CalendarCheck, CircleCheck, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
-import { UsernameSection } from "@/components/account/username-section";
 import { SplitWords } from "@/components/motion/scene";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { PassStage } from "@/components/onboarding/pass-stage";
 import { ProfileStepForm } from "@/components/onboarding/profile-step-form";
 import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
+import { UsernameStepForm } from "@/components/onboarding/username-step-form";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -43,6 +43,10 @@ function fill(template: string, values: Record<string, string | number>): string
   );
 }
 
+function usernameGate(step: OnboardingStep): OnboardingStep {
+  return stepIndex(step) > stepIndex("username") ? "username" : step;
+}
+
 export function OnboardingFlow({
   locale,
   title,
@@ -54,6 +58,7 @@ export function OnboardingFlow({
   regions,
   languageOptions,
   username,
+  addressPrefix,
   labels,
   completionFields,
 }: {
@@ -67,16 +72,18 @@ export function OnboardingFlow({
   regions: readonly { value: string; label: string }[];
   languageOptions: readonly LanguageOption[];
   username: UsernameIdentity;
+  addressPrefix: string | null;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
 }) {
-  const [step, setStep] = useState<OnboardingStep>(initialStep);
+  const [requested, setStep] = useState<OnboardingStep>(initialStep);
   const [direction, setDirection] = useState<StepDirection>("forward");
   const [values, setValues] = useState(initialValues);
   const [saved, setSaved] = useState<VolunteerProfile>(
     profileSaved ? initialValues : EMPTY_PROFILE,
   );
   const usernameRequired = username.source === "generated";
+  const step = usernameRequired ? usernameGate(requested) : requested;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -117,15 +124,7 @@ export function OnboardingFlow({
       stepIndex(key) < stepIndex(step) ? "done" : key === step ? "current" : "upcoming",
   }));
 
-  const skipLink = usernameRequired ? (
-    <button
-      type="button"
-      onClick={() => go("done", "forward")}
-      className="inline-flex min-h-8 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-    >
-      {labels.skipForNow}
-    </button>
-  ) : (
+  const skipLink = usernameRequired ? null : (
     <a
       href={exitHref}
       onClick={skipForNow}
@@ -191,6 +190,20 @@ export function OnboardingFlow({
             <WelcomeBody labels={labels} onStart={advance} skipLink={skipLink} />
           ) : null}
 
+          {step === "username" ? (
+            <>
+              <StepLead>{labels.steps.username.lead}</StepLead>
+              <UsernameStepForm
+                locale={locale}
+                identity={username}
+                addressPrefix={addressPrefix}
+                labels={labels}
+                onContinue={() => go(nextStep("username"), "forward")}
+                onBack={retreat}
+              />
+            </>
+          ) : null}
+
           {isProfileStep(step) ? (
             <>
               <StepLead>{labels.steps[step].lead}</StepLead>
@@ -213,13 +226,10 @@ export function OnboardingFlow({
 
           {step === "done" ? (
             <DoneBody
-              locale={locale}
               labels={labels}
               complete={completion.complete}
               percent={completion.percent}
               missing={completion.missing.map((field) => completionFields[field])}
-              username={username}
-              usernameRequired={usernameRequired}
               ctaHref={ctaHref}
             />
           ) : null}
@@ -263,22 +273,16 @@ const NEXT_STEPS = [
 ] as const;
 
 function DoneBody({
-  locale,
   labels,
   complete,
   percent,
   missing,
-  username,
-  usernameRequired,
   ctaHref,
 }: {
-  locale: Locale;
   labels: OnboardingLabels;
   complete: boolean;
   percent: number;
   missing: readonly string[];
-  username: UsernameIdentity;
-  usernameRequired: boolean;
   ctaHref: string;
 }) {
   return (
@@ -299,16 +303,6 @@ function DoneBody({
           </Link>
         </p>
       )}
-
-      <div className="mt-6 rounded-xl border border-border bg-surface-sunk p-4 sm:p-5">
-        <UsernameSection locale={locale} identity={username} labels={labels.username} />
-      </div>
-
-      {usernameRequired ? (
-        <p className="mt-4 text-sm font-semibold text-primary-ink" role="status">
-          {labels.done.usernameRequired}
-        </p>
-      ) : null}
 
       <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
         {labels.done.nextTitle}
@@ -334,23 +328,21 @@ function DoneBody({
         ))}
       </ol>
 
-      {usernameRequired ? null : (
-        <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
-          <a
-            href={ctaHref}
-            className={buttonClass({ size: "sm", className: "min-w-44" })}
-          >
-            {labels.done.cta}
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </a>
-          <Link
-            href={navHref("dashboard")}
-            className={buttonClass({ variant: "ghost", size: "sm" })}
-          >
-            {labels.done.dashboard}
-          </Link>
-        </div>
-      )}
+      <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
+        <a
+          href={ctaHref}
+          className={buttonClass({ size: "sm", className: "min-w-44" })}
+        >
+          {labels.done.cta}
+          <ArrowRight aria-hidden="true" className="size-4" />
+        </a>
+        <Link
+          href={navHref("dashboard")}
+          className={buttonClass({ variant: "ghost", size: "sm" })}
+        >
+          {labels.done.dashboard}
+        </Link>
+      </div>
     </>
   );
 }

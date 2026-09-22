@@ -259,14 +259,20 @@
     "saveError": "That didn’t save. Check the marked fields and try again.",
     "nameNeeded": "Your name is the one thing an organiser needs.",
     "welcome": {
-      "title": "Three short steps, about a minute.",
-      "body": "Who you are, where you study, and how organisers reach you. Everything can be changed later on your profile."
+      "title": "Four short steps, about two minutes.",
+      "body": "Your username, who you are, where you study, and how organisers reach you. You need all of it to apply, and you can change any of it later on your profile."
     },
-    "username": {
-      "title": "Your leaderboard handle",
-      "description": "This is how you appear on the leaderboard. You can change it any time from your account."
+    "usernameStep": {
+      "field": "Username",
+      "fromTelegram": "This is your Telegram username. Keep it, or choose another one.",
+      "address": "Your public page:",
+      "addressPlaceholder": "username"
     },
     "steps": {
+      "username": {
+        "title": "Choose your username",
+        "lead": "It is how you appear on the leaderboard and the address of your public profile. You can change it later in settings."
+      },
       "about": {
         "title": "About you",
         "lead": "The first thing an organiser reads."
@@ -277,12 +283,13 @@
       },
       "contact": {
         "title": "Contact and public links",
-        "lead": "These details appear to anyone who opens your public profile. Phone or Telegram completes the contact step."
+        "lead": "Organisers need both your phone number and your Telegram username. Everything here appears on your public profile; the links are optional."
       }
     },
     "rail": {
       "label": "Setup steps",
       "welcome": "Welcome",
+      "username": "Username",
       "about": "About you",
       "place": "Where you study",
       "contact": "Contact",
@@ -296,15 +303,14 @@
     "done": {
       "title": "Your pass is ready.",
       "complete": "Your profile is complete. Applying takes under a minute.",
-      "incomplete": "Your profile is {percent}% complete. Still missing: {fields}.",
-      "finishOnProfile": "Add it on your profile",
+      "incomplete": "Your profile is {percent}% complete. Add these before you can apply: {fields}.",
+      "finishOnProfile": "Finish your profile",
       "nextTitle": "What happens next",
       "next": {
         "apply": "Apply with your pass. Nothing to fill in twice.",
         "attend": "Attend. Arrive on time and do the work.",
         "confirm": "The organiser confirms you were there. Your record grows, and so does your level."
       },
-      "usernameRequired": "Choose and save your Volontyorlar username to continue.",
       "cta": "Find your first opportunity",
       "dashboard": "Go to the dashboard"
     },
@@ -368,7 +374,7 @@
   "leaderboard": {
     "metaTitle": "Leaderboard",
     "title": "Leaderboard",
-    "description": "Volunteers who have chosen a handle, ordered by the experience their confirmed attendance has earned.",
+    "description": "Volunteers who have chosen a username, ordered by the experience their confirmed attendance has earned.",
     "you": "You",
     "standing": {
       "rank": "Your place",
@@ -376,7 +382,7 @@
       "xp": "Experience",
       "xpHelp": "Earned from confirmed attendance.",
       "appearAs": "You appear as",
-      "changeHandle": "Change your handle"
+      "changeUsername": "Change your username"
     },
     "table": {
       "title": "Standings",
@@ -504,7 +510,7 @@
       "essayHelp": "Write your essay in your own words. Up to 5,000 characters.",
       "errors": {
         "profileRequired": "Complete your profile before submitting.",
-        "profileIncomplete": "Complete the required profile fields and add a contact method before submitting.",
+        "profileIncomplete": "Complete every required profile field before submitting.",
         "profileLink": "Go to your profile",
         "opportunityUnavailable": "This opportunity is no longer taking applications.",
         "invalidAnswers": "Some answers need another look.",
@@ -586,7 +592,7 @@
       "applyHintEssay": "Write your essay on the next page, then submit your application.",
       "applyHintEssayAndQuestions": "Write your essay and answer {count, plural, one {# question} other {# questions}} on the next page, then submit your application.",
       "viewApplication": "View your application",
-      "profileRequired": "Complete the core profile fields and add a phone number or Telegram username before applying.",
+      "profileRequired": "Complete your profile before applying. Still missing: {fields}.",
       "completeProfile": "Complete profile",
       "applyErrors": {
         "opportunityUnavailable": "This opportunity isn't taking applications right now.",
@@ -709,7 +715,7 @@
     },
     "form": {
       "title": "Edit your profile",
-      "description": "Fill this in once. Every application reuses it."
+      "description": "Fill this in once. Every application reuses it, and every field not marked “Optional” is needed before you can apply."
     },
     "sections": {
       "education": "Education",
@@ -736,7 +742,7 @@
       "languagesRemove": "Remove",
       "languagesLimit": "That is ten. Remove one to add another.",
       "phone": "Phone number",
-      "phoneHelp": "Visible to everyone when your public profile is on.",
+      "phoneHelp": "With the country code, for example +998 90 123 45 67. Visible to everyone when your public profile is on.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @. Visible on your public profile.",
       "instagram": "Instagram username",
@@ -751,9 +757,12 @@
       "fullName": "Full name",
       "bio": "Bio",
       "region": "Region",
+      "city": "City",
       "school": "School",
+      "gradeYear": "Year or grade",
       "languages": "Languages",
-      "contact": "Phone or Telegram"
+      "phone": "Phone",
+      "telegram": "Telegram"
     },
     "optional": "Optional",
     "save": "Save profile",
@@ -773,7 +782,7 @@
       "about": "Your name and a few lines an organiser reads first.",
       "education": "Where you study, so an organiser knows who is applying.",
       "location": "Organisers pick volunteers close to the event.",
-      "contact": "Your phone and Telegram are visible to everyone when your public profile is on.",
+      "contact": "Organisers need both. Your phone and Telegram are visible to everyone when your public profile is on.",
       "links": "Social profiles and work you want anyone with your profile link to open."
     },
     "edit": {
@@ -925,16 +934,16 @@
       "changePasswordDone": "Password changed. Your other sessions were signed out."
     },
     "username": {
-      "title": "Your handle",
+      "title": "Your username",
       "description": "Your Volontyorlar username appears on the leaderboard and in your public profile address.",
       "current": "You appear as",
-      "field": "New handle",
+      "field": "New username",
       "hint": "{min} to {max} characters: lowercase letters, numbers and underscores.",
       "generated": "We made this one up when your account was created. Choose one you would rather be known by.",
       "managed": "Telegram keeps this username current until you choose your own.",
-      "save": "Save handle",
+      "save": "Save username",
       "saving": "Saving…",
-      "saved": "Your handle is saved."
+      "saved": "Your username is saved."
     },
     "connectStatus": {
       "linked": "Connected. Both ways in now open this account.",
@@ -1006,11 +1015,11 @@
       "validationFailed": "Check the fields above and try again.",
       "network": "We could not reach the server. Check your connection and try again.",
       "unknown": "Something went wrong. Try again in a moment.",
-      "usernameUnavailable": "That handle is taken. Try another one.",
+      "usernameUnavailable": "That username is taken. Try another one.",
       "usernameReserved": "That username is reserved by Volontyorlar. Try another one.",
-      "usernameRequired": "Choose a handle.",
-      "usernameShort": "A handle needs at least 5 characters.",
-      "usernameLong": "A handle can be 32 characters at most.",
+      "usernameRequired": "Choose a username.",
+      "usernameShort": "A username needs at least 5 characters.",
+      "usernameLong": "A username can be 32 characters at most.",
       "usernameCharacters": "Use lowercase letters, numbers and underscores only."
     },
     "mergeNotifications": {
