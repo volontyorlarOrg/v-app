@@ -27,15 +27,23 @@ export function OpportunityFacts({
   const t = useTranslations("opportunities");
   const format = useFormatter();
 
+  const placeParts = [
+    opportunity.locationName,
+    opportunity.city,
+    t(`regions.${opportunity.region}`),
+  ].filter((part): part is string => Boolean(part?.trim()));
   const place =
     opportunity.format === "remote"
       ? (opportunity.locationName ?? t(`format.${opportunity.format}`))
-      : [
-          opportunity.locationName ? opportunity.locationName : null,
-          opportunity.city ? opportunity.city : null,
-          t(`regions.${opportunity.region}`),
-        ]
-          .filter(Boolean)
+      : placeParts
+          .filter(
+            (part, index) =>
+              placeParts.findIndex(
+                (candidate) =>
+                  candidate.localeCompare(part, undefined, { sensitivity: "base" }) ===
+                  0,
+              ) === index,
+          )
           .join(", ");
   const deadlineIsNear =
     deadlineState(opportunity.applicationDeadline, now).kind !== "later";

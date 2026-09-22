@@ -5,6 +5,7 @@ import {
   answersFormSchema,
   answersFormValues,
   answersFromFormData,
+  essayFromFormData,
 } from "@/lib/applications/answers";
 import type { ApplicationQuestion } from "@/lib/opportunities/types";
 
@@ -29,6 +30,17 @@ describe("answersFromFormData", () => {
     form.append("answer.q3[]", "");
 
     expect(answersFromFormData(form)).toEqual({});
+  });
+});
+
+describe("essayFromFormData", () => {
+  it("trims a written essay and omits an empty one", () => {
+    const form = new FormData();
+    form.set("essay", "  I want to help.  ");
+    expect(essayFromFormData(form)).toBe("I want to help.");
+
+    form.set("essay", "   ");
+    expect(essayFromFormData(form)).toBeUndefined();
   });
 });
 
@@ -91,8 +103,26 @@ describe("answersFormSchema", () => {
   });
 
   it("builds default values from saved answers", () => {
-    expect(answersFormValues(QUESTIONS, { why: "Yes", roles: ["b"] })).toEqual({
+    expect(
+      answersFormValues(QUESTIONS, { why: "Yes", roles: ["b"] }, "My essay"),
+    ).toEqual({
       answer: { why: "Yes", day: "", roles: ["b"] },
+      essay: "My essay",
     });
+  });
+
+  it("requires an essay only when the vacancy asks for one", () => {
+    expect(
+      answersFormSchema([], true).safeParse({ answer: {}, essay: "" }).success,
+    ).toBe(false);
+    expect(
+      answersFormSchema([], true).safeParse({
+        answer: {},
+        essay: "I want to contribute.",
+      }).success,
+    ).toBe(true);
+    expect(answersFormSchema([]).safeParse({ answer: {}, essay: "" }).success).toBe(
+      true,
+    );
   });
 });

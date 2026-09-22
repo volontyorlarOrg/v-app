@@ -1591,7 +1591,22 @@ export interface components {
             /** @default  */
             gradeYear: string;
             /** @enum {string|null} */
-            region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan" | null;
+            region?:
+                | "andijan"
+                | "bukhara"
+                | "fergana"
+                | "jizzakh"
+                | "kashkadarya"
+                | "khorezm"
+                | "namangan"
+                | "navoiy"
+                | "samarkand"
+                | "sirdaryo"
+                | "surkhandarya"
+                | "tashkent-region"
+                | "tashkent-city"
+                | "karakalpakstan"
+                | null;
             /** @default  */
             city: string;
             /** @default [] */
@@ -1645,7 +1660,21 @@ export interface components {
             description: string;
             requirements?: string[];
             /** @enum {string} */
-            region: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
+            region:
+                | "andijan"
+                | "bukhara"
+                | "fergana"
+                | "jizzakh"
+                | "kashkadarya"
+                | "khorezm"
+                | "namangan"
+                | "navoiy"
+                | "samarkand"
+                | "sirdaryo"
+                | "surkhandarya"
+                | "tashkent-region"
+                | "tashkent-city"
+                | "karakalpakstan";
             city?: string;
             /** @enum {string} */
             format: "onsite" | "remote" | "hybrid";
@@ -1668,6 +1697,8 @@ export interface components {
              */
             acceptanceMode: "manual" | "automatic";
             /** @default false */
+            essayRequired: boolean;
+            /** @default false */
             sourcedByYvc: boolean;
             organizationId: string;
         };
@@ -1682,7 +1713,21 @@ export interface components {
             description?: string;
             requirements?: string[];
             /** @enum {string} */
-            region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
+            region?:
+                | "andijan"
+                | "bukhara"
+                | "fergana"
+                | "jizzakh"
+                | "kashkadarya"
+                | "khorezm"
+                | "namangan"
+                | "navoiy"
+                | "samarkand"
+                | "sirdaryo"
+                | "surkhandarya"
+                | "tashkent-region"
+                | "tashkent-city"
+                | "karakalpakstan";
             city?: string;
             /** @enum {string} */
             format?: "onsite" | "remote" | "hybrid";
@@ -1705,6 +1750,8 @@ export interface components {
              */
             acceptanceMode: "manual" | "automatic";
             /** @default false */
+            essayRequired: boolean;
+            /** @default false */
             sourcedByYvc: boolean;
             organizationId?: string;
         };
@@ -1718,6 +1765,7 @@ export interface components {
             answers: {
                 [key: string]: string | unknown[];
             };
+            essay?: string;
         };
         ReviewApplicationDto: {
             /** @enum {string} */
@@ -1826,7 +1874,22 @@ export interface components {
             /** @example I care about education and my community. */
             bio: string;
             /** @enum {string|null} */
-            region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan" | null;
+            region?:
+                | "andijan"
+                | "bukhara"
+                | "fergana"
+                | "jizzakh"
+                | "kashkadarya"
+                | "khorezm"
+                | "namangan"
+                | "navoiy"
+                | "samarkand"
+                | "sirdaryo"
+                | "surkhandarya"
+                | "tashkent-region"
+                | "tashkent-city"
+                | "karakalpakstan"
+                | null;
             /** @example Tashkent */
             city: string;
             /** @example School 110 */
@@ -2731,7 +2794,21 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
-                region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
+                region?:
+                    | "andijan"
+                    | "bukhara"
+                    | "fergana"
+                    | "jizzakh"
+                    | "kashkadarya"
+                    | "khorezm"
+                    | "namangan"
+                    | "navoiy"
+                    | "samarkand"
+                    | "sirdaryo"
+                    | "surkhandarya"
+                    | "tashkent-region"
+                    | "tashkent-city"
+                    | "karakalpakstan";
                 format?: "onsite" | "remote" | "hybrid";
                 status?: "open" | "closed" | "full";
                 sort?: "deadline" | "startDate" | "newest";
@@ -3123,7 +3200,14 @@ export interface operations {
     ApplicationsController_list: {
         parameters: {
             query?: {
-                status?: "draft" | "submitted" | "under_review" | "accepted" | "rejected" | "withdrawn" | "closed";
+                status?:
+                    | "draft"
+                    | "submitted"
+                    | "under_review"
+                    | "accepted"
+                    | "rejected"
+                    | "withdrawn"
+                    | "closed";
             };
             header?: never;
             path?: never;
@@ -3267,7 +3351,14 @@ export interface operations {
         parameters: {
             query?: {
                 opportunityId?: string;
-                status?: "draft" | "submitted" | "under_review" | "accepted" | "rejected" | "withdrawn" | "closed";
+                status?:
+                    | "draft"
+                    | "submitted"
+                    | "under_review"
+                    | "accepted"
+                    | "rejected"
+                    | "withdrawn"
+                    | "closed";
             };
             header?: never;
             path?: never;
@@ -3329,7 +3420,14 @@ export interface operations {
         parameters: {
             query?: {
                 opportunityId?: string;
-                status?: "draft" | "submitted" | "under_review" | "accepted" | "rejected" | "withdrawn" | "closed";
+                status?:
+                    | "draft"
+                    | "submitted"
+                    | "under_review"
+                    | "accepted"
+                    | "rejected"
+                    | "withdrawn"
+                    | "closed";
             };
             header?: never;
             path?: never;

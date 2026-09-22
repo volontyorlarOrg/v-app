@@ -8,7 +8,7 @@ import {
   submitApplication,
   withdrawApplication,
 } from "@/lib/api/applications.server";
-import { answersFromFormData } from "@/lib/applications/answers";
+import { answersFromFormData, essayFromFormData } from "@/lib/applications/answers";
 
 function applicationIdOf(formData: FormData): string {
   return String(formData.get("applicationId") ?? "");
@@ -19,7 +19,11 @@ export async function saveDraftAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    await saveApplicationDraft(applicationIdOf(formData), answersFromFormData(formData));
+    await saveApplicationDraft(
+      applicationIdOf(formData),
+      answersFromFormData(formData),
+      essayFromFormData(formData),
+    );
   } catch (error) {
     return resultFromError(error);
   }
@@ -33,7 +37,11 @@ export async function submitApplicationAction(
   formData: FormData,
 ): Promise<ActionResult> {
   try {
-    await submitApplication(applicationIdOf(formData), answersFromFormData(formData));
+    await submitApplication(
+      applicationIdOf(formData),
+      answersFromFormData(formData),
+      essayFromFormData(formData),
+    );
   } catch (error) {
     return resultFromError(error);
   }
