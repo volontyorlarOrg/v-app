@@ -1800,8 +1800,16 @@ export interface components {
             page: number;
             /** @example 50 */
             pageSize: number;
-            /** @example 240 */
+            /**
+             * @description Ranked volunteers: active accounts with a chosen username.
+             * @example 240
+             */
             total: number;
+            /**
+             * @description Every active volunteer account, including those not ranked until they choose a username.
+             * @example 310
+             */
+            volunteerTotal: number;
             scoring: components["schemas"]["LeaderboardScoringDto"];
         };
         PublicProfileStatsDto: {

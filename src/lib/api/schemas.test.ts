@@ -503,6 +503,17 @@ describe("the leaderboard schema", () => {
   it("refuses a page whose total is missing", () => {
     expect(leaderboardSchema.safeParse({ items: [entry] }).success).toBe(false);
   });
+
+  it("reads the whole community's size beside the ranked total", () => {
+    const parsed = leaderboardSchema.parse({ ...board, volunteerTotal: 310 });
+
+    expect(parsed.total).toBe(1);
+    expect(parsed.volunteerTotal).toBe(310);
+    expect(leaderboardSchema.parse(board).volunteerTotal).toBe(board.total);
+    expect(leaderboardSchema.safeParse({ ...board, volunteerTotal: -1 }).success).toBe(
+      false,
+    );
+  });
 });
 
 describe("the username mutation schema", () => {
