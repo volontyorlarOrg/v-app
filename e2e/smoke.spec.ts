@@ -325,7 +325,9 @@ test.describe("locale routing", () => {
 
   test("the prefix-less root lands on sign-in in a locale", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveURL(/\/(uz|ru|en)\/login$/);
+    const destination = new URL(page.url());
+    expect(destination.pathname).toMatch(/^\/(uz|ru|en)\/login$/);
+    expect(destination.searchParams.get("next")).toMatch(/^\/(uz|ru|en)$/);
   });
 
   test("switching language keeps the same page", async ({ page }) => {
