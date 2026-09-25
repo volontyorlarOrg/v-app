@@ -1682,7 +1682,7 @@ export interface components {
             requirements?: string[];
             /** @enum {string} */
             region: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
-            city?: Record<string, never> | null;
+            city?: string | null;
             /** @enum {string} */
             format: "onsite" | "remote" | "hybrid";
             /**
@@ -1691,12 +1691,13 @@ export interface components {
              */
             status: "open" | "closed" | "full";
             startsAt: string;
-            endsAt?: Record<string, never> | null;
+            /** Format: date-time */
+            endsAt?: string | null;
             applicationDeadline: string;
-            locationName?: Record<string, never> | null;
-            imageUrl?: string;
-            capacity?: Record<string, never> | null;
-            estimatedTotalHours?: Record<string, never> | null;
+            locationName?: string | null;
+            imageUrl?: string | null;
+            capacity?: number | null;
+            estimatedTotalHours?: number | null;
             /**
              * @description manual: a coordinator reviews each application. automatic: a submitted application is accepted at once while places remain.
              * @default manual
@@ -1721,7 +1722,7 @@ export interface components {
             requirements?: string[];
             /** @enum {string} */
             region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
-            city?: Record<string, never> | null;
+            city?: string | null;
             /** @enum {string} */
             format?: "onsite" | "remote" | "hybrid";
             /**
@@ -1730,12 +1731,13 @@ export interface components {
              */
             status: "open" | "closed" | "full";
             startsAt?: string;
-            endsAt?: Record<string, never> | null;
+            /** Format: date-time */
+            endsAt?: string | null;
             applicationDeadline?: string;
-            locationName?: Record<string, never> | null;
-            imageUrl?: string;
-            capacity?: Record<string, never> | null;
-            estimatedTotalHours?: Record<string, never> | null;
+            locationName?: string | null;
+            imageUrl?: string | null;
+            capacity?: number | null;
+            estimatedTotalHours?: number | null;
             /**
              * @description manual: a coordinator reviews each application. automatic: a submitted application is accepted at once while places remain.
              * @default manual
