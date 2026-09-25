@@ -43,6 +43,11 @@ three languages; the backend will decide whether content is localized.
 passed displays as closed, and one closing within three calendar days displays
 as closing soon. → `src/lib/opportunities/deadline.ts`, `types.ts`
 
+An approved opportunity may include a storage-backed `imageUrl`. The vacancies
+tab shows it above the card content, and the detail page shows it below the
+title. Opportunities without an image keep their text-only layout. A
+coordinator revision temporarily hides the opportunity until renewed approval.
+
 ## Application
 
 One volunteer's application to one opportunity, in one of `draft`,

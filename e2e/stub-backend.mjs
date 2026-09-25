@@ -52,6 +52,7 @@ const organizations = {
 const opportunities = [
   {
     id: "opp-book-drive",
+    imageUrl: "/logo/social/og-image-1200x630.png",
     slug: "winter-book-drive",
     title: "Winter book drive",
     description:
@@ -215,7 +216,7 @@ function serializeOpportunity(item, detail) {
     startsAt: item.startsAt,
     endsAt: item.endsAt ?? undefined,
     applicationDeadline: item.applicationDeadline,
-    imageUrl: undefined,
+    imageUrl: item.imageUrl ?? undefined,
     capacity: item.capacity ?? undefined,
     estimatedTotalHours: item.estimatedTotalHours ?? undefined,
     spotsRemaining,

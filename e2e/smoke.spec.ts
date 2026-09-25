@@ -325,7 +325,9 @@ test.describe("locale routing", () => {
 
   test("the prefix-less root lands on sign-in in a locale", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveURL(/\/(uz|ru|en)\/login$/);
+    const destination = new URL(page.url());
+    expect(destination.pathname).toMatch(/^\/(uz|ru|en)\/login$/);
+    expect(destination.searchParams.get("next")).toMatch(/^\/(uz|ru|en)$/);
   });
 
   test("switching language keeps the same page", async ({ page }) => {
@@ -852,6 +854,25 @@ test.describe("the panel", () => {
 test.describe("opportunities", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
+  });
+
+  test("shows a vacancy photo on its card and detail while keeping other cards text-only", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities");
+    const photographed = page.getByRole("article").filter({
+      has: page.getByRole("link", { name: "Winter book drive" }),
+    });
+    await expect(photographed.locator("img")).toBeVisible();
+    const textOnly = page.getByRole("article").filter({
+      has: page.getByRole("link", { name: "Riverbank clean-up" }),
+    });
+    await expect(textOnly.locator("img")).toHaveCount(0);
+
+    await page.goto("/en/opportunities/winter-book-drive");
+    await expect(
+      page.locator('main img[src="/logo/social/og-image-1200x630.png"]'),
+    ).toBeVisible();
   });
 
   test("saved opportunities are a view and the old route redirects to it", async ({

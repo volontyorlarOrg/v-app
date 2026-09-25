@@ -3,6 +3,7 @@ import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
@@ -22,6 +23,7 @@ import { listSaved, savedIds } from "@/lib/api/saved.server";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { canApply } from "@/lib/opportunities/deadline";
 import type { OpportunityDetail } from "@/lib/opportunities/types";
+import { opportunityImageUrl } from "@/lib/opportunities/image";
 import {
   EMPTY_PROFILE,
   profileCompletion,
@@ -97,6 +99,7 @@ function Opportunity({
   const format = useFormatter();
   const locale = useLocale() as Locale;
   const applicable = canApply(opportunity, now);
+  const photo = opportunityImageUrl(opportunity.imageUrl);
   const asksQuestions = opportunity.questions.length > 0;
   const asksEssay = opportunity.essayRequired;
   const needsApplicationForm = asksQuestions || asksEssay;
@@ -134,6 +137,17 @@ function Opportunity({
           </>
         }
       />
+
+      {photo ? (
+        <Image
+          unoptimized
+          src={photo}
+          alt=""
+          width={1600}
+          height={900}
+          className="mt-6 aspect-video max-h-[32rem] w-full rounded-xl object-cover"
+        />
+      ) : null}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
