@@ -24,6 +24,9 @@ export function isRegion(value: unknown): value is Region {
 export const OPPORTUNITY_FORMATS = ["onsite", "remote", "hybrid"] as const;
 export type OpportunityFormat = (typeof OPPORTUNITY_FORMATS)[number];
 
+export const OPPORTUNITY_KINDS = ["volunteering", "competition"] as const;
+export type OpportunityKind = (typeof OPPORTUNITY_KINDS)[number];
+
 export const OPPORTUNITY_STATUSES = ["open", "closed", "full"] as const;
 export type OpportunityStatus = (typeof OPPORTUNITY_STATUSES)[number];
 
@@ -42,6 +45,7 @@ export type OpportunitySummary = {
   id: string;
   slug: string;
   title: string;
+  kind: OpportunityKind;
   organization: Organization;
   region: Region;
   city?: string;

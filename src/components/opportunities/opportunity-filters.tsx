@@ -37,7 +37,7 @@ export function OpportunityFilters({
   regions,
   formats,
   sorts,
-  hiddenValue,
+  hiddenValues = [],
   clearHref,
   activeCount,
 }: {
@@ -46,7 +46,7 @@ export function OpportunityFilters({
   regions: readonly FilterOption[];
   formats: readonly FilterOption[];
   sorts: readonly FilterOption[];
-  hiddenValue?: { name: string; value: string };
+  hiddenValues?: readonly { name: string; value: string }[];
   clearHref: string;
   activeCount: number;
 }) {
@@ -73,9 +73,14 @@ export function OpportunityFilters({
       aria-label={labels.legend}
       className="grid gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]"
     >
-      {hiddenValue ? (
-        <input type="hidden" name={hiddenValue.name} value={hiddenValue.value} />
-      ) : null}
+      {hiddenValues.map((hidden) => (
+        <input
+          key={hidden.name}
+          type="hidden"
+          name={hidden.name}
+          value={hidden.value}
+        />
+      ))}
       <div className="relative sm:col-span-2 xl:col-span-1">
         <label htmlFor="filter-q" className="sr-only">
           {labels.search}

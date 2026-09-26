@@ -94,7 +94,11 @@ export function OpportunityFacts({
       ? [
           {
             key: "capacity" as const,
-            label: t("detail.capacity"),
+            label: t(
+              opportunity.kind === "competition"
+                ? "detail.competitionCapacity"
+                : "detail.capacity",
+            ),
             value: (
               <span className="tabular">
                 {opportunity.spotsRemaining !== undefined

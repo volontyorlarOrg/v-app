@@ -10,6 +10,7 @@ import {
 } from "@/components/app/load-error";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
+import { Segmented } from "@/components/app/segmented";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityFilters } from "@/components/opportunities/opportunity-filters";
 import { OpportunitySectionTabs } from "@/components/opportunities/section-tabs";
@@ -32,10 +33,12 @@ import {
 import {
   opportunityViewParser,
   serializeOpportunitySearch,
+  toFilterState,
   type OpportunityView,
 } from "@/lib/opportunities/search-params";
 import {
   OPPORTUNITY_FORMATS,
+  OPPORTUNITY_KINDS,
   REGIONS,
   type OpportunitySummary,
 } from "@/lib/opportunities/types";
@@ -164,7 +167,30 @@ function Opportunities({
         current={view}
         savedCount={savedCount}
         applicationCount={applicationCount}
+        kind={filters.kind}
         className="enter-rise mt-6 [--enter-delay:90ms]"
+      />
+
+      <Segmented
+        label={t("kinds.label")}
+        className="mt-5"
+        items={[
+          { key: "all", kind: null, label: t("kinds.all") },
+          ...OPPORTUNITY_KINDS.map((kind) => ({
+            key: kind,
+            kind,
+            label: t(`kinds.${kind}`),
+          })),
+        ].map((item) => ({
+          key: item.key,
+          label: item.label,
+          href: serializeOpportunitySearch(navHref("opportunities"), {
+            ...toFilterState(filters),
+            view,
+            kind: item.kind,
+          }),
+          active: filters.kind === item.kind,
+        }))}
       />
 
       <div className="mt-5">
@@ -195,8 +221,14 @@ function Opportunities({
             value,
             label: t(`filters.sortBy.${value}`),
           }))}
-          hiddenValue={view === "saved" ? { name: "view", value: "saved" } : undefined}
-          clearHref={serializeOpportunitySearch(navHref("opportunities"), { view })}
+          hiddenValues={[
+            ...(view === "saved" ? [{ name: "view", value: "saved" }] : []),
+            ...(filters.kind ? [{ name: "kind", value: filters.kind }] : []),
+          ]}
+          clearHref={serializeOpportunitySearch(navHref("opportunities"), {
+            view,
+            kind: filters.kind,
+          })}
           activeCount={activeCount}
         />
       </div>
@@ -226,7 +258,10 @@ function Opportunities({
                 body={t("empty.body")}
                 action={
                   <Link
-                    href={navHref("opportunities")}
+                    href={serializeOpportunitySearch(navHref("opportunities"), {
+                      view,
+                      kind: filters.kind,
+                    })}
                     className={buttonClass({ variant: "outline", size: "sm" })}
                   >
                     {t("filters.clear")}

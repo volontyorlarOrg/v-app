@@ -128,6 +128,7 @@ function Opportunity({
         }
         actions={
           <>
+            <StateChip tone="structure">{t(`kinds.${opportunity.kind}`)}</StateChip>
             <OpportunityStatusChip opportunity={opportunity} now={now} />
             {opportunity.sourcedByTeam ? (
               <StateChip tone="structure" icon={<BadgeCheck aria-hidden="true" />}>

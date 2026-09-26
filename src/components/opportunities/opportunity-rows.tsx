@@ -5,6 +5,7 @@ import {
   DeadlineText,
   OpportunityStatusChip,
 } from "@/components/dashboard/opportunity-status";
+import { StateChip } from "@/components/dashboard/state-chip";
 import { Link } from "@/i18n/navigation";
 import type { OpportunitySummary } from "@/lib/opportunities/types";
 import { opportunityHref } from "@/lib/routing/routes";
@@ -43,6 +44,7 @@ export function OpportunityRows({
             className="border-t border-border px-5 py-4 first:border-t-0"
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
+              <StateChip tone="structure">{t(`kinds.${opportunity.kind}`)}</StateChip>
               <OpportunityStatusChip opportunity={opportunity} now={now} />
               <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
             </div>

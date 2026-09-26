@@ -58,7 +58,9 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
               </TableCell>
               <TableCell>
                 <p className="font-semibold text-ink">{entry.opportunityTitle}</p>
-                <p className="text-xs text-ink-muted">{entry.organization}</p>
+                <p className="text-xs text-ink-muted">
+                  {entry.organization} · {t(`history.kinds.${entry.kind}`)}
+                </p>
               </TableCell>
               <TableCell>
                 <StateChip tone={tone} icon={<Icon aria-hidden="true" />}>

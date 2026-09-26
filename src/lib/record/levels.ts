@@ -124,6 +124,7 @@ export type AttendanceOutcome = (typeof ATTENDANCE_OUTCOMES)[number];
 export type ParticipationEntry = {
   id: string;
   opportunityTitle: string;
+  kind: import("@/lib/opportunities/types").OpportunityKind;
   organization: string;
   eventDate: string;
   outcome: AttendanceOutcome;

@@ -51,6 +51,28 @@ const organizations = {
 
 const opportunities = [
   {
+    id: "opp-debate",
+    slug: "city-youth-debate",
+    kind: "competition",
+    title: "City youth debate",
+    description: "Take part in a moderated debate with other young people.",
+    requirements: ["Be 15 or older"],
+    organization: organizations.desk,
+    region: "tashkent-city",
+    city: "Tashkent",
+    locationName: "Youth centre",
+    format: "onsite",
+    status: "open",
+    startsAt: at(15, 10),
+    endsAt: at(15, 14),
+    applicationDeadline: at(8, 18),
+    capacity: 16,
+    estimatedTotalHours: null,
+    accepted: 0,
+    questions: [],
+    sourcedByYvc: true,
+  },
+  {
     id: "opp-book-drive",
     imageUrl: "/logo/social/og-image-1200x630.png",
     slug: "winter-book-drive",
@@ -201,6 +223,7 @@ function serializeOpportunity(item, detail) {
     item.capacity === null ? undefined : Math.max(0, item.capacity - item.accepted);
   const base = {
     id: item.id,
+    kind: item.kind ?? "volunteering",
     slug: item.slug,
     title: item.title,
     organization: item.organization,
@@ -441,6 +464,7 @@ function freshState() {
         organization: "Chilonzor Reading Corners",
         eventDate: at(-1, 9),
         outcome: "awaiting_confirmation",
+        kind: "volunteering",
         hours: undefined,
       },
       {
@@ -449,6 +473,7 @@ function freshState() {
         organization: "Volunteer Support Desk",
         eventDate: at(-12, 9),
         outcome: "attended",
+        kind: "volunteering",
         hours: 4,
       },
       {
@@ -457,6 +482,7 @@ function freshState() {
         organization: "Chilonzor Reading Corners",
         eventDate: at(-20, 9),
         outcome: "attended",
+        kind: "volunteering",
         hours: 6,
       },
     ],
@@ -829,6 +855,7 @@ function listOpportunities(query) {
   const q = (query.get("q") ?? "").toLowerCase();
   const region = query.get("region");
   const format = query.get("format");
+  const kind = query.get("kind");
   const openOnly = query.get("openOnly") === "true";
   const sort = query.get("sort") ?? "deadline";
   const page = Number(query.get("page") ?? 1);
@@ -842,6 +869,7 @@ function listOpportunities(query) {
           .includes(q)) &&
       (!region || item.region === region) &&
       (!format || item.format === format) &&
+      (!kind || (item.kind ?? "volunteering") === kind) &&
       (!openOnly || applicable(item)),
   );
   const time = (item) =>

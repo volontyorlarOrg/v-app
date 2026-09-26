@@ -1,8 +1,10 @@
 import { canApply } from "./deadline";
 import {
   OPPORTUNITY_FORMATS,
+  OPPORTUNITY_KINDS,
   REGIONS,
   type OpportunityFormat,
+  type OpportunityKind,
   type OpportunitySummary,
   type Region,
 } from "./types";
@@ -12,6 +14,7 @@ export type OpportunitySort = (typeof OPPORTUNITY_SORTS)[number];
 
 export type OpportunityFilters = {
   q: string;
+  kind: OpportunityKind | null;
   region: Region | null;
   format: OpportunityFormat | null;
   openOnly: boolean;
@@ -20,6 +23,7 @@ export type OpportunityFilters = {
 
 export const DEFAULT_FILTERS: OpportunityFilters = {
   q: "",
+  kind: null,
   region: null,
   format: null,
   openOnly: false,
@@ -49,6 +53,7 @@ function oneOf<T extends string>(
 export function parseOpportunityFilters(params: SearchParams): OpportunityFilters {
   return {
     q: (first(params.q) ?? "").trim().slice(0, MAX_QUERY_LENGTH),
+    kind: oneOf(OPPORTUNITY_KINDS, first(params.kind)),
     region: oneOf(REGIONS, first(params.region)),
     format: oneOf(OPPORTUNITY_FORMATS, first(params.format)),
     openOnly: first(params.open) === "1",
@@ -68,6 +73,7 @@ export function activeFilterCount(filters: OpportunityFilters): number {
 export function filtersToQuery(filters: OpportunityFilters): Record<string, string> {
   const query: Record<string, string> = {};
   if (filters.q) query.q = filters.q;
+  if (filters.kind) query.kind = filters.kind;
   if (filters.region) query.region = filters.region;
   if (filters.format) query.format = filters.format;
   if (filters.openOnly) query.open = "1";
@@ -80,6 +86,7 @@ export function filtersToApiQuery(
 ): Record<string, string | boolean | undefined> {
   return {
     q: filters.q || undefined,
+    kind: filters.kind ?? undefined,
     region: filters.region ?? undefined,
     format: filters.format ?? undefined,
     openOnly: filters.openOnly || undefined,
@@ -100,6 +107,7 @@ export function filterOpportunities<T extends OpportunitySummary>(
 
     return (
       (!needle || haystack.includes(needle)) &&
+      (!filters.kind || opportunity.kind === filters.kind) &&
       (!filters.region || opportunity.region === filters.region) &&
       (!filters.format || opportunity.format === filters.format) &&
       (!filters.openOnly || canApply(opportunity, now))

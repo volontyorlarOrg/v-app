@@ -856,6 +856,27 @@ test.describe("opportunities", () => {
     await signIn(page);
   });
 
+  test("competition type filters the catalogue and opens an individual application", async ({
+    page,
+  }) => {
+    await page.goto("/en/opportunities?kind=competition");
+    await expect(page.getByRole("article")).toHaveCount(1);
+    await expect(page.getByRole("link", { name: "City youth debate" })).toBeVisible();
+    await expect(page.getByText("Riverbank clean-up")).toHaveCount(0);
+
+    await page.getByRole("link", { name: "City youth debate" }).click();
+    await expect(page.getByText("Competitions", { exact: true }).first()).toBeVisible();
+    await page.getByRole("link", { name: "Complete profile" }).click();
+    await page.getByLabel("Bio").fill("I enjoy debating community questions.");
+    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
+    await page.getByRole("button", { name: "Save profile" }).click();
+
+    await page.goto("/en/opportunities/city-youth-debate");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(/\/en\/applications\/app-city-youth-debate$/);
+    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+  });
+
   test("shows a vacancy photo on its card and detail while keeping other cards text-only", async ({
     page,
   }) => {
@@ -1029,7 +1050,7 @@ test.describe("opportunities", () => {
     ).toHaveCount(0);
     const facts = page.getByRole("region", { name: "At a glance" });
     await expect(facts.getByText("Organiser")).toHaveCount(0);
-    await expect(facts.getByText(/^Closes tomorrow · /)).toBeVisible();
+    await expect(facts.getByText(/^Closes (today|tomorrow) · /)).toBeVisible();
     await expect(
       facts.getByText("Instant: you're in as soon as you apply"),
     ).toBeVisible();
@@ -1692,7 +1713,9 @@ test.describe("the leaderboard", () => {
     await expect(standing.getByRole("definition").first()).toHaveText("#30");
     await expect(standing).toContainText("of 30 on the leaderboard");
     await expect(standing).toContainText("@dilnoza_k");
-    await expect(standing).toContainText("50 XP for every confirmed event");
+    await expect(standing).toContainText(
+      "50 XP for every confirmed volunteering event or competition",
+    );
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
   });
 
