@@ -183,7 +183,7 @@
     },
     "tiles": {
       "level": "Level",
-      "events": "Events completed",
+      "events": "Volunteer events completed",
       "reliability": "Reliability",
       "reliabilityPending": "Shown after 3 confirmed events",
       "hours": "Hours",
@@ -197,7 +197,7 @@
     },
     "start": {
       "title": "Start with your first opportunity",
-      "description": "This is how volunteering works on Volontyorlar.",
+      "description": "This is how opportunities work on Volontyorlar.",
       "steps": {
         "apply": {
           "title": "Apply with your profile",
@@ -209,7 +209,7 @@
         },
         "record": {
           "title": "Attend and build your record",
-          "body": "After the event, confirmed hours and experience appear here and on the leaderboard."
+          "body": "After an event, confirmed participation earns experience. Only volunteering earns volunteer hours."
         }
       },
       "cta": "Browse opportunities"
@@ -362,7 +362,11 @@
       "event": "Event",
       "outcome": "Outcome",
       "hours": "Hours",
-      "empty": "Your record starts with your first confirmed event."
+      "empty": "Your record starts with your first confirmed event.",
+      "kinds": {
+        "volunteering": "Volunteering",
+        "competition": "Competition"
+      }
     },
     "outcomes": {
       "attended": "Attended",
@@ -406,7 +410,7 @@
       "place": "Place {rank}"
     },
     "xpValue": "{xp} XP",
-    "scoring": "{event} XP for every confirmed event, {hour} XP for every confirmed hour."
+    "scoring": "{event} XP for every confirmed volunteering event or competition, plus {hour} XP for every confirmed volunteer hour."
   },
   "applications": {
     "metaTitle": "Applications",
@@ -599,7 +603,8 @@
         "opportunityNotFound": "This opportunity is no longer available.",
         "profileIncomplete": "Finish your profile first: it is what the organiser reads.",
         "fallback": "Couldn't send your application. Please try again."
-      }
+      },
+      "competitionCapacity": "Participants needed"
     },
     "status": {
       "open": "Open",
@@ -644,6 +649,12 @@
       "all": "All",
       "saved": "Saved",
       "applications": "Applications"
+    },
+    "kinds": {
+      "label": "Opportunity type",
+      "all": "All types",
+      "volunteering": "Volunteering",
+      "competition": "Competitions"
     }
   },
   "saved": {

@@ -22,6 +22,7 @@ function filterParser<K extends keyof OpportunityFilters>(
 
 export const opportunityFilterParsers = {
   q: filterParser("q", "q", (value) => value).withDefault(DEFAULT_FILTERS.q),
+  kind: filterParser("kind", "kind", (value) => value ?? ""),
   region: filterParser("region", "region", (value) => value ?? ""),
   format: filterParser("format", "format", (value) => value ?? ""),
   open: filterParser("openOnly", "open", (value) => (value ? "1" : "")).withDefault(
@@ -43,6 +44,7 @@ export const serializeOpportunitySearch = createSerializer({
 export function toFilterState(filters: OpportunityFilters) {
   return {
     q: filters.q,
+    kind: filters.kind,
     region: filters.region,
     format: filters.format,
     open: filters.openOnly,

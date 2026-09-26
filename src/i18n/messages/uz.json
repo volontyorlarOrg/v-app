@@ -183,7 +183,7 @@
     },
     "tiles": {
       "level": "Daraja",
-      "events": "Yakunlangan tadbirlar",
+      "events": "Yakunlangan volontyorlik tadbirlari",
       "reliability": "Ishonchlilik",
       "reliabilityPending": "3 ta tasdiqlangan tadbirdan soʻng koʻrsatiladi",
       "hours": "Soatlar",
@@ -197,7 +197,7 @@
     },
     "start": {
       "title": "Birinchi imkoniyatingizdan boshlang",
-      "description": "Volontyorlarda volontyorlik shunday ishlaydi.",
+      "description": "Volontyorlarda imkoniyatlar shunday ishlaydi.",
       "steps": {
         "apply": {
           "title": "Profilingiz bilan ariza bering",
@@ -209,7 +209,7 @@
         },
         "record": {
           "title": "Qatnashing va tarixingizni boyiting",
-          "body": "Tadbirdan soʻng tasdiqlangan soatlar va tajriba shu yerda hamda reytingda koʻrinadi."
+          "body": "Tadbirdan keyin tasdiqlangan ishtirok tajriba beradi. Volontyorlik soatlari faqat volontyorlik uchun hisoblanadi."
         }
       },
       "cta": "Imkoniyatlarni koʻrish"
@@ -362,7 +362,11 @@
       "event": "Tadbir",
       "outcome": "Natija",
       "hours": "Soat",
-      "empty": "Tarixingiz birinchi tasdiqlangan tadbirdan boshlanadi."
+      "empty": "Tarixingiz birinchi tasdiqlangan tadbirdan boshlanadi.",
+      "kinds": {
+        "volunteering": "Volontyorlik",
+        "competition": "Tanlov"
+      }
     },
     "outcomes": {
       "attended": "Qatnashgan",
@@ -406,7 +410,7 @@
       "place": "{rank}-oʻrin"
     },
     "xpValue": "{xp} XP",
-    "scoring": "Har bir tasdiqlangan tadbir uchun {event} XP, har bir tasdiqlangan soat uchun {hour} XP."
+    "scoring": "Har bir tasdiqlangan volontyorlik tadbiri yoki tanlovdagi ishtirok uchun {event} XP, har bir tasdiqlangan volontyorlik soati uchun yana {hour} XP."
   },
   "applications": {
     "metaTitle": "Arizalar",
@@ -599,7 +603,8 @@
         "opportunityNotFound": "Bu imkoniyat endi mavjud emas.",
         "profileIncomplete": "Avval profilingizni toʻldiring: tashkilotchi aynan uni oʻqiydi.",
         "fallback": "Arizani yuborib boʻlmadi. Qayta urinib koʻring."
-      }
+      },
+      "competitionCapacity": "Kerakli ishtirokchilar"
     },
     "status": {
       "open": "Ochiq",
@@ -644,6 +649,12 @@
       "all": "Barchasi",
       "saved": "Saqlanganlar",
       "applications": "Arizalar"
+    },
+    "kinds": {
+      "label": "Imkoniyat turi",
+      "all": "Barcha turlar",
+      "volunteering": "Volontyorlik",
+      "competition": "Tanlovlar"
     }
   },
   "saved": {

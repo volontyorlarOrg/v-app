@@ -34,6 +34,7 @@ const summary = {
   id: "20000000-0000-4000-8000-000000000001",
   slug: "community-library-day",
   title: "Community library day",
+  kind: "volunteering",
   summary: "Help at a library.",
   organization,
   region: "tashkent-city",
@@ -236,6 +237,7 @@ describe("record and notification schemas", () => {
           {
             id: "h1",
             opportunityTitle: "Read-aloud day",
+            kind: "volunteering",
             organization: "Reading Corners",
             eventDate: "2026-06-16T04:00:00.000Z",
             outcome: "attended",

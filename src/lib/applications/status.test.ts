@@ -24,6 +24,7 @@ function opportunity(startsAt: string): OpportunitySummary {
     id: "riverbank",
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
+    kind: "volunteering",
     organization: {
       id: "green",
       name: "Green Corridor Group",

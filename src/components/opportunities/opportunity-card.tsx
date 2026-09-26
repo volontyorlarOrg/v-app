@@ -7,6 +7,7 @@ import {
   OpportunityStatusChip,
 } from "@/components/dashboard/opportunity-status";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
+import { StateChip } from "@/components/dashboard/state-chip";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -54,6 +55,7 @@ export function OpportunityCard({
       ) : null}
       <div className="flex flex-1 flex-col p-5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
+          <StateChip tone="structure">{t(`kinds.${opportunity.kind}`)}</StateChip>
           <OpportunityStatusChip opportunity={opportunity} now={now} />
           {application ? <ApplicationStatusChip status={application.status} /> : null}
           <DeadlineText deadline={opportunity.applicationDeadline} now={now} />

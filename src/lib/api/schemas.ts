@@ -16,6 +16,7 @@ import { issuedSessionSchema } from "@/lib/auth/session";
 import {
   ACCEPTANCE_MODES,
   OPPORTUNITY_FORMATS,
+  OPPORTUNITY_KINDS,
   OPPORTUNITY_STATUSES,
   QUESTION_TYPES,
   REGIONS,
@@ -46,6 +47,7 @@ export const opportunitySummarySchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
   title: z.string(),
+  kind: z.enum(OPPORTUNITY_KINDS),
   organization: organizationSchema,
   region: z.enum(REGIONS),
   city: optional(z.string()),
@@ -229,6 +231,7 @@ export const recordSchema = z.object({
 export const participationEntrySchema = z.object({
   id: z.string().min(1),
   opportunityTitle: z.string(),
+  kind: z.enum(OPPORTUNITY_KINDS),
   organization: z.string(),
   eventDate: isoDate,
   outcome: z.enum(ATTENDANCE_OUTCOMES),

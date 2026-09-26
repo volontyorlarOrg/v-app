@@ -34,6 +34,7 @@ describe("parseOpportunityFilters", () => {
       }),
     ).toEqual({
       q: "books",
+      kind: null,
       region: "samarkand",
       format: "remote",
       openOnly: true,
@@ -78,6 +79,7 @@ describe("activeFilterCount and filtersToQuery", () => {
 
 describe("filterOpportunities", () => {
   const base = {
+    kind: "volunteering" as const,
     format: "onsite" as const,
     status: "open" as const,
     acceptanceMode: "manual" as const,
@@ -146,6 +148,17 @@ describe("filterOpportunities", () => {
       NOW,
     );
     expect(result.map((o) => o.slug)).toEqual(["riverbank-clean-up"]);
+  });
+
+  it("shows only competitions when that type is selected", () => {
+    const competition = { ...list[0]!, id: "debate", kind: "competition" as const };
+    expect(
+      filterOpportunities(
+        [...list, competition],
+        { ...DEFAULT_FILTERS, kind: "competition" },
+        NOW,
+      ).map((item) => item.id),
+    ).toEqual(["debate"]);
   });
 
   it("matches the query against the title and the organiser", () => {
