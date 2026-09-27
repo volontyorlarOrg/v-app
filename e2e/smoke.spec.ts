@@ -4,6 +4,21 @@ import { PASSWORD_MIN_LENGTH } from "@/lib/auth/credentials";
 
 const LOCALES = ["uz", "ru", "en"] as const;
 
+// A loaded HTML document can still be hydrating on the WebKit CI runner.
+// Wait for React and the form hooks before filling or clicking client controls.
+async function gotoReady(page: Page, url: string) {
+  const response = await page.goto(url);
+  if (/\/(login|signup|welcome|settings|profile\/edit)(?:[/?#]|$)/.test(page.url())) {
+    await page.locator("html[data-app-hydrated='true']").waitFor();
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("form[data-action-form]")].every(
+        (form) => form.getAttribute("data-form-hydrated") === "true",
+      ),
+    );
+  }
+  return response;
+}
+
 async function isMobile(page: Page) {
   return (page.viewportSize()?.width ?? 1280) < 1024;
 }
@@ -15,14 +30,14 @@ async function shellIdentity(page: Page, name: string) {
 }
 
 async function signIn(page: Page, locale = "en") {
-  await page.goto(`/api/auth/telegram/start?locale=${locale}`);
+  await gotoReady(page, `/api/auth/telegram/start?locale=${locale}`);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
 }
 
 const PASSPHRASE = "seven purple lanterns";
 
 async function postGoogleAnswer(page: Page, state: string) {
-  await page.goto("/en/login");
+  await gotoReady(page, "/en/login");
   await page.evaluate(
     (posted) => {
       const form = document.createElement("form");
@@ -69,7 +84,7 @@ async function submitPasswordLogin(page: Page, destination: RegExp) {
 }
 
 async function signInWithPassword(page: Page, locale = "en") {
-  await page.goto(`/${locale}/login`);
+  await gotoReady(page, `/${locale}/login`);
   await submitPasswordLogin(page, new RegExp(`/${locale}/dashboard$`));
 }
 
@@ -88,13 +103,14 @@ async function connectState(
 
 async function completeTelegramConnection(page: Page, code: string, state?: string) {
   const bound = state ?? (await connectState(page, "telegram"));
-  await page.goto(
+  await gotoReady(
+    page,
     `/api/auth/connect/telegram/callback?code=${code}&state=${encodeURIComponent(bound)}`,
   );
 }
 
 async function postGoogleConnection(page: Page, state: string, credential: string) {
-  await page.goto("/en/settings");
+  await gotoReady(page, "/en/settings");
   await page.evaluate(
     (posted) => {
       const form = document.createElement("form");
@@ -122,7 +138,7 @@ function requestRow(page: Page, panel: string, provider: string) {
 }
 
 async function createAccount(page: Page, email: string) {
-  await page.goto("/en/signup");
+  await gotoReady(page, "/en/signup");
   await page.getByLabel("Full name").fill("Malika Karimova");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
@@ -222,7 +238,7 @@ test.describe("welcome flow", () => {
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
     await expect(page).toHaveURL(/\/en\/opportunities$/);
 
-    await page.goto("/en/profile/edit");
+    await gotoReady(page, "/en/profile/edit");
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
@@ -236,12 +252,12 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Remove: English" })).toBeVisible();
 
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     await expect(page.getByRole("region", { name: "Your username" })).toContainText(
       "@malika_reads",
     );
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
       0,
     );
@@ -249,7 +265,7 @@ test.describe("welcome flow", () => {
 
   test("a generated username cannot bypass onboarding", async ({ page }, info) => {
     await createAccount(page, `skip-${info.project.name}@example.org`);
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/welcome$/);
     await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
     await page.getByRole("button", { name: "Start" }).click();
@@ -272,7 +288,7 @@ test.describe("welcome flow", () => {
     await page.evaluate(() =>
       window.localStorage.setItem("volontyorlar_onboarding", "skipped:contact"),
     );
-    await page.goto("/en/welcome");
+    await gotoReady(page, "/en/welcome");
     await expect(
       page.getByRole("heading", { level: 2, name: "Choose your username" }),
     ).toBeVisible();
@@ -288,7 +304,7 @@ test.describe("welcome flow", () => {
 
   test("a Telegram username is kept with one tap", async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/welcome");
+    await gotoReady(page, "/en/welcome");
     await page.getByRole("button", { name: "Start" }).click();
 
     const username = page.getByLabel("Username", { exact: true });
@@ -301,7 +317,7 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
 
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     await expect(page.getByRole("region", { name: "Your username" })).toContainText(
       "@dilnoza_k",
     );
@@ -317,21 +333,21 @@ test.describe("welcome flow", () => {
 test.describe("locale routing", () => {
   for (const locale of LOCALES) {
     test(`the ${locale} sign-in page renders in ${locale}`, async ({ page }) => {
-      await page.goto(`/${locale}/login`);
+      await gotoReady(page, `/${locale}/login`);
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     });
   }
 
   test("the prefix-less root lands on sign-in in a locale", async ({ page }) => {
-    await page.goto("/");
+    await gotoReady(page, "/");
     const destination = new URL(page.url());
     expect(destination.pathname).toMatch(/^\/(uz|ru|en)\/login$/);
     expect(destination.searchParams.get("next")).toMatch(/^\/(uz|ru|en)$/);
   });
 
   test("switching language keeps the same page", async ({ page }) => {
-    await page.goto("/uz/login");
+    await gotoReady(page, "/uz/login");
     await page.getByRole("button", { name: /Til: O‘zbekcha/ }).click();
     await page.getByRole("menuitem", { name: "English", exact: true }).click();
     await expect(page).toHaveURL(/\/en\/login$/);
@@ -341,7 +357,7 @@ test.describe("locale routing", () => {
 
 test.describe("sign-in", () => {
   test("offers Telegram, Google and the email form", async ({ page }) => {
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await expect(
       page.getByRole("link", { name: "Continue with Telegram" }),
     ).toHaveAttribute("href", "/api/auth/telegram/start?locale=en");
@@ -386,7 +402,7 @@ test.describe("sign-in", () => {
     await postGoogleAnswer(page, "e2e-google-state-9999-never-minted-here");
     await expect(page).toHaveURL(/\/en\/login\?google=expired$/);
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
@@ -402,14 +418,14 @@ test.describe("sign-in", () => {
     await postGoogleAnswer(page, state);
     await expect(page).toHaveURL(/\/en\/dashboard$/);
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/dashboard$/);
   });
 
   test("the email form names a malformed address before it reaches the backend", async ({
     page,
   }) => {
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await page.getByLabel("Email").fill("not-an-email");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Log in" }).click();
@@ -421,7 +437,7 @@ test.describe("sign-in", () => {
   });
 
   test("email and password sign-in lands on the dashboard", async ({ page }) => {
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Log in" }).click();
@@ -432,7 +448,7 @@ test.describe("sign-in", () => {
   test("a wrong password is refused without naming which half was wrong", async ({
     page,
   }) => {
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill("not the passphrase");
     await page.getByRole("button", { name: "Log in" }).click();
@@ -448,7 +464,7 @@ test.describe("sign-in", () => {
   test("a short password is refused in the browser, with the rule in words", async ({
     page,
   }) => {
-    await page.goto("/en/signup");
+    await gotoReady(page, "/en/signup");
     await page.getByLabel("Full name").fill("Malika Karimova");
     await page.getByLabel("Email").fill("malika@example.org");
     await page.getByLabel("Password", { exact: true }).fill("ab");
@@ -463,7 +479,7 @@ test.describe("sign-in", () => {
   test("an address that already has an account is named by the backend", async ({
     page,
   }) => {
-    await page.goto("/en/signup");
+    await gotoReady(page, "/en/signup");
     await page.getByLabel("Full name").fill("Dilnoza Karimova");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
@@ -477,7 +493,7 @@ test.describe("sign-in", () => {
   test("creating an account with an email opens the welcome flow", async ({
     page,
   }, info) => {
-    await page.goto("/en/signup");
+    await gotoReady(page, "/en/signup");
     await page.getByLabel("Full name").fill("Malika Karimova");
     await page.getByLabel("Email").fill(`malika-${info.project.name}@example.org`);
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
@@ -505,7 +521,7 @@ test.describe("sign-in", () => {
   test("create account offers the same three ways in, plus a name", async ({
     page,
   }) => {
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await page.getByRole("link", { name: "Create an account" }).click();
     await expect(page).toHaveURL(/\/en\/signup$/);
     await expect(
@@ -519,7 +535,7 @@ test.describe("sign-in", () => {
   });
 
   test("the password reset route no longer exists", async ({ page }) => {
-    const response = await page.goto("/en/forgot-password");
+    const response = await gotoReady(page, "/en/forgot-password");
     expect(response?.status()).toBe(404);
   });
 
@@ -527,13 +543,14 @@ test.describe("sign-in", () => {
     page,
   }) => {
     await startedState(page);
-    await page.goto(
+    await gotoReady(
+      page,
       "/api/auth/telegram/callback?code=e2e-code&state=e2e-state-0000-never-minted-here",
     );
     await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
     await expect(page.getByRole("status")).toContainText(/expired/i);
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
@@ -542,12 +559,12 @@ test.describe("sign-in", () => {
     const handoff = (await page.context().cookies()).filter(
       (cookie) => cookie.name !== "volontyorlar_session",
     );
-    await page.goto(`/api/auth/telegram/callback?code=e2e-code&state=${state}`);
+    await gotoReady(page, `/api/auth/telegram/callback?code=e2e-code&state=${state}`);
     await expect(page).toHaveURL(/\/en\/dashboard$/);
 
     await page.context().clearCookies();
     await page.context().addCookies(handoff);
-    await page.goto(`/api/auth/telegram/callback?code=e2e-code&state=${state}`);
+    await gotoReady(page, `/api/auth/telegram/callback?code=e2e-code&state=${state}`);
     await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
   });
 
@@ -555,17 +572,17 @@ test.describe("sign-in", () => {
     page,
   }) => {
     const state = await startedState(page);
-    await page.goto(`/api/auth/telegram/callback?code=no-phone&state=${state}`);
+    await gotoReady(page, `/api/auth/telegram/callback?code=no-phone&state=${state}`);
     await expect(page).toHaveURL(/\/en\/login\?telegram=phoneRequired$/);
     await expect(page.getByRole("status")).toContainText(/phone number/i);
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
   test("declining in Telegram returns to sign-in as cancelled", async ({ page }) => {
     await startedState(page);
-    await page.goto("/api/auth/telegram/callback?error=access_denied");
+    await gotoReady(page, "/api/auth/telegram/callback?error=access_denied");
     await expect(page).toHaveURL(/\/en\/login\?telegram=cancelled$/);
     await expect(page.getByRole("status")).toContainText(/cancelled/i);
   });
@@ -579,7 +596,7 @@ test.describe("sign-in", () => {
   });
 
   test("sign-in returns to the page that required it", async ({ page }) => {
-    await page.goto("/en/profile");
+    await gotoReady(page, "/en/profile");
     await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Fprofile$/);
     await page.getByRole("link", { name: "Continue with Telegram" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
@@ -593,7 +610,7 @@ test.describe("sign-in", () => {
       "/en/record",
       "/en/leaderboard",
     ]) {
-      await page.goto(path);
+      await gotoReady(page, path);
       await expect(page, path).toHaveURL(/\/en\/login\?next=/);
     }
   });
@@ -602,16 +619,16 @@ test.describe("sign-in", () => {
     page,
   }) => {
     await signIn(page);
-    await page.goto("/en/login");
+    await gotoReady(page, "/en/login");
     await expect(page).toHaveURL(/\/en\/dashboard$/);
   });
 
   test("an ended session returns to sign-in with a message", async ({ page }) => {
     await signIn(page);
-    await page.goto("/api/auth/session/expired?locale=en");
+    await gotoReady(page, "/api/auth/session/expired?locale=en");
     await expect(page).toHaveURL(/\/en\/login\?session=expired$/);
     await expect(page.getByRole("status")).toContainText(/session ended/i);
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 });
@@ -666,13 +683,13 @@ test.describe("the panel", () => {
     ).toBeVisible();
 
     for (const path of ["/en/profile", "/en/profile/edit", "/en/settings"]) {
-      await page.goto(path);
+      await gotoReady(page, path);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     }
   });
 
   test("the old record URL lands on the dashboard's history", async ({ page }) => {
-    await page.goto("/en/record");
+    await gotoReady(page, "/en/record");
     await expect(page).toHaveURL(/\/en\/dashboard#history$/);
     await expect(
       page.getByRole("heading", { level: 2, name: "Participation history" }),
@@ -770,20 +787,20 @@ test.describe("the panel", () => {
       await identity.click();
       await expect(page).toHaveURL(/\/en\/profile$/);
       await expect(identity).toHaveAttribute("aria-current", "page");
-      await page.goto("/en/profile/edit");
+      await gotoReady(page, "/en/profile/edit");
       await expect(identity).toHaveAttribute("aria-current", "page");
       await page.getByRole("button", { name: "Sign out" }).click();
     }
     await expect(page).toHaveURL(/\/en\/login$/);
 
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page).toHaveURL(/\/en\/login\?next=/);
   });
 
   test("the theme switch lives in settings and flips the document theme", async ({
     page,
   }) => {
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     const appearance = page.getByRole("region", { name: "Appearance" });
     const toggle = appearance.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
@@ -796,7 +813,7 @@ test.describe("the panel", () => {
 
     test("the switch reads on before anyone has chosen a theme", async ({ page }) => {
       await page.context().clearCookies({ name: "theme" });
-      await page.goto("/en/settings");
+      await gotoReady(page, "/en/settings");
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
       await expect(
         page
@@ -809,7 +826,7 @@ test.describe("the panel", () => {
   test("settings carries the interface language, and switching it keeps the page", async ({
     page,
   }) => {
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     const appearance = page.getByRole("region", { name: "Appearance" });
     await expect(
       appearance.getByRole("link", { name: "English", exact: true }),
@@ -828,7 +845,7 @@ test.describe("the panel", () => {
       "/en/settings",
       "/en/applications/app-book-drive",
     ]) {
-      await page.goto(path);
+      await gotoReady(page, path);
       const overflow = await page.evaluate(
         () =>
           document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -839,7 +856,7 @@ test.describe("the panel", () => {
 
   test("renders complete with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     const hidden = await page.evaluate(
       () =>
         [...document.querySelectorAll<HTMLElement>("[data-scene]")].filter(
@@ -859,7 +876,7 @@ test.describe("opportunities", () => {
   test("competition type filters the catalogue and opens an individual application", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities?kind=competition");
+    await gotoReady(page, "/en/opportunities?kind=competition");
     await expect(page.getByRole("article")).toHaveCount(1);
     await expect(page.getByRole("link", { name: "City youth debate" })).toBeVisible();
     await expect(page.getByText("Riverbank clean-up")).toHaveCount(0);
@@ -871,7 +888,7 @@ test.describe("opportunities", () => {
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
-    await page.goto("/en/opportunities/city-youth-debate");
+    await gotoReady(page, "/en/opportunities/city-youth-debate");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-city-youth-debate$/);
     await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
@@ -880,7 +897,7 @@ test.describe("opportunities", () => {
   test("shows a vacancy photo on its card and detail while keeping other cards text-only", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities");
+    await gotoReady(page, "/en/opportunities");
     const photographed = page.getByRole("article").filter({
       has: page.getByRole("link", { name: "Winter book drive" }),
     });
@@ -890,7 +907,7 @@ test.describe("opportunities", () => {
     });
     await expect(textOnly.locator("img")).toHaveCount(0);
 
-    await page.goto("/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/en/opportunities/winter-book-drive");
     await expect(
       page.locator('main img[src="/logo/social/og-image-1200x630.png"]'),
     ).toBeVisible();
@@ -899,7 +916,7 @@ test.describe("opportunities", () => {
   test("saved opportunities are a view and the old route redirects to it", async ({
     page,
   }) => {
-    await page.goto("/en/saved");
+    await gotoReady(page, "/en/saved");
     await expect(page).toHaveURL(/\/en\/opportunities\?view=saved$/);
     const views = page.getByRole("navigation", {
       name: "Opportunities sections",
@@ -914,7 +931,7 @@ test.describe("opportunities", () => {
   test("a listing that fails to load keeps the section standing and offers a retry", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities?q=__fail__");
+    await gotoReady(page, "/en/opportunities?q=__fail__");
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
@@ -936,7 +953,7 @@ test.describe("opportunities", () => {
   test("filtering by region puts the filter in the URL and asks the backend", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities");
+    await gotoReady(page, "/en/opportunities");
     const before = await page.getByRole("article").count();
     expect(before).toBeGreaterThan(3);
 
@@ -951,7 +968,7 @@ test.describe("opportunities", () => {
   test("the open-only switch and the search both round-trip through the URL", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities?open=1&q=book");
+    await gotoReady(page, "/en/opportunities?open=1&q=book");
     await expect(page.getByRole("switch", { name: "Open only" })).toHaveAttribute(
       "aria-checked",
       "true",
@@ -961,13 +978,16 @@ test.describe("opportunities", () => {
   });
 
   test("an unknown filter value degrades instead of erroring", async ({ page }) => {
-    const response = await page.goto("/en/opportunities?region=atlantis&sort=abc");
+    const response = await gotoReady(
+      page,
+      "/en/opportunities?region=atlantis&sort=abc",
+    );
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("article").first()).toBeVisible();
   });
 
   test("saving an opportunity persists on the backend", async ({ page }) => {
-    await page.goto("/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/en/opportunities/winter-book-drive");
     const save = page.getByRole("button", { name: /^Save$|^Saved$/ }).first();
     await expect(save).toHaveAttribute("aria-pressed", "false");
     await save.click();
@@ -978,14 +998,14 @@ test.describe("opportunities", () => {
     await expect(
       page.getByRole("button", { name: /^Save$|^Saved$/ }).first(),
     ).toHaveAttribute("aria-pressed", "true");
-    await page.goto("/en/opportunities?view=saved");
+    await gotoReady(page, "/en/opportunities?view=saved");
     await expect(page.getByRole("article")).toHaveCount(3);
   });
 
   test("opening an opportunity shows the facts, requirements and questions", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/en/opportunities/winter-book-drive");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("book drive");
     for (const name of ["At a glance", "What you need", "What you will be asked"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
@@ -998,7 +1018,7 @@ test.describe("opportunities", () => {
   test("applying creates a draft and submitting it needs the required answer", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities/remote-translation-support");
+    await gotoReady(page, "/en/opportunities/remote-translation-support");
     await expect(
       page.getByText(
         "Complete your profile before applying. Still missing: Bio, Phone.",
@@ -1008,7 +1028,7 @@ test.describe("opportunities", () => {
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await page.goto("/en/opportunities/remote-translation-support");
+    await gotoReady(page, "/en/opportunities/remote-translation-support");
     await expect(
       page.getByText("Still missing: Phone.", { exact: false }),
     ).toBeVisible();
@@ -1017,7 +1037,7 @@ test.describe("opportunities", () => {
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
-    await page.goto("/en/opportunities/remote-translation-support");
+    await gotoReady(page, "/en/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
 
@@ -1037,14 +1057,14 @@ test.describe("opportunities", () => {
   test("applying to an opportunity that accepts automatically is accepted in one step", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I help at city events.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
 
-    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
     await expect(
       page.getByRole("heading", { level: 2, name: "What you will be asked" }),
     ).toHaveCount(0);
@@ -1077,7 +1097,7 @@ test.describe("opportunities", () => {
       page.getByText("The profile you applied with.", { exact: false }),
     ).toBeVisible();
 
-    await page.goto("/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
     await expect(
       page.getByRole("link", { name: "View your application" }),
     ).toBeVisible();
@@ -1085,7 +1105,7 @@ test.describe("opportunities", () => {
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {
-    await page.goto("/en/opportunities/read-aloud-day");
+    await gotoReady(page, "/en/opportunities/read-aloud-day");
     await expect(
       page.getByRole("button", { name: "Applications are closed" }),
     ).toBeDisabled();
@@ -1094,7 +1114,7 @@ test.describe("opportunities", () => {
   test("an unknown opportunity shows the not-found panel inside the shell", async ({
     page,
   }) => {
-    await page.goto("/en/opportunities/does-not-exist");
+    await gotoReady(page, "/en/opportunities/does-not-exist");
     await expect(
       page.getByRole("heading", { level: 1, name: "Page not found" }),
     ).toBeVisible();
@@ -1110,7 +1130,7 @@ test.describe("applications, record, profile and settings", () => {
   });
 
   test("applications filter by group and a draft can be saved", async ({ page }) => {
-    await page.goto("/en/applications?group=drafts");
+    await gotoReady(page, "/en/applications?group=drafts");
     await expect(page.getByRole("link", { name: /Drafts/ })).toHaveAttribute(
       "aria-current",
       "page",
@@ -1139,7 +1159,7 @@ test.describe("applications, record, profile and settings", () => {
   test("an accepted application can be withdrawn after confirming", async ({
     page,
   }) => {
-    await page.goto("/en/applications/app-riverbank");
+    await gotoReady(page, "/en/applications/app-riverbank");
     await expect(
       page.getByRole("heading", { level: 2, name: "Attendance" }),
     ).toHaveCount(0);
@@ -1155,7 +1175,7 @@ test.describe("applications, record, profile and settings", () => {
   });
 
   test("an unknown application shows the not-found panel", async ({ page }) => {
-    await page.goto("/en/applications/does-not-exist");
+    await gotoReady(page, "/en/applications/does-not-exist");
     await expect(
       page.getByRole("heading", { level: 1, name: "Page not found" }),
     ).toBeVisible();
@@ -1167,7 +1187,7 @@ test.describe("applications, record, profile and settings", () => {
   test("the dashboard shows the history table with the awaiting-confirmation rule", async ({
     page,
   }) => {
-    await page.goto("/en/dashboard");
+    await gotoReady(page, "/en/dashboard");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
@@ -1176,7 +1196,7 @@ test.describe("applications, record, profile and settings", () => {
   test("the profile opens on the volunteer's own record and hands editing to its own page", async ({
     page,
   }) => {
-    await page.goto("/en/profile");
+    await gotoReady(page, "/en/profile");
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
@@ -1208,7 +1228,7 @@ test.describe("applications, record, profile and settings", () => {
 
   test("a profile picture can be cropped, saved and removed", async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/profile/edit");
+    await gotoReady(page, "/en/profile/edit");
 
     const editor = page.getByRole("region", { name: "Profile picture" });
     const chooser = page.waitForEvent("filechooser");
@@ -1234,7 +1254,7 @@ test.describe("applications, record, profile and settings", () => {
 
   test("the public profile can be hidden from settings", async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const toggle = page.getByRole("switch", {
       name: "Show my public profile",
@@ -1250,12 +1270,12 @@ test.describe("applications, record, profile and settings", () => {
   test("the profile form saves to the backend and completes the profile", async ({
     page,
   }) => {
-    await page.goto("/en/profile");
+    await gotoReady(page, "/en/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveAttribute("aria-valuenow", "78");
 
-    await page.goto("/en/profile/edit");
+    await gotoReady(page, "/en/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
@@ -1267,14 +1287,14 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveCount(0);
 
-    await page.goto("/en/profile/edit");
+    await gotoReady(page, "/en/profile/edit");
     await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
   test("applying needs both phone and Telegram, yet a partial profile still saves", async ({
     page,
   }) => {
-    await page.goto("/en/profile/edit");
+    await gotoReady(page, "/en/profile/edit");
     const phone = page.getByLabel("Phone number");
     await expect(phone).not.toHaveAttribute("required", "");
     await expect(phone).toHaveValue("");
@@ -1298,7 +1318,7 @@ test.describe("applications, record, profile and settings", () => {
   });
 
   test("the profile carries no settings of its own", async ({ page }) => {
-    await page.goto("/en/profile");
+    await gotoReady(page, "/en/profile");
     await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveCount(
       0,
     );
@@ -1308,10 +1328,10 @@ test.describe("applications, record, profile and settings", () => {
   test("the theme is switched from settings, not from the profile", async ({
     page,
   }) => {
-    await page.goto("/en/profile");
+    await gotoReady(page, "/en/profile");
     await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
 
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     const dark = page
       .getByRole("region", { name: "Appearance" })
       .getByRole("switch", { name: "Dark theme" });
@@ -1324,7 +1344,7 @@ test.describe("applications, record, profile and settings", () => {
 test.describe("account connections and merges", () => {
   test.beforeEach(async ({ page }) => {
     await signInWithPassword(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
   });
 
   test("shows every way in and offers to connect what is missing", async ({ page }) => {
@@ -1415,7 +1435,8 @@ test.describe("account connections and merges", () => {
     page,
   }) => {
     await connectState(page, "telegram");
-    await page.goto(
+    await gotoReady(
+      page,
       "/api/auth/connect/telegram/callback?code=connect-link&state=not-the-state-this-browser-started",
     );
 
@@ -1435,7 +1456,7 @@ test.describe("account connections and merges", () => {
 
     await expect(page).toHaveURL(/\/(uz|en)\/settings\?connect=expired$/);
 
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
     await expect(
       page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
         name: "Connect Google",
@@ -1455,7 +1476,7 @@ test.describe("account connections and merges", () => {
   test("a replayed callback returns in the language the reader was reading", async ({
     page,
   }) => {
-    await page.goto("/ru/settings");
+    await gotoReady(page, "/ru/settings");
     const state = await connectState(page, "telegram", "ru");
 
     await completeTelegramConnection(page, "connect-link", state);
@@ -1530,7 +1551,7 @@ test.describe("account connections and merges", () => {
     page,
   }, testInfo) => {
     await signIn(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     await page
       .getByLabel("Email")
@@ -1625,7 +1646,7 @@ test.describe("account connections and merges", () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const approve = requestRow(page, "Waiting for your approval", "Google").getByRole(
       "button",
@@ -1648,7 +1669,7 @@ test.describe("account connections and merges", () => {
 test.describe("the leaderboard", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/leaderboard");
+    await gotoReady(page, "/en/leaderboard");
   });
 
   test("ranks volunteers on the backend's own numbers", async ({ page }) => {
@@ -1736,7 +1757,7 @@ test.describe("the leaderboard", () => {
   });
 
   test("a page beyond the last one returns to the last page", async ({ page }) => {
-    await page.goto("/en/leaderboard?page=9");
+    await gotoReady(page, "/en/leaderboard?page=9");
     await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
     await expect(page.getByRole("status")).toContainText("Showing 26\u201330 of 30");
   });
@@ -1752,7 +1773,7 @@ test.describe("the leaderboard", () => {
 test.describe("the leaderboard username", () => {
   test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     await expect(panel).toContainText("@dilnoza_k");
@@ -1766,7 +1787,7 @@ test.describe("the leaderboard username", () => {
     page,
   }) => {
     await signInWithPassword(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     await panel.getByLabel("New username").fill("Chilonzor_Reader");
@@ -1774,7 +1795,7 @@ test.describe("the leaderboard username", () => {
     await expect(panel.getByRole("status")).toContainText("Your username is saved.");
     await expect(panel).toContainText("@chilonzor_reader");
 
-    await page.goto("/en/leaderboard?page=2");
+    await gotoReady(page, "/en/leaderboard?page=2");
     await expect(
       page.getByRole("row").filter({ hasText: "@chilonzor_reader" }),
     ).toContainText("You");
@@ -1782,7 +1803,7 @@ test.describe("the leaderboard username", () => {
 
   test("a username another volunteer holds is refused by name", async ({ page }) => {
     await signInWithPassword(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     await panel.getByLabel("New username").fill("volunteer_01");
@@ -1794,7 +1815,7 @@ test.describe("the leaderboard username", () => {
     page,
   }) => {
     await signInWithPassword(page);
-    await page.goto("/en/settings");
+    await gotoReady(page, "/en/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     const field = panel.getByLabel("New username");
@@ -1864,7 +1885,7 @@ test.describe("privacy and hardening", () => {
   });
 
   test("an unknown URL returns a 404 page", async ({ page }) => {
-    const response = await page.goto("/uz/does-not-exist");
+    const response = await gotoReady(page, "/uz/does-not-exist");
     expect(response?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   });
