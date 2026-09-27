@@ -360,6 +360,32 @@
     box-shadow: var(--shadow-panel);
   }
 
+  .past-opportunity-art {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: clip;
+    background-color: var(--color-surface-sunk);
+    background-image: url("/opportunities/past-opportunities-illustrations.png");
+    background-repeat: no-repeat;
+    background-size: 200% auto;
+  }
+
+  .past-opportunity-art[data-scene="stadium"] {
+    background-position: left top;
+  }
+
+  .past-opportunity-art[data-scene="mountains"] {
+    background-position: right top;
+  }
+
+  .past-opportunity-art[data-scene="expo"] {
+    background-position: left bottom;
+  }
+
+  .past-opportunity-art[data-scene="media"] {
+    background-position: right bottom;
+  }
+
   .dashboard-hero {
     position: relative;
     display: grid;

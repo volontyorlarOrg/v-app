@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Segmented } from "@/components/app/segmented";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityFilters } from "@/components/opportunities/opportunity-filters";
+import { PastOpportunitiesArchive } from "@/components/opportunities/past-opportunities-archive";
 import { OpportunitySectionTabs } from "@/components/opportunities/section-tabs";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -158,6 +159,7 @@ function Opportunities({
   const locale = useLocale() as Locale;
 
   const activeCount = activeFilterCount(filters);
+  const showArchive = view === "all" && activeCount === 0 && filters.kind === null;
 
   return (
     <>
@@ -241,15 +243,22 @@ function Opportunities({
         />
       ) : (
         <>
-          <p
-            role="status"
-            className="enter-rise mt-4 text-sm text-ink-muted [--enter-delay:160ms]"
-          >
-            {t("count", { count: listing.data.total })}
-            {listing.data.total > listing.data.items.length
-              ? ` · ${t("showingOf", { shown: listing.data.items.length, total: listing.data.total })}`
-              : null}
-          </p>
+          <div className="enter-rise mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 [--enter-delay:160ms]">
+            <p role="status" className="text-sm text-ink-muted">
+              {t("count", { count: listing.data.total })}
+              {listing.data.total > listing.data.items.length
+                ? ` · ${t("showingOf", { shown: listing.data.items.length, total: listing.data.total })}`
+                : null}
+            </p>
+            {showArchive ? (
+              <a
+                href="#past-opportunities-title"
+                className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+              >
+                {t("archive.jumpTo")}
+              </a>
+            ) : null}
+          </div>
 
           {listing.data.items.length === 0 ? (
             <Panel className="mt-4" padding="none">
@@ -285,6 +294,8 @@ function Opportunities({
           )}
         </>
       )}
+
+      {showArchive ? <PastOpportunitiesArchive /> : null}
     </>
   );
 }

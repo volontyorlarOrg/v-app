@@ -655,6 +655,42 @@
       "all": "All types",
       "volunteering": "Volunteering",
       "competition": "Competitions"
+    },
+    "archive": {
+      "title": "Past opportunities",
+      "description": "A few volunteer calls and team roles from our public archive.",
+      "illustrationsNote": "Images are AI-generated illustrations, not photos from these events.",
+      "jumpTo": "See past opportunities",
+      "eventsOrganized": "events organized",
+      "countSource": "Open the source for the 50+ events figure",
+      "closed": "Applications closed",
+      "deadline": "Deadline:",
+      "recruitmentClosed": "Recruitment closed",
+      "originalPost": "Original post",
+      "sourceFor": "Open the original post for {title}",
+      "illustration": "Illustration",
+      "categories": {
+        "eventTeam": "Event team",
+        "communityRole": "Community role",
+        "regionalRole": "Regional role"
+      },
+      "locations": {
+        "uzbekistan": "Uzbekistan",
+        "tashkent": "Tashkent, Paxtakor Stadium",
+        "amirsoy": "Amirsoy Resort",
+        "allRegions": "Across Uzbekistan",
+        "andijan": "Andijan"
+      },
+      "items": {
+        "profession": "Best in the Profession 2026",
+        "articular": "ArticularUZ regional coordinators",
+        "writer": "Independent writer",
+        "coordinators": "Regional volunteer coordinators",
+        "yashilQollar": "Yashil Qoʻllar media team",
+        "amirsoy": "Amirsoy Paradiso — Open Air",
+        "football": "International football match at Paxtakor Stadium",
+        "xFactor": "X-Factor Uzbekistan casting crew"
+      }
     }
   },
   "saved": {
