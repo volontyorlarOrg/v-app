@@ -71,6 +71,10 @@ export function useActionForm<TValues extends FieldValues>({
   const formRef = useRef<HTMLFormElement>(null);
   const submit = useValidatedSubmit(form, formRef);
 
+  useEffect(() => {
+    formRef.current?.setAttribute("data-form-hydrated", "true");
+  }, []);
+
   useActionOutcome(pending, result, (settled) => {
     if (settled.status === "ok") onSuccess?.();
   });
@@ -84,6 +88,7 @@ export function useActionForm<TValues extends FieldValues>({
       ref: formRef,
       action: dispatch,
       noValidate: true,
+      "data-action-form": "true",
       onSubmit: submit(dispatch),
     },
   };
