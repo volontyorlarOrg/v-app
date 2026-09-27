@@ -658,38 +658,27 @@
     },
     "archive": {
       "title": "Avvalgi imkoniyatlar",
-      "description": "Ochiq arxivimizdagi volontyorlik chaqiruvlari va jamoa rollaridan ayrimlari.",
+      "description": "Volontyorlar jamoalari yordamida amalga oshgan avvalgi tadbirlardan ayrimlari.",
       "illustrationsNote": "Rasmlar bu tadbirlarning fotosi emas, AI yordamida yaratilgan illyustratsiyalardir.",
       "jumpTo": "Avvalgi imkoniyatlarni koʻrish",
       "eventsOrganized": "tashkil etilgan tadbir",
       "countSource": "50 dan ortiq tadbir haqidagi manbani ochish",
-      "closed": "Arizalar qabuli yopilgan",
-      "deadline": "Ariza muddati:",
-      "recruitmentClosed": "Qabul yakunlangan",
+      "pastEvent": "Tadbir oʻtgan",
       "originalPost": "Asl eʼlon",
       "sourceFor": "{title} haqidagi asl eʼlonni ochish",
       "illustration": "Illyustratsiya",
       "categories": {
-        "eventTeam": "Tadbir jamoasi",
-        "communityRole": "Hamjamiyatdagi rol",
-        "regionalRole": "Hududiy rol"
+        "eventTeam": "Volontyorlar tadbiri"
       },
       "locations": {
-        "uzbekistan": "Oʻzbekiston",
         "tashkent": "Toshkent, Paxtakor stadioni",
         "amirsoy": "Amirsoy kurorti",
-        "allRegions": "Oʻzbekiston boʻylab",
         "andijan": "Andijon"
       },
       "items": {
         "profession": "«Eng yaxshi kasb egasi — 2026» tanlovi",
-        "articular": "ArticularUZ hududiy koordinatorlari",
-        "writer": "Mustaqil muallif",
-        "coordinators": "Hududiy volontyorlar koordinatorlari",
-        "yashilQollar": "Yashil Qoʻllar media jamoasi",
         "amirsoy": "Amirsoy Paradiso — Open Air",
-        "football": "Paxtakor stadionidagi xalqaro futbol uchrashuvi",
-        "xFactor": "X-Factor Uzbekistan suratga olish jamoasi"
+        "football": "Paxtakor stadionidagi xalqaro futbol uchrashuvi"
       }
     }
   },

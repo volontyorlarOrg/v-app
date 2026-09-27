@@ -873,6 +873,59 @@ test.describe("opportunities", () => {
     await signIn(page);
   });
 
+  test("shows three illustrated past events only in the unfiltered listing", async ({
+    page,
+  }, testInfo) => {
+    await gotoReady(page, "/en/opportunities");
+    const archive = page.getByRole("region", { name: "Past opportunities" });
+
+    await expect(archive.getByRole("article")).toHaveCount(3);
+    for (const title of [
+      "Best in the Profession 2026",
+      "Amirsoy Paradiso — Open Air",
+      "International football match at Paxtakor Stadium",
+    ]) {
+      await expect(
+        archive.getByRole("heading", { level: 3, name: title }),
+      ).toBeVisible();
+    }
+
+    await page.getByRole("link", { name: "See past opportunities" }).click();
+    await expect(page).toHaveURL(/#past-opportunities-title$/);
+
+    if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.screenshot({
+        path: testInfo.outputPath("past-opportunities-light.png"),
+        fullPage: true,
+      });
+    }
+
+    await gotoReady(page, "/en/settings");
+    await page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("switch", { name: "Dark theme" })
+      .click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await gotoReady(page, "/en/opportunities");
+
+    if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.screenshot({
+        path: testInfo.outputPath("past-opportunities-dark.png"),
+        fullPage: true,
+      });
+    }
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoReady(page, "/en/opportunities");
+    await expect(page.locator("#past-opportunities-title")).toBeVisible();
+    expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
+
+    await gotoReady(page, "/en/opportunities?kind=competition");
+    await expect(page.getByRole("region", { name: "Past opportunities" })).toHaveCount(
+      0,
+    );
+  });
+
   test("competition type filters the catalogue and opens an individual application", async ({
     page,
   }) => {

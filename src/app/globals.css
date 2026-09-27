@@ -382,10 +382,6 @@
     background-position: left bottom;
   }
 
-  .past-opportunity-art[data-scene="media"] {
-    background-position: right bottom;
-  }
-
   .dashboard-hero {
     position: relative;
     display: grid;

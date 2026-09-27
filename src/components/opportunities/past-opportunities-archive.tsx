@@ -70,61 +70,35 @@ export function PastOpportunitiesArchive() {
                 <div className="flex flex-1 flex-col p-4 sm:p-5">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-muted">
                     <span className="rounded-full bg-surface-sunk px-2.5 py-1 font-medium">
-                      {t(`categories.${item.categoryKey}`)}
+                      {t("categories.eventTeam")}
                     </span>
-                    <span>{t("closed")}</span>
+                    <span>{t("pastEvent")}</span>
                   </div>
 
                   <h3 className="mt-3 text-base leading-snug font-semibold text-balance text-ink">
                     {title}
                   </h3>
 
-                  {item.dateKind === "event" && item.startsAt ? (
-                    <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
-                      <CalendarDays
-                        aria-hidden="true"
-                        className="mt-0.5 size-4 shrink-0"
-                      />
-                      <span>
-                        <time dateTime={item.startsAt}>
-                          {formatDate(format, item.startsAt)}
-                        </time>
-                        {item.endsAt ? (
-                          <>
-                            <span aria-hidden="true"> – </span>
-                            <time dateTime={item.endsAt}>
-                              {formatDate(format, item.endsAt)}
-                            </time>
-                          </>
-                        ) : null}
-                      </span>
-                    </p>
-                  ) : item.dateKind === "deadline" && item.startsAt ? (
-                    <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
-                      <CalendarDays
-                        aria-hidden="true"
-                        className="mt-0.5 size-4 shrink-0"
-                      />
-                      <span>
-                        {t("deadline")} {formatDate(format, item.startsAt)}
-                      </span>
-                    </p>
-                  ) : (
-                    <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
-                      <CalendarDays
-                        aria-hidden="true"
-                        className="mt-0.5 size-4 shrink-0"
-                      />
-                      <span>{t("recruitmentClosed")}</span>
-                    </p>
-                  )}
+                  <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
+                    <CalendarDays
+                      aria-hidden="true"
+                      className="mt-0.5 size-4 shrink-0"
+                    />
+                    <span>
+                      <time dateTime={item.startsAt}>
+                        {formatDate(format, item.startsAt)}
+                      </time>
+                      <span aria-hidden="true"> – </span>
+                      <time dateTime={item.endsAt}>
+                        {formatDate(format, item.endsAt)}
+                      </time>
+                    </span>
+                  </p>
 
-                  {item.locationKey ? (
-                    <p className="mt-2 flex items-start gap-2 text-sm text-ink-muted">
-                      <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                      <span>{t(`locations.${item.locationKey}`)}</span>
-                    </p>
-                  ) : null}
+                  <p className="mt-2 flex items-start gap-2 text-sm text-ink-muted">
+                    <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                    <span>{t(`locations.${item.locationKey}`)}</span>
+                  </p>
 
                   <a
                     href={item.sourceUrl}
