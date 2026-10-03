@@ -835,6 +835,13 @@ function leaderboard(state, query) {
       attendedEventXp: 50,
       confirmedHourXp: 10,
       rounding: "nearest-total",
+      defaults: {
+        xpPerHour: 10,
+        xpWinner: 50,
+        xpContributor: 30,
+        xpAttendee: 10,
+        xpNoShowPenalty: 10,
+      },
     },
   };
 }

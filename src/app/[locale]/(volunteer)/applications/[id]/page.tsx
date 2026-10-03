@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -224,6 +224,31 @@ function Application({
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
+          {application.status === "accepted" && application.instructions ? (
+            <Panel
+              id="instructions"
+              title={t("instructions.title")}
+              description={t("instructions.sent", {
+                when: format.dateTime(new Date(application.instructions.sentAt), "day"),
+              })}
+            >
+              <p className="leading-relaxed whitespace-pre-line text-ink">
+                {application.instructions.message}
+              </p>
+              {application.instructions.groupLink ? (
+                <a
+                  href={application.instructions.groupLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonClass({ className: "mt-4" })}
+                >
+                  <Send aria-hidden="true" />
+                  {t("instructions.join")}
+                </a>
+              ) : null}
+            </Panel>
+          ) : null}
+
           <Panel id="timeline" title={t("detail.timeline")}>
             <ApplicationTimeline application={application} now={now} />
           </Panel>
@@ -329,6 +354,30 @@ function Application({
                     </dt>
                     <dd className="tabular mt-1 text-sm font-semibold text-accent-ink">
                       {format.number(confirmedHours)}
+                    </dd>
+                  </div>
+                )}
+                {application.attendance.placement ? (
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                      {t("attendance.placement")}
+                    </dt>
+                    <dd className="mt-1 text-sm font-semibold text-ink">
+                      {t(`attendance.placements.${application.attendance.placement}`)}
+                    </dd>
+                  </div>
+                ) : null}
+                {application.attendance.xpAwarded === undefined ? null : (
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                      {t("attendance.xp")}
+                    </dt>
+                    <dd className="tabular mt-1 text-sm font-semibold text-accent-ink">
+                      {application.attendance.xpAwarded > 0
+                        ? `+${application.attendance.xpAwarded}`
+                        : application.attendance.xpAwarded < 0
+                          ? `−${Math.abs(application.attendance.xpAwarded)}`
+                          : "0"}
                     </dd>
                   </div>
                 )}

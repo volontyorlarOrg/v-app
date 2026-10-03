@@ -1,5 +1,5 @@
 import type { OpportunitySummary, QuestionType } from "@/lib/opportunities/types";
-import type { AttendanceOutcome } from "@/lib/record/levels";
+import type { AttendanceOutcome, Placement } from "@/lib/record/levels";
 
 export const APPLICATION_STATUSES = [
   "draft",
@@ -30,7 +30,15 @@ export type ApplicationAttendance = {
   outcome: AttendanceOutcome;
   scheduledHours?: number;
   confirmedHours?: number;
+  placement?: Placement;
+  xpAwarded?: number;
   resolvedAt?: string;
+};
+
+export type ApplicationInstructions = {
+  message: string;
+  groupLink?: string;
+  sentAt: string;
 };
 
 export type AnswerValue = string | string[];
@@ -61,6 +69,7 @@ export type ApplicationDetail = ApplicationSummary & {
   answers: ApplicationAnswer[];
   profileSnapshot?: ProfileSnapshot;
   reviewerNote?: string;
+  instructions?: ApplicationInstructions;
 };
 
 export function decidedAt(
