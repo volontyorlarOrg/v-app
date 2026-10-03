@@ -26,8 +26,9 @@ tab bar on a phone; and panels of content on a flat workspace. **Every
 sidebar entry is a plain link — nothing in it collapses**, and the bell is the
 only tray. The theme switch and the
 interface language are a panel on `/settings`, not shell controls.
-Applications and saved items are tabs inside the opportunities section, not
-sections of their own. Only the sign-in pages keep the marketing site's
+Applications and saved items live inside the opportunities section, not
+sections of their own: saved items are the toolbar's "Saved only" switch, and
+applications are the outline link beside the page title. Only the sign-in pages keep the marketing site's
 whiteboard ground. See [`DESIGN.md`](DESIGN.md).
 
 ## Product identity
@@ -285,7 +286,7 @@ docs/                           -> stable project documentation and the plan
 - Two brand colours with a role each. **Blue is the institution**: navigation,
   structure, chips for a system state, primary actions. **Orange is the
   person**: the level reached, an accepted application, a confirmed attendance,
-  the record's figures, a completed profile. Blue and orange sit 1.25:1 apart
+  the record's figures, a completed profile, a saved opportunity. Blue and orange sit 1.25:1 apart
   and must never be combined; the logo's orange heart is the one exception,
   drawn by the kit as its own shape beside the blue. Each hue has a graphics
   value and a text value. The palette defines no red; an error colour needs a decision

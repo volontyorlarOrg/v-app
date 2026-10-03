@@ -10,11 +10,9 @@ import {
 } from "@/components/app/load-error";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
-import { Segmented } from "@/components/app/segmented";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityFilters } from "@/components/opportunities/opportunity-filters";
 import { PastOpportunitiesArchive } from "@/components/opportunities/past-opportunities-archive";
-import { OpportunitySectionTabs } from "@/components/opportunities/section-tabs";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -25,7 +23,7 @@ import { listSaved, savedIds } from "@/lib/api/saved.server";
 import type { ApplicationList, OpportunityList, SavedList } from "@/lib/api/schemas";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import {
-  OPPORTUNITY_SORTS,
+  DEFAULT_FILTERS,
   activeFilterCount,
   filterOpportunities,
   parseOpportunityFilters,
@@ -38,7 +36,6 @@ import {
   type OpportunityView,
 } from "@/lib/opportunities/search-params";
 import {
-  OPPORTUNITY_FORMATS,
   OPPORTUNITY_KINDS,
   REGIONS,
   type OpportunitySummary,
@@ -91,7 +88,6 @@ export default async function OpportunitiesPage({
       filters={filters}
       view={view}
       listing={listing}
-      savedCount={savedList?.total ?? null}
       saved={savedList ? savedIds(savedList) : new Set()}
       applications={applicationsByOpportunity(dataOf(applications))}
       applicationCount={dataOf(applications)?.items.length ?? null}
@@ -138,7 +134,6 @@ function Opportunities({
   filters,
   view,
   listing,
-  savedCount,
   saved,
   applications,
   applicationCount,
@@ -148,7 +143,6 @@ function Opportunities({
   filters: Filters;
   view: OpportunityView;
   listing: Loaded<Listing>;
-  savedCount: number | null;
   saved: ReadonlySet<string>;
   applications: ApplicationByOpportunity;
   applicationCount: number | null;
@@ -163,69 +157,62 @@ function Opportunities({
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
-
-      <OpportunitySectionTabs
-        current={view}
-        savedCount={savedCount}
-        applicationCount={applicationCount}
-        kind={filters.kind}
-        className="enter-rise mt-6 [--enter-delay:90ms]"
+      <PageHeader
+        title={t("title")}
+        actions={
+          <Link
+            href={navHref("applications")}
+            className={buttonClass({ variant: "outline", size: "sm" })}
+          >
+            {t("tabs.applications")}
+            {applicationCount !== null ? (
+              <span className="tabular text-xs text-ink-muted">{applicationCount}</span>
+            ) : null}
+          </Link>
+        }
       />
 
-      <Segmented
-        label={t("kinds.label")}
-        className="mt-5"
-        items={[
-          { key: "all", kind: null, label: t("kinds.all") },
-          ...OPPORTUNITY_KINDS.map((kind) => ({
-            key: kind,
-            kind,
-            label: t(`kinds.${kind}`),
-          })),
-        ].map((item) => ({
-          key: item.key,
-          label: item.label,
-          href: serializeOpportunitySearch(navHref("opportunities"), {
-            ...toFilterState(filters),
-            view,
-            kind: item.kind,
-          }),
-          active: filters.kind === item.kind,
-        }))}
-      />
-
-      <div className="mt-5">
+      <div className="enter-rise mt-6 [--enter-delay:90ms]">
         <OpportunityFilters
           action={localePath(locale, "opportunities")}
           labels={{
             legend: t("filters.legend"),
             search: t("filters.search"),
             searchPlaceholder: t("filters.searchPlaceholder"),
+            kinds: t("kinds.label"),
             region: t("filters.region"),
             regionAny: t("filters.regionAny"),
-            format: t("filters.format"),
-            formatAny: t("filters.formatAny"),
-            sort: t("filters.sort"),
-            openOnly: t("filters.openOnly"),
-            apply: t("filters.apply"),
+            savedOnly: t("filters.savedOnly"),
             clear: t("filters.clear"),
           }}
+          kinds={[
+            { key: "all", kind: null, label: t("kinds.all") },
+            ...OPPORTUNITY_KINDS.map((kind) => ({
+              key: kind,
+              kind,
+              label: t(`kinds.${kind}`),
+            })),
+          ].map((item) => ({
+            key: item.key,
+            label: item.label,
+            href: serializeOpportunitySearch(navHref("opportunities"), {
+              ...toFilterState(filters),
+              view,
+              kind: item.kind,
+            }),
+            active: filters.kind === item.kind,
+          }))}
           regions={REGIONS.map((region) => ({
             value: region,
             label: t(`regions.${region}`),
           }))}
-          formats={OPPORTUNITY_FORMATS.map((value) => ({
-            value,
-            label: t(`format.${value}`),
-          }))}
-          sorts={OPPORTUNITY_SORTS.map((value) => ({
-            value,
-            label: t(`filters.sortBy.${value}`),
-          }))}
           hiddenValues={[
-            ...(view === "saved" ? [{ name: "view", value: "saved" }] : []),
             ...(filters.kind ? [{ name: "kind", value: filters.kind }] : []),
+            ...(filters.format ? [{ name: "format", value: filters.format }] : []),
+            ...(filters.openOnly ? [{ name: "open", value: "1" }] : []),
+            ...(filters.sort !== DEFAULT_FILTERS.sort
+              ? [{ name: "sort", value: filters.sort }]
+              : []),
           ]}
           clearHref={serializeOpportunitySearch(navHref("opportunities"), {
             view,
@@ -243,7 +230,7 @@ function Opportunities({
         />
       ) : (
         <>
-          <div className="enter-rise mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 [--enter-delay:160ms]">
+          <div className="enter-rise mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 [--enter-delay:160ms]">
             <p role="status" className="text-sm text-ink-muted">
               {t("count", { count: listing.data.total })}
               {listing.data.total > listing.data.items.length
@@ -279,7 +266,7 @@ function Opportunities({
               />
             </Panel>
           ) : (
-            <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {listing.data.items.map((opportunity) => (
                 <li key={opportunity.id} className="flex">
                   <OpportunityCard

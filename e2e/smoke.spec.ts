@@ -664,9 +664,11 @@ test.describe("the panel", () => {
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
 
-    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
-    await expect(sections.getByRole("link")).toHaveCount(3);
-    await sections.getByRole("link", { name: /^Applications/ }).click();
+    await expect(
+      page.getByRole("navigation", { name: "Opportunity type" }).getByRole("link"),
+    ).toHaveCount(3);
+    await expect(page.getByRole("switch", { name: "Saved only" })).toBeVisible();
+    await page.getByRole("link", { name: /^Applications/ }).click();
     await expect(page).toHaveURL(/\/en\/applications$/);
     await expect(
       page.getByRole("heading", { level: 2, name: "Your applications" }),
@@ -971,14 +973,14 @@ test.describe("opportunities", () => {
   }) => {
     await gotoReady(page, "/en/saved");
     await expect(page).toHaveURL(/\/en\/opportunities\?view=saved$/);
-    const views = page.getByRole("navigation", {
-      name: "Opportunities sections",
-    });
-    await expect(views.getByRole("link", { name: /Saved/ })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+    const savedOnly = page.getByRole("switch", { name: "Saved only" });
+    await expect(savedOnly).toHaveAttribute("aria-checked", "true");
     await expect(page.getByRole("article")).toHaveCount(2);
+
+    await savedOnly.click();
+    await expect(page).toHaveURL(/\/en\/opportunities$/);
+    await expect(savedOnly).toHaveAttribute("aria-checked", "false");
+    await expect.poll(() => page.getByRole("article").count()).toBeGreaterThan(2);
   });
 
   test("a listing that fails to load keeps the section standing and offers a retry", async ({
@@ -988,8 +990,8 @@ test.describe("opportunities", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
-    const sections = page.getByRole("navigation", { name: "Opportunities sections" });
-    await expect(sections.getByRole("link", { name: /^All/ })).toHaveAttribute(
+    const kinds = page.getByRole("navigation", { name: "Opportunity type" });
+    await expect(kinds.getByRole("link", { name: "All", exact: true })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -1018,15 +1020,19 @@ test.describe("opportunities", () => {
     await expect(page).not.toHaveURL(/region=/);
   });
 
-  test("the open-only switch and the search both round-trip through the URL", async ({
+  test("the search and the saved-only switch both round-trip through the URL", async ({
     page,
   }) => {
     await gotoReady(page, "/en/opportunities?open=1&q=book");
-    await expect(page.getByRole("switch", { name: "Open only" })).toHaveAttribute(
+    await expect(page.getByLabel("Search", { exact: true })).toHaveValue("book");
+    await expect(page.getByRole("article")).toHaveCount(1);
+
+    await gotoReady(page, "/en/opportunities?view=saved&q=river");
+    await expect(page.getByRole("switch", { name: "Saved only" })).toHaveAttribute(
       "aria-checked",
       "true",
     );
-    await expect(page.getByLabel("Search", { exact: true })).toHaveValue("book");
+    await expect(page.getByLabel("Search", { exact: true })).toHaveValue("river");
     await expect(page.getByRole("article")).toHaveCount(1);
   });
 

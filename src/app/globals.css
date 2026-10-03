@@ -382,6 +382,20 @@
     background-position: left bottom;
   }
 
+  .opportunity-card-art {
+    background-color: var(--color-surface-soft);
+    background-image:
+      radial-gradient(circle at 1px 1px, var(--board-dot) 1px, transparent 1.6px),
+      radial-gradient(
+        28rem 14rem at 100% 0%,
+        color-mix(in srgb, var(--color-primary) var(--wash-primary), transparent),
+        transparent 70%
+      );
+    background-size:
+      20px 20px,
+      100% 100%;
+  }
+
   .dashboard-hero {
     position: relative;
     display: grid;

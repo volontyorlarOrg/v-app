@@ -12,6 +12,7 @@ export function SaveButton({
   saveLabel,
   savedLabel,
   errorLabel,
+  variant = "pill",
   className,
 }: {
   opportunityId: string;
@@ -19,11 +20,46 @@ export function SaveButton({
   saveLabel: string;
   savedLabel: string;
   errorLabel: string;
+  variant?: "pill" | "icon";
   className?: string;
 }) {
   const save = useOptimisticServerAction(saved, (next: boolean) =>
     setSavedAction(opportunityId, next),
   );
+
+  if (variant === "icon") {
+    return (
+      <span className={cn("relative inline-flex flex-col items-end", className)}>
+        <button
+          type="button"
+          aria-pressed={save.optimistic}
+          aria-label={save.optimistic ? savedLabel : saveLabel}
+          title={save.optimistic ? savedLabel : saveLabel}
+          disabled={save.isPending}
+          onClick={() => save.mutate(!save.optimistic)}
+          className={cn(
+            "inline-flex size-11 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors disabled:opacity-70",
+            save.optimistic
+              ? "border-accent bg-accent text-knockout"
+              : "border-border bg-surface/85 text-ink hover:bg-surface hover:text-primary-ink",
+          )}
+        >
+          <Bookmark
+            aria-hidden="true"
+            className={cn("size-5", save.optimistic && "fill-current")}
+          />
+        </button>
+        {save.isError ? (
+          <span
+            role="alert"
+            className="mt-1.5 rounded-md bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-ink-muted shadow-raised"
+          >
+            {errorLabel}
+          </span>
+        ) : null}
+      </span>
+    );
+  }
 
   return (
     <span className={cn("inline-flex flex-col items-start", className)}>

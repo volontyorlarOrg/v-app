@@ -214,8 +214,11 @@ volunteer into the room.
   washes are halved so orange never muddies to brown, and the accent text
   values are lifted so both hues keep their AA ratios.
 - Underlined section tabs under a page header, with a count on each, where a
-  section has more than one listing: All, Saved and Applications under
-  Opportunities.
+  section has more than one listing; the applications page uses them. The
+  opportunities page has none: one toolbar row instead — search, the type
+  switcher, region, and a "Saved only" switch.
+- Photo-first opportunity cards: the vacancy photo across the top at 2:1 with
+  the type chip in its top-left corner and the bookmark in its top-right.
 - Washes of the two hues where a surface is the volunteer's own: the dashboard
   hero, the leaderboard's standing card and the podium stage. A wash never carries text contrast; the tokens beneath do.
 - Panels, stat tiles and cards with a `border` edge and a 20px radius. Content
@@ -225,7 +228,7 @@ volunteer into the room.
 - Switches, segmented filters, selects and a search field that all clear 44px
   and take the global focus ring.
 - Orange for what the person did: the level, an acceptance, a confirmed
-  attendance, the record's figures, a completed profile.
+  attendance, the record's figures, a completed profile, a saved opportunity.
 - Chips that carry an icon and a word; a dashed chip for anything that is a
   sample, a preview, or not connected yet.
 
@@ -245,8 +248,10 @@ extra-large breakpoint, and the participation history across both columns.
 The band has two cells built the same way — a title and its action, a rail,
 a labelled meter, one sentence — the level rail and next-level meter leading
 to the leaderboard, the profile's six fields and completeness leading to the
-editor. The opportunities section holds three tabs — All, Saved and
-Applications — under one header, and the applications tab keeps its pill
+editor. The opportunities page is a title with an outline "Applications"
+link and its count on the right, one toolbar row (search, the All /
+Volunteering / Competitions switcher, region, "Saved only"), and a three-column
+grid of photo cards; the applications page keeps the section tabs and its pill
 filter inside its panel. The leaderboard opens on the viewer's standing card,
 the top three on a podium stage, and the ranked table from fourth place. The
 profile is the volunteer's own page: one read-only profile sheet, the same
@@ -331,8 +336,16 @@ disabled, not a red one.
   beneath it, and the request reference in small tabular type. The rest of the
   page stays up around it.
 - **Stat tile** — the same box carrying one label, one figure and one note.
-- **Card** — the opportunity card in a grid: chips, title, organiser, meta,
-  then save and view actions along the bottom edge.
+- **Card** — the opportunity card in a grid, photo first: the vacancy photo at
+  2:1 (or, without one, `surface-soft` with the dot grid and the type's glyph),
+  the type chip on a translucent `surface` pill in its top-left corner and the
+  bookmark in its top-right; then the title with the organiser beneath it and,
+  on the right, the application's status chip (or Closed / Full when nothing
+  can be applied for); a row with the start date and the place, a `primary-ink`
+  line with the deadline (muted once closed); and a full-width outline "View
+  details →" along the bottom edge, which reads Continue, Track status or
+  Attendance once an application exists. Hours and spots stay on the detail
+  page.
 - **Rows** — hairline-separated, the first flush to the panel edge; the same
   row shape on the dashboard, in the applications list and in "closing soon".
 - **Table** — the participation history only, scrolling inside its panel below
@@ -344,14 +357,15 @@ two surfaces that are not a `Panel`.
 
 ## Controls
 
-| Control          | Shape                                                                                                                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Switch           | 48 × 28px track, `action` when on, `surface-sunk` with a `border-control` edge when off, a white knob; the button around it is 44px tall; `role="switch"` with `aria-checked` |
-| Segmented filter | Pills; the active one is `action` with a knockout label and a `band-copy` count                                                                                               |
-| Select           | The 48px control with a chevron; filters use a 44px variant                                                                                                                   |
-| Search           | A 44px control on the opportunities page; it submits as a plain GET so the URL carries the query                                                                              |
-| Save             | A pill toggle with `aria-pressed`; filled bookmark when saved                                                                                                                 |
-| Disabled action  | The real button, `disabled`, with a `PreviewNote` beside it saying what will make it work                                                                                     |
+| Control          | Shape                                                                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Switch           | 48 × 28px track, `action` when on, `surface-sunk` with a `border-control` edge when off, a white knob; the button around it is 44px tall; `role="switch"` with `aria-checked`                 |
+| Segmented filter | Pills; the active one is `action` with a knockout label and a `band-copy` count                                                                                                               |
+| Type switcher    | The opportunities toolbar's All / Volunteering / Competitions: links in one 44px bordered `surface` box, the active one a filled `action` block with a knockout label                         |
+| Select           | The 48px control with a chevron; filters use a 44px variant                                                                                                                                   |
+| Search           | A 44px control on the opportunities page; it submits as a plain GET so the URL carries the query                                                                                              |
+| Save             | A pill toggle with `aria-pressed` on the detail page; on a card a 44px square over the photo, translucent `surface` off and a filled `accent` bookmark on — saving is the person's own choice |
+| Disabled action  | The real button, `disabled`, with a `PreviewNote` beside it saying what will make it work                                                                                                     |
 
 ## Motion
 

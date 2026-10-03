@@ -1,4 +1,14 @@
-import { BadgeCheck, CalendarDays, Clock3, MapPin, Monitor, Users } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  Clock3,
+  HandHeart,
+  MapPin,
+  Monitor,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { useFormatter, useTranslations } from "next-intl";
 
@@ -7,14 +17,20 @@ import {
   OpportunityStatusChip,
 } from "@/components/dashboard/opportunity-status";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
-import { StateChip } from "@/components/dashboard/state-chip";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ApplicationStatus } from "@/lib/applications/status";
-import type { OpportunitySummary } from "@/lib/opportunities/types";
+import { displayStatus } from "@/lib/opportunities/deadline";
+import type { OpportunityKind, OpportunitySummary } from "@/lib/opportunities/types";
 import { opportunityImageUrl } from "@/lib/opportunities/image";
 import { applicationHref, opportunityHref } from "@/lib/routing/routes";
+import { cn } from "@/lib/utils";
+
+const KIND_ICON: Record<OpportunityKind, LucideIcon> = {
+  volunteering: HandHeart,
+  competition: Trophy,
+};
 
 export function OpportunityCard({
   opportunity,
@@ -33,6 +49,9 @@ export function OpportunityCard({
   const applications = useTranslations("applications");
   const format = useFormatter();
   const photo = opportunityImageUrl(opportunity.imageUrl);
+  const KindIcon = KIND_ICON[opportunity.kind];
+  const status = displayStatus(opportunity, now);
+  const unavailable = status === "closed" || status === "full";
 
   const remote = opportunity.format === "remote";
   const place = remote
@@ -42,91 +61,112 @@ export function OpportunityCard({
       : t(`regions.${opportunity.region}`);
 
   return (
-    <article className="panel-surface flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface">
-      {photo ? (
-        <Image
-          unoptimized
-          src={photo}
-          alt=""
-          width={960}
-          height={540}
-          className="aspect-video w-full object-cover"
-        />
-      ) : null}
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
-          <StateChip tone="structure">{t(`kinds.${opportunity.kind}`)}</StateChip>
-          <OpportunityStatusChip opportunity={opportunity} now={now} />
-          {application ? <ApplicationStatusChip status={application.status} /> : null}
-          <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
+    <article className="panel-surface group/card flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-primary/50">
+      <div className="relative aspect-[2/1] overflow-hidden bg-surface-soft">
+        {photo ? (
+          <Image
+            unoptimized
+            src={photo}
+            alt=""
+            width={960}
+            height={480}
+            className="size-full object-cover"
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="opportunity-card-art flex size-full items-center justify-center text-primary"
+          >
+            <KindIcon className="size-10 opacity-70" strokeWidth={1.5} />
+          </div>
+        )}
+
+        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface/90 px-2.5 py-1 text-xs font-semibold text-primary-ink backdrop-blur-sm">
+          <KindIcon aria-hidden="true" className="size-3.5" />
+          {t(`kinds.${opportunity.kind}`)}
+        </span>
+
+        {showSave ? (
+          <SaveButton
+            opportunityId={opportunity.id}
+            saved={saved}
+            saveLabel={t("card.save")}
+            savedLabel={t("card.saved")}
+            errorLabel={t("card.saveError")}
+            variant="icon"
+            className="absolute top-2 right-2"
+          />
+        ) : null}
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-base leading-snug font-semibold text-balance">
+              <Link
+                href={opportunityHref(opportunity.slug)}
+                className="text-ink hover:text-primary-ink"
+              >
+                {opportunity.title}
+              </Link>
+            </h3>
+            <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
+              <span>{opportunity.organization.name}</span>
+              {opportunity.organization.verified ? (
+                <BadgeCheck
+                  aria-label={t("verified")}
+                  className="size-3.5 text-primary"
+                />
+              ) : null}
+            </p>
+          </div>
+          {application ? (
+            <ApplicationStatusChip status={application.status} />
+          ) : unavailable ? (
+            <OpportunityStatusChip opportunity={opportunity} now={now} />
+          ) : null}
         </div>
 
-        <h3 className="mt-3 text-title font-semibold text-balance">
-          <Link
-            href={opportunityHref(opportunity.slug)}
-            className="text-ink hover:text-primary-ink"
-          >
-            {opportunity.title}
-          </Link>
-        </h3>
-
-        <p className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
-          <span>{opportunity.organization.name}</span>
-          {opportunity.organization.verified ? (
-            <BadgeCheck aria-label={t("verified")} className="size-3.5 text-primary" />
-          ) : null}
-        </p>
-
-        <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-ink-muted">
-          <li className="inline-flex items-center gap-1.5">
-            {remote ? (
-              <Monitor aria-hidden="true" className="size-3.5" />
-            ) : (
-              <MapPin aria-hidden="true" className="size-3.5" />
+        <ul className="mt-4 grid gap-2 text-sm text-ink-muted">
+          <li className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays aria-hidden="true" className="size-4 text-primary" />
+              <time dateTime={opportunity.startsAt} className="tabular">
+                {format.dateTime(new Date(opportunity.startsAt), "day")}
+              </time>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              {remote ? (
+                <Monitor aria-hidden="true" className="size-4 text-primary" />
+              ) : (
+                <MapPin aria-hidden="true" className="size-4 text-primary" />
+              )}
+              {place}
+            </span>
+          </li>
+          <li
+            className={cn(
+              "inline-flex items-center gap-2",
+              unavailable ? "text-ink-muted" : "font-medium text-primary-ink",
             )}
-            {place}
+          >
+            <Clock3 aria-hidden="true" className="size-4" />
+            <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
           </li>
-          <li className="inline-flex items-center gap-1.5">
-            <CalendarDays aria-hidden="true" className="size-3.5" />
-            <time dateTime={opportunity.startsAt} className="tabular">
-              {format.dateTime(new Date(opportunity.startsAt), "day")}
-            </time>
-          </li>
-          {opportunity.spotsRemaining !== undefined &&
-          opportunity.spotsRemaining > 0 ? (
-            <li className="inline-flex items-center gap-1.5">
-              <Users aria-hidden="true" className="size-3.5" />
-              {t("spotsLeft", { count: opportunity.spotsRemaining })}
-            </li>
-          ) : null}
-          {opportunity.estimatedTotalHours !== undefined ? (
-            <li className="inline-flex items-center gap-1.5">
-              <Clock3 aria-hidden="true" className="size-3.5" />
-              {t("estimatedHours", { hours: opportunity.estimatedTotalHours })}
-            </li>
-          ) : null}
         </ul>
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-          {showSave ? (
-            <SaveButton
-              opportunityId={opportunity.id}
-              saved={saved}
-              saveLabel={t("card.save")}
-              savedLabel={t("card.saved")}
-              errorLabel={t("card.saveError")}
-              className="-ml-4"
-            />
-          ) : (
-            <span />
-          )}
+        <div className="mt-auto pt-4">
           <Link
             href={
               application
                 ? applicationHref(application.id)
                 : opportunityHref(opportunity.slug)
             }
-            className={buttonClass({ variant: "outline", size: "sm" })}
+            className={buttonClass({
+              variant: "outline",
+              size: "sm",
+              className: "w-full gap-2",
+            })}
           >
             {application
               ? application.status === "draft"
@@ -135,6 +175,7 @@ export function OpportunityCard({
                   ? applications("card.attendance")
                   : applications("card.track")
               : t("card.view")}
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         </div>
       </div>

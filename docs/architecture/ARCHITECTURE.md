@@ -111,8 +111,10 @@ props so no page-level translation reaches the browser:
 - `Switch` owns its on/off state (or follows a controlled value), emits a
   hidden input when it has a `name`, and renders `SwitchControl` inside.
 - `OpportunityFilters` writes every change to the URL through `nuqs` with
-  `shallow: false`, so the server re-renders the list; its GET form remains
-  the path for a browser without JavaScript.
+  `shallow: false`, so the server re-renders the list — the region select,
+  the search on Enter, and the "Saved only" switch, which sets or clears
+  `view`; the type switcher is plain links. Its GET form remains the path for
+  a browser without JavaScript.
 - `SaveButton`, `PreferenceSwitches` and `NotificationsMenu` call a Server
   Action through `useServerAction`; `useOptimisticServerAction` shows the
   requested value while the mutation is pending or has succeeded and resets
@@ -181,10 +183,16 @@ opportunities first. It is the single parser: `src/lib/opportunities/search-para
 wraps each key in a `nuqs` parser that calls it, adds the `view` parser, and
 exports the serializer every filter link is built with, so a default value
 never appears in a URL. On the client `OpportunityFilters` writes through
-`useQueryStates` — a select or the switch on change, the search field on Enter
-— with `history: "push"` and `shallow: false`, which is a server round trip
-for the list; "clear filters" is a link that retains the selected All or Saved
-view. Without JavaScript the same form submits as a GET request. A filtered
+`useQueryStates` — the region select or the "Saved only" switch on change,
+the search field on Enter — with `history: "push"` and `shallow: false`, which
+is a server round trip for the list; the type switcher is a row of links built
+by the serializer; "clear filters" appears beside the toolbar while any filter
+is set, and is a link that retains the type and the Saved-only state. The
+page has no control for `format`, `open` or `sort` any more, but the parser
+still reads them: a shared link that carries them still filters, the form
+passes them on as hidden values so a search does not drop them, and they count
+as active filters so "clear filters" can remove them. Without JavaScript the
+same form submits as a GET request. A filtered
 screen can therefore be shared, reloaded and switched between languages
 without losing its state. The application status groups work the same way:
 `src/lib/applications/search-params.ts` loads `?group=` on the server and

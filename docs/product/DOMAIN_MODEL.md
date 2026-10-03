@@ -105,8 +105,8 @@ arrive. → [`LEADERBOARD.md`](LEADERBOARD.md)
 
 ## SavedOpportunity
 
-A bookmark. Opportunities includes a Saved view; the toggle arrives with the
-opportunities section.
+A bookmark. Saved by the bookmark on a card or the detail page, and listed by
+the "Saved only" switch in the opportunities toolbar (`?view=saved`).
 
 ## Activity
 
