@@ -154,8 +154,11 @@ function Leaderboard({
           xp={viewer.xp}
           total={board.total}
           scoring={{
-            event: board.scoring.attendedEventXp,
-            hour: board.scoring.confirmedHourXp,
+            hour: board.scoring.defaults?.xpPerHour ?? board.scoring.confirmedHourXp,
+            winner: board.scoring.defaults?.xpWinner ?? board.scoring.attendedEventXp,
+            contributor: board.scoring.defaults?.xpContributor ?? 30,
+            attendee: board.scoring.defaults?.xpAttendee ?? 10,
+            penalty: board.scoring.defaults?.xpNoShowPenalty ?? 10,
           }}
           handleEditable={handleEditable}
         />

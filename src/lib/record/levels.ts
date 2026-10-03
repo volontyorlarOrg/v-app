@@ -116,8 +116,13 @@ export const ATTENDANCE_OUTCOMES = [
   "attended",
   "excused",
   "cancelled",
+  "no_show",
   "awaiting_confirmation",
 ] as const;
+
+export const PLACEMENTS = ["winner", "contributor", "attendee"] as const;
+
+export type Placement = (typeof PLACEMENTS)[number];
 
 export type AttendanceOutcome = (typeof ATTENDANCE_OUTCOMES)[number];
 
@@ -129,4 +134,6 @@ export type ParticipationEntry = {
   eventDate: string;
   outcome: AttendanceOutcome;
   hours?: number;
+  placement?: Placement;
+  xpAwarded?: number;
 };

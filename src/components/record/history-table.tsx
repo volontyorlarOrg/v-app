@@ -3,6 +3,7 @@ import {
   CircleSlash,
   CircleX,
   Hourglass,
+  UserX,
   type LucideIcon,
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
@@ -23,6 +24,7 @@ const PRESENTATION: Record<AttendanceOutcome, { tone: ChipTone; Icon: LucideIcon
   attended: { tone: "achievement", Icon: CircleCheck },
   excused: { tone: "neutral", Icon: CircleSlash },
   cancelled: { tone: "neutral", Icon: CircleX },
+  no_show: { tone: "neutral", Icon: UserX },
   awaiting_confirmation: { tone: "structure", Icon: Hourglass },
 };
 
@@ -43,6 +45,9 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
           <TableHead scope="col">{t("history.outcome")}</TableHead>
           <TableHead scope="col" className="text-right">
             {t("history.hours")}
+          </TableHead>
+          <TableHead scope="col" className="text-right">
+            {t("history.xp")}
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -66,9 +71,23 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
                 <StateChip tone={tone} icon={<Icon aria-hidden="true" />}>
                   {t(`outcomes.${entry.outcome}`)}
                 </StateChip>
+                {entry.placement && entry.kind === "competition" ? (
+                  <p className="mt-1 text-xs text-ink-muted">
+                    {t(`history.placements.${entry.placement}`)}
+                  </p>
+                ) : null}
               </TableCell>
               <TableCell className="tabular text-right text-ink">
                 {entry.hours !== undefined ? format.number(entry.hours) : "—"}
+              </TableCell>
+              <TableCell className="tabular text-right font-semibold text-accent-ink">
+                {entry.xpAwarded === undefined
+                  ? "—"
+                  : entry.xpAwarded > 0
+                    ? `+${entry.xpAwarded}`
+                    : entry.xpAwarded < 0
+                      ? `−${Math.abs(entry.xpAwarded)}`
+                      : "0"}
               </TableCell>
             </TableRow>
           );
