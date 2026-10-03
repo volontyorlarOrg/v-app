@@ -21,7 +21,7 @@ import {
   QUESTION_TYPES,
   REGIONS,
 } from "@/lib/opportunities/types";
-import { ATTENDANCE_OUTCOMES, LEVELS } from "@/lib/record/levels";
+import { ATTENDANCE_OUTCOMES, LEVELS, PLACEMENTS } from "@/lib/record/levels";
 
 function optional<T extends z.ZodTypeAny>(schema: T) {
   return schema.nullish().transform((value) => value ?? undefined);
@@ -70,6 +70,8 @@ export const applicationAttendanceSchema = z.object({
   outcome: z.enum(ATTENDANCE_OUTCOMES),
   scheduledHours: optional(z.number()),
   confirmedHours: optional(z.number()),
+  placement: optional(z.enum(PLACEMENTS)),
+  xpAwarded: optional(z.number().int()),
   resolvedAt: optional(isoDate),
 });
 
@@ -166,6 +168,13 @@ export const applicationDetailSchema = applicationSummarySchema.extend({
   answers: z.array(applicationAnswerSchema).default([]),
   profileSnapshot: optional(profileSnapshotSchema),
   reviewerNote: optional(z.string()),
+  instructions: optional(
+    z.object({
+      message: z.string(),
+      groupLink: optional(z.string()),
+      sentAt: isoDate,
+    }),
+  ),
 });
 
 export const applicationListSchema = z.object({
@@ -245,6 +254,8 @@ export const participationEntrySchema = z.object({
   eventDate: isoDate,
   outcome: z.enum(ATTENDANCE_OUTCOMES),
   hours: optional(z.number()),
+  placement: optional(z.enum(PLACEMENTS)),
+  xpAwarded: optional(z.number().int()),
 });
 
 export const historySchema = z.object({
@@ -305,6 +316,17 @@ const leaderboardScoringSchema = z
     attendedEventXp: z.number().int().nonnegative(),
     confirmedHourXp: z.number().int().nonnegative(),
     rounding: z.literal("nearest-total"),
+    defaults: optional(
+      z
+        .object({
+          xpPerHour: z.number().int().nonnegative(),
+          xpWinner: z.number().int().nonnegative(),
+          xpContributor: z.number().int().nonnegative(),
+          xpAttendee: z.number().int().nonnegative(),
+          xpNoShowPenalty: z.number().int().nonnegative(),
+        })
+        .strict(),
+    ),
   })
   .strict();
 

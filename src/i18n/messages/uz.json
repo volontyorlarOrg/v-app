@@ -366,12 +366,19 @@
       "kinds": {
         "volunteering": "Volontyorlik",
         "competition": "Tanlov"
+      },
+      "xp": "XP",
+      "placements": {
+        "winner": "Gʻolib",
+        "contributor": "Faol ishtirokchi",
+        "attendee": "Ishtirok etdi"
       }
     },
     "outcomes": {
       "attended": "Qatnashgan",
       "excused": "Uzrli sabab",
       "cancelled": "Bekor qilingan",
+      "no_show": "Sababsiz kelmadi",
       "awaiting_confirmation": "Tasdiq kutilmoqda"
     }
   },
@@ -410,7 +417,7 @@
       "place": "{rank}-oʻrin"
     },
     "xpValue": "{xp} XP",
-    "scoring": "Har bir tasdiqlangan volontyorlik tadbiri yoki tanlovdagi ishtirok uchun {event} XP, har bir tasdiqlangan volontyorlik soati uchun yana {hour} XP."
+    "scoring": "Har bir imkoniyat oʻz XP sini belgilaydi. Odatda har bir tasdiqlangan volontyorlik soati uchun {hour} XP; tanlovlarda gʻolibga {winner} XP, faol ishtirokchiga {contributor} va ishtirok uchun {attendee}. Sababsiz kelmaslik {penalty} XP ga tushadi."
   },
   "applications": {
     "metaTitle": "Arizalar",
@@ -498,8 +505,16 @@
         "attended": "Qatnashdi",
         "excused": "Sababli",
         "cancelled": "Bekor qilindi",
+        "no_show": "Sababsiz kelmadi",
         "awaiting_confirmation": "Koordinator tasdigʻi kutilmoqda"
-      }
+      },
+      "placement": "Natija",
+      "placements": {
+        "winner": "Gʻolib",
+        "contributor": "Faol ishtirokchi",
+        "attendee": "Ishtirok etdi"
+      },
+      "xp": "Berilgan XP"
     },
     "form": {
       "save": "Qoralamani saqlash",
@@ -521,6 +536,11 @@
         "applicationNotEditable": "Bu arizani endi tahrirlab boʻlmaydi.",
         "fallback": "Saqlab boʻlmadi. Qayta urinib koʻring."
       }
+    },
+    "instructions": {
+      "title": "Tashkilotchidan yoʻriqnoma",
+      "sent": "{when} da yuborilgan",
+      "join": "Telegram guruhiga qoʻshilish"
     }
   },
   "opportunities": {
