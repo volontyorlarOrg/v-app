@@ -543,19 +543,11 @@
       "searchPlaceholder": "Tadbir, tashkilotchi, kalit soʻz",
       "region": "Hudud",
       "regionAny": "Barcha hududlar",
-      "format": "Shakl",
-      "formatAny": "Istalgan shakl",
-      "sort": "Saralash",
-      "sortBy": {
-        "deadline": "Tez yopiladiganlar",
-        "start": "Tez boshlanadiganlar"
-      },
-      "openOnly": "Faqat ochiqlar",
-      "apply": "Qidirish",
+      "savedOnly": "Faqat saqlanganlar",
       "clear": "Filtrlarni tozalash"
     },
     "card": {
-      "view": "Koʻrish",
+      "view": "Batafsil",
       "save": "Saqlash",
       "saved": "Saqlangan",
       "sourced": "Volontyorlar topgan",
@@ -652,7 +644,7 @@
     },
     "kinds": {
       "label": "Imkoniyat turi",
-      "all": "Barcha turlar",
+      "all": "Barchasi",
       "volunteering": "Volontyorlik",
       "competition": "Tanlovlar"
     },

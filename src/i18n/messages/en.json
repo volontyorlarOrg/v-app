@@ -543,19 +543,11 @@
       "searchPlaceholder": "Event, organiser, keyword",
       "region": "Region",
       "regionAny": "All regions",
-      "format": "Format",
-      "formatAny": "Any format",
-      "sort": "Sort by",
-      "sortBy": {
-        "deadline": "Closing soonest",
-        "start": "Starting soonest"
-      },
-      "openOnly": "Open only",
-      "apply": "Search",
+      "savedOnly": "Saved only",
       "clear": "Clear filters"
     },
     "card": {
-      "view": "View",
+      "view": "View details",
       "save": "Save",
       "saved": "Saved",
       "sourced": "Sourced by Volontyorlar",
@@ -652,7 +644,7 @@
     },
     "kinds": {
       "label": "Opportunity type",
-      "all": "All types",
+      "all": "All",
       "volunteering": "Volunteering",
       "competition": "Competitions"
     },
