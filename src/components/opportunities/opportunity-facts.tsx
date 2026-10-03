@@ -4,10 +4,11 @@ import type { ReactNode } from "react";
 import { DeadlineText } from "@/components/dashboard/opportunity-status";
 import { deadlineState } from "@/lib/opportunities/deadline";
 import { eventSchedule, momentOf } from "@/lib/opportunities/schedule";
-import type { OpportunitySummary } from "@/lib/opportunities/types";
+import type { OpportunitySummary, ScheduleDay } from "@/lib/opportunities/types";
 
 export type OpportunityFactKey =
   | "date"
+  | "dailyTime"
   | "location"
   | "deadline"
   | "format"
@@ -20,7 +21,10 @@ export function OpportunityFacts({
   now,
   omit = [],
 }: {
-  opportunity: OpportunitySummary;
+  opportunity: OpportunitySummary & {
+    schedule?: readonly ScheduleDay[] | undefined;
+    allDaysRequired?: boolean;
+  };
   now: Date;
   omit?: readonly OpportunityFactKey[];
 }) {
@@ -49,12 +53,37 @@ export function OpportunityFacts({
     deadlineState(opportunity.applicationDeadline, now).kind !== "later";
   const formatLabel = t(`format.${opportunity.format}`);
 
+  const days = opportunity.schedule ?? [];
+  const first = days[0];
+  const sameTimes = days.every(
+    (day) => day.startTime === first?.startTime && day.endTime === first?.endTime,
+  );
+  const dailyTime = first ? (
+    <span className="tabular">
+      {sameTimes
+        ? days.length > 1
+          ? t("detail.eachDay", { time: `${first.startTime}–${first.endTime}` })
+          : `${first.startTime}–${first.endTime}`
+        : t("detail.timesVary")}
+      {days.length > 1 ? (
+        <span className="mt-0.5 block font-normal text-ink-muted">
+          {opportunity.allDaysRequired === false
+            ? t("detail.someDays")
+            : t("detail.allDays", { count: days.length })}
+        </span>
+      ) : null}
+    </span>
+  ) : null;
+
   const facts: { key: OpportunityFactKey; label: string; value: ReactNode }[] = [
     {
       key: "date",
       label: t("detail.date"),
       value: <span className="tabular">{eventSchedule(opportunity, format)}</span>,
     },
+    ...(dailyTime
+      ? [{ key: "dailyTime" as const, label: t("detail.dailyTime"), value: dailyTime }]
+      : []),
     { key: "location", label: t("detail.location"), value: place },
     {
       key: "deadline",

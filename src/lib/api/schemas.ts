@@ -90,10 +90,19 @@ export const applicationQuestionSchema = z.object({
   options: optional(z.array(questionOptionSchema)),
 });
 
+const scheduleDaySchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/),
+});
+
 export const opportunityDetailSchema = opportunitySummarySchema
   .extend({
     description: z.string().default(""),
     requirements: z.array(z.string()).default([]),
+    essayPrompt: optional(z.string()),
+    schedule: optional(z.array(scheduleDaySchema)),
+    allDaysRequired: z.boolean().default(true),
     questions: z.array(applicationQuestionSchema).default([]),
     sourcedByYvc: z.boolean().default(false),
   })
