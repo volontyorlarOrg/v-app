@@ -596,7 +596,13 @@
         "profileIncomplete": "Finish your profile first: it is what the organiser reads.",
         "fallback": "Couldn't send your application. Please try again."
       },
-      "competitionCapacity": "Participants needed"
+      "competitionCapacity": "Participants needed",
+      "dailyTime": "Daily time",
+      "eachDay": "{time} each day",
+      "timesVary": "Times vary by day",
+      "allDays": "{count, plural, =1 {Required on the day} other {All # days required}}",
+      "someDays": "You can come on some of the days",
+      "essayPromptDescription": "You answer this in your own words before you submit your application."
     },
     "status": {
       "open": "Open",

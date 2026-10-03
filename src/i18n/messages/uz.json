@@ -596,7 +596,13 @@
         "profileIncomplete": "Avval profilingizni toʻldiring: tashkilotchi aynan uni oʻqiydi.",
         "fallback": "Arizani yuborib boʻlmadi. Qayta urinib koʻring."
       },
-      "competitionCapacity": "Kerakli ishtirokchilar"
+      "competitionCapacity": "Kerakli ishtirokchilar",
+      "dailyTime": "Kunlik vaqt",
+      "eachDay": "Har kuni {time}",
+      "timesVary": "Vaqt kunlarga qarab farq qiladi",
+      "allDays": "{count, plural, =1 {Shu kuni qatnashish kerak} other {Barcha # kunda qatnashish majburiy}}",
+      "someDays": "Kunlarning bir qismida kelishingiz mumkin",
+      "essayPromptDescription": "Arizani yuborishdan oldin bu savolga oʻz soʻzlaringiz bilan javob berasiz."
     },
     "status": {
       "open": "Ochiq",

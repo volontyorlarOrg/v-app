@@ -83,9 +83,16 @@ export type ApplicationQuestion = {
   options?: QuestionOption[];
 };
 
+/** One day of an event, in Tashkent time. */
+export type ScheduleDay = { date: string; startTime: string; endTime: string };
+
 export type OpportunityDetail = OpportunitySummary & {
   description: string;
   requirements: string[];
+  /** The organization's own essay question; absent means the standard one. */
+  essayPrompt?: string;
+  schedule?: ScheduleDay[];
+  allDaysRequired: boolean;
   questions: ApplicationQuestion[];
   sourcedByTeam: boolean;
 };

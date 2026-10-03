@@ -69,6 +69,7 @@ export default async function ApplicationPage({
       application={application}
       questions={opportunity?.questions ?? null}
       essayRequired={opportunity?.essayRequired ?? null}
+      essayPrompt={opportunity?.essayPrompt}
       open={opportunity ? canApply(opportunity, now) : false}
       snapshot={snapshot}
       now={now}
@@ -95,6 +96,7 @@ function Application({
   application,
   questions,
   essayRequired,
+  essayPrompt,
   open,
   snapshot,
   now,
@@ -102,6 +104,7 @@ function Application({
   application: ApplicationDetail;
   questions: readonly ApplicationQuestion[] | null;
   essayRequired: boolean | null;
+  essayPrompt?: string | undefined;
   open: boolean;
   snapshot: ProfileSnapshot;
   now: Date;
@@ -248,7 +251,10 @@ function Application({
                 essay={application.essay ?? ""}
                 questions={fields}
                 answers={answers}
-                labels={answersLabels(t, localePath(locale, "profileEdit"))}
+                labels={{
+                  ...answersLabels(t, localePath(locale, "profileEdit")),
+                  ...(essayPrompt ? { essayLabel: essayPrompt } : {}),
+                }}
               />
             </Panel>
           ) : application.essay || application.answers.length > 0 ? (
@@ -256,7 +262,7 @@ function Application({
               {application.essay ? (
                 <div className={application.answers.length > 0 ? "mb-6" : undefined}>
                   <h3 className="text-sm font-semibold text-ink">
-                    {t("detail.essay")}
+                    {essayPrompt ?? t("detail.essay")}
                   </h3>
                   <p className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
                     {application.essay}

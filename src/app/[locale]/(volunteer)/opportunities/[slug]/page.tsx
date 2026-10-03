@@ -176,8 +176,15 @@ function Opportunity({
 
           {asksEssay ? (
             <Panel id="essay" title={t("detail.essayTitle")}>
-              <p className="max-w-prose text-sm leading-relaxed text-ink-muted">
-                {t("detail.essayDescription")}
+              {opportunity.essayPrompt ? (
+                <p className="max-w-prose font-semibold text-ink">
+                  {opportunity.essayPrompt}
+                </p>
+              ) : null}
+              <p className="mt-1 max-w-prose text-sm leading-relaxed text-ink-muted">
+                {opportunity.essayPrompt
+                  ? t("detail.essayPromptDescription")
+                  : t("detail.essayDescription")}
               </p>
             </Panel>
           ) : null}
