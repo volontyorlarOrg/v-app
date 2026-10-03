@@ -1794,7 +1794,7 @@ test.describe("the leaderboard", () => {
     await expect(standing).toContainText("of 30 on the leaderboard");
     await expect(standing).toContainText("@dilnoza_k");
     await expect(standing).toContainText(
-      "50 XP for every confirmed volunteering event or competition",
+      "Usually 10 XP for every verified volunteer hour",
     );
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
   });

@@ -26,7 +26,13 @@ export function LeaderboardStanding({
   rank: number;
   xp: number;
   total: number;
-  scoring: { event: number; hour: number };
+  scoring: {
+    hour: number;
+    winner: number;
+    contributor: number;
+    attendee: number;
+    penalty: number;
+  };
   handleEditable: boolean;
 }) {
   const t = useTranslations("leaderboard");
@@ -56,7 +62,7 @@ export function LeaderboardStanding({
               <span className="font-semibold text-ink">@{username}</span>
             </p>
             <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-              {t("scoring", { event: scoring.event, hour: scoring.hour })}
+              {t("scoring", scoring)}
             </p>
           </div>
         </div>

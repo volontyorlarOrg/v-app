@@ -366,12 +366,19 @@
       "kinds": {
         "volunteering": "Volunteering",
         "competition": "Competition"
+      },
+      "xp": "XP",
+      "placements": {
+        "winner": "Winner",
+        "contributor": "Contributor",
+        "attendee": "Took part"
       }
     },
     "outcomes": {
       "attended": "Attended",
       "excused": "Excused",
       "cancelled": "Cancelled",
+      "no_show": "Unexcused no-show",
       "awaiting_confirmation": "Awaiting confirmation"
     }
   },
@@ -410,7 +417,7 @@
       "place": "Place {rank}"
     },
     "xpValue": "{xp} XP",
-    "scoring": "{event} XP for every confirmed volunteering event or competition, plus {hour} XP for every confirmed volunteer hour."
+    "scoring": "Each opportunity sets its own XP. Usually {hour} XP for every verified volunteer hour; in competitions {winner} XP for a winner, {contributor} for a contributor and {attendee} for taking part. An unexcused no-show costs {penalty} XP."
   },
   "applications": {
     "metaTitle": "Applications",
@@ -498,8 +505,16 @@
         "attended": "Attended",
         "excused": "Excused",
         "cancelled": "Cancelled",
+        "no_show": "Unexcused no-show",
         "awaiting_confirmation": "Awaiting coordinator confirmation"
-      }
+      },
+      "placement": "Outcome",
+      "placements": {
+        "winner": "Winner",
+        "contributor": "Contributor",
+        "attendee": "Took part"
+      },
+      "xp": "XP awarded"
     },
     "form": {
       "save": "Save draft",
@@ -521,6 +536,11 @@
         "applicationNotEditable": "This application can no longer be edited.",
         "fallback": "That didn't save. Please try again."
       }
+    },
+    "instructions": {
+      "title": "Instructions from the organizer",
+      "sent": "Sent {when}",
+      "join": "Join the Telegram group"
     }
   },
   "opportunities": {
