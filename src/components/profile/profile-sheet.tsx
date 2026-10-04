@@ -49,6 +49,7 @@ export function ProfileSheet({
   socials,
   figures,
   rows,
+  pastEvents,
   completion,
   labels,
 }: {
@@ -61,6 +62,7 @@ export function ProfileSheet({
   socials: readonly ProfileSocialLink[];
   figures: readonly ProfileFigure[];
   rows: readonly ProfileRow[];
+  pastEvents?: ReactNode;
   completion: ProfileCompletionLine | null;
   labels: {
     action?: string;
@@ -184,6 +186,7 @@ export function ProfileSheet({
       ) : (
         <div className="pb-6 sm:pb-8" />
       )}
+      {pastEvents}
     </article>
   );
 }

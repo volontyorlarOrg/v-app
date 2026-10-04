@@ -128,6 +128,7 @@ export type AttendanceOutcome = (typeof ATTENDANCE_OUTCOMES)[number];
 
 export type ParticipationEntry = {
   id: string;
+  source: "attendance" | "manual";
   opportunityTitle: string;
   kind: import("@/lib/opportunities/types").OpportunityKind;
   organization: string;
@@ -136,4 +137,5 @@ export type ParticipationEntry = {
   hours?: number;
   placement?: Placement;
   xpAwarded?: number;
+  countsTowardProgress?: boolean;
 };

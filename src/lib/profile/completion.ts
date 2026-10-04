@@ -20,7 +20,6 @@ export const COMPLETION_FIELDS = [
   "school",
   "gradeYear",
   "languages",
-  "phone",
   "telegram",
 ] as const;
 
