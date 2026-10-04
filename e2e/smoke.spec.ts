@@ -649,7 +649,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "78");
+    ).toHaveAttribute("aria-valuenow", "88");
   });
 
   test("reaches every section from the shell, with an h1 on each", async ({ page }) => {
@@ -1079,23 +1079,12 @@ test.describe("opportunities", () => {
   }) => {
     await gotoReady(page, "/en/opportunities/remote-translation-support");
     await expect(
-      page.getByText(
-        "Complete your profile before applying. Still missing: Bio, Phone.",
-      ),
+      page.getByText("Complete your profile before applying. Still missing: Bio."),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await gotoReady(page, "/en/opportunities/remote-translation-support");
-    await expect(
-      page.getByText("Still missing: Phone.", { exact: false }),
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
-    await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Phone number").fill("+998 90 123 45 67");
-    await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
     await gotoReady(page, "/en/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
@@ -1249,6 +1238,7 @@ test.describe("applications, record, profile and settings", () => {
     await gotoReady(page, "/en/dashboard");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
+    await expect(page.getByText("Neighborhood reading day")).toBeVisible();
     await expect(page.getByText("They never count against you.").first()).toBeVisible();
   });
 
@@ -1273,6 +1263,7 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("definition").filter({ hasText: "@dilnoza_k" }),
     ).toBeVisible();
     await expect(page.getByLabel("Bio")).toHaveCount(0);
+    await expect(page.getByText("Neighborhood reading day")).toBeVisible();
     const edit = page.getByRole("link", { name: "Complete profile" });
     await expect(edit).toHaveAttribute("href", "/en/profile/edit");
     await edit.click();
@@ -1332,7 +1323,7 @@ test.describe("applications, record, profile and settings", () => {
     await gotoReady(page, "/en/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "78");
+    ).toHaveAttribute("aria-valuenow", "88");
 
     await gotoReady(page, "/en/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
@@ -1350,9 +1341,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
-  test("applying needs both phone and Telegram, yet a partial profile still saves", async ({
-    page,
-  }) => {
+  test("applying needs Telegram but allows an empty phone number", async ({ page }) => {
     await gotoReady(page, "/en/profile/edit");
     const phone = page.getByLabel("Phone number");
     await expect(phone).not.toHaveAttribute("required", "");
@@ -1369,11 +1358,17 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page).toHaveURL(/\/en\/profile\/edit$/);
 
     await phone.fill("");
+    await page.getByLabel("Telegram username").fill("");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
     await expect(
-      page.getByText("Still missing: Phone", { exact: false }),
+      page.getByText("Still missing: Telegram", { exact: false }),
     ).toBeVisible();
+    await gotoReady(page, "/en/profile/edit");
+    await page.getByLabel("Telegram username").fill("dilnoza_k");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page.getByText("Still missing:", { exact: false })).toHaveCount(0);
   });
 
   test("the profile carries no settings of its own", async ({ page }) => {

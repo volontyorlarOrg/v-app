@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 
 import {
   LoadErrorPanel,
+  LoadErrorRows,
   loadErrorLabels,
   type LoadErrorLabels,
 } from "@/components/app/load-error";
@@ -16,11 +17,13 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
+import { PastEventsSection } from "@/components/profile/past-events-section";
 import { Link } from "@/i18n/navigation";
 import { getMe } from "@/lib/api/account.server";
-import { settle, type LoadFailure } from "@/lib/api/load.server";
+import { settle, type LoadFailure, type Loaded } from "@/lib/api/load.server";
+import type { History } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
-import { getRecord } from "@/lib/api/record.server";
+import { getHistory, getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import type { Locale } from "@/i18n/routing";
 import {
@@ -55,11 +58,12 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, me, volunteerRecord, common] = await Promise.all([
+  const [session, profile, me, volunteerRecord, history, common] = await Promise.all([
     requireSession(),
     settle(() => getProfile()),
     getMe(),
     getRecord(),
+    settle(() => getHistory()),
     getTranslations({ locale, namespace: "common" }),
   ]);
 
@@ -82,6 +86,8 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       avatarUrl={me.avatarUrl}
       publicPage={publicPage(me.username, me.publicProfileEnabled)}
       joinedAt={me.createdAt}
+      history={history}
+      errorLabels={loadErrorLabels(common)}
     />
   );
 }
@@ -118,6 +124,8 @@ function Profile({
   avatarUrl,
   publicPage,
   joinedAt,
+  history,
+  errorLabels,
 }: {
   values: VolunteerProfile;
   record: VolunteerRecord;
@@ -125,6 +133,8 @@ function Profile({
   avatarUrl?: string;
   publicPage: PublicPage;
   joinedAt: string;
+  history: Loaded<History>;
+  errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("profile");
   const common = useTranslations("common");
@@ -246,6 +256,27 @@ function Profile({
       socials={socials}
       figures={figures}
       rows={rows}
+      pastEvents={
+        history.status === "failed" ? (
+          <div className="border-t border-border px-5 py-5 sm:px-8">
+            <LoadErrorRows failure={history.failure} labels={errorLabels} />
+          </div>
+        ) : (
+          <PastEventsSection
+            events={history.data.items
+              .filter((entry) => entry.source === "manual")
+              .map((entry) => ({
+                id: entry.id,
+                title: entry.opportunityTitle,
+                organization: entry.organization,
+                eventDate: entry.eventDate,
+                hours: entry.hours ?? 0,
+                xpAwarded: entry.xpAwarded ?? 0,
+                countsTowardProgress: entry.countsTowardProgress ?? false,
+              }))}
+          />
+        )
+      }
       completion={
         completion.complete
           ? null

@@ -23,13 +23,19 @@ profile, and portfolio links. These profile fields are public while the public
 profile is enabled. Deliberately absent: date of birth, home address, document
 number, parent contact, and gender.
 
-**Completion** counts nine fields — `fullName`, `bio`, `region`, `city`,
-`school`, `gradeYear`, `languages`, `phone` and `telegram` — every field except
-the photo, Instagram, LinkedIn and portfolio links, because "complete" means an
+**Completion** counts eight fields — `fullName`, `bio`, `region`, `city`,
+`school`, `gradeYear`, `languages` and `telegram` — every field except
+the phone, photo, Instagram, LinkedIn and portfolio links, because "complete" means an
 organiser can evaluate and contact you. Applying needs a complete profile and
 a chosen username; the backend enforces it on starting and on sending an
 application (`profileIncomplete` with the missing `fields`), and this is its
 mirror. → `src/lib/profile/completion.ts`
+
+An administrator may attach a past volunteering event with an existing
+organization to a volunteer. It appears on the signed-in and enabled public
+profile and in dashboard history. A counted event contributes the entered
+hours and custom XP plus one event toward level and reliability; a history-only
+event contributes no totals. Phone remains optional when applying.
 
 ## Opportunity
 

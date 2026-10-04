@@ -232,6 +232,19 @@ export const publicProfileSchema = z.object({
     attendedEvents: z.number().int().nonnegative(),
     confirmedHours: z.number().nonnegative(),
   }),
+  pastEvents: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        title: z.string(),
+        organization: z.string(),
+        eventDate: z.iso.date(),
+        hours: z.number().nonnegative(),
+        xpAwarded: z.number().int().nonnegative(),
+        countsTowardProgress: z.boolean(),
+      }),
+    )
+    .default([]),
 });
 
 export const recordSchema = z.object({
@@ -248,6 +261,7 @@ export const recordSchema = z.object({
 
 export const participationEntrySchema = z.object({
   id: z.string().min(1),
+  source: z.enum(["attendance", "manual"]).default("attendance"),
   opportunityTitle: z.string(),
   kind: z.enum(OPPORTUNITY_KINDS),
   organization: z.string(),
@@ -256,6 +270,7 @@ export const participationEntrySchema = z.object({
   hours: optional(z.number()),
   placement: optional(z.enum(PLACEMENTS)),
   xpAwarded: optional(z.number().int()),
+  countsTowardProgress: z.boolean().optional(),
 });
 
 export const historySchema = z.object({
