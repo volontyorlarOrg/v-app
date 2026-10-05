@@ -283,7 +283,7 @@
       },
       "contact": {
         "title": "Contact and public links",
-        "lead": "Organisers need both your phone number and your Telegram username. Everything here appears on your public profile; the links are optional."
+        "lead": "Add your Telegram username so organisers can reach you. A phone number is optional. Contact details appear on your public profile when it is on."
       }
     },
     "rail": {
@@ -363,6 +363,10 @@
       "outcome": "Outcome",
       "hours": "Hours",
       "empty": "Your record starts with your first confirmed event.",
+      "adminAdded": "Added by an administrator",
+      "manual": "Past event",
+      "counted": "Counts toward progress",
+      "notCounted": "History only",
       "kinds": {
         "volunteering": "Volunteering",
         "competition": "Competition"
@@ -744,6 +748,13 @@
       "hours": "{count, plural, one {<n>{value}</n> hour} other {<n>{value}</n> hours}}",
       "xp": "<n>{value}</n> XP"
     },
+    "pastEvents": {
+      "title": "Past events",
+      "hours": "h",
+      "adminAdded": "Added by an administrator",
+      "counted": "Counts toward progress",
+      "notCounted": "History only"
+    },
     "avatar": {
       "title": "Profile picture",
       "description": "Choose a JPEG, PNG or WebP up to 10 MB. Move and zoom it before saving.",
@@ -836,7 +847,7 @@
       "about": "Your name and a few lines an organiser reads first.",
       "education": "Where you study, so an organiser knows who is applying.",
       "location": "Organisers pick volunteers close to the event.",
-      "contact": "Organisers need both. Your phone and Telegram are visible to everyone when your public profile is on.",
+      "contact": "A Telegram username is needed to apply. A phone number is optional. Both are public when your public profile is on.",
       "links": "Social profiles and work you want anyone with your profile link to open."
     },
     "edit": {
