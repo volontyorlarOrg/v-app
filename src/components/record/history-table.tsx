@@ -53,6 +53,7 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
       </TableHeader>
       <TableBody>
         {entries.map((entry) => {
+          const manual = entry.source === "manual";
           const { tone, Icon } = PRESENTATION[entry.outcome];
           return (
             <TableRow key={entry.id}>
@@ -64,13 +65,24 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
               <TableCell>
                 <p className="font-semibold text-ink">{entry.opportunityTitle}</p>
                 <p className="text-xs text-ink-muted">
-                  {entry.organization} · {t(`history.kinds.${entry.kind}`)}
+                  {entry.organization} ·{" "}
+                  {manual ? t("history.adminAdded") : t(`history.kinds.${entry.kind}`)}
                 </p>
               </TableCell>
               <TableCell>
-                <StateChip tone={tone} icon={<Icon aria-hidden="true" />}>
-                  {t(`outcomes.${entry.outcome}`)}
+                <StateChip
+                  tone={manual && !entry.countsTowardProgress ? "neutral" : tone}
+                  icon={<Icon aria-hidden="true" />}
+                >
+                  {manual ? t("history.manual") : t(`outcomes.${entry.outcome}`)}
                 </StateChip>
+                {manual ? (
+                  <p className="mt-1 text-xs text-ink-muted">
+                    {entry.countsTowardProgress
+                      ? t("history.counted")
+                      : t("history.notCounted")}
+                  </p>
+                ) : null}
                 {entry.placement && entry.kind === "competition" ? (
                   <p className="mt-1 text-xs text-ink-muted">
                     {t(`history.placements.${entry.placement}`)}
@@ -81,13 +93,15 @@ export function HistoryTable({ entries }: { entries: readonly ParticipationEntry
                 {entry.hours !== undefined ? format.number(entry.hours) : "—"}
               </TableCell>
               <TableCell className="tabular text-right font-semibold text-accent-ink">
-                {entry.xpAwarded === undefined
+                {manual && !entry.countsTowardProgress
                   ? "—"
-                  : entry.xpAwarded > 0
-                    ? `+${entry.xpAwarded}`
-                    : entry.xpAwarded < 0
-                      ? `−${Math.abs(entry.xpAwarded)}`
-                      : "0"}
+                  : entry.xpAwarded === undefined
+                    ? "—"
+                    : entry.xpAwarded > 0
+                      ? `+${entry.xpAwarded}`
+                      : entry.xpAwarded < 0
+                        ? `−${Math.abs(entry.xpAwarded)}`
+                        : "0"}
               </TableCell>
             </TableRow>
           );

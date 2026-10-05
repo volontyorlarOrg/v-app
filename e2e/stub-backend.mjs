@@ -276,7 +276,6 @@ const REQUIRED_PROFILE_FIELDS = [
   "school",
   "gradeYear",
   "languages",
-  "phone",
   "telegram",
 ];
 
@@ -484,6 +483,18 @@ function freshState() {
         outcome: "attended",
         kind: "volunteering",
         hours: 6,
+      },
+      {
+        id: "h-past-reading",
+        source: "manual",
+        opportunityTitle: "Neighborhood reading day",
+        organization: "Chilonzor Reading Corners",
+        eventDate: at(-45, 9),
+        outcome: "attended",
+        kind: "volunteering",
+        hours: 2,
+        xpAwarded: 0,
+        countsTowardProgress: false,
       },
     ],
     notifications: [
@@ -1068,6 +1079,19 @@ const server = createServer(async (request, response) => {
         attendedEvents: isViewer ? state.record.counts.attended : 5,
         confirmedHours: isViewer ? (state.record.hours ?? 0) : 18,
       },
+      pastEvents: isViewer
+        ? state.history
+            .filter((item) => item.source === "manual")
+            .map((item) => ({
+              id: item.id,
+              title: item.opportunityTitle,
+              organization: item.organization,
+              eventDate: item.eventDate.slice(0, 10),
+              hours: item.hours,
+              xpAwarded: item.xpAwarded,
+              countsTowardProgress: item.countsTowardProgress,
+            }))
+        : [],
     });
   }
   if (path === "/me/username" && method === "PUT") {

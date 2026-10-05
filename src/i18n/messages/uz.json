@@ -283,7 +283,7 @@
       },
       "contact": {
         "title": "Aloqa va ochiq havolalar",
-        "lead": "Tashkilotchilarga telefon raqamingiz ham, Telegram foydalanuvchi nomingiz ham kerak. Bu yerdagi hamma maʼlumot ochiq profilingizda koʻrinadi; havolalar ixtiyoriy."
+        "lead": "Tashkilotchilar bogʻlanishi uchun Telegram foydalanuvchi nomingizni kiriting. Telefon raqami ixtiyoriy. Ochiq profilingiz yoqilganida aloqa maʼlumotlari koʻrinadi."
       }
     },
     "rail": {
@@ -363,6 +363,10 @@
       "outcome": "Natija",
       "hours": "Soat",
       "empty": "Tarixingiz birinchi tasdiqlangan tadbirdan boshlanadi.",
+      "adminAdded": "Administrator qoʻshgan",
+      "manual": "Oʻtgan tadbir",
+      "counted": "Taraqqiyotga hisoblanadi",
+      "notCounted": "Faqat tarix",
       "kinds": {
         "volunteering": "Volontyorlik",
         "competition": "Tanlov"
@@ -744,6 +748,13 @@
       "hours": "{count, plural, other {<n>{value}</n> soat}}",
       "xp": "<n>{value}</n> XP"
     },
+    "pastEvents": {
+      "title": "Oʻtgan tadbirlar",
+      "hours": "soat",
+      "adminAdded": "Administrator qoʻshgan",
+      "counted": "Taraqqiyotga hisoblanadi",
+      "notCounted": "Faqat tarix"
+    },
     "avatar": {
       "title": "Profil rasmi",
       "description": "10 MB gacha JPEG, PNG yoki WebP tanlang. Saqlashdan oldin joyini va kattaligini sozlang.",
@@ -836,7 +847,7 @@
       "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
       "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
-      "contact": "Tashkilotchilarga ikkalasi ham kerak. Ochiq profilingiz yoqilganida telefon va Telegram hammaga koʻrinadi.",
+      "contact": "Ariza berish uchun Telegram foydalanuvchi nomi kerak. Telefon ixtiyoriy. Ochiq profilingiz yoqilganida ikkalasi ham koʻrinadi.",
       "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar."
     },
     "edit": {

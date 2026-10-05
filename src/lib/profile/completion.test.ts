@@ -52,7 +52,6 @@ describe("profileCompletion", () => {
       "school",
       "gradeYear",
       "languages",
-      "phone",
       "telegram",
     ]);
   });
@@ -62,8 +61,8 @@ describe("profileCompletion", () => {
     expect(completion.missing).toEqual(["fullName", "city"]);
   });
 
-  it("requires both a phone number and a Telegram username", () => {
-    expect(profileCompletion({ ...FULL, phone: "" }).missing).toEqual(["phone"]);
+  it("allows a missing phone number but requires a Telegram username", () => {
+    expect(profileCompletion({ ...FULL, phone: "" }).missing).toEqual([]);
     expect(profileCompletion({ ...FULL, telegram: "" }).missing).toEqual(["telegram"]);
   });
 
@@ -81,7 +80,7 @@ describe("profileCompletion", () => {
   });
 
   it("rounds the share of filled fields", () => {
-    expect(profileCompletion(profile({ fullName: "Aziza Karimova" })).percent).toBe(11);
+    expect(profileCompletion(profile({ fullName: "Aziza Karimova" })).percent).toBe(13);
   });
 
   it("recognises the names of required fields", () => {

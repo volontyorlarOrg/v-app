@@ -13,6 +13,7 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
+import { PastEventsSection } from "@/components/profile/past-events-section";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { settle } from "@/lib/api/load.server";
@@ -162,6 +163,7 @@ export default async function MemberProfilePage({
           socials={profileSocialLinks(profile)}
           figures={figures}
           rows={rows}
+          pastEvents={<PastEventsSection events={profile.pastEvents} />}
           completion={null}
           labels={{
             figures: t("sheet.figures"),
