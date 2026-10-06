@@ -25,6 +25,7 @@
     "applications": "Applications",
     "saved": "Saved",
     "record": "My record",
+    "checkpoints": "Checkpoints",
     "leaderboard": "Leaderboard",
     "profile": "Profile",
     "settings": "Settings",
@@ -80,6 +81,11 @@
           "title": "Marked as cancelled",
           "body": "The organiser recorded your place as cancelled."
         }
+      },
+      "checkpoint": {
+        "title": "{count, plural, one {Checkpoint reached} other {# checkpoints reached}}",
+        "one": "{name}: +{xp} XP",
+        "many": "+{xp} XP earned"
       }
     },
     "userMenu": {
@@ -384,6 +390,105 @@
       "cancelled": "Cancelled",
       "no_show": "Unexcused no-show",
       "awaiting_confirmation": "Awaiting confirmation"
+    }
+  },
+  "checkpoints": {
+    "metaTitle": "Checkpoints",
+    "title": "Checkpoints",
+    "description": "Milestones along the way. Each one pays XP once, the moment you reach it.",
+    "summary": {
+      "label": "Checkpoints reached",
+      "reached": "{completed} of {total} reached",
+      "xp": "{earned} of {available} XP earned"
+    },
+    "groups": {
+      "start": "Getting started",
+      "applying": "Applying",
+      "events": "Events",
+      "hours": "Hours",
+      "competitions": "Competitions"
+    },
+    "items": {
+      "username": {
+        "title": "Choose your username",
+        "body": "Pick the name other volunteers see on the leaderboard."
+      },
+      "profile": {
+        "title": "Complete your profile",
+        "body": "Fill in every required field so you can apply anywhere."
+      },
+      "telegram": {
+        "title": "Connect Telegram",
+        "body": "Get decisions and reminders straight from our bot."
+      },
+      "second_sign_in": {
+        "title": "Add a second way to sign in",
+        "body": "Keep your account within reach if one way in stops working."
+      },
+      "first_saved": {
+        "title": "Save an opportunity",
+        "body": "Bookmark one you would like to come back to."
+      },
+      "first_application": {
+        "title": "Send your first application",
+        "body": "Apply to an opportunity that fits you."
+      },
+      "first_acceptance": {
+        "title": "Get accepted",
+        "body": "An organiser says yes to one of your applications."
+      },
+      "events_1": {
+        "title": "Attend your first event",
+        "body": "Take part and have your attendance confirmed."
+      },
+      "events_3": {
+        "title": "Attend 3 events",
+        "body": "Confirmed attendance at three events."
+      },
+      "events_8": {
+        "title": "Attend 8 events",
+        "body": "Confirmed attendance at eight events."
+      },
+      "events_20": {
+        "title": "Attend 20 events",
+        "body": "Confirmed attendance at twenty events."
+      },
+      "hours_10": {
+        "title": "Volunteer 10 hours",
+        "body": "Ten confirmed volunteering hours."
+      },
+      "hours_25": {
+        "title": "Volunteer 25 hours",
+        "body": "Twenty-five confirmed volunteering hours."
+      },
+      "hours_50": {
+        "title": "Volunteer 50 hours",
+        "body": "Fifty confirmed volunteering hours."
+      },
+      "hours_100": {
+        "title": "Volunteer 100 hours",
+        "body": "A hundred confirmed volunteering hours."
+      },
+      "competition_1": {
+        "title": "Take part in a competition",
+        "body": "Have your part in a competition confirmed."
+      },
+      "competition_win": {
+        "title": "Win a competition",
+        "body": "Finish a competition as a winner."
+      }
+    },
+    "xp": "+{xp} XP",
+    "progress": "{progress} of {target}",
+    "reachedOn": "Reached {date}",
+    "reached": "Reached",
+    "notReached": "Not reached yet",
+    "panel": {
+      "title": "Checkpoints",
+      "description": "Reach a milestone, earn XP once.",
+      "next": "Up next",
+      "all": "See all",
+      "done": "You have reached every checkpoint."
     }
   },
   "leaderboard": {

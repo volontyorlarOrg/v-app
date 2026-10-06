@@ -690,6 +690,44 @@ test.describe("the panel", () => {
     }
   });
 
+  test("the dashboard leads to checkpoints, grouped with progress and rewards", async ({
+    page,
+  }) => {
+    const panel = page.getByRole("region", { name: "Checkpoints" });
+    await expect(panel.getByText("8 of 17 reached")).toBeVisible();
+    await expect(panel.getByText("235 of 1,195 XP earned")).toBeVisible();
+    await expect(
+      panel.getByRole("heading", { level: 3, name: /^Complete your profile/ }),
+    ).toBeVisible();
+
+    await panel.getByRole("link", { name: "See all" }).click();
+    await expect(page).toHaveURL(/\/en\/checkpoints$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Checkpoints" }),
+    ).toBeVisible();
+    for (const name of [
+      "Getting started",
+      "Applying",
+      "Events",
+      "Hours",
+      "Competitions",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+    }
+    await expect(
+      page.getByRole("heading", { level: 3, name: "Choose your username (Reached)" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 3,
+        name: "Win a competition (Not reached yet)",
+      }),
+    ).toBeVisible();
+    const eightEvents = page.getByRole("progressbar", { name: "Attend 8 events" });
+    await expect(eightEvents).toHaveAttribute("aria-valuenow", "5");
+    await expect(eightEvents).toHaveAttribute("aria-valuemax", "8");
+  });
+
   test("the old record URL lands on the dashboard's history", async ({ page }) => {
     await gotoReady(page, "/en/record");
     await expect(page).toHaveURL(/\/en\/dashboard#history$/);
@@ -753,6 +791,11 @@ test.describe("the panel", () => {
     ).toHaveAttribute("href", "/en/settings");
     await expect(page.getByText("bekzod@example.org")).toHaveCount(0);
     await expect(page.getByText("merge-incoming")).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "2 checkpoints reached" }),
+    ).toHaveAttribute("href", "/en/checkpoints");
+    await expect(page.getByText("+15 XP earned")).toBeVisible();
+    await expect(page.getByText(/earned 15 XP: Choose/)).toHaveCount(0);
     await page.getByRole("button", { name: "Mark all as read" }).click();
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),

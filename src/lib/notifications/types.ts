@@ -1,3 +1,5 @@
+import { isCheckpointKey, type CheckpointKey } from "@/lib/checkpoints/checkpoints";
+
 export type Notification = {
   id: string;
   kind: string;
@@ -35,11 +37,19 @@ const MERGE_NOTIFICATION_NAMES: readonly MergeNotificationName[] = [
   "expired",
 ];
 
+const MERGE_NAME_ALIASES: Readonly<Record<string, MergeNotificationName>> = {
+  completed: "approved",
+};
+
 export function mergeNotificationName(kind: string): MergeNotificationName | null {
   if (!isMergeNotificationKind(kind)) return null;
 
   const name = kind.slice(MERGE_KIND_PREFIX.length).replace(/^\./, "");
-  return MERGE_NOTIFICATION_NAMES.find((candidate) => candidate === name) ?? "other";
+  return (
+    MERGE_NAME_ALIASES[name] ??
+    MERGE_NOTIFICATION_NAMES.find((candidate) => candidate === name) ??
+    "other"
+  );
 }
 
 export const ACTIVITY_NOTIFICATION_NAMES = [
@@ -104,4 +114,27 @@ export function activityNotification(
   }
 
   return null;
+}
+
+export const CHECKPOINT_NOTIFICATION_KIND = "checkpoint.completed";
+
+export type CheckpointNotification = {
+  keys: CheckpointKey[];
+  xp: number;
+};
+
+export function checkpointNotification(
+  kind: string,
+  data: Notification["data"],
+): CheckpointNotification | null {
+  if (kind !== CHECKPOINT_NOTIFICATION_KIND) return null;
+  const awards = Array.isArray(data?.checkpoints) ? data.checkpoints : [];
+  const keys = awards.flatMap((award: unknown) => {
+    const key =
+      award && typeof award === "object" ? (award as { key?: unknown }).key : undefined;
+    return typeof key === "string" && isCheckpointKey(key) ? [key] : [];
+  });
+  const xp = data?.xp;
+  if (keys.length === 0 || typeof xp !== "number") return null;
+  return { keys, xp };
 }

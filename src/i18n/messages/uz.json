@@ -25,6 +25,7 @@
     "applications": "Arizalar",
     "saved": "Saqlanganlar",
     "record": "Mening tarixim",
+    "checkpoints": "Marralar",
     "leaderboard": "Reyting",
     "profile": "Profil",
     "settings": "Sozlamalar",
@@ -80,6 +81,11 @@
           "title": "Bekor qilindi deb belgilandi",
           "body": "Tashkilotchi ishtirokingizni bekor qilingan deb belgiladi."
         }
+      },
+      "checkpoint": {
+        "title": "{count, plural, one {Marraga yetdingiz} other {# ta marraga yetdingiz}}",
+        "one": "{name}: +{xp} XP",
+        "many": "+{xp} XP qoʻlga kiritildi"
       }
     },
     "userMenu": {
@@ -384,6 +390,105 @@
       "cancelled": "Bekor qilingan",
       "no_show": "Sababsiz kelmadi",
       "awaiting_confirmation": "Tasdiq kutilmoqda"
+    }
+  },
+  "checkpoints": {
+    "metaTitle": "Marralar",
+    "title": "Marralar",
+    "description": "Yoʻlingizdagi muhim bosqichlar. Har biriga yetganingizda bir marta XP beriladi.",
+    "summary": {
+      "label": "Bajarilgan marralar",
+      "reached": "{total} tadan {completed} tasi bajarildi",
+      "xp": "{available} XP dan {earned} XP olindi"
+    },
+    "groups": {
+      "start": "Boshlash",
+      "applying": "Ariza berish",
+      "events": "Tadbirlar",
+      "hours": "Soatlar",
+      "competitions": "Tanlovlar"
+    },
+    "items": {
+      "username": {
+        "title": "Foydalanuvchi nomini tanlang",
+        "body": "Boshqa volontyorlar reytingda koʻradigan nomni tanlang."
+      },
+      "profile": {
+        "title": "Profilingizni toʻldiring",
+        "body": "Istalgan imkoniyatga ariza bera olish uchun barcha majburiy maydonlarni toʻldiring."
+      },
+      "telegram": {
+        "title": "Telegramni ulang",
+        "body": "Qarorlar va eslatmalarni botimizdan toʻgʻridan-toʻgʻri oling."
+      },
+      "second_sign_in": {
+        "title": "Kirishning ikkinchi usulini qoʻshing",
+        "body": "Bir usul ishlamay qolsa ham hisobingizga kira olasiz."
+      },
+      "first_saved": {
+        "title": "Imkoniyatni saqlang",
+        "body": "Keyinroq qaytmoqchi boʻlgan imkoniyatni belgilab qoʻying."
+      },
+      "first_application": {
+        "title": "Birinchi arizangizni yuboring",
+        "body": "Sizga mos imkoniyatga ariza bering."
+      },
+      "first_acceptance": {
+        "title": "Qabul qilining",
+        "body": "Tashkilotchi arizalaringizdan birini qabul qiladi."
+      },
+      "events_1": {
+        "title": "Birinchi tadbiringizda qatnashing",
+        "body": "Ishtirok eting va qatnashuvingiz tasdiqlansin."
+      },
+      "events_3": {
+        "title": "3 ta tadbirda qatnashing",
+        "body": "Uchta tadbirda tasdiqlangan ishtirok."
+      },
+      "events_8": {
+        "title": "8 ta tadbirda qatnashing",
+        "body": "Sakkizta tadbirda tasdiqlangan ishtirok."
+      },
+      "events_20": {
+        "title": "20 ta tadbirda qatnashing",
+        "body": "Yigirmata tadbirda tasdiqlangan ishtirok."
+      },
+      "hours_10": {
+        "title": "10 soat volontyorlik qiling",
+        "body": "Oʻn soatlik tasdiqlangan volontyorlik."
+      },
+      "hours_25": {
+        "title": "25 soat volontyorlik qiling",
+        "body": "Yigirma besh soatlik tasdiqlangan volontyorlik."
+      },
+      "hours_50": {
+        "title": "50 soat volontyorlik qiling",
+        "body": "Ellik soatlik tasdiqlangan volontyorlik."
+      },
+      "hours_100": {
+        "title": "100 soat volontyorlik qiling",
+        "body": "Yuz soatlik tasdiqlangan volontyorlik."
+      },
+      "competition_1": {
+        "title": "Tanlovda ishtirok eting",
+        "body": "Tanlovdagi ishtirokingiz tasdiqlansin."
+      },
+      "competition_win": {
+        "title": "Tanlovda gʻolib boʻling",
+        "body": "Tanlovni gʻolib sifatida yakunlang."
+      }
+    },
+    "xp": "+{xp} XP",
+    "progress": "{progress} / {target}",
+    "reachedOn": "Bajarildi: {date}",
+    "reached": "Bajarildi",
+    "notReached": "Hali bajarilmagan",
+    "panel": {
+      "title": "Marralar",
+      "description": "Marraga yeting va bir marta XP oling.",
+      "next": "Navbatdagilar",
+      "all": "Barchasi",
+      "done": "Barcha marralarga yetdingiz."
     }
   },
   "leaderboard": {

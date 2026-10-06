@@ -10,6 +10,7 @@ import {
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTiles, type Stat } from "@/components/app/stat-tile";
+import { CheckpointsPanel } from "@/components/checkpoints/checkpoints-panel";
 import { ApplicationRows } from "@/components/dashboard/application-rows";
 import {
   ConnectTelegram,
@@ -32,10 +33,16 @@ import type { Locale } from "@/i18n/routing";
 import { connectStartHref } from "@/lib/account/connections";
 import { getMe } from "@/lib/api/account.server";
 import { listApplications } from "@/lib/api/applications.server";
+import { getCheckpoints } from "@/lib/api/checkpoints.server";
 import { settle, type Loaded } from "@/lib/api/load.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { getHistory, getRecord } from "@/lib/api/record.server";
-import type { ApplicationList, History, Profile } from "@/lib/api/schemas";
+import type {
+  ApplicationList,
+  CheckpointList,
+  History,
+  Profile,
+} from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { isUpcomingCommitment } from "@/lib/applications/status";
 import { serializeOnboardingState } from "@/lib/onboarding/state";
@@ -85,6 +92,7 @@ export default async function DashboardPage({
     onboarding,
     telegram,
     common,
+    checkpoints,
   ] = await Promise.all([
     requireSession(),
     settle(() => getProfile()),
@@ -94,6 +102,7 @@ export default async function DashboardPage({
     readOnboardingState(),
     readTelegramConnection(),
     getTranslations({ locale, namespace: "common" }),
+    settle(() => getCheckpoints()),
   ]);
   const loadedProfile = profile.status === "loaded" ? profile.data : null;
 
@@ -107,6 +116,7 @@ export default async function DashboardPage({
       applications={applications}
       onboardingState={onboarding && serializeOnboardingState(onboarding)}
       telegramConnected={telegram}
+      checkpoints={checkpoints}
       errorLabels={loadErrorLabels(common)}
     />
   );
@@ -129,6 +139,7 @@ function Dashboard({
   applications: loadedApplications,
   onboardingState,
   telegramConnected,
+  checkpoints,
   errorLabels,
 }: {
   locale: Locale;
@@ -139,6 +150,7 @@ function Dashboard({
   applications: Loaded<ApplicationList>;
   onboardingState: string | null;
   telegramConnected: boolean | null;
+  checkpoints: Loaded<CheckpointList>;
   errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("dashboard");
@@ -328,6 +340,12 @@ function Dashboard({
       {hasParticipation(volunteerRecord) ? (
         <StatTiles stats={stats} className="mt-6" />
       ) : null}
+
+      <CheckpointsPanel
+        checkpoints={checkpoints}
+        errorLabels={errorLabels}
+        className="mt-6"
+      />
 
       {fresh ? (
         <GettingStarted id={HISTORY_ANCHOR} className="mt-6 scroll-mt-20" />
