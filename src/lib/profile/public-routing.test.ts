@@ -7,6 +7,7 @@ import {
   preferredProfileLocale,
   publicProfileUsername,
 } from "@/lib/profile/public-routing";
+import { appRoutes } from "@/lib/routing/routes";
 
 describe("member profile routing", () => {
   it("accepts a root username and protects product routes", () => {
@@ -16,6 +17,13 @@ describe("member profile routing", () => {
     expect(publicProfileUsername("/leaderboard")).toBeNull();
     expect(publicProfileUsername("/short")).toBe("short");
     expect(publicProfileUsername("/no/slash")).toBeNull();
+  });
+
+  it("never lets a username shadow a top-level page of the app", () => {
+    for (const route of appRoutes) {
+      const segment = route.path.split("/")[1] ?? "";
+      expect(publicProfileUsername(`/${segment}`), route.path).toBeNull();
+    }
   });
 
   it("maps the public app URL to its locale-backed route", () => {

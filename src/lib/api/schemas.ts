@@ -303,6 +303,23 @@ export const notificationListSchema = z.object({
   unread: z.number().int().default(0),
 });
 
+export const checkpointSchema = z.object({
+  key: z.string().min(1),
+  group: z.string().min(1),
+  target: z.number().positive(),
+  progress: z.number().nonnegative(),
+  xp: z.number().int().nonnegative(),
+  completedAt: isoDate.nullable(),
+});
+
+export const checkpointListSchema = z.object({
+  items: z.array(checkpointSchema),
+  completed: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+  xpEarned: z.number().int().nonnegative(),
+  xpAvailable: z.number().int().nonnegative(),
+});
+
 export const leaderboardEntrySchema = z
   .object({
     rank: z.number().int().positive(),
@@ -474,4 +491,5 @@ export type OpportunityList = z.infer<typeof opportunityListSchema>;
 export type ApplicationList = z.infer<typeof applicationListSchema>;
 export type SavedList = z.infer<typeof savedListSchema>;
 export type NotificationList = z.infer<typeof notificationListSchema>;
+export type CheckpointList = z.infer<typeof checkpointListSchema>;
 export type History = z.infer<typeof historySchema>;

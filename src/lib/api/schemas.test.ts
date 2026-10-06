@@ -4,6 +4,7 @@ import {
   applicationDetailSchema,
   applicationListSchema,
   authMethodsSchema,
+  checkpointListSchema,
   connectionOutcomeSchema,
   historySchema,
   leaderboardSchema,
@@ -650,5 +651,60 @@ describe("merge requests", () => {
         session: { userId: "u1" },
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("checkpoints", () => {
+  const list = {
+    items: [
+      {
+        key: "profile",
+        group: "start",
+        target: 1,
+        progress: 1,
+        xp: 40,
+        completedAt: "2026-10-07T09:00:00.000Z",
+      },
+      {
+        key: "hours_10",
+        group: "hours",
+        target: 10,
+        progress: 4.5,
+        xp: 25,
+        completedAt: null,
+      },
+    ],
+    completed: 1,
+    total: 17,
+    xpEarned: 40,
+    xpAvailable: 1195,
+  };
+
+  it("reads the list with fractional hours and an unreached checkpoint", () => {
+    const parsed = checkpointListSchema.parse(list);
+
+    expect(parsed.items[1]).toMatchObject({ progress: 4.5, completedAt: null });
+    expect(parsed.xpAvailable).toBe(1195);
+  });
+
+  it("keeps a key and a group this build does not know for the domain rule to drop", () => {
+    expect(
+      checkpointListSchema.safeParse({
+        ...list,
+        items: [{ ...list.items[0], key: "brand_new", group: "brand_new_group" }],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("refuses negative XP and a missing total", () => {
+    expect(
+      checkpointListSchema.safeParse({
+        ...list,
+        items: [{ ...list.items[0], xp: -5 }],
+      }).success,
+    ).toBe(false);
+    const withoutTotal: Record<string, unknown> = { ...list };
+    delete withoutTotal.total;
+    expect(checkpointListSchema.safeParse(withoutTotal).success).toBe(false);
   });
 });

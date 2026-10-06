@@ -5,6 +5,10 @@ import { AppShell } from "@/components/app/app-shell";
 import { LoadErrorPanel, loadErrorLabels } from "@/components/app/load-error";
 import type { NotificationItem } from "@/components/app/notifications-menu";
 import { PanelErrorBoundary } from "@/components/app/panel-error-boundary";
+import {
+  CheckpointToasts,
+  type CheckpointToast,
+} from "@/components/checkpoints/checkpoint-toasts";
 import { getMe } from "@/lib/api/account.server";
 import { isApiError } from "@/lib/api/errors";
 import { failureOf, type LoadFailure } from "@/lib/api/load.server";
@@ -12,7 +16,11 @@ import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import type { Locale } from "@/i18n/routing";
-import { activityNotification, mergeNotificationName } from "@/lib/notifications/types";
+import {
+  activityNotification,
+  checkpointNotification,
+  mergeNotificationName,
+} from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
 import {
   applicationHref,
@@ -24,6 +32,8 @@ import {
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+const CHECKPOINT_TOAST_WINDOW_MS = 5 * 60_000;
+
 export default async function VolunteerLayout({
   children,
   params,
@@ -32,12 +42,13 @@ export default async function VolunteerLayout({
   setRequestLocale(locale);
 
   const session = await requireSession();
-  const [record, common, settings, nav, format] = await Promise.all([
+  const [record, common, settings, nav, format, checkpointsT] = await Promise.all([
     getTranslations({ locale, namespace: "record" }),
     getTranslations({ locale, namespace: "common" }),
     getTranslations({ locale, namespace: "settings" }),
     getTranslations({ locale, namespace: "nav" }),
     getFormatter({ locale }),
+    getTranslations({ locale, namespace: "checkpoints" }),
   ]);
   const errorLabels = loadErrorLabels(common);
 
@@ -57,8 +68,38 @@ export default async function VolunteerLayout({
   const name =
     me.displayName?.trim() || session.displayName?.trim() || common("volunteer");
   const now = new Date();
+  const checkpointToasts: CheckpointToast[] = [];
   const notifications: NotificationItem[] = notificationList.items.map((item) => {
     const time = format.relativeTime(new Date(item.at), now);
+    const checkpoint = checkpointNotification(item.kind, item.data);
+    if (checkpoint) {
+      const [only] = checkpoint.keys;
+      const xp = format.number(checkpoint.xp);
+      const title = nav("notifications.checkpoint.title", {
+        count: checkpoint.keys.length,
+      });
+      const body =
+        checkpoint.keys.length === 1 && only
+          ? nav("notifications.checkpoint.one", {
+              name: checkpointsT(`items.${only}.title`),
+              xp,
+            })
+          : nav("notifications.checkpoint.many", { xp });
+      if (
+        item.unread &&
+        now.getTime() - new Date(item.at).getTime() < CHECKPOINT_TOAST_WINDOW_MS
+      ) {
+        checkpointToasts.push({ id: item.id, title, body });
+      }
+      return {
+        id: item.id,
+        title,
+        body,
+        time,
+        unread: item.unread,
+        href: navHref("checkpoints"),
+      };
+    }
     const merge = mergeNotificationName(item.kind);
     if (merge) {
       return {
@@ -109,6 +150,7 @@ export default async function VolunteerLayout({
       notifications={notifications}
       signOutLocale={locale}
     >
+      <CheckpointToasts items={checkpointToasts} />
       <PanelErrorBoundary labels={errorLabels}>{children}</PanelErrorBoundary>
     </AppShell>
   );
