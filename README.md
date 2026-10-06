@@ -38,10 +38,12 @@ reads the local `v-backend` and its separate development database. Run
 
 ## What is here
 
-- The two sign-in surfaces: log in and create an account, both with Telegram.
-  Google renders disabled with a note; there is no email or password.
-- A product panel: a sidebar and a minimal top bar with notifications and an
-  account menu on desktop; a top bar and a four-tab bar on a phone.
+- The two sign-in surfaces: log in and create an account, each with Telegram,
+  Google, and an email and password form. Google renders disabled with a note
+  until its client id is set.
+- A product panel: a navy sidebar on desktop carrying the lockup, the
+  notification bell, the three sections and the identity card, with no top
+  bar; a slim header and a four-tab bar on a phone.
 - The dashboard: greeting and level, three figures, the next commitment,
   recent applications, and one progress panel for record and profile readiness.
 - Live-data product screens: opportunities with URL-backed filters and detail
@@ -51,9 +53,10 @@ reads the local `v-backend` and its separate development database. Run
 
 ## Where to read next
 
-| You want                     | Go to                                                 |
-| ---------------------------- | ----------------------------------------------------- |
-| What the product is          | [`PRODUCT.md`](PRODUCT.md)                            |
-| How to work in this repo     | [`AGENTS.md`](AGENTS.md)                              |
-| The design system as applied | [`DESIGN.md`](DESIGN.md)                              |
-| Everything else              | [`docs/README.md`](docs/README.md) — a context router |
+| You want                              | Go to                                                                                              |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| What the product is                   | [`PRODUCT.md`](PRODUCT.md)                                                                         |
+| How to work in this repo              | [`AGENTS.md`](AGENTS.md)                                                                           |
+| The design system as applied          | [`DESIGN.md`](DESIGN.md)                                                                           |
+| Everything else                       | [`docs/README.md`](docs/README.md) — a context router                                              |
+| How all six repositories fit together | [`../v-backend/docs/architecture/SYSTEM_GUIDE.md`](../v-backend/docs/architecture/SYSTEM_GUIDE.md) |
