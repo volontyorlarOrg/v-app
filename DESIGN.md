@@ -247,7 +247,7 @@ stat tiles, then the next commitment and applications side by side from the
 extra-large breakpoint, and the participation history across both columns.
 The band has two cells built the same way — a title and its action, a rail,
 a labelled meter, one sentence — the level rail and next-level meter leading
-to the leaderboard, the profile's six fields and completeness leading to the
+to the leaderboard, the profile's eight fields and completeness leading to the
 editor. The opportunities page is a title with an outline "Applications"
 link and its count on the right, one toolbar row (search, the All /
 Volunteering / Competitions switcher, region, "Saved only"), and a three-column

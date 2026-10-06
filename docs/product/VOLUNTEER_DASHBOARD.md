@@ -29,7 +29,7 @@ and offers one action: browse opportunities. Beside the greeting hangs the
 volunteer's pass, the badge from the welcome flow, showing the parts their
 profile has filled. Question 3 lives in the hero's band rather than in a
 column of its own, so it is read first: the level rail and the next-level
-meter on one side, the profile's six fields and its completeness meter on the
+meter on one side, the profile's eight fields and its completeness meter on the
 other, each with its one action. The figures below it are completed events,
 reliability, recorded hours, and events awaiting confirmation.
 

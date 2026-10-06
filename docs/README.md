@@ -4,6 +4,7 @@ Use this file to route project questions to the smallest relevant source.
 
 | Task                                                                               | Read                                                                                                                   |
 | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **New to the codebase:** how all six repositories fit together, end to end         | [`../../v-backend/docs/architecture/SYSTEM_GUIDE.md`](../../v-backend/docs/architecture/SYSTEM_GUIDE.md)               |
 | Product truth, the volunteer loop, levels, the three-repository boundary           | [`../PRODUCT.md`](../PRODUCT.md)                                                                                       |
 | The design system as applied to the product                                        | [`../DESIGN.md`](../DESIGN.md)                                                                                         |
 | Routes, rendering, module ownership, dependency boundary                           | [`architecture/ARCHITECTURE.md`](architecture/ARCHITECTURE.md)                                                         |
