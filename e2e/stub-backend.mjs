@@ -304,6 +304,103 @@ function refuseUnready(response, state) {
   return true;
 }
 
+const CHECKPOINTS = [
+  { key: "username", group: "start", metric: "usernameChosen", target: 1, xp: 10 },
+  { key: "profile", group: "start", metric: "profileComplete", target: 1, xp: 40 },
+  { key: "telegram", group: "start", metric: "telegramConnected", target: 1, xp: 20 },
+  { key: "second_sign_in", group: "start", metric: "signInMethods", target: 2, xp: 15 },
+  { key: "first_saved", group: "applying", metric: "saved", target: 1, xp: 5 },
+  {
+    key: "first_application",
+    group: "applying",
+    metric: "submitted",
+    target: 1,
+    xp: 20,
+  },
+  { key: "first_acceptance", group: "applying", metric: "accepted", target: 1, xp: 30 },
+  { key: "events_1", group: "events", metric: "events", target: 1, xp: 50 },
+  { key: "events_3", group: "events", metric: "events", target: 3, xp: 75 },
+  { key: "events_8", group: "events", metric: "events", target: 8, xp: 150 },
+  { key: "events_20", group: "events", metric: "events", target: 20, xp: 300 },
+  { key: "hours_10", group: "hours", metric: "hours", target: 10, xp: 25 },
+  { key: "hours_25", group: "hours", metric: "hours", target: 25, xp: 50 },
+  { key: "hours_50", group: "hours", metric: "hours", target: 50, xp: 100 },
+  { key: "hours_100", group: "hours", metric: "hours", target: 100, xp: 200 },
+  {
+    key: "competition_1",
+    group: "competitions",
+    metric: "competitions",
+    target: 1,
+    xp: 30,
+  },
+  { key: "competition_win", group: "competitions", metric: "wins", target: 1, xp: 75 },
+];
+
+const PROFILE_REQUIRED = [
+  "fullName",
+  "bio",
+  "region",
+  "city",
+  "school",
+  "gradeYear",
+  "telegram",
+];
+
+function checkpointFacts(state) {
+  const profile = state.profile;
+  const methods = state.account.authMethods;
+  const complete =
+    state.account.usernameSource !== "generated" &&
+    profile !== null &&
+    PROFILE_REQUIRED.every((field) => String(profile[field] ?? "").trim().length > 0) &&
+    (profile.languages ?? []).length > 0;
+  return {
+    usernameChosen: state.account.usernameSource === "generated" ? 0 : 1,
+    profileComplete: complete ? 1 : 0,
+    telegramConnected: methods.telegram ? 1 : 0,
+    signInMethods: [methods.telegram, methods.google, methods.password].filter(Boolean)
+      .length,
+    saved: state.saved.length,
+    submitted: state.applications.filter((item) => item.status !== "draft").length,
+    accepted: state.applications.filter((item) => item.status === "accepted").length,
+    events: state.record.counts.attended,
+    hours: state.record.hours ?? 0,
+    competitions: 0,
+    wins: 0,
+  };
+}
+
+function checkpointList(state) {
+  state.checkpointsReached ??= new Map();
+  const facts = checkpointFacts(state);
+  const items = CHECKPOINTS.map((checkpoint) => {
+    if (
+      facts[checkpoint.metric] >= checkpoint.target &&
+      !state.checkpointsReached.has(checkpoint.key)
+    )
+      state.checkpointsReached.set(checkpoint.key, at(-2, 9));
+    const completedAt = state.checkpointsReached.get(checkpoint.key) ?? null;
+    return {
+      key: checkpoint.key,
+      group: checkpoint.group,
+      target: checkpoint.target,
+      progress: completedAt
+        ? checkpoint.target
+        : Math.min(facts[checkpoint.metric], checkpoint.target),
+      xp: checkpoint.xp,
+      completedAt,
+    };
+  });
+  const reached = items.filter((item) => item.completedAt !== null);
+  return {
+    items,
+    completed: reached.length,
+    total: items.length,
+    xpEarned: reached.reduce((total, item) => total + item.xp, 0),
+    xpAvailable: CHECKPOINTS.reduce((total, item) => total + item.xp, 0),
+  };
+}
+
 function freshAccount() {
   return {
     email: null,
@@ -541,6 +638,22 @@ function freshState() {
         data: null,
         readAt: at(-1, 20),
         createdAt: at(-1, 19),
+      },
+      {
+        id: "n-checkpoints",
+        kind: "checkpoint.completed",
+        title: "Checkpoints reached",
+        body: "You reached 2 checkpoints and earned 15 XP: Choose your username, Save an opportunity.",
+        data: {
+          userId: "user-dilnoza",
+          checkpoints: [
+            { key: "username", xp: 10 },
+            { key: "first_saved", xp: 5 },
+          ],
+          xp: 15,
+        },
+        readAt: at(-2, 10),
+        createdAt: at(-2, 9),
       },
     ],
   };
@@ -1269,6 +1382,8 @@ const server = createServer(async (request, response) => {
     return send(response, 200, state.profile);
   }
   if (path === "/record" && method === "GET") return send(response, 200, state.record);
+  if (path === "/checkpoints" && method === "GET")
+    return send(response, 200, checkpointList(state));
   if (path === "/record/history" && method === "GET")
     return send(response, 200, { items: state.history, total: state.history.length });
   if (path === "/notifications" && method === "GET") {

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MERGE_NOTIFICATION_KINDS,
   activityNotification,
+  checkpointNotification,
   isMergeNotificationKind,
   mergeNotificationName,
 } from "@/lib/notifications/types";
@@ -13,6 +14,10 @@ describe("merge notifications", () => {
       expect(isMergeNotificationKind(kind), kind).toBe(true);
       expect(mergeNotificationName(kind), kind).toBe(kind.split(".").at(-1));
     }
+  });
+
+  it("reads the backend's completed merge as the approved one", () => {
+    expect(mergeNotificationName("account.merge.completed")).toBe("approved");
   });
 
   it("recognises a kind it has no copy for yet without inventing one", () => {
@@ -69,5 +74,51 @@ describe("application and attendance notifications", () => {
       activityNotification("opportunity.approved", { opportunityId: "o" }),
     ).toBeNull();
     expect(activityNotification("application.accepted", null)).toBeNull();
+  });
+});
+
+describe("checkpoint notifications", () => {
+  it("reads the checkpoints reached together and the XP they paid", () => {
+    expect(
+      checkpointNotification("checkpoint.completed", {
+        userId: "user-1",
+        checkpoints: [
+          { key: "username", xp: 10 },
+          { key: "profile", xp: 40 },
+        ],
+        xp: 50,
+      }),
+    ).toEqual({ keys: ["username", "profile"], xp: 50 });
+  });
+
+  it("names only the checkpoints this build has copy for", () => {
+    expect(
+      checkpointNotification("checkpoint.completed", {
+        checkpoints: [
+          { key: "brand_new", xp: 5 },
+          { key: "profile", xp: 40 },
+          "events_1",
+        ],
+        xp: 45,
+      }),
+    ).toEqual({ keys: ["profile"], xp: 45 });
+  });
+
+  it("leaves a checkpoint notification it cannot read to the backend's own words", () => {
+    expect(
+      checkpointNotification("checkpoint.completed", {
+        checkpoints: [{ key: "brand_new", xp: 5 }],
+        xp: 5,
+      }),
+    ).toBeNull();
+    expect(
+      checkpointNotification("checkpoint.completed", {
+        checkpoints: [{ key: "profile", xp: 40 }],
+      }),
+    ).toBeNull();
+    expect(checkpointNotification("checkpoint.completed", null)).toBeNull();
+    expect(
+      checkpointNotification("application.submitted", { checkpoints: [], xp: 0 }),
+    ).toBeNull();
   });
 });

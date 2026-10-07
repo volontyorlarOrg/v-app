@@ -117,6 +117,17 @@ describe("app route registry", () => {
     expect(sectionKeyFor("/opportunities/winter-book-drive")).toBe("opportunities");
   });
 
+  it("keeps checkpoints under the dashboard, without a sidebar row or a tab", () => {
+    const checkpoints = getRoute("checkpoints");
+    expect(checkpoints.path).toBe("/checkpoints");
+    expect(checkpoints.guard).toBe("session");
+    expect(checkpoints.navGroup).toBeNull();
+    expect(checkpoints.inTabBar).toBe(false);
+    expect(sectionKeyFor("/en/checkpoints")).toBe("dashboard");
+    expect(isSectionActive("/checkpoints", "dashboard")).toBe(true);
+    expect(guardFor("/uz/checkpoints")).toBe("session");
+  });
+
   it("keeps the profile editor under the profile", () => {
     const editor = getRoute("profileEdit");
     expect(editor.path).toBe("/profile/edit");
