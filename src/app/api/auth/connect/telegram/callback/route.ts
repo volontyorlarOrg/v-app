@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
 
   const providerError = url.searchParams.get("error");
   if (providerError) {
-    console.warn("[telegram-connect] telegram declined the connection:", providerError);
     return backToSettings(connectStatusForProviderError(providerError));
   }
 
@@ -67,7 +66,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const status = connectStatusForError(error);
     if (status === "unavailable") {
-      console.error("[telegram-connect] completion failed:", error);
+      console.error("[telegram-connect] completion unavailable");
     } else {
       console.warn("[telegram-connect] completion rejected:", status);
     }

@@ -8,6 +8,7 @@ import type { z } from "zod";
 import type { paths } from "@/lib/api/generated/schema";
 import { visitorHeaders } from "@/lib/api/visitor";
 import { apiBaseUrl, proxySecret } from "@/lib/auth/config";
+import { apiFailureLog } from "@/lib/security/api-failure-log";
 import {
   ApiError,
   classifyApiError,
@@ -150,11 +151,7 @@ async function forwardedVisitor(): Promise<Record<string, string>> {
 }
 
 function logFailure(method: string, path: string, error: ApiError) {
-  console.error(
-    `[api] ${method} ${path} -> ${error.code}` +
-      (error.status ? ` (${error.status})` : "") +
-      ` [${error.requestId ?? ""}]`,
-  );
+  console.error(apiFailureLog(method, path, error));
 }
 
 export async function api<TSchema extends z.ZodType | undefined = undefined>(
