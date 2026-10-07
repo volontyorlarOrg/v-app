@@ -101,9 +101,9 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/checkpoints",
     area: "volunteer",
     guard: "session",
-    navGroup: null,
-    inTabBar: false,
-    section: "dashboard",
+    navGroup: "primary",
+    inTabBar: true,
+    section: null,
   },
   {
     key: "leaderboard",

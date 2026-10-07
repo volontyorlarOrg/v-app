@@ -75,16 +75,31 @@ export default async function VolunteerLayout({
     if (checkpoint) {
       const [only] = checkpoint.keys;
       const xp = format.number(checkpoint.xp);
-      const title = nav("notifications.checkpoint.title", {
-        count: checkpoint.keys.length,
-      });
+      const title = nav(
+        item.kind === "checkpoint.ready"
+          ? "notifications.checkpoint.readyTitle"
+          : "notifications.checkpoint.title",
+        {
+          count: checkpoint.keys.length,
+        },
+      );
       const body =
         checkpoint.keys.length === 1 && only
-          ? nav("notifications.checkpoint.one", {
-              name: checkpointsT(`items.${only}.title`),
-              xp,
-            })
-          : nav("notifications.checkpoint.many", { xp });
+          ? nav(
+              item.kind === "checkpoint.ready"
+                ? "notifications.checkpoint.readyOne"
+                : "notifications.checkpoint.one",
+              {
+                name: checkpointsT(`items.${only}.title`),
+                xp,
+              },
+            )
+          : nav(
+              item.kind === "checkpoint.ready"
+                ? "notifications.checkpoint.readyMany"
+                : "notifications.checkpoint.many",
+              { xp },
+            );
       if (
         item.unread &&
         now.getTime() - new Date(item.at).getTime() < CHECKPOINT_TOAST_WINDOW_MS

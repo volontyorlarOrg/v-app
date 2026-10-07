@@ -22,6 +22,7 @@ function item(
     progress: 0,
     xp: 10,
     completedAt: null,
+    claimedAt: null,
     ...overrides,
   };
 }
@@ -61,9 +62,17 @@ describe("checkpoints", () => {
   it("suggests the next open checkpoints, one tier per series, in catalog order", () => {
     const next = nextCheckpoints(
       knownCheckpoints([
-        item("username", "start", { completedAt: REACHED, progress: 1 }),
+        item("username", "start", {
+          completedAt: REACHED,
+          claimedAt: REACHED,
+          progress: 1,
+        }),
         item("profile", "start"),
-        item("events_1", "events", { completedAt: REACHED, progress: 1 }),
+        item("events_1", "events", {
+          completedAt: REACHED,
+          claimedAt: REACHED,
+          progress: 1,
+        }),
         item("events_3", "events", { target: 3, progress: 1 }),
         item("events_8", "events", { target: 8, progress: 1 }),
         item("hours_10", "hours", { target: 10, progress: 4 }),
@@ -74,10 +83,12 @@ describe("checkpoints", () => {
     expect(next.map((entry) => entry.key)).toEqual(["profile", "events_3", "hours_10"]);
   });
 
-  it("suggests nothing once every checkpoint is reached", () => {
+  it("suggests nothing once every reward is claimed", () => {
     expect(
       nextCheckpoints(
-        knownCheckpoints([item("profile", "start", { completedAt: REACHED })]),
+        knownCheckpoints([
+          item("profile", "start", { completedAt: REACHED, claimedAt: REACHED }),
+        ]),
       ),
     ).toEqual([]);
   });
@@ -86,4 +97,15 @@ describe("checkpoints", () => {
     expect(hasCountedProgress(item("profile", "start"))).toBe(false);
     expect(hasCountedProgress(item("hours_10", "hours", { target: 10 }))).toBe(true);
   });
+});
+
+it("suggests claimable rewards before unfinished checkpoints", () => {
+  const next = nextCheckpoints(
+    knownCheckpoints([
+      item("profile", "start"),
+      item("events_1", "events", { completedAt: REACHED, progress: 1 }),
+      item("events_3", "events", { target: 3 }),
+    ]),
+  );
+  expect(next.map((entry) => entry.key)).toEqual(["events_1", "profile"]);
 });

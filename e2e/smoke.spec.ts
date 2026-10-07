@@ -678,6 +678,16 @@ test.describe("the panel", () => {
       navigation.getByRole("link", { name: "Opportunities" }),
     ).toHaveAttribute("aria-current", "page");
 
+    await navigation.getByRole("link", { name: "Milestones" }).click();
+    await expect(page).toHaveURL(/\/en\/checkpoints$/);
+    await expect(navigation.getByRole("link", { name: "Milestones" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Milestones" }),
+    ).toBeVisible();
+
     await navigation.getByRole("link", { name: "Leaderboard" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard$/);
     await expect(
@@ -690,20 +700,20 @@ test.describe("the panel", () => {
     }
   });
 
-  test("the dashboard leads to checkpoints, grouped with progress and rewards", async ({
+  test("milestones list every checkpoint and pay rewards only after claiming", async ({
     page,
   }) => {
-    const panel = page.getByRole("region", { name: "Checkpoints" });
+    const panel = page.getByRole("region", { name: "Milestones" });
     await expect(panel.getByText("8 of 17 reached")).toBeVisible();
-    await expect(panel.getByText("235 of 1,195 XP earned")).toBeVisible();
+    await expect(panel.getByText("0 of 1,195 XP earned")).toBeVisible();
     await expect(
-      panel.getByRole("heading", { level: 3, name: /^Complete your profile/ }),
+      panel.getByRole("heading", { level: 3, name: /^Choose your username/ }),
     ).toBeVisible();
 
     await panel.getByRole("link", { name: "See all" }).click();
     await expect(page).toHaveURL(/\/en\/checkpoints$/);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Checkpoints" }),
+      page.getByRole("heading", { level: 1, name: "Milestones" }),
     ).toBeVisible();
     for (const name of [
       "Getting started",
@@ -715,7 +725,10 @@ test.describe("the panel", () => {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
     }
     await expect(
-      page.getByRole("heading", { level: 3, name: "Choose your username (Reached)" }),
+      page.getByRole("heading", {
+        level: 3,
+        name: "Choose your username (Ready to claim)",
+      }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", {
@@ -723,6 +736,20 @@ test.describe("the panel", () => {
         name: "Win a competition (Not reached yet)",
       }),
     ).toBeVisible();
+    await expect(page.getByText("235 XP ready to claim")).toBeVisible();
+    const claim = page.getByRole("button", {
+      name: "Claim 10 XP for Choose your username",
+      exact: true,
+    });
+    await claim.click();
+    await expect(page.getByText("10 of 1,195 XP earned")).toBeVisible();
+    await expect(page.getByText("225 XP ready to claim")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 3, name: "Choose your username (Claimed)" }),
+    ).toBeVisible();
+    await expect(claim).toHaveCount(0);
+    await page.reload();
+    await expect(page.getByText("10 of 1,195 XP earned")).toBeVisible();
     const eightEvents = page.getByRole("progressbar", { name: "Attend 8 events" });
     await expect(eightEvents).toHaveAttribute("aria-valuenow", "5");
     await expect(eightEvents).toHaveAttribute("aria-valuemax", "8");

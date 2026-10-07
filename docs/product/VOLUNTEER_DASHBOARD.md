@@ -40,8 +40,9 @@ are stored as ISO 639 codes and named from the `languages` catalog; a value
 typed before the list existed is recognised where it can be and kept as it
 was where it cannot.
 
-Below the figures sits **Checkpoints**: how many milestones are reached, the
-XP they paid out of the XP available, and the next three to reach, each with
+Below the figures sits **Milestones**: how many milestones are reached, the
+XP claimed out of the XP available, XP ready to claim, and three suggested
+rewards, each with
 its progress and reward. It is drawn for a new volunteer too, because the
 first checkpoints (username, profile, Telegram) are exactly what a new account
 needs next. See [`CHECKPOINTS.md`](CHECKPOINTS.md).

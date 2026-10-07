@@ -81,7 +81,11 @@ function Checkpoints({ list }: { list: CheckpointList }) {
           >
             <ol>
               {items.map((checkpoint) => (
-                <CheckpointRow key={checkpoint.key} checkpoint={checkpoint} />
+                <CheckpointRow
+                  key={checkpoint.key}
+                  checkpoint={checkpoint}
+                  claimingEnabled={list.claimingEnabled}
+                />
               ))}
             </ol>
           </Panel>

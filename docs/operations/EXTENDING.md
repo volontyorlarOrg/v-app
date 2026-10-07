@@ -33,7 +33,7 @@ inside the source. Compiler and linter directives are not comments and stay.
    opens with `PageHeader` and composes `Panel`s.
 4. **Keep it private.** Every response already carries `noindex`; a public
    route needs the per-route policy from the implementation plan first.
-5. **Run the checks.** The tab bar is intentionally limited to four essential
+5. **Run the checks.** The tab bar is intentionally limited to five essential
    destinations; `routes.test.ts` says so.
 
 A list too long for one screen pages through `Pagination` from

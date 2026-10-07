@@ -182,6 +182,27 @@ the raw string, and the anchor carries `rel="noopener noreferrer nofollow"`.
 They are designed in
 [`../plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](../plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md).
 
+## Dependency review for milestone launch
+
+The October 7, 2026 release updates Next.js and its matching lint configuration
+to 16.3.6 and refreshes compatible dependencies. The unused local shadcn generator
+was removed; existing components remain ordinary checked-in source.
+
+`npm run security:audit` blocks high and critical advisories, including new
+development findings. One temporary exception covers
+[the unpatched braces recursion advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+and its five-package lint dependency chain. Every affected installed node must be
+development-only, the advisory must match exactly, and the exception expires on
+November 7, 2026. Braces is reached through Next's lint tooling on repository
+glob patterns, not browser or API input, and is absent from production dependencies.
+An additional advisory, runtime dependency or expired exception fails CI.
+
+Milestone writes use a Server Action with the encrypted session. The backend
+derives the account from the bearer token, refuses client reward amounts, locks
+the canonical account, and atomically records a claim and its XP. Claim retries
+return the existing result. The interface obeys the server launch gate, while
+the backend enforces it independently.
+
 ## Secrets
 
 The application still requires no secret to install, lint, typecheck, test, or

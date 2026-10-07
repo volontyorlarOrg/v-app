@@ -372,6 +372,7 @@ function checkpointFacts(state) {
 
 function checkpointList(state) {
   state.checkpointsReached ??= new Map();
+  state.checkpointsClaimed ??= new Map();
   const facts = checkpointFacts(state);
   const items = CHECKPOINTS.map((checkpoint) => {
     if (
@@ -389,14 +390,22 @@ function checkpointList(state) {
         : Math.min(facts[checkpoint.metric], checkpoint.target),
       xp: checkpoint.xp,
       completedAt,
+      claimedAt: state.checkpointsClaimed.get(checkpoint.key) ?? null,
     };
   });
   const reached = items.filter((item) => item.completedAt !== null);
   return {
     items,
+    claimingEnabled: true,
     completed: reached.length,
     total: items.length,
-    xpEarned: reached.reduce((total, item) => total + item.xp, 0),
+    claimed: reached.filter((item) => item.claimedAt).length,
+    xpEarned: reached
+      .filter((item) => item.claimedAt)
+      .reduce((total, item) => total + item.xp, 0),
+    xpClaimable: reached
+      .filter((item) => !item.claimedAt)
+      .reduce((total, item) => total + item.xp, 0),
     xpAvailable: CHECKPOINTS.reduce((total, item) => total + item.xp, 0),
   };
 }
@@ -1382,6 +1391,26 @@ const server = createServer(async (request, response) => {
     return send(response, 200, state.profile);
   }
   if (path === "/record" && method === "GET") return send(response, 200, state.record);
+  if (
+    path.startsWith("/checkpoints/") &&
+    path.endsWith("/claim") &&
+    method === "POST"
+  ) {
+    const key = path.split("/")[2];
+    const item = checkpointList(state).items.find((item) => item.key === key);
+    if (!item) return send(response, 422, { code: "validation" });
+    if (!item.completedAt) return send(response, 409, { code: "checkpointNotReached" });
+    if (!state.checkpointsClaimed.has(key)) {
+      state.checkpointsClaimed.set(key, new Date().toISOString());
+      state.record.xp += item.xp;
+    }
+    return send(response, 200, {
+      key,
+      xp: item.xp,
+      claimedAt: state.checkpointsClaimed.get(key),
+    });
+  }
+
   if (path === "/checkpoints" && method === "GET")
     return send(response, 200, checkpointList(state));
   if (path === "/record/history" && method === "GET")

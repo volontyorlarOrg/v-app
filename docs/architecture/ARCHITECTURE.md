@@ -153,7 +153,7 @@ identity card is the profile's link (`IDENTITY_ROUTE`, lit on `/profile` and
 the interface language are not shell controls at all; they are the Appearance
 panel on `/settings`. The column holds the phone header (lockup, bell, avatar;
 hidden from the large breakpoint), the workspace and the footer, and the tab
-bar carries four essential destinations on a phone. Every navigation reads the
+bar carries five essential destinations on a phone. Every navigation reads the
 registry: `primaryNavRoutes` for the stack under the lockup,
 `accountNavRoutes` for the stack at the foot (and for the phone's account
 menu, whose name block is the same profile link), `IDENTITY_ROUTE` for the

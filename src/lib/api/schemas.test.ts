@@ -656,6 +656,7 @@ describe("merge requests", () => {
 
 describe("checkpoints", () => {
   const list = {
+    claimingEnabled: true,
     items: [
       {
         key: "profile",
@@ -664,6 +665,7 @@ describe("checkpoints", () => {
         progress: 1,
         xp: 40,
         completedAt: "2026-10-07T09:00:00.000Z",
+        claimedAt: "2026-10-07T09:00:00.000Z",
       },
       {
         key: "hours_10",
@@ -672,9 +674,12 @@ describe("checkpoints", () => {
         progress: 4.5,
         xp: 25,
         completedAt: null,
+        claimedAt: null,
       },
     ],
     completed: 1,
+    claimed: 1,
+    xpClaimable: 0,
     total: 17,
     xpEarned: 40,
     xpAvailable: 1195,
