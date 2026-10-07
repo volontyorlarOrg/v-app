@@ -777,7 +777,7 @@ test.describe("the panel", () => {
     const sidebar = page.getByRole("complementary");
     await expect(
       page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-    ).toHaveCount(3);
+    ).toHaveCount(4);
     await expect(page.getByRole("banner")).toHaveCount(0);
     await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
 
