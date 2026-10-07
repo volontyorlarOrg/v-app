@@ -203,6 +203,15 @@ the canonical account, and atomically records a claim and its XP. Claim retries
 return the existing result. The interface obeys the server launch gate, while
 the backend enforces it independently.
 
+Provider callback logs omit raw provider values and caught error objects. API
+failure logs encode bounded fields as one JSON line, omit query values and error
+details, and retain only generated UUID request IDs. The historic high CodeQL
+provider-error branch finding was reviewed: that branch only redirects to a fixed
+local error screen; it grants no session and skips no successful-login checks.
+Successful callbacks still require the matching browser state and backend OIDC
+redemption. Backend alert enumeration requires GitHub Advanced Security, which
+is not enabled for that repository; its CodeQL workflow results remain separate.
+
 ## Secrets
 
 The application still requires no secret to install, lint, typecheck, test, or

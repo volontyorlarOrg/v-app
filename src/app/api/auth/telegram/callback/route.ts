@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
 
   const providerError = url.searchParams.get("error");
   if (providerError) {
-    console.warn("[telegram-auth] telegram declined the sign-in:", providerError);
     return backToLogin(telegramStatusForProviderError(providerError));
   }
 
@@ -70,7 +69,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const status = telegramStatusForError(error);
     if (status === "unavailable") {
-      console.error("[telegram-auth] callback redemption failed:", error);
+      console.error("[telegram-auth] callback redemption unavailable");
     } else {
       console.warn("[telegram-auth] callback rejected:", status);
     }
