@@ -25,7 +25,7 @@
     "applications": "Applications",
     "saved": "Saved",
     "record": "My record",
-    "checkpoints": "Checkpoints",
+    "checkpoints": "Milestones",
     "leaderboard": "Leaderboard",
     "profile": "Profile",
     "settings": "Settings",
@@ -85,7 +85,10 @@
       "checkpoint": {
         "title": "{count, plural, one {Checkpoint reached} other {# checkpoints reached}}",
         "one": "{name}: +{xp} XP",
-        "many": "+{xp} XP earned"
+        "many": "+{xp} XP earned",
+        "readyTitle": "{count, plural, one {Reward ready to claim} other {# rewards ready to claim}}",
+        "readyOne": "{name}: claim {xp} XP in Milestones.",
+        "readyMany": "Claim {xp} XP in Milestones."
       }
     },
     "userMenu": {
@@ -393,13 +396,14 @@
     }
   },
   "checkpoints": {
-    "metaTitle": "Checkpoints",
-    "title": "Checkpoints",
-    "description": "Milestones along the way. Each one pays XP once, the moment you reach it.",
+    "metaTitle": "Milestones",
+    "title": "Milestones",
+    "description": "Reach a checkpoint, then claim its reward to add XP to your account.",
     "summary": {
       "label": "Checkpoints reached",
       "reached": "{completed} of {total} reached",
-      "xp": "{earned} of {available} XP earned"
+      "xp": "{earned} of {available} XP earned",
+      "claimable": "{xp} XP ready to claim"
     },
     "groups": {
       "start": "Getting started",
@@ -484,11 +488,23 @@
     "reached": "Reached",
     "notReached": "Not reached yet",
     "panel": {
-      "title": "Checkpoints",
-      "description": "Reach a milestone, earn XP once.",
+      "title": "Milestones",
+      "description": "Reach checkpoints and claim your XP rewards.",
       "next": "Up next",
       "all": "See all",
-      "done": "You have reached every checkpoint."
+      "done": "You have claimed every milestone reward."
+    },
+    "claim": {
+      "ready": "Ready to claim",
+      "button": "Claim {xp} XP",
+      "claiming": "Claiming…",
+      "claimed": "Claimed",
+      "claimedOn": "Claimed {date}",
+      "accessible": "Claim {xp} XP for {name}",
+      "success": "Reward claimed: +{xp} XP",
+      "error": "Could not claim this reward. Try again.",
+      "notReached": "This checkpoint is not ready yet. Refresh to see your progress.",
+      "unavailable": "Claiming will open after the XP reset. Please check back shortly."
     }
   },
   "leaderboard": {

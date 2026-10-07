@@ -523,10 +523,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List every checkpoint with progress, awarding any newly reached ones first */
+        /** List all milestones, recording reached checkpoints without awarding XP */
         get: operations["CheckpointsController_list"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkpoints/{key}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim a reached milestone reward once. Repeated claims return the original reward. */
+        post: operations["CheckpointsController_claim"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2704,7 +2721,7 @@ export interface components {
              */
             progress: number;
             /**
-             * @description XP awarded when reached, or XP it pays once reached.
+             * @description XP available to claim once reached; stored reward for completed checkpoints.
              * @example 40
              */
             xp: number;
@@ -2713,11 +2730,17 @@ export interface components {
              * @example 2026-10-07T09:30:00.000Z
              */
             completedAt: string | null;
+            /** Format: date-time */
+            claimedAt: string | null;
         };
         CheckpointListDto: {
+            /** @description Claiming opens after the production XP reset completes. */
+            claimingEnabled: boolean;
             items: components["schemas"]["CheckpointDto"][];
             /** @example 4 */
             completed: number;
+            /** @example 2 */
+            claimed: number;
             /** @example 17 */
             total: number;
             /**
@@ -2730,6 +2753,20 @@ export interface components {
              * @example 1195
              */
             xpAvailable: number;
+            /**
+             * @description XP from reached, unclaimed checkpoints in the current catalog.
+             * @example 40
+             */
+            xpClaimable: number;
+        };
+        ClaimCheckpointBodyDto: Record<string, never>;
+        CheckpointClaimDto: {
+            /** @example profile */
+            key: string;
+            /** @example 40 */
+            xp: number;
+            /** Format: date-time */
+            claimedAt: string;
         };
         UpdateProfileDto: {
             fullName: string;
@@ -5795,6 +5832,101 @@ export interface operations {
                 content?: never;
             };
             /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CheckpointsController_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: "username" | "profile" | "telegram" | "second_sign_in" | "first_saved" | "first_application" | "first_acceptance" | "events_1" | "events_3" | "events_8" | "events_20" | "hours_10" | "hours_25" | "hours_50" | "hours_100" | "competition_1" | "competition_win";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClaimCheckpointBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckpointClaimDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description checkpointNotReached: the checkpoint has not been reached. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description validation: unknown checkpoint key. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description checkpointClaimsUnavailable: claiming has not opened yet. */
             503: {
                 headers: {
                     [name: string]: unknown;

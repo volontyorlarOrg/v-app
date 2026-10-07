@@ -41,6 +41,11 @@ export function CheckpointSummary({
         aria-label={t("label")}
         className="mt-2"
       />
+      {list.xpClaimable > 0 ? (
+        <p className="mt-2 text-sm font-semibold text-accent-ink">
+          {t("claimable", { xp: format.number(list.xpClaimable) })}
+        </p>
+      ) : null}
     </div>
   );
 }

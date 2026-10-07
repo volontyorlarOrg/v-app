@@ -25,7 +25,7 @@
     "applications": "Arizalar",
     "saved": "Saqlanganlar",
     "record": "Mening tarixim",
-    "checkpoints": "Marralar",
+    "checkpoints": "Bosqichlar",
     "leaderboard": "Reyting",
     "profile": "Profil",
     "settings": "Sozlamalar",
@@ -85,7 +85,10 @@
       "checkpoint": {
         "title": "{count, plural, one {Marraga yetdingiz} other {# ta marraga yetdingiz}}",
         "one": "{name}: +{xp} XP",
-        "many": "+{xp} XP qoʻlga kiritildi"
+        "many": "+{xp} XP qoʻlga kiritildi",
+        "readyTitle": "{count, plural, one {Mukofot olishga tayyor} other {# ta mukofot olishga tayyor}}",
+        "readyOne": "{name}: Bosqichlar boʻlimida {xp} XP oling.",
+        "readyMany": "Bosqichlar boʻlimida {xp} XP oling."
       }
     },
     "userMenu": {
@@ -393,13 +396,14 @@
     }
   },
   "checkpoints": {
-    "metaTitle": "Marralar",
-    "title": "Marralar",
-    "description": "Yoʻlingizdagi muhim bosqichlar. Har biriga yetganingizda bir marta XP beriladi.",
+    "metaTitle": "Bosqichlar",
+    "title": "Bosqichlar",
+    "description": "Bosqichga erishing, keyin hisobingizga XP qoʻshish uchun mukofotni oling.",
     "summary": {
       "label": "Bajarilgan marralar",
       "reached": "{total} tadan {completed} tasi bajarildi",
-      "xp": "{available} XP dan {earned} XP olindi"
+      "xp": "{available} XP dan {earned} XP olindi",
+      "claimable": "{xp} XP olishga tayyor"
     },
     "groups": {
       "start": "Boshlash",
@@ -484,11 +488,23 @@
     "reached": "Bajarildi",
     "notReached": "Hali bajarilmagan",
     "panel": {
-      "title": "Marralar",
-      "description": "Marraga yeting va bir marta XP oling.",
+      "title": "Bosqichlar",
+      "description": "Bosqichlarga erishing va XP mukofotlarini oling.",
       "next": "Navbatdagilar",
       "all": "Barchasi",
-      "done": "Barcha marralarga yetdingiz."
+      "done": "Barcha bosqich mukofotlarini oldingiz."
+    },
+    "claim": {
+      "ready": "Olishga tayyor",
+      "button": "{xp} XP olish",
+      "claiming": "Olinmoqda…",
+      "claimed": "Olindi",
+      "claimedOn": "{date} kuni olindi",
+      "accessible": "{name} uchun {xp} XP olish",
+      "success": "Mukofot olindi: +{xp} XP",
+      "error": "Mukofotni olib boʻlmadi. Qayta urinib koʻring.",
+      "notReached": "Bu bosqich hali tayyor emas. Natijani koʻrish uchun sahifani yangilang.",
+      "unavailable": "XP qayta boshlanganidan keyin mukofot olish ochiladi. Birozdan keyin tekshiring."
     }
   },
   "leaderboard": {

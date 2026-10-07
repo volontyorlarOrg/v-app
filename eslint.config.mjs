@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "*.tsbuildinfo",
     "docs/**",
     "src/lib/api/generated/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

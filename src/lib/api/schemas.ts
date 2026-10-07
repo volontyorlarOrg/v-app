@@ -310,14 +310,24 @@ export const checkpointSchema = z.object({
   progress: z.number().nonnegative(),
   xp: z.number().int().nonnegative(),
   completedAt: isoDate.nullable(),
+  claimedAt: isoDate.nullable(),
+});
+
+export const checkpointClaimSchema = z.object({
+  key: z.string().min(1),
+  xp: z.number().int().nonnegative(),
+  claimedAt: isoDate,
 });
 
 export const checkpointListSchema = z.object({
+  claimingEnabled: z.boolean(),
   items: z.array(checkpointSchema),
   completed: z.number().int().nonnegative(),
+  claimed: z.number().int().nonnegative(),
   total: z.number().int().nonnegative(),
   xpEarned: z.number().int().nonnegative(),
   xpAvailable: z.number().int().nonnegative(),
+  xpClaimable: z.number().int().nonnegative(),
 });
 
 export const leaderboardEntrySchema = z

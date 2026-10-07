@@ -18,6 +18,7 @@ export const ROUTE_ICONS: Partial<Record<RouteKey, LucideIcon>> = {
   applications: FileText,
   saved: Bookmark,
   record: Medal,
+  checkpoints: Medal,
   leaderboard: Trophy,
   profile: UserRound,
   settings: Settings,

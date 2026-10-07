@@ -117,6 +117,7 @@ export function activityNotification(
 }
 
 export const CHECKPOINT_NOTIFICATION_KIND = "checkpoint.completed";
+export const CHECKPOINT_READY_NOTIFICATION_KIND = "checkpoint.ready";
 
 export type CheckpointNotification = {
   keys: CheckpointKey[];
@@ -127,7 +128,11 @@ export function checkpointNotification(
   kind: string,
   data: Notification["data"],
 ): CheckpointNotification | null {
-  if (kind !== CHECKPOINT_NOTIFICATION_KIND) return null;
+  if (
+    kind !== CHECKPOINT_NOTIFICATION_KIND &&
+    kind !== CHECKPOINT_READY_NOTIFICATION_KIND
+  )
+    return null;
   const awards = Array.isArray(data?.checkpoints) ? data.checkpoints : [];
   const keys = awards.flatMap((award: unknown) => {
     const key =

@@ -76,7 +76,7 @@ describe("app route registry", () => {
     }
     expect(
       appRoutes.filter((route) => route.navGroup !== null).map((route) => route.key),
-    ).toEqual(["dashboard", "opportunities", "leaderboard", "settings"]);
+    ).toEqual(["dashboard", "opportunities", "checkpoints", "leaderboard", "settings"]);
   });
 
   it("puts the leaderboard in the sidebar and the phone tab bar, never the account group", () => {
@@ -94,10 +94,11 @@ describe("app route registry", () => {
     }
   });
 
-  it("keeps the sidebar's primary group to three sections", () => {
+  it("keeps the sidebar's primary group to four sections", () => {
     expect(primaryNavRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
+      "checkpoints",
       "leaderboard",
     ]);
   });
@@ -117,14 +118,14 @@ describe("app route registry", () => {
     expect(sectionKeyFor("/opportunities/winter-book-drive")).toBe("opportunities");
   });
 
-  it("keeps checkpoints under the dashboard, without a sidebar row or a tab", () => {
+  it("makes milestones a dedicated sidebar section and phone tab", () => {
     const checkpoints = getRoute("checkpoints");
     expect(checkpoints.path).toBe("/checkpoints");
     expect(checkpoints.guard).toBe("session");
-    expect(checkpoints.navGroup).toBeNull();
-    expect(checkpoints.inTabBar).toBe(false);
-    expect(sectionKeyFor("/en/checkpoints")).toBe("dashboard");
-    expect(isSectionActive("/checkpoints", "dashboard")).toBe(true);
+    expect(checkpoints.navGroup).toBe("primary");
+    expect(checkpoints.inTabBar).toBe(true);
+    expect(sectionKeyFor("/en/checkpoints")).toBe("checkpoints");
+    expect(isSectionActive("/checkpoints", "checkpoints")).toBe(true);
     expect(guardFor("/uz/checkpoints")).toBe("session");
   });
 
@@ -161,10 +162,11 @@ describe("app route registry", () => {
     expect(historyHref()).toBe("/dashboard#history");
   });
 
-  it("keeps the mobile tab bar to four essential destinations", () => {
+  it("keeps the mobile tab bar to five essential destinations", () => {
     expect(tabBarRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
+      "checkpoints",
       "leaderboard",
       "profile",
     ]);

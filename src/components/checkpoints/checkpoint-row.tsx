@@ -14,11 +14,13 @@ import {
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { ClaimButton } from "@/components/checkpoints/claim-button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   hasCountedProgress,
   isReached,
+  isClaimed,
   type Checkpoint,
   type CheckpointKey,
 } from "@/lib/checkpoints/checkpoints";
@@ -44,11 +46,18 @@ const ICONS: Record<CheckpointKey, LucideIcon> = {
   competition_win: Medal,
 };
 
-export function CheckpointRow({ checkpoint }: { checkpoint: Checkpoint }) {
+export function CheckpointRow({
+  checkpoint,
+  claimingEnabled,
+}: {
+  checkpoint: Checkpoint;
+  claimingEnabled: boolean;
+}) {
   const t = useTranslations("checkpoints");
   const format = useFormatter();
   const Icon = ICONS[checkpoint.key];
   const reached = isReached(checkpoint);
+  const claimed = isClaimed(checkpoint);
   const title = t(`items.${checkpoint.key}.title`);
   const progress = t("progress", {
     progress: format.number(checkpoint.progress),
@@ -69,7 +78,7 @@ export function CheckpointRow({ checkpoint }: { checkpoint: Checkpoint }) {
         <Icon className="size-4.5" />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
           <h3
             className={cn(
               "min-w-0 text-base font-semibold text-balance",
@@ -79,7 +88,13 @@ export function CheckpointRow({ checkpoint }: { checkpoint: Checkpoint }) {
             {title}
             <span className="sr-only">
               {" "}
-              ({reached ? t("reached") : t("notReached")})
+              (
+              {claimed
+                ? t("claim.claimed")
+                : reached
+                  ? t("claim.ready")
+                  : t("notReached")}
+              )
             </span>
           </h3>
           <Badge
@@ -110,6 +125,38 @@ export function CheckpointRow({ checkpoint }: { checkpoint: Checkpoint }) {
             <span className="tabular shrink-0 text-sm text-ink-muted">{progress}</span>
           </div>
         ) : null}
+        {claimed && checkpoint.claimedAt ? (
+          <p className="mt-2 text-sm font-semibold text-accent-ink">
+            {t("claim.claimedOn", {
+              date: format.dateTime(new Date(checkpoint.claimedAt), "date"),
+            })}
+          </p>
+        ) : reached ? (
+          <>
+            <p className="mt-2 text-sm font-semibold text-accent-ink">
+              {t("claim.ready")}
+            </p>
+            <ClaimButton
+              checkpointKey={checkpoint.key}
+              enabled={claimingEnabled}
+              labels={{
+                claim: t("claim.button", { xp: format.number(checkpoint.xp) }),
+                claiming: t("claim.claiming"),
+                claimed: t("claim.claimed"),
+                accessible: t("claim.accessible", {
+                  name: title,
+                  xp: format.number(checkpoint.xp),
+                }),
+                success: t("claim.success", { xp: format.number(checkpoint.xp) }),
+                error: t("claim.error"),
+                notReached: t("claim.notReached"),
+                unavailable: t("claim.unavailable"),
+              }}
+            />
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-ink-muted">{t("notReached")}</p>
+        )}
       </div>
     </li>
   );

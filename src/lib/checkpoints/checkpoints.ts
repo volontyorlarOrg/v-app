@@ -37,6 +37,7 @@ export type CheckpointItem = {
   progress: number;
   xp: number;
   completedAt: string | null;
+  claimedAt: string | null;
 };
 
 export type Checkpoint = CheckpointItem & {
@@ -63,6 +64,10 @@ export function isReached(item: CheckpointItem): boolean {
   return item.completedAt !== null;
 }
 
+export function isClaimed(item: CheckpointItem): boolean {
+  return item.claimedAt !== null;
+}
+
 export function groupedCheckpoints(
   items: readonly Checkpoint[],
 ): Array<{ group: CheckpointGroup; items: Checkpoint[] }> {
@@ -79,8 +84,12 @@ function seriesOf(item: Checkpoint): string {
 export function nextCheckpoints(items: readonly Checkpoint[], count = 3): Checkpoint[] {
   const series = new Set<string>();
   const next: Checkpoint[] = [];
-  for (const item of items) {
-    if (isReached(item) || series.has(seriesOf(item))) continue;
+  const ordered = [
+    ...items.filter((item) => isReached(item) && !isClaimed(item)),
+    ...items.filter((item) => !isReached(item)),
+  ];
+  for (const item of ordered) {
+    if (series.has(seriesOf(item))) continue;
     series.add(seriesOf(item));
     next.push(item);
     if (next.length === count) break;

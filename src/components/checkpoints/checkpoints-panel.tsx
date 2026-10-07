@@ -50,7 +50,11 @@ export function CheckpointsPanel({
         <section aria-label={t("next")} className="border-t border-border">
           <ol>
             {next.map((checkpoint) => (
-              <CheckpointRow key={checkpoint.key} checkpoint={checkpoint} />
+              <CheckpointRow
+                key={checkpoint.key}
+                checkpoint={checkpoint}
+                claimingEnabled={checkpoints.data.claimingEnabled}
+              />
             ))}
           </ol>
         </section>
