@@ -8,6 +8,7 @@ export const RESERVED_PROFILE_SEGMENTS = new Set([
   "about",
   "admin",
   "applications",
+  "checkpoints",
   "contact",
   "dashboard",
   "leaderboard",

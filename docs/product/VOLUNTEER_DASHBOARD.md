@@ -29,7 +29,7 @@ and offers one action: browse opportunities. Beside the greeting hangs the
 volunteer's pass, the badge from the welcome flow, showing the parts their
 profile has filled. Question 3 lives in the hero's band rather than in a
 column of its own, so it is read first: the level rail and the next-level
-meter on one side, the profile's six fields and its completeness meter on the
+meter on one side, the profile's eight fields and its completeness meter on the
 other, each with its one action. The figures below it are completed events,
 reliability, recorded hours, and events awaiting confirmation.
 
@@ -39,6 +39,12 @@ the interface language, found by typing its name in any of the three. They
 are stored as ISO 639 codes and named from the `languages` catalog; a value
 typed before the list existed is recognised where it can be and kept as it
 was where it cannot.
+
+Below the figures sits **Checkpoints**: how many milestones are reached, the
+XP they paid out of the XP available, and the next three to reach, each with
+its progress and reward. It is drawn for a new volunteer too, because the
+first checkpoints (username, profile, Telegram) are exactly what a new account
+needs next. See [`CHECKPOINTS.md`](CHECKPOINTS.md).
 
 Closing-soon and saved opportunities now live together on Opportunities.
 Recent changes live in Notifications. This keeps the dashboard personal and
@@ -84,11 +90,12 @@ actionable instead of making it another catalogue.
 
 ## What is deliberately absent
 
-- **Stars, scores, rankings.** No formula exists that a volunteer agreed to.
+- **Stars and scores made up here.** The level, the leaderboard's XP and the
+  checkpoints all come from the backend; the dashboard never invents a number.
 - **Verified hours.** Hours are shown as recorded with a note until the backend
   defines what an hour means.
-- **Notifications, messaging, an inbox.** Telegram already does this for the
-  community; nothing is duplicated until a product decision exists.
+- **Messaging and an inbox page.** The bell in the sidebar is the only inbox;
+  Telegram carries the same notifications to the phone.
 - **Recommendations by skill.** "Near you" is the only personalisation, because
   region is the only profile field the sample can honestly match on.
 - **Partner or coordinator views.** Different products, no permission model.
@@ -113,14 +120,15 @@ The backend's contract (`../v-backend/docs/api/FRONTEND_CONTRACT.md`) already
 plans most of it. Each block maps to one server-only read once the plan's
 session boundary exists:
 
-| Block                 | Read                                                    | Status in `v-backend`          |
-| --------------------- | ------------------------------------------------------- | ------------------------------ |
-| Hero, record          | `GET /record` (counts, hours, standout flag)            | Planned                        |
-| Next up, applications | `GET /applications` (with opportunity summaries)        | Planned                        |
-| Closing soon          | `GET /opportunities?region=…&sort=deadline&status=open` | Planned; used by Opportunities |
-| Profile               | `GET /profile`                                          | Planned                        |
-| Saved                 | `GET /saved`                                            | Planned; used by Opportunities |
-| Recently              | `GET /activity`                                         | Deferred from the dashboard    |
+| Block                 | Read                                                    | Status in `v-backend`         |
+| --------------------- | ------------------------------------------------------- | ----------------------------- |
+| Hero, record          | `GET /record` (counts, hours, standout flag)            | Implemented                   |
+| Next up, applications | `GET /applications` (with opportunity summaries)        | Implemented                   |
+| Closing soon          | `GET /opportunities?region=…&sort=deadline&status=open` | Implemented; on Opportunities |
+| Profile               | `GET /profile`                                          | Implemented                   |
+| Saved                 | `GET /saved`                                            | Implemented; on Opportunities |
+| Checkpoints           | `GET /checkpoints`                                      | Implemented                   |
+| Recently              | `GET /activity`                                         | Deferred from the dashboard   |
 
 The level, the deadline state, the completion percentage and the upcoming
 filter stay on the frontend, in the same modules the sample uses today.

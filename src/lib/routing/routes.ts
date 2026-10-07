@@ -8,6 +8,7 @@ export type RouteKey =
   | "applications"
   | "saved"
   | "record"
+  | "checkpoints"
   | "leaderboard"
   | "profile"
   | "profileEdit"
@@ -89,6 +90,15 @@ export const appRoutes: readonly AppRoute[] = [
   {
     key: "record",
     path: "/record",
+    area: "volunteer",
+    guard: "session",
+    navGroup: null,
+    inTabBar: false,
+    section: "dashboard",
+  },
+  {
+    key: "checkpoints",
+    path: "/checkpoints",
     area: "volunteer",
     guard: "session",
     navGroup: null,

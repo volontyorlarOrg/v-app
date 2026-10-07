@@ -239,18 +239,18 @@ src/hooks/                      -> useServerAction and useActionForm: TanStack Q
 src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
                                    applications[/id], saved and record (redirects),
-                                   leaderboard, profile, profile/edit, settings
+                                   checkpoints, leaderboard, profile, profile/edit, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
 src/lib/routing/routes.ts       -> the app route registry: area, sidebar, tab bar, hrefs
-src/lib/{record,leaderboard,opportunities,applications,profile,notifications}/
+src/lib/{record,leaderboard,checkpoints,opportunities,applications,profile,notifications}/
                                 -> domain rules and vocabulary, no JSX; each write lives in its actions.ts
 src/lib/onboarding/             -> the welcome flow's steps, pass parts, and progress cookie
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
-src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,opportunities,applications,record,leaderboard,profile,settings}/
+src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,checkpoints,opportunities,applications,record,leaderboard,profile,settings}/
 e2e/                            -> Playwright smoke suite
 docs/                           -> stable project documentation and the plan
 .agent-memory/                  -> durable decisions, discoveries, gotchas
