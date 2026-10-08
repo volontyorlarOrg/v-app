@@ -40,12 +40,11 @@ are stored as ISO 639 codes and named from the `languages` catalog; a value
 typed before the list existed is recognised where it can be and kept as it
 was where it cannot.
 
-Below the figures sits **Milestones**: how many milestones are reached, the
-XP claimed out of the XP available, XP ready to claim, and three suggested
-rewards, each with
-its progress and reward. It is drawn for a new volunteer too, because the
-first checkpoints (username, profile, Telegram) are exactly what a new account
-needs next. See [`CHECKPOINTS.md`](CHECKPOINTS.md).
+Below the figures sits **Tasks**: one row for the profile reward, "+50 XP",
+its state, how many of the 1,000 rewards are claimed, and the claim button or
+"Complete profile". It is drawn for a new volunteer too, because completing the
+profile is exactly what a new account needs next, and it disappears once the
+reward is claimed or no places remain. See [`CHECKPOINTS.md`](CHECKPOINTS.md).
 
 Closing-soon and saved opportunities now live together on Opportunities.
 Recent changes live in Notifications. This keeps the dashboard personal and

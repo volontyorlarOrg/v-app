@@ -76,7 +76,7 @@ describe("app route registry", () => {
     }
     expect(
       appRoutes.filter((route) => route.navGroup !== null).map((route) => route.key),
-    ).toEqual(["dashboard", "opportunities", "checkpoints", "leaderboard", "settings"]);
+    ).toEqual(["dashboard", "opportunities", "leaderboard", "checkpoints", "settings"]);
   });
 
   it("puts the leaderboard in the sidebar and the phone tab bar, never the account group", () => {
@@ -98,8 +98,8 @@ describe("app route registry", () => {
     expect(primaryNavRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
-      "checkpoints",
       "leaderboard",
+      "checkpoints",
     ]);
   });
 
@@ -166,8 +166,8 @@ describe("app route registry", () => {
     expect(tabBarRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
-      "checkpoints",
       "leaderboard",
+      "checkpoints",
       "profile",
     ]);
   });

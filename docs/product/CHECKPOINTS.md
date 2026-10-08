@@ -1,58 +1,79 @@
-# Milestones
+# Tasks
 
-The Milestones section at `/checkpoints` lists all 14 backend checkpoints in five
-groups: Getting started, Applying, Events, Hours and Competitions. It is a primary
-sidebar link and a phone tab. The existing `/checkpoints` URL remains stable.
+The Tasks section at `/checkpoints` holds one task: complete your profile and
+claim 50 XP. Only the first 1,000 volunteers to claim it get it. It is a primary
+sidebar link after the leaderboard and a phone tab. The URL keeps its old name,
+and so do the code and the backend contract ("checkpoint", "milestone").
 
-Getting started has one 85 XP reward for completing the required profile. Only
-the first 1,000 recorded completions receive a reserved reward place. The row
-shows remaining places before completion and confirms a reserved place afterward.
-When places are exhausted, it shows "No rewards left" ("Наград не осталось")
-with an explanation and no claim button. Reserved rewards remain claimable after
-the remaining count reaches zero. Existing claimed starter XP is retained and
-deducted from a pending combined reward to avoid double payment.
+Until 2026-10-08 this section listed 14 milestones (saves, applications,
+events, hours, competitions). They were removed; the backend no longer pays or
+counts their XP, and this build drops any key other than `profile`.
 
-Each row shows its requirement, progress and XP reward. Unfinished checkpoints
-show their progress and an explicit unfinished state. Reached checkpoints show
-"Ready to claim" and a "Claim XP" button. Claimed rewards show their claim date
-and cannot be claimed again. XP is added only by the backend claim operation.
+## The task card
 
-The summary shows reached checkpoints, claimed XP out of total catalog XP, and
-XP ready to claim. The dashboard's Milestones panel prioritizes claimable rewards
-before unfinished checkpoints, excluding exhausted rewards, with one tier per event/hour series. "See all"
-opens the complete list. The completed message appears once all rewards are claimed.
+`ProfileTask` (`src/components/checkpoints/profile-task.tsx`) follows the design
+mock, inside the panel rules, in three ruled parts:
+
+- a header with the volunteer's photo in the orange ring the sidebar and the
+  profile use (initials, then a person icon, when there is no photo), the serif
+  title "Complete your profile", the reward "+50 XP" in the orange figure style
+  and one sentence;
+- two meters side by side (stacked on a phone): the profile in blue ("Your
+  profile: 6 of 7 complete", a percentage, then "Still missing: …" or "Every
+  required detail is filled in.") and the reward places in orange ("700 of 1,000
+  rewards claimed", "Available while rewards remain.");
+- a footer: "Claim once while rewards remain." with "Claim 50 XP" when ready or
+  "Complete profile" (to `/profile/edit`) while fields are missing; "You claimed
+  50 XP on …" once claimed; "All 1,000 rewards have been claimed." when places
+  ran out. A paused launch gate disables the button and says so under it.
+
+The first version also had a status band and a seven-row checklist; both were
+removed on request to keep the card short. The mock's "Profile photo" item was
+never rewarded: the reward follows the backend rule that gates applying, and a
+photo is deliberately not rewarded because the audience includes minors.
+
+`profileTaskChecklist()` in `src/lib/checkpoints/checkpoints.ts` groups the
+eight required profile fields plus the chosen username into seven items (name;
+username; Telegram; languages; region and city; school and grade; short
+introduction) using the same `profileCompletion()` the profile meter uses; the
+card counts them and names the missing ones. The places come from the backend's
+`rewardLimit` and `rewardsRemaining` (`rewardPlaces()`); the frontend never
+counts claims itself.
+
+The dashboard's Tasks panel is one row of the same task: title, "+50 XP", the
+state and the places line, and the claim button or "Complete profile". It is
+hidden once the reward is claimed or no places remain.
 
 ## Data and writes
 
-- `getCheckpoints()` reads `GET /checkpoints` and parses `checkpointListSchema`.
-- Items carry separate `completedAt` and `claimedAt` timestamps. List totals
-  also carry `rewardState`, `rewardLimit`, `rewardsRemaining`, `rewardReserved`; totals
-  include `completed`, `claimed`, `xpEarned`, `xpAvailable` and `xpClaimable`.
+- The page reads `GET /checkpoints`, `GET /profile` and `GET /me` (for the
+  username and the photo); any failure renders the load-error panel under the
+  page header.
 - `claimCheckpointAction()` validates the key and calls authenticated
-  `POST /checkpoints/:key/claim`, parsing `checkpointClaimSchema`.
-- The claim button shows pending, success and translated retryable error states.
-  Revalidating the root layout refreshes milestones, dashboard, profile and XP.
-- The server rejects an unreached reward and derives identity from the session.
-  Repeated requests return the same claim without paying twice.
+  `POST /checkpoints/profile/claim`, parsing `checkpointClaimSchema`. The button
+  shows pending, success and translated errors (`checkpointNotReached`,
+  `checkpointRewardExhausted`, `checkpointClaimsUnavailable`). Revalidating the
+  root layout refreshes the card, the dashboard and XP.
+- The backend owns eligibility, the 1,000 places (taken when claiming, not when
+  completing), authorization, transactions, duplicate prevention and XP.
 
-`checkpoint.ready` notifications and recent toasts tell the volunteer to claim XP
-in Milestones. Historic `checkpoint.completed` notifications retain their original
-earned-XP copy. All copy is available in Uzbek, Russian and English.
+`checkpoint.ready` notifications read "Reward ready to claim" with a link to
+`/checkpoints#task-profile`, and switch to "Reward claimed" or "No profile
+rewards left" as the backend restates them. Legacy `checkpoint.completed`
+notifications are no longer listed by the backend. All copy is in Uzbek, Russian
+and English.
 
-The backend catalog and ledger rules are in
+The backend rules are in
 [`../../../v-backend/docs/architecture/CHECKPOINTS.md`](../../../v-backend/docs/architecture/CHECKPOINTS.md).
-Already awarded rewards are preserved as claimed by the migration.
 
-## Extending and verifying
+## Verifying
 
-Add catalog keys to `CHECKPOINT_KEYS`, their icons to `CheckpointRow`, and title
-and body copy to all three catalogs. Clients drop unknown keys they cannot label.
-Add new catalog entries to the E2E backend fixture.
-
-Unit tests cover grouping, claimable-first suggestions, contract parsing and
-navigation. The milestone browser flow checks all groups, reward claiming,
-refreshed totals, claimed state and persistence after reload. The backend owns
-eligibility, authorization, transactions, duplicate prevention and XP arithmetic.
+Unit tests cover the reward lookup, the places arithmetic, the field grouping
+and the notification parsing. The browser flow checks the locked card and its
+missing-field line, completing the profile, the dashboard row, the notification,
+claiming,
+"701 of 1,000 rewards claimed" after the claim, persistence after reload, and
+the sold-out state.
 
 ## Notification tray
 
@@ -60,5 +81,4 @@ The tray fits the viewport, has a close button, unread count, pending and error
 feedback, and an explanatory empty state. Each destination is a full clickable
 row with a category icon, date and explicit action. Opening a destination marks
 that notification read. Mark-all tracks only the notifications included in that
-request, so later arrivals retain their unread state. Ready notices reflect the
-current backend ledger and switch to claimed or exhausted copy when needed.
+request, so later arrivals retain their unread state.

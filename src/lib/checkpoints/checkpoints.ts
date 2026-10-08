@@ -1,31 +1,12 @@
-export const CHECKPOINT_GROUPS = [
-  "start",
-  "applying",
-  "events",
-  "hours",
-  "competitions",
-] as const;
+import { profileCompletion, type ProfileFields } from "@/lib/profile/completion";
 
-export type CheckpointGroup = (typeof CHECKPOINT_GROUPS)[number];
+export const CHECKPOINT_KEYS = ["profile"] as const;
 
-export const CHECKPOINT_KEYS = [
-  "profile",
-  "first_saved",
-  "first_application",
-  "first_acceptance",
-  "events_1",
-  "events_3",
-  "events_8",
-  "events_20",
-  "hours_10",
-  "hours_25",
-  "hours_50",
-  "hours_100",
-  "competition_1",
-  "competition_win",
-] as const;
+export const PROFILE_TASK_ANCHOR = "task-profile";
 
 export type CheckpointKey = (typeof CHECKPOINT_KEYS)[number];
+
+export type RewardState = "locked" | "ready" | "claimed" | "exhausted";
 
 export type CheckpointItem = {
   key: string;
@@ -35,69 +16,58 @@ export type CheckpointItem = {
   xp: number;
   completedAt: string | null;
   claimedAt: string | null;
-  rewardState: "locked" | "ready" | "claimed" | "exhausted";
+  rewardState: RewardState;
   rewardLimit: number | null;
   rewardsRemaining: number | null;
   rewardReserved: boolean;
 };
 
-export type Checkpoint = CheckpointItem & {
-  key: CheckpointKey;
-  group: CheckpointGroup;
-};
+export type Checkpoint = CheckpointItem & { key: CheckpointKey };
 
 export function isCheckpointKey(value: string): value is CheckpointKey {
   return (CHECKPOINT_KEYS as readonly string[]).includes(value);
 }
 
-function isCheckpointGroup(value: string): value is CheckpointGroup {
-  return (CHECKPOINT_GROUPS as readonly string[]).includes(value);
+export function profileReward(items: readonly CheckpointItem[]): Checkpoint | null {
+  return items.find((item): item is Checkpoint => item.key === "profile") ?? null;
 }
 
-export function knownCheckpoints(items: readonly CheckpointItem[]): Checkpoint[] {
-  return items.filter(
-    (item): item is Checkpoint =>
-      isCheckpointKey(item.key) && isCheckpointGroup(item.group),
-  );
+export type RewardPlaces = { limit: number; claimed: number; remaining: number };
+
+export function rewardPlaces(reward: CheckpointItem): RewardPlaces | null {
+  if (reward.rewardLimit === null || reward.rewardsRemaining === null) return null;
+  const remaining = Math.min(reward.rewardsRemaining, reward.rewardLimit);
+  return {
+    limit: reward.rewardLimit,
+    claimed: reward.rewardLimit - remaining,
+    remaining,
+  };
 }
 
-export function isReached(item: CheckpointItem): boolean {
-  return item.completedAt !== null;
-}
+export const PROFILE_TASK_ITEMS = [
+  { id: "name", fields: ["fullName"] },
+  { id: "username", fields: [] },
+  { id: "telegram", fields: ["telegram"] },
+  { id: "languages", fields: ["languages"] },
+  { id: "place", fields: ["region", "city"] },
+  { id: "school", fields: ["school", "gradeYear"] },
+  { id: "bio", fields: ["bio"] },
+] as const;
 
-export function isClaimed(item: CheckpointItem): boolean {
-  return item.claimedAt !== null;
-}
+export type ProfileTaskItemId = (typeof PROFILE_TASK_ITEMS)[number]["id"];
 
-export function groupedCheckpoints(
-  items: readonly Checkpoint[],
-): Array<{ group: CheckpointGroup; items: Checkpoint[] }> {
-  return CHECKPOINT_GROUPS.flatMap((group) => {
-    const members = items.filter((item) => item.group === group);
-    return members.length > 0 ? [{ group, items: members }] : [];
-  });
-}
+export type ProfileTaskItem = { id: ProfileTaskItemId; done: boolean };
 
-function seriesOf(item: Checkpoint): string {
-  return item.group === "events" || item.group === "hours" ? item.group : item.key;
-}
-
-export function nextCheckpoints(items: readonly Checkpoint[], count = 3): Checkpoint[] {
-  const series = new Set<string>();
-  const next: Checkpoint[] = [];
-  const ordered = [
-    ...items.filter((item) => item.rewardState === "ready"),
-    ...items.filter((item) => !isReached(item) && item.rewardState !== "exhausted"),
-  ];
-  for (const item of ordered) {
-    if (series.has(seriesOf(item))) continue;
-    series.add(seriesOf(item));
-    next.push(item);
-    if (next.length === count) break;
-  }
-  return next;
-}
-
-export function hasCountedProgress(item: CheckpointItem): boolean {
-  return item.target > 1;
+export function profileTaskChecklist(
+  profile: ProfileFields,
+  usernameChosen: boolean,
+): ProfileTaskItem[] {
+  const { missing } = profileCompletion(profile);
+  return PROFILE_TASK_ITEMS.map((item) => ({
+    id: item.id,
+    done:
+      item.id === "username"
+        ? usernameChosen
+        : item.fields.every((field) => !missing.includes(field)),
+  }));
 }

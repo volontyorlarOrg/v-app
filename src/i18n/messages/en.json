@@ -25,7 +25,7 @@
     "applications": "Applications",
     "saved": "Saved",
     "record": "My record",
-    "checkpoints": "Milestones",
+    "checkpoints": "Tasks",
     "leaderboard": "Leaderboard",
     "profile": "Profile",
     "settings": "Settings",
@@ -83,26 +83,22 @@
         }
       },
       "checkpoint": {
-        "title": "{count, plural, one {Checkpoint reached} other {# checkpoints reached}}",
-        "one": "{name}: +{xp} XP",
-        "many": "+{xp} XP earned",
-        "readyTitle": "{count, plural, one {Reward ready to claim} other {# rewards ready to claim}}",
-        "readyOne": "{name}: claim {xp} XP in Milestones.",
-        "readyMany": "Claim {xp} XP in Milestones.",
+        "readyTitle": "Reward ready to claim",
+        "readyBody": "{name}: claim {xp} XP in Tasks.",
         "claimedTitle": "Reward claimed",
         "claimedBody": "{xp} XP has been added to your account.",
         "exhaustedTitle": "No profile rewards left",
-        "exhaustedBody": "All 1,000 profile reward places have been reserved. You can still complete your profile and apply."
+        "exhaustedBody": "All 1,000 profile rewards have been claimed. You can still complete your profile and apply."
       },
       "close": "Close notifications",
       "allRead": "All caught up",
       "marking": "Marking…",
       "readError": "Could not mark notifications as read. Please try again.",
-      "emptyBody": "Application updates and milestone rewards will appear here.",
+      "emptyBody": "Application updates and task rewards will appear here.",
       "new": "Unread",
       "viewDetails": "View details",
       "viewReward": "Claim reward",
-      "viewMilestones": "View milestones",
+      "viewTasks": "View tasks",
       "viewAccount": "View account",
       "unreadLabel": "Unread"
     },
@@ -411,121 +407,57 @@
     }
   },
   "checkpoints": {
-    "metaTitle": "Milestones",
-    "title": "Milestones",
-    "description": "Reach a checkpoint, then claim its reward to add XP to your account.",
-    "summary": {
-      "label": "Checkpoints reached",
-      "reached": "{completed} of {total} reached",
-      "xp": "{earned} of {available} XP earned",
-      "claimable": "{xp} XP ready to claim"
-    },
-    "groups": {
-      "start": "Getting started",
-      "applying": "Applying",
-      "events": "Events",
-      "hours": "Hours",
-      "competitions": "Competitions"
-    },
-    "items": {
-      "username": {
-        "title": "Choose your username",
-        "body": "Pick the name other volunteers see on the leaderboard."
-      },
-      "profile": {
-        "title": "Complete your profile",
-        "body": "Fill in every required field so you can apply anywhere."
-      },
-      "telegram": {
-        "title": "Connect Telegram",
-        "body": "Get decisions and reminders straight from our bot."
-      },
-      "second_sign_in": {
-        "title": "Add a second way to sign in",
-        "body": "Keep your account within reach if one way in stops working."
-      },
-      "first_saved": {
-        "title": "Save an opportunity",
-        "body": "Bookmark one you would like to come back to."
-      },
-      "first_application": {
-        "title": "Send your first application",
-        "body": "Apply to an opportunity that fits you."
-      },
-      "first_acceptance": {
-        "title": "Get accepted",
-        "body": "An organiser says yes to one of your applications."
-      },
-      "events_1": {
-        "title": "Attend your first event",
-        "body": "Take part and have your attendance confirmed."
-      },
-      "events_3": {
-        "title": "Attend 3 events",
-        "body": "Confirmed attendance at three events."
-      },
-      "events_8": {
-        "title": "Attend 8 events",
-        "body": "Confirmed attendance at eight events."
-      },
-      "events_20": {
-        "title": "Attend 20 events",
-        "body": "Confirmed attendance at twenty events."
-      },
-      "hours_10": {
-        "title": "Volunteer 10 hours",
-        "body": "Ten confirmed volunteering hours."
-      },
-      "hours_25": {
-        "title": "Volunteer 25 hours",
-        "body": "Twenty-five confirmed volunteering hours."
-      },
-      "hours_50": {
-        "title": "Volunteer 50 hours",
-        "body": "Fifty confirmed volunteering hours."
-      },
-      "hours_100": {
-        "title": "Volunteer 100 hours",
-        "body": "A hundred confirmed volunteering hours."
-      },
-      "competition_1": {
-        "title": "Take part in a competition",
-        "body": "Have your part in a competition confirmed."
-      },
-      "competition_win": {
-        "title": "Win a competition",
-        "body": "Finish a competition as a winner."
+    "metaTitle": "Tasks",
+    "title": "Tasks",
+    "description": "Complete simple actions and claim platform rewards.",
+    "xp": "+{xp} XP",
+    "profile": {
+      "title": "Complete your profile",
+      "body": "Complete the required profile details, then claim your launch bonus.",
+      "progress": "Your profile: {done} of {total} complete",
+      "percent": "{percent}%",
+      "label": "Required profile details",
+      "missing": "Still missing: {fields}",
+      "complete": "Every required detail is filled in.",
+      "items": {
+        "name": "First and last name",
+        "username": "Username",
+        "telegram": "Telegram username",
+        "languages": "Languages you speak",
+        "place": "Region and city",
+        "school": "School and grade",
+        "bio": "Short introduction"
       }
     },
-    "xp": "+{xp} XP",
-    "progress": "{progress} of {target}",
-    "reachedOn": "Reached {date}",
-    "reached": "Reached",
-    "notReached": "Not reached yet",
+    "places": {
+      "claimed": "{claimed} of {limit} rewards claimed",
+      "label": "Rewards claimed",
+      "note": "Available while rewards remain."
+    },
+    "status": {
+      "ready": "Your reward is ready.",
+      "claimed": "You claimed {xp} XP on {date}.",
+      "exhausted": "All {limit} rewards have been claimed.",
+      "exhaustedBody": "You can still complete your profile and apply to opportunities.",
+      "paused": "Claiming is paused for now. Your reward will wait for you."
+    },
+    "footer": "Claim once while rewards remain.",
+    "completeProfile": "Complete profile",
     "panel": {
-      "title": "Milestones",
-      "description": "Reach checkpoints and claim your XP rewards.",
-      "next": "Up next",
-      "all": "See all",
-      "done": "All available rewards are claimed."
+      "title": "Tasks",
+      "description": "Claim XP for simple actions while rewards remain.",
+      "all": "Open tasks"
     },
     "claim": {
-      "ready": "Ready to claim",
       "button": "Claim {xp} XP",
       "claiming": "Claiming…",
       "claimed": "Claimed",
-      "claimedOn": "Claimed {date}",
       "accessible": "Claim {xp} XP for {name}",
       "success": "Reward claimed: +{xp} XP",
       "error": "Could not claim this reward. Try again.",
       "notReached": "This checkpoint is not ready yet. Refresh to see your progress.",
       "unavailable": "Reward claiming is temporarily unavailable. Please try again later.",
-      "limited": "For the first {limit} volunteers to complete their profiles.",
-      "remaining": "{count} reward places left",
-      "reserved": "Your reward is reserved. Claim it whenever you are ready.",
-      "exhausted": "No rewards left",
-      "exhaustedBody": "All {limit} places have been reserved. You can still complete your profile and apply to opportunities.",
-      "completeProfile": "Complete profile"
+      "exhausted": "No rewards left"
     }
   },
   "leaderboard": {

@@ -77,48 +77,47 @@ describe("application and attendance notifications", () => {
   });
 });
 
-describe("checkpoint notifications", () => {
-  it("reads the checkpoints reached together and the XP they paid", () => {
+describe("profile reward notifications", () => {
+  it("reads a ready reward and the XP it pays", () => {
     expect(
-      checkpointNotification("checkpoint.completed", {
+      checkpointNotification("checkpoint.ready", {
         userId: "user-1",
-        checkpoints: [
-          { key: "username", xp: 10 },
-          { key: "profile", xp: 40 },
-        ],
+        checkpoints: [{ key: "profile", xp: 50 }],
         xp: 50,
+        rewardState: "ready",
       }),
-    ).toEqual({ keys: ["username", "profile"], xp: 50, rewardState: "ready" });
+    ).toEqual({ xp: 50, rewardState: "ready" });
   });
 
-  it("names only the checkpoints this build has copy for", () => {
-    expect(
-      checkpointNotification("checkpoint.completed", {
-        checkpoints: [
-          { key: "brand_new", xp: 5 },
-          { key: "profile", xp: 40 },
-          "events_1",
-        ],
-        xp: 45,
-      }),
-    ).toEqual({ keys: ["profile"], xp: 45, rewardState: "ready" });
+  it("follows the backend when the reward was claimed or the places ran out", () => {
+    for (const rewardState of ["claimed", "exhausted"] as const)
+      expect(
+        checkpointNotification("checkpoint.ready", {
+          checkpoints: [{ key: "profile", xp: 50 }],
+          xp: 50,
+          rewardState,
+        }),
+      ).toEqual({ xp: 50, rewardState });
   });
 
-  it("leaves a checkpoint notification it cannot read to the backend's own words", () => {
+  it("leaves removed milestones and the automatic-award notices to the backend's own words", () => {
     expect(
-      checkpointNotification("checkpoint.completed", {
-        checkpoints: [{ key: "brand_new", xp: 5 }],
-        xp: 5,
+      checkpointNotification("checkpoint.ready", {
+        checkpoints: [{ key: "events_1", xp: 50 }],
+        xp: 50,
       }),
     ).toBeNull();
     expect(
       checkpointNotification("checkpoint.completed", {
         checkpoints: [{ key: "profile", xp: 40 }],
+        xp: 40,
       }),
     ).toBeNull();
-    expect(checkpointNotification("checkpoint.completed", null)).toBeNull();
     expect(
-      checkpointNotification("application.submitted", { checkpoints: [], xp: 0 }),
+      checkpointNotification("checkpoint.ready", {
+        checkpoints: [{ key: "profile", xp: 50 }],
+      }),
     ).toBeNull();
+    expect(checkpointNotification("checkpoint.ready", null)).toBeNull();
   });
 });

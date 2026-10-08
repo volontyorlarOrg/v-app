@@ -634,7 +634,7 @@ test.describe("sign-in", () => {
 });
 
 test.describe("profile reward availability", () => {
-  test("profile rewards show a sold-out state after all places are reserved", async ({
+  test("the profile task shows a sold-out state once all 1,000 rewards are claimed", async ({
     page,
   }, testInfo) => {
     const state = await startedState(page);
@@ -644,10 +644,13 @@ test.describe("profile reward availability", () => {
     );
     await expect(page).toHaveURL(/\/en\/dashboard$/);
     await gotoReady(page, "/ru/checkpoints");
-    const reward = page.locator("#milestone-profile");
-    await expect(reward.getByText("Наград не осталось", { exact: true })).toBeVisible();
-    await expect(reward.getByText(/Все 1.*000 мест уже заняты/)).toBeVisible();
+    const reward = page.locator("#task-profile");
+    await expect(reward.getByText(/Все 1.000 наград уже получены/)).toBeVisible();
+    await expect(reward.getByText(/Получено наград: 1.000 из 1.000/)).toBeVisible();
     await expect(reward.getByRole("button")).toHaveCount(0);
+    await expect(reward.getByRole("link")).toHaveCount(0);
+    await gotoReady(page, "/ru/dashboard");
+    await expect(page.getByRole("region", { name: "Задания" })).toHaveCount(0);
     await page.screenshot({
       path: testInfo.outputPath("sold-out.png"),
       fullPage: true,
@@ -705,15 +708,13 @@ test.describe("the panel", () => {
       navigation.getByRole("link", { name: "Opportunities" }),
     ).toHaveAttribute("aria-current", "page");
 
-    await navigation.getByRole("link", { name: "Milestones" }).click();
+    await navigation.getByRole("link", { name: "Tasks" }).click();
     await expect(page).toHaveURL(/\/en\/checkpoints$/);
-    await expect(navigation.getByRole("link", { name: "Milestones" })).toHaveAttribute(
+    await expect(navigation.getByRole("link", { name: "Tasks" })).toHaveAttribute(
       "aria-current",
       "page",
     );
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Milestones" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
 
     await navigation.getByRole("link", { name: "Leaderboard" }).click();
     await expect(page).toHaveURL(/\/en\/leaderboard$/);
@@ -727,69 +728,85 @@ test.describe("the panel", () => {
     }
   });
 
-  test("milestones list every checkpoint and pay rewards only after claiming", async ({
+  test("the profile task unlocks with the profile and pays 50 XP only once claimed", async ({
     page,
   }, testInfo) => {
+    await gotoReady(page, "/en/checkpoints");
+    await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
+    const task = page.locator("#task-profile");
+    await expect(
+      task.getByRole("heading", { level: 2, name: "Complete your profile" }),
+    ).toBeVisible();
+    await expect(task.getByText("+50 XP", { exact: true })).toBeVisible();
+    await expect(task.getByText("Your profile: 6 of 7 complete")).toBeVisible();
+    await expect(task.getByText("700 of 1,000 rewards claimed")).toBeVisible();
+    await expect(task.getByText("Still missing: Short introduction")).toBeVisible();
+    await expect(task.getByText("Claim once while rewards remain.")).toBeVisible();
+    await expect(task.getByRole("button")).toHaveCount(0);
+    await expect(task.getByRole("link", { name: "Complete profile" })).toHaveAttribute(
+      "href",
+      "/en/profile/edit",
+    );
+
     await gotoReady(page, "/en/profile/edit");
     await page.getByLabel("Bio").fill("I volunteer at community events.");
     await page.getByLabel("Phone number").fill("+998901234567");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
-    await gotoReady(page, "/en/dashboard");
-    const panel = page.getByRole("region", { name: "Milestones" });
-    await expect(panel.getByText("7 of 14 reached")).toBeVisible();
-    await expect(panel.getByText("0 of 1,195 XP earned")).toBeVisible();
-    await expect(
-      panel.getByRole("heading", { level: 3, name: /^Complete your profile/ }),
-    ).toBeVisible();
 
-    await panel.getByRole("link", { name: "See all" }).click();
-    await expect(page).toHaveURL(/\/en\/checkpoints$/);
+    await gotoReady(page, "/en/dashboard");
+    const panel = page.getByRole("region", { name: "Tasks" });
+    await expect(panel.getByText(/^Your reward is ready\./)).toBeVisible();
     await expect(
-      page.getByRole("heading", { level: 1, name: "Milestones" }),
+      panel.getByRole("button", { name: "Claim 50 XP for Complete your profile" }),
     ).toBeVisible();
-    for (const name of [
-      "Getting started",
-      "Applying",
-      "Events",
-      "Hours",
-      "Competitions",
-    ]) {
-      await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
-    }
+    await page
+      .getByRole("button", { name: /^Notifications/ })
+      .first()
+      .click();
     await expect(
-      page.getByRole("heading", {
-        level: 3,
-        name: "Complete your profile (Ready to claim)",
-      }),
-    ).toBeVisible();
+      page.getByRole("link", { name: /^Reward ready to claim/ }),
+    ).toHaveAttribute("href", "/en/checkpoints#task-profile");
     await expect(
-      page.getByRole("heading", {
-        level: 3,
-        name: "Win a competition (Not reached yet)",
-      }),
+      page.getByText("Complete your profile: claim 50 XP in Tasks."),
     ).toBeVisible();
-    await expect(page.getByText("290 XP ready to claim")).toBeVisible();
-    await page.screenshot({
-      path: testInfo.outputPath("milestones.png"),
-      fullPage: true,
-    });
-    const claim = page.getByRole("button", {
-      name: "Claim 85 XP for Complete your profile",
+    await page.keyboard.press("Escape");
+
+    await panel.getByRole("link", { name: "Open tasks" }).click();
+    await expect(page).toHaveURL(/\/en\/checkpoints#task-profile$/);
+    await expect(task.getByText("Your profile: 7 of 7 complete")).toBeVisible();
+    await expect(task.getByText("100%", { exact: true })).toBeVisible();
+    await expect(task.getByText("Every required detail is filled in.")).toBeVisible();
+    await expect(task.getByText("Claim once while rewards remain.")).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("tasks.png"), fullPage: true });
+
+    const claim = task.getByRole("button", {
+      name: "Claim 50 XP for Complete your profile",
       exact: true,
     });
     await claim.click();
-    await expect(page.getByText("85 of 1,195 XP earned")).toBeVisible();
-    await expect(page.getByText("205 XP ready to claim")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 3, name: "Complete your profile (Claimed)" }),
-    ).toBeVisible();
+    await expect(task.getByText(/^You claimed 50 XP on /)).toBeVisible();
+    await expect(task.getByText("701 of 1,000 rewards claimed")).toBeVisible();
     await expect(claim).toHaveCount(0);
     await page.reload();
-    await expect(page.getByText("85 of 1,195 XP earned")).toBeVisible();
-    const eightEvents = page.getByRole("progressbar", { name: "Attend 8 events" });
-    await expect(eightEvents).toHaveAttribute("aria-valuenow", "5");
-    await expect(eightEvents).toHaveAttribute("aria-valuemax", "8");
+    await expect(task.getByText(/^You claimed 50 XP on /)).toBeVisible();
+    await page.screenshot({
+      path: testInfo.outputPath("tasks-claimed.png"),
+      fullPage: true,
+    });
+
+    await gotoReady(page, "/en/dashboard");
+    await expect(page.getByRole("region", { name: "Tasks" })).toHaveCount(0);
+    await page
+      .getByRole("button", { name: /^Notifications/ })
+      .first()
+      .click();
+    await expect(page.getByRole("link", { name: /^Reward claimed/ })).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
   });
 
   test("opening a notification marks it read and closes the tray", async ({ page }) => {
@@ -871,10 +888,8 @@ test.describe("the panel", () => {
     await expect(page.getByText("bekzod@example.org")).toHaveCount(0);
     await expect(page.getByText("merge-incoming")).toHaveCount(0);
     await expect(
-      page.getByRole("link", { name: /^2 checkpoints reached/ }),
-    ).toHaveAttribute("href", "/en/checkpoints");
-    await expect(page.getByText("+15 XP earned")).toBeVisible();
-    await expect(page.getByText(/earned 15 XP: Choose/)).toHaveCount(0);
+      page.getByRole("link", { name: /^Reward ready to claim/ }),
+    ).toHaveCount(0);
     await page.screenshot({ path: testInfo.outputPath("notifications.png") });
     await page.getByRole("button", { name: "Mark all as read" }).click();
     await expect(

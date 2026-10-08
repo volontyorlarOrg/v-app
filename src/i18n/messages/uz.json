@@ -25,7 +25,7 @@
     "applications": "Arizalar",
     "saved": "Saqlanganlar",
     "record": "Mening tarixim",
-    "checkpoints": "Bosqichlar",
+    "checkpoints": "Vazifalar",
     "leaderboard": "Reyting",
     "profile": "Profil",
     "settings": "Sozlamalar",
@@ -83,26 +83,22 @@
         }
       },
       "checkpoint": {
-        "title": "{count, plural, one {Marraga yetdingiz} other {# ta marraga yetdingiz}}",
-        "one": "{name}: +{xp} XP",
-        "many": "+{xp} XP qoʻlga kiritildi",
-        "readyTitle": "{count, plural, one {Mukofot olishga tayyor} other {# ta mukofot olishga tayyor}}",
-        "readyOne": "{name}: Bosqichlar boʻlimida {xp} XP oling.",
-        "readyMany": "Bosqichlar boʻlimida {xp} XP oling.",
+        "readyTitle": "Mukofot olishga tayyor",
+        "readyBody": "{name}: Vazifalar boʻlimida {xp} XP oling.",
         "claimedTitle": "Mukofot olindi",
         "claimedBody": "Akkauntingizga {xp} XP qoʻshildi.",
         "exhaustedTitle": "Profil mukofotlari qolmadi",
-        "exhaustedBody": "Profil mukofoti uchun barcha 1 000 ta oʻrin band qilingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin."
+        "exhaustedBody": "Profil uchun barcha 1 000 ta mukofot olib boʻlingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin."
       },
       "close": "Bildirishnomalarni yopish",
       "allRead": "Barchasi oʻqildi",
       "marking": "Belgilanmoqda…",
       "readError": "Bildirishnomalarni oʻqilgan deb belgilab boʻlmadi. Qayta urinib koʻring.",
-      "emptyBody": "Arizalar haqidagi yangiliklar va bosqich mukofotlari shu yerda koʻrinadi.",
+      "emptyBody": "Arizalar haqidagi yangiliklar va vazifa mukofotlari shu yerda koʻrinadi.",
       "new": "Oʻqilmagan",
       "viewDetails": "Batafsil",
       "viewReward": "Mukofotni olish",
-      "viewMilestones": "Bosqichlarni ochish",
+      "viewTasks": "Vazifalarni ochish",
       "viewAccount": "Akkauntni ochish",
       "unreadLabel": "Oʻqilmagan"
     },
@@ -411,121 +407,57 @@
     }
   },
   "checkpoints": {
-    "metaTitle": "Bosqichlar",
-    "title": "Bosqichlar",
-    "description": "Bosqichga erishing, keyin hisobingizga XP qoʻshish uchun mukofotni oling.",
-    "summary": {
-      "label": "Bajarilgan marralar",
-      "reached": "{total} tadan {completed} tasi bajarildi",
-      "xp": "{available} XP dan {earned} XP olindi",
-      "claimable": "{xp} XP olishga tayyor"
-    },
-    "groups": {
-      "start": "Boshlash",
-      "applying": "Ariza berish",
-      "events": "Tadbirlar",
-      "hours": "Soatlar",
-      "competitions": "Tanlovlar"
-    },
-    "items": {
-      "username": {
-        "title": "Foydalanuvchi nomini tanlang",
-        "body": "Boshqa volontyorlar reytingda koʻradigan nomni tanlang."
-      },
-      "profile": {
-        "title": "Profilingizni toʻldiring",
-        "body": "Istalgan imkoniyatga ariza bera olish uchun barcha majburiy maydonlarni toʻldiring."
-      },
-      "telegram": {
-        "title": "Telegramni ulang",
-        "body": "Qarorlar va eslatmalarni botimizdan toʻgʻridan-toʻgʻri oling."
-      },
-      "second_sign_in": {
-        "title": "Kirishning ikkinchi usulini qoʻshing",
-        "body": "Bir usul ishlamay qolsa ham hisobingizga kira olasiz."
-      },
-      "first_saved": {
-        "title": "Imkoniyatni saqlang",
-        "body": "Keyinroq qaytmoqchi boʻlgan imkoniyatni belgilab qoʻying."
-      },
-      "first_application": {
-        "title": "Birinchi arizangizni yuboring",
-        "body": "Sizga mos imkoniyatga ariza bering."
-      },
-      "first_acceptance": {
-        "title": "Qabul qilining",
-        "body": "Tashkilotchi arizalaringizdan birini qabul qiladi."
-      },
-      "events_1": {
-        "title": "Birinchi tadbiringizda qatnashing",
-        "body": "Ishtirok eting va qatnashuvingiz tasdiqlansin."
-      },
-      "events_3": {
-        "title": "3 ta tadbirda qatnashing",
-        "body": "Uchta tadbirda tasdiqlangan ishtirok."
-      },
-      "events_8": {
-        "title": "8 ta tadbirda qatnashing",
-        "body": "Sakkizta tadbirda tasdiqlangan ishtirok."
-      },
-      "events_20": {
-        "title": "20 ta tadbirda qatnashing",
-        "body": "Yigirmata tadbirda tasdiqlangan ishtirok."
-      },
-      "hours_10": {
-        "title": "10 soat volontyorlik qiling",
-        "body": "Oʻn soatlik tasdiqlangan volontyorlik."
-      },
-      "hours_25": {
-        "title": "25 soat volontyorlik qiling",
-        "body": "Yigirma besh soatlik tasdiqlangan volontyorlik."
-      },
-      "hours_50": {
-        "title": "50 soat volontyorlik qiling",
-        "body": "Ellik soatlik tasdiqlangan volontyorlik."
-      },
-      "hours_100": {
-        "title": "100 soat volontyorlik qiling",
-        "body": "Yuz soatlik tasdiqlangan volontyorlik."
-      },
-      "competition_1": {
-        "title": "Tanlovda ishtirok eting",
-        "body": "Tanlovdagi ishtirokingiz tasdiqlansin."
-      },
-      "competition_win": {
-        "title": "Tanlovda gʻolib boʻling",
-        "body": "Tanlovni gʻolib sifatida yakunlang."
+    "metaTitle": "Vazifalar",
+    "title": "Vazifalar",
+    "description": "Oddiy amallarni bajaring va platforma mukofotlarini oling.",
+    "xp": "+{xp} XP",
+    "profile": {
+      "title": "Profilingizni toʻldiring",
+      "body": "Profilning majburiy maʼlumotlarini toʻldiring va boshlangʻich bonusni oling.",
+      "progress": "Profilingiz: {total} tadan {done} tasi toʻldirilgan",
+      "percent": "{percent}%",
+      "label": "Profilning majburiy maʼlumotlari",
+      "missing": "Hali yetishmayapti: {fields}",
+      "complete": "Barcha majburiy maʼlumotlar toʻldirilgan.",
+      "items": {
+        "name": "Ism va familiya",
+        "username": "Foydalanuvchi nomi",
+        "telegram": "Telegram foydalanuvchi nomi",
+        "languages": "Biladigan tillaringiz",
+        "place": "Hudud va shahar",
+        "school": "Maktab va sinf",
+        "bio": "Oʻzingiz haqingizda qisqacha"
       }
     },
-    "xp": "+{xp} XP",
-    "progress": "{progress} / {target}",
-    "reachedOn": "Bajarildi: {date}",
-    "reached": "Bajarildi",
-    "notReached": "Hali bajarilmagan",
+    "places": {
+      "claimed": "{limit} ta mukofotdan {claimed} tasi olingan",
+      "label": "Olingan mukofotlar",
+      "note": "Mukofotlar tugaguncha olish mumkin."
+    },
+    "status": {
+      "ready": "Mukofotingiz tayyor.",
+      "claimed": "Siz {date} kuni {xp} XP oldingiz.",
+      "exhausted": "Barcha {limit} ta mukofot olib boʻlingan.",
+      "exhaustedBody": "Profilingizni toʻldirish va imkoniyatlarga ariza yuborish hali ham mumkin.",
+      "paused": "Mukofot olish vaqtincha toʻxtatilgan. Mukofotingiz sizni kutadi."
+    },
+    "footer": "Mukofotlar tugaguncha bir marta olish mumkin.",
+    "completeProfile": "Profilni toʻldirish",
     "panel": {
-      "title": "Bosqichlar",
-      "description": "Bosqichlarga erishing va XP mukofotlarini oling.",
-      "next": "Navbatdagilar",
-      "all": "Barchasi",
-      "done": "Barcha mavjud mukofotlar olindi."
+      "title": "Vazifalar",
+      "description": "Mukofotlar tugaguncha oddiy amallar uchun XP oling.",
+      "all": "Vazifalarni ochish"
     },
     "claim": {
-      "ready": "Olishga tayyor",
       "button": "{xp} XP olish",
       "claiming": "Olinmoqda…",
       "claimed": "Olindi",
-      "claimedOn": "{date} kuni olindi",
       "accessible": "{name} uchun {xp} XP olish",
       "success": "Mukofot olindi: +{xp} XP",
       "error": "Mukofotni olib boʻlmadi. Qayta urinib koʻring.",
       "notReached": "Bu bosqich hali tayyor emas. Natijani koʻrish uchun sahifani yangilang.",
       "unavailable": "Mukofot olish vaqtincha ishlamayapti. Keyinroq qayta urinib koʻring.",
-      "limited": "Profilini toʻldirgan birinchi {limit} volontyor uchun.",
-      "remaining": "{count} ta mukofot oʻrni qoldi",
-      "reserved": "Mukofot siz uchun band qilingan. Tayyor boʻlganingizda oling.",
-      "exhausted": "Mukofotlar qolmadi",
-      "exhaustedBody": "Barcha {limit} ta oʻrin band qilingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin.",
-      "completeProfile": "Profilni toʻldirish"
+      "exhausted": "Mukofotlar qolmadi"
     }
   },
   "leaderboard": {

@@ -1,130 +1,111 @@
 import { describe, expect, it } from "vitest";
 
+import { EMPTY_PROFILE, type ProfileFields } from "@/lib/profile/completion";
+
 import {
   CHECKPOINT_KEYS,
-  groupedCheckpoints,
-  hasCountedProgress,
+  PROFILE_TASK_ITEMS,
   isCheckpointKey,
-  knownCheckpoints,
-  nextCheckpoints,
+  profileReward,
+  profileTaskChecklist,
+  rewardPlaces,
   type CheckpointItem,
 } from "./checkpoints";
 
-function item(
-  key: string,
-  group: string,
-  overrides: Partial<CheckpointItem> = {},
-): CheckpointItem {
+function item(key: string, overrides: Partial<CheckpointItem> = {}): CheckpointItem {
   return {
     key,
-    group,
+    group: "start",
     target: 1,
     progress: 0,
-    xp: 10,
+    xp: 50,
     completedAt: null,
     claimedAt: null,
-    rewardState: overrides.claimedAt
-      ? "claimed"
-      : overrides.completedAt
-        ? "ready"
-        : "locked",
-    rewardLimit: null,
-    rewardsRemaining: null,
+    rewardState: "locked",
+    rewardLimit: 1000,
+    rewardsRemaining: 300,
     rewardReserved: false,
     ...overrides,
   };
 }
 
-const REACHED = "2026-10-07T09:00:00.000Z";
+const COMPLETE: ProfileFields = {
+  fullName: "Aziza Karimova",
+  bio: "I like helping at school events.",
+  region: "tashkent-city",
+  city: "Tashkent",
+  school: "School 110",
+  gradeYear: "10",
+  languages: ["uz"],
+  phone: "",
+  telegram: "aziza_k",
+};
 
-describe("checkpoints", () => {
-  it("knows the fourteen keys the backend catalog sends", () => {
-    expect(CHECKPOINT_KEYS).toHaveLength(14);
+describe("the profile reward", () => {
+  it("is the only task the backend catalog sends", () => {
+    expect(CHECKPOINT_KEYS).toEqual(["profile"]);
     expect(isCheckpointKey("profile")).toBe(true);
-    expect(isCheckpointKey("photo")).toBe(false);
+    for (const removed of ["events_1", "username", "first_saved", "photo"])
+      expect(isCheckpointKey(removed)).toBe(false);
   });
 
-  it("drops a key this build has no copy for instead of failing the page", () => {
-    const items = knownCheckpoints([
-      item("profile", "start"),
-      item("brand_new", "start"),
-      item("username", "brand_new_group"),
+  it("picks the profile reward and ignores keys this build has no copy for", () => {
+    expect(profileReward([item("events_1"), item("profile", { xp: 50 })])?.xp).toBe(50);
+    expect(profileReward([item("events_1")])).toBeNull();
+    expect(profileReward([])).toBeNull();
+  });
+
+  it("reads the claimed count from the places left", () => {
+    expect(rewardPlaces(item("profile", { rewardsRemaining: 300 }))).toEqual({
+      limit: 1000,
+      claimed: 700,
+      remaining: 300,
+    });
+    expect(rewardPlaces(item("profile", { rewardsRemaining: 0 }))).toEqual({
+      limit: 1000,
+      claimed: 1000,
+      remaining: 0,
+    });
+    expect(rewardPlaces(item("profile", { rewardLimit: null }))).toBeNull();
+  });
+});
+
+describe("the profile checklist", () => {
+  it("covers every field the backend requires, grouped as the task shows them", () => {
+    expect(PROFILE_TASK_ITEMS.flatMap((entry) => entry.fields).sort()).toEqual([
+      "bio",
+      "city",
+      "fullName",
+      "gradeYear",
+      "languages",
+      "region",
+      "school",
+      "telegram",
     ]);
-
-    expect(items.map((entry) => entry.key)).toEqual(["profile"]);
   });
 
-  it("groups in the product's order and leaves out a group with nothing in it", () => {
-    const groups = groupedCheckpoints(
-      knownCheckpoints([
-        item("hours_10", "hours", { target: 10 }),
-        item("username", "start"),
-        item("profile", "start"),
-      ]),
+  it("marks everything done for a complete profile with a chosen username", () => {
+    const checklist = profileTaskChecklist(COMPLETE, true);
+    expect(checklist).toHaveLength(7);
+    expect(checklist.every((entry) => entry.done)).toBe(true);
+  });
+
+  it("needs both fields of a pair before the pair is done", () => {
+    const checklist = profileTaskChecklist(
+      { ...COMPLETE, city: "", gradeYear: " " },
+      true,
     );
-
-    expect(groups.map((group) => group.group)).toEqual(["start", "hours"]);
-    expect(groups[0]?.items.map((entry) => entry.key)).toEqual(["profile"]);
+    expect(checklist.filter((entry) => !entry.done).map((entry) => entry.id)).toEqual([
+      "place",
+      "school",
+    ]);
   });
 
-  it("suggests the next open checkpoints, one tier per series, in catalog order", () => {
-    const next = nextCheckpoints(
-      knownCheckpoints([
-        item("username", "start", {
-          completedAt: REACHED,
-          claimedAt: REACHED,
-          progress: 1,
-        }),
-        item("profile", "start"),
-        item("events_1", "events", {
-          completedAt: REACHED,
-          claimedAt: REACHED,
-          progress: 1,
-        }),
-        item("events_3", "events", { target: 3, progress: 1 }),
-        item("events_8", "events", { target: 8, progress: 1 }),
-        item("hours_10", "hours", { target: 10, progress: 4 }),
-        item("hours_25", "hours", { target: 25, progress: 4 }),
-      ]),
-    );
-
-    expect(next.map((entry) => entry.key)).toEqual(["profile", "events_3", "hours_10"]);
-  });
-
-  it("suggests nothing once every reward is claimed", () => {
+  it("starts empty for a new account and counts the username on its own", () => {
+    const checklist = profileTaskChecklist(EMPTY_PROFILE, false);
+    expect(checklist.some((entry) => entry.done)).toBe(false);
     expect(
-      nextCheckpoints(
-        knownCheckpoints([
-          item("profile", "start", { completedAt: REACHED, claimedAt: REACHED }),
-        ]),
-      ),
-    ).toEqual([]);
+      profileTaskChecklist(EMPTY_PROFILE, true).filter((entry) => entry.done),
+    ).toEqual([{ id: "username", done: true }]);
   });
-
-  it("draws a progress count only for checkpoints with more than one step", () => {
-    expect(hasCountedProgress(item("profile", "start"))).toBe(false);
-    expect(hasCountedProgress(item("hours_10", "hours", { target: 10 }))).toBe(true);
-  });
-});
-
-it("suggests claimable rewards before unfinished checkpoints", () => {
-  const next = nextCheckpoints(
-    knownCheckpoints([
-      item("profile", "start"),
-      item("events_1", "events", { completedAt: REACHED, progress: 1 }),
-      item("events_3", "events", { target: 3 }),
-    ]),
-  );
-  expect(next.map((entry) => entry.key)).toEqual(["events_1", "profile"]);
-});
-
-it("skips exhausted rewards when suggesting next steps", () => {
-  expect(
-    nextCheckpoints(
-      knownCheckpoints([
-        item("profile", "start", { rewardState: "exhausted" }),
-        item("first_saved", "applying"),
-      ]),
-    ).map((entry) => entry.key),
-  ).toEqual(["first_saved"]);
 });
