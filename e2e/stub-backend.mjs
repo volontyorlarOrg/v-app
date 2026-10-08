@@ -323,6 +323,7 @@ const PROFILE_REQUIRED = [
 function checkpointFacts(state) {
   const profile = state.profile;
   const complete =
+    Boolean(state.account.avatarUrl) &&
     state.account.usernameSource !== "generated" &&
     profile !== null &&
     PROFILE_REQUIRED.every((field) => String(profile[field] ?? "").trim().length > 0) &&
@@ -350,9 +351,10 @@ function checkpointList(state) {
       key: checkpoint.key,
       group: checkpoint.group,
       target: checkpoint.target,
-      progress: completedAt
-        ? checkpoint.target
-        : Math.min(facts[checkpoint.metric], checkpoint.target),
+      progress:
+        completedAt && (claimed || state.account.avatarUrl)
+          ? checkpoint.target
+          : Math.min(facts[checkpoint.metric], checkpoint.target),
       xp: checkpoint.xp,
       completedAt,
       claimedAt: state.checkpointsClaimed.get(checkpoint.key) ?? null,
@@ -360,7 +362,7 @@ function checkpointList(state) {
         ? "claimed"
         : remaining === 0
           ? "exhausted"
-          : completedAt
+          : completedAt && state.account.avatarUrl
             ? "ready"
             : "locked",
       rewardLimit: PROFILE_REWARD_LIMIT,
@@ -1059,6 +1061,7 @@ const server = createServer(async (request, response) => {
     if (body.code === "e2e-profile-exhausted") {
       opened.profile.bio = "A complete volunteer profile.";
       opened.profileRewardsExhausted = true;
+      opened.account.avatarUrl = `http://127.0.0.1:${PORT}/avatar.webp`;
     }
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
@@ -1396,6 +1399,8 @@ const server = createServer(async (request, response) => {
       return send(response, 409, { code: "checkpointRewardExhausted" });
     if (!item.completedAt) return send(response, 409, { code: "checkpointNotReached" });
     if (!state.checkpointsClaimed.has(key)) {
+      if (!state.account.avatarUrl)
+        return send(response, 409, { code: "checkpointPhotoRequired" });
       state.checkpointsClaimed.set(key, new Date().toISOString());
       state.profileRewardsClaimed += 1;
       state.record.xp += item.xp;

@@ -85,14 +85,21 @@ describe("the profile checklist", () => {
   });
 
   it("marks everything done for a complete profile with a chosen username", () => {
-    const checklist = profileTaskChecklist(COMPLETE, true);
-    expect(checklist).toHaveLength(7);
+    const checklist = profileTaskChecklist(COMPLETE, true, true);
+    expect(checklist).toHaveLength(8);
     expect(checklist.every((entry) => entry.done)).toBe(true);
+  });
+
+  it("keeps the photo missing even when every profile field is complete", () => {
+    expect(
+      profileTaskChecklist(COMPLETE, true, false).filter((entry) => !entry.done),
+    ).toEqual([{ id: "photo", done: false }]);
   });
 
   it("needs both fields of a pair before the pair is done", () => {
     const checklist = profileTaskChecklist(
       { ...COMPLETE, city: "", gradeYear: " " },
+      true,
       true,
     );
     expect(checklist.filter((entry) => !entry.done).map((entry) => entry.id)).toEqual([
@@ -102,10 +109,10 @@ describe("the profile checklist", () => {
   });
 
   it("starts empty for a new account and counts the username on its own", () => {
-    const checklist = profileTaskChecklist(EMPTY_PROFILE, false);
+    const checklist = profileTaskChecklist(EMPTY_PROFILE, false, false);
     expect(checklist.some((entry) => entry.done)).toBe(false);
     expect(
-      profileTaskChecklist(EMPTY_PROFILE, true).filter((entry) => entry.done),
+      profileTaskChecklist(EMPTY_PROFILE, true, false).filter((entry) => entry.done),
     ).toEqual([{ id: "username", done: true }]);
   });
 });

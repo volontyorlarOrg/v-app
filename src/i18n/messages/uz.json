@@ -413,7 +413,7 @@
     "xp": "+{xp} XP",
     "profile": {
       "title": "Profilingizni toʻldiring",
-      "body": "Profilning majburiy maʼlumotlarini toʻldiring va boshlangʻich bonusni oling.",
+      "body": "Profil rasmini qoʻshing va zarur maʼlumotlarni toʻldiring, soʻng boshlangʻich mukofotni oling.",
       "progress": "Profilingiz: {total} tadan {done} tasi toʻldirilgan",
       "percent": "{percent}%",
       "label": "Profilning majburiy maʼlumotlari",
@@ -426,7 +426,8 @@
         "languages": "Biladigan tillaringiz",
         "place": "Hudud va shahar",
         "school": "Maktab va sinf",
-        "bio": "Oʻzingiz haqingizda qisqacha"
+        "bio": "Oʻzingiz haqingizda qisqacha",
+        "photo": "Profil rasmi"
       }
     },
     "places": {
@@ -457,8 +458,10 @@
       "error": "Mukofotni olib boʻlmadi. Qayta urinib koʻring.",
       "notReached": "Bu bosqich hali tayyor emas. Natijani koʻrish uchun sahifani yangilang.",
       "unavailable": "Mukofot olish vaqtincha ishlamayapti. Keyinroq qayta urinib koʻring.",
-      "exhausted": "Mukofotlar qolmadi"
-    }
+      "exhausted": "Mukofotlar qolmadi",
+      "photoRequired": "Bu mukofotni olishdan oldin profil rasmini qoʻshing."
+    },
+    "addPhoto": "Profil rasmini qoʻshish"
   },
   "leaderboard": {
     "metaTitle": "Reyting",

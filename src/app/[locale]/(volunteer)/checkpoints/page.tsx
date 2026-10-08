@@ -56,6 +56,7 @@ export default async function TasksRoute({
   const checklist = profileTaskChecklist(
     profile.data ?? EMPTY_PROFILE,
     me.data.usernameSource !== "generated",
+    Boolean(me.data.avatarUrl),
   );
 
   const name = profile.data?.fullName.trim() || me.data.displayName?.trim() || "";

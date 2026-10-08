@@ -413,7 +413,7 @@
     "xp": "+{xp} XP",
     "profile": {
       "title": "Complete your profile",
-      "body": "Complete the required profile details, then claim your launch bonus.",
+      "body": "Add a profile photo and complete the required details, then claim your launch bonus.",
       "progress": "Your profile: {done} of {total} complete",
       "percent": "{percent}%",
       "label": "Required profile details",
@@ -426,7 +426,8 @@
         "languages": "Languages you speak",
         "place": "Region and city",
         "school": "School and grade",
-        "bio": "Short introduction"
+        "bio": "Short introduction",
+        "photo": "Profile photo"
       }
     },
     "places": {
@@ -457,8 +458,10 @@
       "error": "Could not claim this reward. Try again.",
       "notReached": "This checkpoint is not ready yet. Refresh to see your progress.",
       "unavailable": "Reward claiming is temporarily unavailable. Please try again later.",
-      "exhausted": "No rewards left"
-    }
+      "exhausted": "No rewards left",
+      "photoRequired": "Add a profile photo before claiming this reward."
+    },
+    "addPhoto": "Add profile photo"
   },
   "leaderboard": {
     "metaTitle": "Leaderboard",

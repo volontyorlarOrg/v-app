@@ -1,3 +1,5 @@
+import { mkdir } from "node:fs/promises";
+
 import { expect, test, type Page } from "@playwright/test";
 
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/credentials";
@@ -17,6 +19,17 @@ async function gotoReady(page: Page, url: string) {
     );
   }
   return response;
+}
+
+async function uploadProfilePhoto(page: Page) {
+  const editor = page.getByRole("region", { name: "Profile picture" });
+  const chooser = page.waitForEvent("filechooser");
+  await editor.getByRole("button", { name: "Choose picture" }).click();
+  await (await chooser).setFiles("public/opengraph-image.png");
+  await editor.getByRole("button", { name: "Save picture" }).click();
+  await expect(editor.getByRole("status")).toContainText(
+    "Your profile picture is saved.",
+  );
 }
 
 async function isMobile(page: Page) {
@@ -738,12 +751,14 @@ test.describe("the panel", () => {
       task.getByRole("heading", { level: 2, name: "Complete your profile" }),
     ).toBeVisible();
     await expect(task.getByText("+50 XP", { exact: true })).toBeVisible();
-    await expect(task.getByText("Your profile: 6 of 7 complete")).toBeVisible();
+    await expect(task.getByText("Your profile: 6 of 8 complete")).toBeVisible();
     await expect(task.getByText("700 of 1,000 rewards claimed")).toBeVisible();
-    await expect(task.getByText("Still missing: Short introduction")).toBeVisible();
+    await expect(
+      task.getByText("Still missing: Profile photo and Short introduction"),
+    ).toBeVisible();
     await expect(task.getByText("Claim once while rewards remain.")).toBeVisible();
     await expect(task.getByRole("button")).toHaveCount(0);
-    await expect(task.getByRole("link", { name: "Complete profile" })).toHaveAttribute(
+    await expect(task.getByRole("link", { name: "Add profile photo" })).toHaveAttribute(
       "href",
       "/en/profile/edit",
     );
@@ -753,6 +768,53 @@ test.describe("the panel", () => {
     await page.getByLabel("Phone number").fill("+998901234567");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
+
+    await gotoReady(page, "/en/checkpoints");
+    await expect(task.getByText("Your profile: 7 of 8 complete")).toBeVisible();
+    await expect(task.getByText("Still missing: Profile photo")).toBeVisible();
+    await expect(task.getByRole("button")).toHaveCount(0);
+    await page.screenshot({
+      path: testInfo.outputPath("tasks-photo-required.png"),
+      fullPage: true,
+    });
+    await mkdir(".impeccable/review", { recursive: true });
+    const device = testInfo.project.name.includes("mobile") ? "mobile" : "desktop";
+    for (const theme of ["dark", "light"] as const) {
+      await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
+      await page.reload();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      await expect(task.getByText("Still missing: Profile photo")).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `.impeccable/review/tasks-${testInfo.project.name}-${device}-${theme}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+    }
+
+    await gotoReady(page, "/en/profile/edit");
+    await uploadProfilePhoto(page);
+    await gotoReady(page, "/en/checkpoints");
+    await expect(
+      task.getByRole("button", { name: "Claim 50 XP for Complete your profile" }),
+    ).toBeVisible();
+
+    await gotoReady(page, "/en/profile/edit");
+    const photo = page.getByRole("region", { name: "Profile picture" });
+    await photo.getByRole("button", { name: "Remove picture" }).click();
+    await expect(photo.getByRole("status")).toContainText(
+      "Your profile picture was removed.",
+    );
+    await gotoReady(page, "/en/checkpoints");
+    await expect(task.getByText("Still missing: Profile photo")).toBeVisible();
+    await expect(task.getByRole("button")).toHaveCount(0);
+    await task.getByRole("link", { name: "Add profile photo" }).click();
+    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await uploadProfilePhoto(page);
 
     await gotoReady(page, "/en/dashboard");
     const panel = page.getByRole("region", { name: "Tasks" });
@@ -774,7 +836,7 @@ test.describe("the panel", () => {
 
     await panel.getByRole("link", { name: "Open tasks" }).click();
     await expect(page).toHaveURL(/\/en\/checkpoints#task-profile$/);
-    await expect(task.getByText("Your profile: 7 of 7 complete")).toBeVisible();
+    await expect(task.getByText("Your profile: 8 of 8 complete")).toBeVisible();
     await expect(task.getByText("100%", { exact: true })).toBeVisible();
     await expect(task.getByText("Every required detail is filled in.")).toBeVisible();
     await expect(task.getByText("Claim once while rewards remain.")).toBeVisible();

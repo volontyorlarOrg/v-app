@@ -11,32 +11,30 @@ counts their XP, and this build drops any key other than `profile`.
 
 ## The task card
 
-`ProfileTask` (`src/components/checkpoints/profile-task.tsx`) follows the design
-mock, inside the panel rules, in three ruled parts:
+`ProfileTask` (`src/components/checkpoints/profile-task.tsx`) uses the existing
+panel rules in three ruled parts:
 
 - a header with the volunteer's photo in the orange ring the sidebar and the
   profile use (initials, then a person icon, when there is no photo), the serif
   title "Complete your profile", the reward "+50 XP" in the orange figure style
   and one sentence;
 - two meters side by side (stacked on a phone): the profile in blue ("Your
-  profile: 6 of 7 complete", a percentage, then "Still missing: …" or "Every
+  profile: 6 of 8 complete", a percentage, then "Still missing: …" or "Every
   required detail is filled in.") and the reward places in orange ("700 of 1,000
   rewards claimed", "Available while rewards remain.");
 - a footer: "Claim once while rewards remain." with "Claim 50 XP" when ready or
-  "Complete profile" (to `/profile/edit`) while fields are missing; "You claimed
-  50 XP on …" once claimed; "All 1,000 rewards have been claimed." when places
+  "Complete profile" (to `/profile/edit`) while fields are missing or
+  "Add profile photo" while a photo is missing; "You claimed 50 XP on …" once
+  claimed; "All 1,000 rewards have been claimed." when places
   ran out. A paused launch gate disables the button and says so under it.
 
-The first version also had a status band and a seven-row checklist; both were
-removed on request to keep the card short. The mock's "Profile photo" item was
-never rewarded: the reward follows the backend rule that gates applying, and a
-photo is deliberately not rewarded because the audience includes minors.
-
-`profileTaskChecklist()` in `src/lib/checkpoints/checkpoints.ts` groups the
-eight required profile fields plus the chosen username into seven items (name;
-username; Telegram; languages; region and city; school and grade; short
-introduction) using the same `profileCompletion()` the profile meter uses; the
-card counts them and names the missing ones. The places come from the backend's
+The card keeps the missing items in one sentence instead of a long checklist.
+`profileTaskChecklist()` groups the existing profile requirements into seven
+items (name; username; Telegram; languages; region and city; school and grade;
+short introduction) and adds the current profile photo as an eighth item.
+Photo presence comes from `GET /me`; it is reward-specific and does not alter
+the ordinary profile meter or the rule for applying. The card counts the eight
+items and names the missing ones. The places come from the backend's
 `rewardLimit` and `rewardsRemaining` (`rewardPlaces()`); the frontend never
 counts claims itself.
 
@@ -52,14 +50,21 @@ hidden once the reward is claimed or no places remain.
 - `claimCheckpointAction()` validates the key and calls authenticated
   `POST /checkpoints/profile/claim`, parsing `checkpointClaimSchema`. The button
   shows pending, success and translated errors (`checkpointNotReached`,
-  `checkpointRewardExhausted`, `checkpointClaimsUnavailable`). Revalidating the
+  `checkpointRewardExhausted`, `checkpointClaimsUnavailable`,
+  `checkpointPhotoRequired`). Revalidating the
   root layout refreshes the card, the dashboard and XP.
+- Removing the photo locks an unclaimed reward even if it was reached earlier.
+  This includes stored unpaid completions reached before the photo requirement.
+  Uploading a photo restores readiness. The backend rechecks photo presence
+  under the claim lock before taking a place and paying XP. Paid claims stay
+  idempotent and keep their XP after photo removal.
 - The backend owns eligibility, the 1,000 places (taken when claiming, not when
   completing), authorization, transactions, duplicate prevention and XP.
 
 `checkpoint.ready` notifications read "Reward ready to claim" with a link to
 `/checkpoints#task-profile`, and switch to "Reward claimed" or "No profile
-rewards left" as the backend restates them. Legacy `checkpoint.completed`
+rewards left" as the backend restates them. An unclaimed ready notice is hidden
+while the photo is missing. Legacy `checkpoint.completed`
 notifications are no longer listed by the backend. All copy is in Uzbek, Russian
 and English.
 
@@ -70,8 +75,8 @@ The backend rules are in
 
 Unit tests cover the reward lookup, the places arithmetic, the field grouping
 and the notification parsing. The browser flow checks the locked card and its
-missing-field line, completing the profile, the dashboard row, the notification,
-claiming,
+missing-field line, completing the fields without a photo, upload, removal
+after readiness, re-upload, the dashboard row, the notification, claiming,
 "701 of 1,000 rewards claimed" after the claim, persistence after reload, and
 the sold-out state.
 
