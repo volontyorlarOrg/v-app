@@ -45,6 +45,7 @@ export function rewardPlaces(reward: CheckpointItem): RewardPlaces | null {
 }
 
 export const PROFILE_TASK_ITEMS = [
+  { id: "photo", fields: [] },
   { id: "name", fields: ["fullName"] },
   { id: "username", fields: [] },
   { id: "telegram", fields: ["telegram"] },
@@ -61,13 +62,16 @@ export type ProfileTaskItem = { id: ProfileTaskItemId; done: boolean };
 export function profileTaskChecklist(
   profile: ProfileFields,
   usernameChosen: boolean,
+  hasPhoto: boolean,
 ): ProfileTaskItem[] {
   const { missing } = profileCompletion(profile);
   return PROFILE_TASK_ITEMS.map((item) => ({
     id: item.id,
     done:
-      item.id === "username"
-        ? usernameChosen
-        : item.fields.every((field) => !missing.includes(field)),
+      item.id === "photo"
+        ? hasPhoto
+        : item.id === "username"
+          ? usernameChosen
+          : item.fields.every((field) => !missing.includes(field)),
   }));
 }

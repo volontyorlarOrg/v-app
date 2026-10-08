@@ -19,6 +19,7 @@ export type ClaimButtonLabels = {
   notReached: string;
   unavailable: string;
   exhausted: string;
+  photoRequired: string;
 };
 
 export function ClaimButton({
@@ -38,13 +39,15 @@ export function ClaimButton({
     onSuccess: () => toast.success(labels.success),
   });
   const error =
-    claim.error?.result.code === "checkpointNotReached"
-      ? labels.notReached
-      : claim.error?.result.code === "checkpointRewardExhausted"
-        ? labels.exhausted
-        : claim.error?.result.code === "checkpointClaimsUnavailable"
-          ? labels.unavailable
-          : labels.error;
+    claim.error?.result.code === "checkpointPhotoRequired"
+      ? labels.photoRequired
+      : claim.error?.result.code === "checkpointNotReached"
+        ? labels.notReached
+        : claim.error?.result.code === "checkpointRewardExhausted"
+          ? labels.exhausted
+          : claim.error?.result.code === "checkpointClaimsUnavailable"
+            ? labels.unavailable
+            : labels.error;
 
   return (
     <div className={cn("flex flex-col items-stretch gap-2 sm:items-end", className)}>

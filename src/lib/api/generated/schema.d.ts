@@ -1824,6 +1824,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get daily volunteer growth, applications and impact in Tashkent time */
+        get: operations["AdminAnalyticsController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/essays": {
         parameters: {
             query?: never;
@@ -3269,6 +3286,56 @@ export interface components {
         RemovedManualPastEventDto: {
             /** Format: uuid */
             id: string;
+        };
+        AnalyticsRangeDto: {
+            /** Format: date-time */
+            from: string;
+            /** Format: date-time */
+            to: string;
+            /** @enum {number} */
+            days: 30 | 90;
+            /** @enum {string} */
+            timeZone: "Asia/Tashkent";
+        };
+        AnalyticsComparisonDto: {
+            /** Format: date-time */
+            from: string;
+            /** Format: date-time */
+            to: string;
+            signups: number;
+            applications: number;
+        };
+        AnalyticsSummaryDto: {
+            signups: number;
+            signupAverage: number;
+            signupChange: number | null;
+            activatedSignups: number;
+            applications: number;
+            attended: number;
+            noShow: number;
+            excused: number;
+            cancelled: number;
+            awaiting: number;
+            confirmedHours: number;
+        };
+        AnalyticsDayDto: {
+            /** Format: date-time */
+            date: string;
+            signups: number;
+            volunteers: number;
+            applications: number;
+            attended: number;
+            noShow: number;
+            excused: number;
+            cancelled: number;
+            awaiting: number;
+            confirmedHours: number;
+        };
+        AdminAnalyticsResponseDto: {
+            range: components["schemas"]["AnalyticsRangeDto"];
+            previous: components["schemas"]["AnalyticsComparisonDto"];
+            summary: components["schemas"]["AnalyticsSummaryDto"];
+            daily: components["schemas"]["AnalyticsDayDto"][];
         };
         SaveEssayDto: {
             title?: string;
@@ -5899,7 +5966,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description checkpointNotReached: the checkpoint has not been reached. checkpointRewardExhausted: all 1,000 profile rewards are claimed. */
+            /** @description checkpointNotReached: the checkpoint has not been reached. checkpointPhotoRequired: a profile photo is required for an unclaimed profile reward. checkpointRewardExhausted: all 1,000 profile rewards are claimed. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -12591,6 +12658,69 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAnalyticsController_get: {
+        parameters: {
+            query?: {
+                days?: 30 | 90;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAnalyticsResponseDto"];
+                };
             };
             /** @description Missing or invalid credentials */
             401: {

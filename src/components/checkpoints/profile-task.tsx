@@ -33,6 +33,7 @@ export function useClaimLabels(xp: number): ClaimButtonLabels {
     notReached: t("claim.notReached"),
     unavailable: t("claim.unavailable"),
     exhausted: t("claim.exhausted"),
+    photoRequired: t("claim.photoRequired"),
   };
 }
 
@@ -141,6 +142,7 @@ export function ProfileTask({
           <TaskAction
             state={reward.rewardState}
             complete={missing.length === 0}
+            hasPhoto={Boolean(avatar.url)}
             claimingEnabled={claimingEnabled}
             labels={labels}
           />
@@ -186,17 +188,19 @@ function TaskNote({ reward, limit }: { reward: Checkpoint; limit: number | null 
 function TaskAction({
   state,
   complete,
+  hasPhoto,
   claimingEnabled,
   labels,
 }: {
   state: Checkpoint["rewardState"];
   complete: boolean;
+  hasPhoto: boolean;
   claimingEnabled: boolean;
   labels: ClaimButtonLabels;
 }) {
   const t = useTranslations("checkpoints");
 
-  if (state === "ready")
+  if (state === "ready" && hasPhoto)
     return (
       <ClaimButton
         checkpointKey="profile"
@@ -214,7 +218,7 @@ function TaskAction({
         className: "shrink-0",
       })}
     >
-      {t("completeProfile")}
+      {hasPhoto ? t("completeProfile") : t("addPhoto")}
       <ArrowRight aria-hidden="true" className="size-4" />
     </Link>
   );
