@@ -88,8 +88,23 @@
         "many": "+{xp} XP qoʻlga kiritildi",
         "readyTitle": "{count, plural, one {Mukofot olishga tayyor} other {# ta mukofot olishga tayyor}}",
         "readyOne": "{name}: Bosqichlar boʻlimida {xp} XP oling.",
-        "readyMany": "Bosqichlar boʻlimida {xp} XP oling."
-      }
+        "readyMany": "Bosqichlar boʻlimida {xp} XP oling.",
+        "claimedTitle": "Mukofot olindi",
+        "claimedBody": "Akkauntingizga {xp} XP qoʻshildi.",
+        "exhaustedTitle": "Profil mukofotlari qolmadi",
+        "exhaustedBody": "Profil mukofoti uchun barcha 1 000 ta oʻrin band qilingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin."
+      },
+      "close": "Bildirishnomalarni yopish",
+      "allRead": "Barchasi oʻqildi",
+      "marking": "Belgilanmoqda…",
+      "readError": "Bildirishnomalarni oʻqilgan deb belgilab boʻlmadi. Qayta urinib koʻring.",
+      "emptyBody": "Arizalar haqidagi yangiliklar va bosqich mukofotlari shu yerda koʻrinadi.",
+      "new": "Oʻqilmagan",
+      "viewDetails": "Batafsil",
+      "viewReward": "Mukofotni olish",
+      "viewMilestones": "Bosqichlarni ochish",
+      "viewAccount": "Akkauntni ochish",
+      "unreadLabel": "Oʻqilmagan"
     },
     "userMenu": {
       "label": "Hisob menyusi"
@@ -492,7 +507,7 @@
       "description": "Bosqichlarga erishing va XP mukofotlarini oling.",
       "next": "Navbatdagilar",
       "all": "Barchasi",
-      "done": "Barcha bosqich mukofotlarini oldingiz."
+      "done": "Barcha mavjud mukofotlar olindi."
     },
     "claim": {
       "ready": "Olishga tayyor",
@@ -504,7 +519,13 @@
       "success": "Mukofot olindi: +{xp} XP",
       "error": "Mukofotni olib boʻlmadi. Qayta urinib koʻring.",
       "notReached": "Bu bosqich hali tayyor emas. Natijani koʻrish uchun sahifani yangilang.",
-      "unavailable": "XP qayta boshlanganidan keyin mukofot olish ochiladi. Birozdan keyin tekshiring."
+      "unavailable": "Mukofot olish vaqtincha ishlamayapti. Keyinroq qayta urinib koʻring.",
+      "limited": "Profilini toʻldirgan birinchi {limit} volontyor uchun.",
+      "remaining": "{count} ta mukofot oʻrni qoldi",
+      "reserved": "Mukofot siz uchun band qilingan. Tayyor boʻlganingizda oling.",
+      "exhausted": "Mukofotlar qolmadi",
+      "exhaustedBody": "Barcha {limit} ta oʻrin band qilingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin.",
+      "completeProfile": "Profilni toʻldirish"
     }
   },
   "leaderboard": {

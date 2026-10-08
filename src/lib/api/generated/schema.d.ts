@@ -2722,7 +2722,7 @@ export interface components {
             progress: number;
             /**
              * @description XP available to claim once reached; stored reward for completed checkpoints.
-             * @example 40
+             * @example 85
              */
             xp: number;
             /**
@@ -2732,6 +2732,13 @@ export interface components {
             completedAt: string | null;
             /** Format: date-time */
             claimedAt: string | null;
+            /** @enum {string} */
+            rewardState: "locked" | "ready" | "claimed" | "exhausted";
+            /** @example 1000 */
+            rewardLimit: number | null;
+            rewardsRemaining: number | null;
+            /** @description A place is reserved on profile completion, even when none remain for new completers. */
+            rewardReserved: boolean;
         };
         CheckpointListDto: {
             /** @description Claiming opens after the production XP reset completes. */
@@ -2741,7 +2748,7 @@ export interface components {
             completed: number;
             /** @example 2 */
             claimed: number;
-            /** @example 17 */
+            /** @example 14 */
             total: number;
             /**
              * @description XP this account has earned from checkpoints.
@@ -2763,7 +2770,7 @@ export interface components {
         CheckpointClaimDto: {
             /** @example profile */
             key: string;
-            /** @example 40 */
+            /** @example 85 */
             xp: number;
             /** Format: date-time */
             claimedAt: string;
@@ -5845,7 +5852,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                key: "username" | "profile" | "telegram" | "second_sign_in" | "first_saved" | "first_application" | "first_acceptance" | "events_1" | "events_3" | "events_8" | "events_20" | "hours_10" | "hours_25" | "hours_50" | "hours_100" | "competition_1" | "competition_win";
+                key: "profile" | "first_saved" | "first_application" | "first_acceptance" | "events_1" | "events_3" | "events_8" | "events_20" | "hours_10" | "hours_25" | "hours_50" | "hours_100" | "competition_1" | "competition_win";
             };
             cookie?: never;
         };
@@ -5891,7 +5898,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description checkpointNotReached: the checkpoint has not been reached. */
+            /** @description checkpointNotReached: the checkpoint has not been reached. checkpointRewardExhausted: all 1,000 profile reward places are reserved. */
             409: {
                 headers: {
                     [name: string]: unknown;

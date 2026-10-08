@@ -9,10 +9,7 @@ export const CHECKPOINT_GROUPS = [
 export type CheckpointGroup = (typeof CHECKPOINT_GROUPS)[number];
 
 export const CHECKPOINT_KEYS = [
-  "username",
   "profile",
-  "telegram",
-  "second_sign_in",
   "first_saved",
   "first_application",
   "first_acceptance",
@@ -38,6 +35,10 @@ export type CheckpointItem = {
   xp: number;
   completedAt: string | null;
   claimedAt: string | null;
+  rewardState: "locked" | "ready" | "claimed" | "exhausted";
+  rewardLimit: number | null;
+  rewardsRemaining: number | null;
+  rewardReserved: boolean;
 };
 
 export type Checkpoint = CheckpointItem & {
@@ -85,8 +86,8 @@ export function nextCheckpoints(items: readonly Checkpoint[], count = 3): Checkp
   const series = new Set<string>();
   const next: Checkpoint[] = [];
   const ordered = [
-    ...items.filter((item) => isReached(item) && !isClaimed(item)),
-    ...items.filter((item) => !isReached(item)),
+    ...items.filter((item) => item.rewardState === "ready"),
+    ...items.filter((item) => !isReached(item) && item.rewardState !== "exhausted"),
   ];
   for (const item of ordered) {
     if (series.has(seriesOf(item))) continue;

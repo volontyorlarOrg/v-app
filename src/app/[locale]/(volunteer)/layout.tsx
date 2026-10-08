@@ -22,6 +22,7 @@ import {
   mergeNotificationName,
 } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
+import { isCheckpointKey } from "@/lib/checkpoints/checkpoints";
 import {
   applicationHref,
   historyHref,
@@ -77,31 +78,40 @@ export default async function VolunteerLayout({
       const xp = format.number(checkpoint.xp);
       const title = nav(
         item.kind === "checkpoint.ready"
-          ? "notifications.checkpoint.readyTitle"
+          ? checkpoint.rewardState === "claimed"
+            ? "notifications.checkpoint.claimedTitle"
+            : checkpoint.rewardState === "exhausted"
+              ? "notifications.checkpoint.exhaustedTitle"
+              : "notifications.checkpoint.readyTitle"
           : "notifications.checkpoint.title",
         {
           count: checkpoint.keys.length,
         },
       );
       const body =
-        checkpoint.keys.length === 1 && only
-          ? nav(
-              item.kind === "checkpoint.ready"
-                ? "notifications.checkpoint.readyOne"
-                : "notifications.checkpoint.one",
-              {
-                name: checkpointsT(`items.${only}.title`),
-                xp,
-              },
-            )
-          : nav(
-              item.kind === "checkpoint.ready"
-                ? "notifications.checkpoint.readyMany"
-                : "notifications.checkpoint.many",
-              { xp },
-            );
+        item.kind === "checkpoint.ready" && checkpoint.rewardState === "exhausted"
+          ? nav("notifications.checkpoint.exhaustedBody")
+          : item.kind === "checkpoint.ready" && checkpoint.rewardState === "claimed"
+            ? nav("notifications.checkpoint.claimedBody", { xp })
+            : checkpoint.keys.length === 1 && only
+              ? nav(
+                  item.kind === "checkpoint.ready"
+                    ? "notifications.checkpoint.readyOne"
+                    : "notifications.checkpoint.one",
+                  {
+                    name: checkpointsT(`items.${only}.title`),
+                    xp,
+                  },
+                )
+              : nav(
+                  item.kind === "checkpoint.ready"
+                    ? "notifications.checkpoint.readyMany"
+                    : "notifications.checkpoint.many",
+                  { xp },
+                );
       if (
         item.unread &&
+        (item.kind !== "checkpoint.ready" || checkpoint.rewardState === "ready") &&
         now.getTime() - new Date(item.at).getTime() < CHECKPOINT_TOAST_WINDOW_MS
       ) {
         checkpointToasts.push({ id: item.id, title, body });
@@ -112,7 +122,15 @@ export default async function VolunteerLayout({
         body,
         time,
         unread: item.unread,
-        href: navHref("checkpoints"),
+        href: `${navHref("checkpoints")}${checkpoint.keys.length === 1 && only && isCheckpointKey(only) ? `#milestone-${only}` : ""}`,
+        category: "reward",
+        action: nav(
+          checkpoint.rewardState === "ready" && item.kind === "checkpoint.ready"
+            ? "notifications.viewReward"
+            : "notifications.viewMilestones",
+        ),
+        rewardState:
+          item.kind === "checkpoint.ready" ? checkpoint.rewardState : "claimed",
       };
     }
     const merge = mergeNotificationName(item.kind);
@@ -124,6 +142,8 @@ export default async function VolunteerLayout({
         time,
         unread: item.unread,
         href: navHref("settings"),
+        category: "account",
+        action: nav("notifications.viewAccount"),
       };
     }
 
@@ -141,6 +161,8 @@ export default async function VolunteerLayout({
         time,
         unread: item.unread,
         ...(href ? { href } : {}),
+        category: "activity",
+        ...(href ? { action: nav("notifications.viewDetails") } : {}),
       };
     }
 

@@ -23,6 +23,14 @@ function item(
     xp: 10,
     completedAt: null,
     claimedAt: null,
+    rewardState: overrides.claimedAt
+      ? "claimed"
+      : overrides.completedAt
+        ? "ready"
+        : "locked",
+    rewardLimit: null,
+    rewardsRemaining: null,
+    rewardReserved: false,
     ...overrides,
   };
 }
@@ -30,8 +38,8 @@ function item(
 const REACHED = "2026-10-07T09:00:00.000Z";
 
 describe("checkpoints", () => {
-  it("knows the seventeen keys the backend catalog sends", () => {
-    expect(CHECKPOINT_KEYS).toHaveLength(17);
+  it("knows the fourteen keys the backend catalog sends", () => {
+    expect(CHECKPOINT_KEYS).toHaveLength(14);
     expect(isCheckpointKey("profile")).toBe(true);
     expect(isCheckpointKey("photo")).toBe(false);
   });
@@ -56,7 +64,7 @@ describe("checkpoints", () => {
     );
 
     expect(groups.map((group) => group.group)).toEqual(["start", "hours"]);
-    expect(groups[0]?.items.map((entry) => entry.key)).toEqual(["username", "profile"]);
+    expect(groups[0]?.items.map((entry) => entry.key)).toEqual(["profile"]);
   });
 
   it("suggests the next open checkpoints, one tier per series, in catalog order", () => {
@@ -108,4 +116,15 @@ it("suggests claimable rewards before unfinished checkpoints", () => {
     ]),
   );
   expect(next.map((entry) => entry.key)).toEqual(["events_1", "profile"]);
+});
+
+it("skips exhausted rewards when suggesting next steps", () => {
+  expect(
+    nextCheckpoints(
+      knownCheckpoints([
+        item("profile", "start", { rewardState: "exhausted" }),
+        item("first_saved", "applying"),
+      ]),
+    ).map((entry) => entry.key),
+  ).toEqual(["first_saved"]);
 });

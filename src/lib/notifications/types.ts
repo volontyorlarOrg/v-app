@@ -120,8 +120,9 @@ export const CHECKPOINT_NOTIFICATION_KIND = "checkpoint.completed";
 export const CHECKPOINT_READY_NOTIFICATION_KIND = "checkpoint.ready";
 
 export type CheckpointNotification = {
-  keys: CheckpointKey[];
+  keys: Array<CheckpointKey | "username" | "telegram" | "second_sign_in">;
   xp: number;
+  rewardState: "ready" | "claimed" | "exhausted";
 };
 
 export function checkpointNotification(
@@ -137,9 +138,22 @@ export function checkpointNotification(
   const keys = awards.flatMap((award: unknown) => {
     const key =
       award && typeof award === "object" ? (award as { key?: unknown }).key : undefined;
-    return typeof key === "string" && isCheckpointKey(key) ? [key] : [];
+    return typeof key === "string" &&
+      (isCheckpointKey(key) ||
+        key === "username" ||
+        key === "telegram" ||
+        key === "second_sign_in")
+      ? [key as CheckpointNotification["keys"][number]]
+      : [];
   });
   const xp = data?.xp;
-  if (keys.length === 0 || typeof xp !== "number") return null;
-  return { keys, xp };
+  if (keys.length === 0 || typeof xp !== "number" || !Number.isFinite(xp) || xp < 0)
+    return null;
+  const rewardState = data?.rewardState;
+  return {
+    keys,
+    xp,
+    rewardState:
+      rewardState === "claimed" || rewardState === "exhausted" ? rewardState : "ready",
+  };
 }

@@ -633,6 +633,33 @@ test.describe("sign-in", () => {
   });
 });
 
+test.describe("profile reward availability", () => {
+  test("profile rewards show a sold-out state after all places are reserved", async ({
+    page,
+  }, testInfo) => {
+    const state = await startedState(page);
+    await gotoReady(
+      page,
+      `/api/auth/telegram/callback?code=e2e-profile-exhausted&state=${encodeURIComponent(state)}`,
+    );
+    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await gotoReady(page, "/ru/checkpoints");
+    const reward = page.locator("#milestone-profile");
+    await expect(reward.getByText("Наград не осталось", { exact: true })).toBeVisible();
+    await expect(reward.getByText(/Все 1.*000 мест уже заняты/)).toBeVisible();
+    await expect(reward.getByRole("button")).toHaveCount(0);
+    await page.screenshot({
+      path: testInfo.outputPath("sold-out.png"),
+      fullPage: true,
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+});
+
 test.describe("the panel", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
@@ -702,12 +729,18 @@ test.describe("the panel", () => {
 
   test("milestones list every checkpoint and pay rewards only after claiming", async ({
     page,
-  }) => {
+  }, testInfo) => {
+    await gotoReady(page, "/en/profile/edit");
+    await page.getByLabel("Bio").fill("I volunteer at community events.");
+    await page.getByLabel("Phone number").fill("+998901234567");
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+    await gotoReady(page, "/en/dashboard");
     const panel = page.getByRole("region", { name: "Milestones" });
-    await expect(panel.getByText("8 of 17 reached")).toBeVisible();
+    await expect(panel.getByText("7 of 14 reached")).toBeVisible();
     await expect(panel.getByText("0 of 1,195 XP earned")).toBeVisible();
     await expect(
-      panel.getByRole("heading", { level: 3, name: /^Choose your username/ }),
+      panel.getByRole("heading", { level: 3, name: /^Complete your profile/ }),
     ).toBeVisible();
 
     await panel.getByRole("link", { name: "See all" }).click();
@@ -727,7 +760,7 @@ test.describe("the panel", () => {
     await expect(
       page.getByRole("heading", {
         level: 3,
-        name: "Choose your username (Ready to claim)",
+        name: "Complete your profile (Ready to claim)",
       }),
     ).toBeVisible();
     await expect(
@@ -736,23 +769,43 @@ test.describe("the panel", () => {
         name: "Win a competition (Not reached yet)",
       }),
     ).toBeVisible();
-    await expect(page.getByText("235 XP ready to claim")).toBeVisible();
+    await expect(page.getByText("290 XP ready to claim")).toBeVisible();
+    await page.screenshot({
+      path: testInfo.outputPath("milestones.png"),
+      fullPage: true,
+    });
     const claim = page.getByRole("button", {
-      name: "Claim 10 XP for Choose your username",
+      name: "Claim 85 XP for Complete your profile",
       exact: true,
     });
     await claim.click();
-    await expect(page.getByText("10 of 1,195 XP earned")).toBeVisible();
-    await expect(page.getByText("225 XP ready to claim")).toBeVisible();
+    await expect(page.getByText("85 of 1,195 XP earned")).toBeVisible();
+    await expect(page.getByText("205 XP ready to claim")).toBeVisible();
     await expect(
-      page.getByRole("heading", { level: 3, name: "Choose your username (Claimed)" }),
+      page.getByRole("heading", { level: 3, name: "Complete your profile (Claimed)" }),
     ).toBeVisible();
     await expect(claim).toHaveCount(0);
     await page.reload();
-    await expect(page.getByText("10 of 1,195 XP earned")).toBeVisible();
+    await expect(page.getByText("85 of 1,195 XP earned")).toBeVisible();
     const eightEvents = page.getByRole("progressbar", { name: "Attend 8 events" });
     await expect(eightEvents).toHaveAttribute("aria-valuenow", "5");
     await expect(eightEvents).toHaveAttribute("aria-valuemax", "8");
+  });
+
+  test("opening a notification marks it read and closes the tray", async ({ page }) => {
+    await page.getByRole("button", { name: "Notifications (1)" }).click();
+    await page.getByRole("link", { name: /^You were accepted/ }).click();
+    await expect(page).toHaveURL(/\/en\/applications\/app-riverbank$/);
+    await expect(
+      page.getByRole("button", { name: "Notifications", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close notifications" })).toHaveCount(
+      0,
+    );
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: "Notifications", exact: true }),
+    ).toBeVisible();
   });
 
   test("the old record URL lands on the dashboard's history", async ({ page }) => {
@@ -798,31 +851,31 @@ test.describe("the panel", () => {
 
   test("the notifications menu shows the backend's messages and marks them read", async ({
     page,
-  }) => {
+  }, testInfo) => {
     const bell = page.getByRole("button", { name: "Notifications (1)" });
     await bell.click();
-    await expect(page.getByRole("link", { name: "You were accepted" })).toHaveAttribute(
-      "href",
-      "/en/applications/app-riverbank",
-    );
+    await expect(
+      page.getByRole("link", { name: /^You were accepted/ }),
+    ).toHaveAttribute("href", "/en/applications/app-riverbank");
     await expect(
       page.getByText("Open your application for the date and place."),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Attendance confirmed" }),
+      page.getByRole("link", { name: /^Attendance confirmed/ }),
     ).toHaveAttribute("href", "/en/dashboard#history");
     await expect(page.getByText(/status is now/)).toHaveCount(0);
     await expect(page.getByText("An account asked to join yours")).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "An account asked to join yours" }),
+      page.getByRole("link", { name: /^An account asked to join yours/ }),
     ).toHaveAttribute("href", "/en/settings");
     await expect(page.getByText("bekzod@example.org")).toHaveCount(0);
     await expect(page.getByText("merge-incoming")).toHaveCount(0);
     await expect(
-      page.getByRole("link", { name: "2 checkpoints reached" }),
+      page.getByRole("link", { name: /^2 checkpoints reached/ }),
     ).toHaveAttribute("href", "/en/checkpoints");
     await expect(page.getByText("+15 XP earned")).toBeVisible();
     await expect(page.getByText(/earned 15 XP: Choose/)).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("notifications.png") });
     await page.getByRole("button", { name: "Mark all as read" }).click();
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),
@@ -1079,8 +1132,7 @@ test.describe("opportunities", () => {
     page,
   }) => {
     await gotoReady(page, "/en/opportunities");
-    const before = await page.getByRole("article").count();
-    expect(before).toBeGreaterThan(3);
+    await expect.poll(() => page.getByRole("article").count()).toBeGreaterThan(3);
 
     await page.getByLabel("Region").selectOption("samarkand");
     await expect(page).toHaveURL(/region=samarkand/);

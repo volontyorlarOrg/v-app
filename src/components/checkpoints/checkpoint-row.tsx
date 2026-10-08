@@ -1,13 +1,10 @@
 import {
-  AtSign,
   Bookmark,
   CalendarCheck,
   CircleCheck,
   Clock,
   FileText,
-  KeyRound,
   Medal,
-  Send,
   Trophy,
   UserRoundCheck,
   type LucideIcon,
@@ -17,6 +14,8 @@ import { useFormatter, useTranslations } from "next-intl";
 import { ClaimButton } from "@/components/checkpoints/claim-button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
 import {
   hasCountedProgress,
   isReached,
@@ -27,10 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<CheckpointKey, LucideIcon> = {
-  username: AtSign,
   profile: UserRoundCheck,
-  telegram: Send,
-  second_sign_in: KeyRound,
   first_saved: Bookmark,
   first_application: FileText,
   first_acceptance: CircleCheck,
@@ -58,6 +54,8 @@ export function CheckpointRow({
   const Icon = ICONS[checkpoint.key];
   const reached = isReached(checkpoint);
   const claimed = isClaimed(checkpoint);
+  const exhausted = checkpoint.rewardState === "exhausted";
+  const profile = checkpoint.key === "profile";
   const title = t(`items.${checkpoint.key}.title`);
   const progress = t("progress", {
     progress: format.number(checkpoint.progress),
@@ -65,12 +63,18 @@ export function CheckpointRow({
   });
 
   return (
-    <li className="flex gap-4 border-t border-border px-5 py-4 first:border-t-0">
+    <li
+      id={`milestone-${checkpoint.key}`}
+      className={cn(
+        "flex scroll-mt-6 gap-4 border-t border-border px-5 py-5 first:border-t-0",
+        profile && "bg-surface-soft/40",
+      )}
+    >
       <span
         aria-hidden="true"
         className={cn(
           "inline-grid size-10 shrink-0 place-items-center rounded-full",
-          reached
+          reached && !exhausted
             ? "bg-accent text-knockout"
             : "border border-border-control text-ink-muted",
         )}
@@ -82,7 +86,7 @@ export function CheckpointRow({
           <h3
             className={cn(
               "min-w-0 text-base font-semibold text-balance",
-              reached ? "text-accent-ink" : "text-ink",
+              reached && !exhausted ? "text-accent-ink" : "text-ink",
             )}
           >
             {title}
@@ -91,14 +95,16 @@ export function CheckpointRow({
               (
               {claimed
                 ? t("claim.claimed")
-                : reached
-                  ? t("claim.ready")
-                  : t("notReached")}
+                : exhausted
+                  ? t("claim.exhausted")
+                  : reached
+                    ? t("claim.ready")
+                    : t("notReached")}
               )
             </span>
           </h3>
           <Badge
-            variant={reached ? "achievement" : "neutral"}
+            variant={reached && !exhausted ? "achievement" : "neutral"}
             className="tabular shrink-0"
           >
             {t("xp", { xp: format.number(checkpoint.xp) })}
@@ -107,6 +113,20 @@ export function CheckpointRow({
         <p className="mt-1 text-sm leading-relaxed text-ink-muted">
           {t(`items.${checkpoint.key}.body`)}
         </p>
+        {checkpoint.rewardLimit !== null ? (
+          <p className="mt-2 text-sm text-ink-muted">
+            {t("claim.limited", { limit: format.number(checkpoint.rewardLimit) })}
+          </p>
+        ) : null}
+        {!claimed && !exhausted && checkpoint.rewardsRemaining !== null ? (
+          <p className="tabular mt-1 text-sm font-semibold text-ink">
+            {checkpoint.rewardReserved
+              ? t("claim.reserved")
+              : t("claim.remaining", {
+                  count: format.number(checkpoint.rewardsRemaining),
+                })}
+          </p>
+        ) : null}
         {reached && checkpoint.completedAt ? (
           <p className="mt-1 text-sm text-ink-muted">
             {t("reachedOn", {
@@ -131,6 +151,15 @@ export function CheckpointRow({
               date: format.dateTime(new Date(checkpoint.claimedAt), "date"),
             })}
           </p>
+        ) : exhausted ? (
+          <div className="mt-3 space-y-1" role="status">
+            <p className="text-sm font-semibold text-ink">{t("claim.exhausted")}</p>
+            <p className="text-sm text-ink-muted">
+              {t("claim.exhaustedBody", {
+                limit: format.number(checkpoint.rewardLimit ?? 1000),
+              })}
+            </p>
+          </div>
         ) : reached ? (
           <>
             <p className="mt-2 text-sm font-semibold text-accent-ink">
@@ -151,11 +180,20 @@ export function CheckpointRow({
                 error: t("claim.error"),
                 notReached: t("claim.notReached"),
                 unavailable: t("claim.unavailable"),
+                exhausted: t("claim.exhausted"),
               }}
             />
           </>
         ) : (
-          <p className="mt-2 text-sm text-ink-muted">{t("notReached")}</p>
+          <div className="mt-3">
+            {profile ? (
+              <Button asChild size="sm" variant="outline">
+                <Link href="/profile/edit">{t("claim.completeProfile")}</Link>
+              </Button>
+            ) : (
+              <p className="text-sm text-ink-muted">{t("notReached")}</p>
+            )}
+          </div>
         )}
       </div>
     </li>

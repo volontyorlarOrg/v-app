@@ -23,6 +23,7 @@ export function ClaimButton({
     error: string;
     notReached: string;
     unavailable: string;
+    exhausted: string;
   };
 }) {
   const claim = useServerAction(() => claimCheckpointAction(checkpointKey), {
@@ -31,9 +32,11 @@ export function ClaimButton({
   const error =
     claim.error?.result.code === "checkpointNotReached"
       ? labels.notReached
-      : claim.error?.result.code === "checkpointClaimsUnavailable"
-        ? labels.unavailable
-        : labels.error;
+      : claim.error?.result.code === "checkpointRewardExhausted"
+        ? labels.exhausted
+        : claim.error?.result.code === "checkpointClaimsUnavailable"
+          ? labels.unavailable
+          : labels.error;
 
   return (
     <div className="mt-3 flex flex-col items-start gap-2">
@@ -42,7 +45,12 @@ export function ClaimButton({
         size="sm"
         aria-label={labels.accessible}
         aria-busy={claim.isPending}
-        disabled={!enabled || claim.isPending || claim.isSuccess}
+        disabled={
+          !enabled ||
+          claim.isPending ||
+          claim.isSuccess ||
+          claim.error?.result.code === "checkpointRewardExhausted"
+        }
         onClick={() => claim.mutate()}
       >
         {claim.isPending

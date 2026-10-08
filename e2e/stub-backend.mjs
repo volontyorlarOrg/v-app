@@ -305,10 +305,7 @@ function refuseUnready(response, state) {
 }
 
 const CHECKPOINTS = [
-  { key: "username", group: "start", metric: "usernameChosen", target: 1, xp: 10 },
-  { key: "profile", group: "start", metric: "profileComplete", target: 1, xp: 40 },
-  { key: "telegram", group: "start", metric: "telegramConnected", target: 1, xp: 20 },
-  { key: "second_sign_in", group: "start", metric: "signInMethods", target: 2, xp: 15 },
+  { key: "profile", group: "start", metric: "profileComplete", target: 1, xp: 85 },
   { key: "first_saved", group: "applying", metric: "saved", target: 1, xp: 5 },
   {
     key: "first_application",
@@ -391,6 +388,20 @@ function checkpointList(state) {
       xp: checkpoint.xp,
       completedAt,
       claimedAt: state.checkpointsClaimed.get(checkpoint.key) ?? null,
+      rewardState: state.checkpointsClaimed.has(checkpoint.key)
+        ? "claimed"
+        : checkpoint.key === "profile" && state.profileRewardsExhausted
+          ? "exhausted"
+          : completedAt
+            ? "ready"
+            : "locked",
+      rewardLimit: checkpoint.key === "profile" ? 1000 : null,
+      rewardsRemaining:
+        checkpoint.key === "profile" ? (state.profileRewardsExhausted ? 0 : 999) : null,
+      rewardReserved:
+        checkpoint.key === "profile" &&
+        completedAt !== null &&
+        !state.profileRewardsExhausted,
     };
   });
   const reached = items.filter((item) => item.completedAt !== null);
@@ -404,7 +415,7 @@ function checkpointList(state) {
       .filter((item) => item.claimedAt)
       .reduce((total, item) => total + item.xp, 0),
     xpClaimable: reached
-      .filter((item) => !item.claimedAt)
+      .filter((item) => item.rewardState === "ready")
       .reduce((total, item) => total + item.xp, 0),
     xpAvailable: CHECKPOINTS.reduce((total, item) => total + item.xp, 0),
   };
@@ -605,7 +616,7 @@ function freshState() {
     ],
     notifications: [
       {
-        id: "n-accepted",
+        id: "00000000-0000-4000-8000-000000000091",
         kind: "application.reviewed",
         title: "Application update",
         body: "Your application status is now accepted.",
@@ -1064,9 +1075,13 @@ const server = createServer(async (request, response) => {
     if (!pendingStates.delete(body.state))
       return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
-    if (body.code !== "e2e-code")
+    if (!["e2e-code", "e2e-profile-exhausted"].includes(body.code))
       return send(response, 401, { code: "invalidAuthorizationCode" });
     const opened = freshState();
+    if (body.code === "e2e-profile-exhausted") {
+      opened.profile.bio = "A complete volunteer profile.";
+      opened.profileRewardsExhausted = true;
+    }
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
     opened.account.usernameSource = "telegram";
@@ -1399,6 +1414,8 @@ const server = createServer(async (request, response) => {
     const key = path.split("/")[2];
     const item = checkpointList(state).items.find((item) => item.key === key);
     if (!item) return send(response, 422, { code: "validation" });
+    if (item.rewardState === "exhausted")
+      return send(response, 409, { code: "checkpointRewardExhausted" });
     if (!item.completedAt) return send(response, 409, { code: "checkpointNotReached" });
     if (!state.checkpointsClaimed.has(key)) {
       state.checkpointsClaimed.set(key, new Date().toISOString());
@@ -1420,6 +1437,13 @@ const server = createServer(async (request, response) => {
       items: state.notifications,
       unread: state.notifications.filter((item) => item.readAt === null).length,
     });
+  }
+  if (/^\/notifications\/[^/]+\/read$/.test(path) && method === "PATCH") {
+    const id = path.split("/")[2];
+    const item = state.notifications.find((item) => item.id === id);
+    if (!item) return send(response, 404, { code: "notificationNotFound" });
+    item.readAt = new Date().toISOString();
+    return send(response, 200, { id, read: true });
   }
   if (path === "/notifications/read-all" && method === "POST") {
     let updated = 0;
