@@ -9,13 +9,22 @@ import {
   type NotificationList,
 } from "@/lib/api/schemas";
 
-export const listNotifications = cache(function listNotifications(): Promise<NotificationList> {
-  return authed("/notifications", { schema: notificationListSchema });
-});
+export const listNotifications = cache(
+  function listNotifications(): Promise<NotificationList> {
+    return authed("/notifications", { schema: notificationListSchema });
+  },
+);
 
 export function markAllNotificationsRead() {
   return authed("/notifications/read-all", {
     method: "POST",
+    schema: acknowledgementSchema,
+  });
+}
+
+export function markNotificationRead(id: string) {
+  return authed(`/notifications/${encodeURIComponent(id)}/read`, {
+    method: "PATCH",
     schema: acknowledgementSchema,
   });
 }

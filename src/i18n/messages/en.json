@@ -88,8 +88,23 @@
         "many": "+{xp} XP earned",
         "readyTitle": "{count, plural, one {Reward ready to claim} other {# rewards ready to claim}}",
         "readyOne": "{name}: claim {xp} XP in Milestones.",
-        "readyMany": "Claim {xp} XP in Milestones."
-      }
+        "readyMany": "Claim {xp} XP in Milestones.",
+        "claimedTitle": "Reward claimed",
+        "claimedBody": "{xp} XP has been added to your account.",
+        "exhaustedTitle": "No profile rewards left",
+        "exhaustedBody": "All 1,000 profile reward places have been reserved. You can still complete your profile and apply."
+      },
+      "close": "Close notifications",
+      "allRead": "All caught up",
+      "marking": "Marking…",
+      "readError": "Could not mark notifications as read. Please try again.",
+      "emptyBody": "Application updates and milestone rewards will appear here.",
+      "new": "Unread",
+      "viewDetails": "View details",
+      "viewReward": "Claim reward",
+      "viewMilestones": "View milestones",
+      "viewAccount": "View account",
+      "unreadLabel": "Unread"
     },
     "userMenu": {
       "label": "Account menu"
@@ -492,7 +507,7 @@
       "description": "Reach checkpoints and claim your XP rewards.",
       "next": "Up next",
       "all": "See all",
-      "done": "You have claimed every milestone reward."
+      "done": "All available rewards are claimed."
     },
     "claim": {
       "ready": "Ready to claim",
@@ -504,7 +519,13 @@
       "success": "Reward claimed: +{xp} XP",
       "error": "Could not claim this reward. Try again.",
       "notReached": "This checkpoint is not ready yet. Refresh to see your progress.",
-      "unavailable": "Claiming will open after the XP reset. Please check back shortly."
+      "unavailable": "Reward claiming is temporarily unavailable. Please try again later.",
+      "limited": "For the first {limit} volunteers to complete their profiles.",
+      "remaining": "{count} reward places left",
+      "reserved": "Your reward is reserved. Claim it whenever you are ready.",
+      "exhausted": "No rewards left",
+      "exhaustedBody": "All {limit} places have been reserved. You can still complete your profile and apply to opportunities.",
+      "completeProfile": "Complete profile"
     }
   },
   "leaderboard": {

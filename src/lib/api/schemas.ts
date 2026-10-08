@@ -311,6 +311,10 @@ export const checkpointSchema = z.object({
   xp: z.number().int().nonnegative(),
   completedAt: isoDate.nullable(),
   claimedAt: isoDate.nullable(),
+  rewardState: z.enum(["locked", "ready", "claimed", "exhausted"]),
+  rewardLimit: z.number().int().positive().nullable(),
+  rewardsRemaining: z.number().int().nonnegative().nullable(),
+  rewardReserved: z.boolean(),
 });
 
 export const checkpointClaimSchema = z.object({

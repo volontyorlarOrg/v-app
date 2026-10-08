@@ -88,7 +88,7 @@ describe("checkpoint notifications", () => {
         ],
         xp: 50,
       }),
-    ).toEqual({ keys: ["username", "profile"], xp: 50 });
+    ).toEqual({ keys: ["username", "profile"], xp: 50, rewardState: "ready" });
   });
 
   it("names only the checkpoints this build has copy for", () => {
@@ -101,7 +101,7 @@ describe("checkpoint notifications", () => {
         ],
         xp: 45,
       }),
-    ).toEqual({ keys: ["profile"], xp: 45 });
+    ).toEqual({ keys: ["profile"], xp: 45, rewardState: "ready" });
   });
 
   it("leaves a checkpoint notification it cannot read to the backend's own words", () => {

@@ -11,6 +11,7 @@ import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
+import { notificationLabels } from "@/lib/notifications/labels";
 import {
   IDENTITY_ROUTE,
   accountNavRoutes,
@@ -69,6 +70,7 @@ export function Sidebar({
             emptyLabel={t("notifications.empty")}
             markAllLabel={t("notifications.markAllRead")}
             items={notifications}
+            labels={notificationLabels(t)}
           />
         </div>
 

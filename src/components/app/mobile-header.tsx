@@ -13,6 +13,7 @@ import type { ShellUser } from "@/components/app/sidebar";
 import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
+import { notificationLabels } from "@/lib/notifications/labels";
 import { IDENTITY_ROUTE, accountNavRoutes, navHref } from "@/lib/routing/routes";
 
 function accountMenuItems(t: (key: string) => string): AccountMenuItem[] {
@@ -60,6 +61,7 @@ export function MobileHeader({
             emptyLabel={t("notifications.empty")}
             markAllLabel={t("notifications.markAllRead")}
             items={notifications}
+            labels={notificationLabels(t)}
           />
           <AccountMenu
             labels={accountMenuLabels(t)}
