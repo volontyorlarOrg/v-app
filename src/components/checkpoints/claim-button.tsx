@@ -1,30 +1,38 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useServerAction } from "@/hooks/use-server-action";
 import { claimCheckpointAction } from "@/lib/checkpoints/actions";
 import type { CheckpointKey } from "@/lib/checkpoints/checkpoints";
+import { cn } from "@/lib/utils";
+
+export type ClaimButtonLabels = {
+  claim: string;
+  claiming: string;
+  claimed: string;
+  accessible: string;
+  success: string;
+  error: string;
+  notReached: string;
+  unavailable: string;
+  exhausted: string;
+};
 
 export function ClaimButton({
   checkpointKey,
   enabled,
   labels,
+  size = "md",
+  className,
 }: {
   checkpointKey: CheckpointKey;
   enabled: boolean;
-  labels: {
-    claim: string;
-    claiming: string;
-    claimed: string;
-    accessible: string;
-    success: string;
-    error: string;
-    notReached: string;
-    unavailable: string;
-    exhausted: string;
-  };
+  labels: ClaimButtonLabels;
+  size?: "sm" | "md";
+  className?: string;
 }) {
   const claim = useServerAction(() => claimCheckpointAction(checkpointKey), {
     onSuccess: () => toast.success(labels.success),
@@ -39,10 +47,10 @@ export function ClaimButton({
           : labels.error;
 
   return (
-    <div className="mt-3 flex flex-col items-start gap-2">
+    <div className={cn("flex flex-col items-stretch gap-2 sm:items-end", className)}>
       <Button
         type="button"
-        size="sm"
+        size={size}
         aria-label={labels.accessible}
         aria-busy={claim.isPending}
         disabled={
@@ -58,6 +66,9 @@ export function ClaimButton({
           : claim.isSuccess
             ? labels.claimed
             : labels.claim}
+        {claim.isPending || claim.isSuccess ? null : (
+          <ArrowRight aria-hidden="true" className="size-4" />
+        )}
       </Button>
       {!enabled ? <p className="text-sm text-ink-muted">{labels.unavailable}</p> : null}
       {claim.isError ? (

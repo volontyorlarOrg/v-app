@@ -705,6 +705,10 @@
     transition: transform 500ms var(--ease-scene);
   }
 
+  .meter-accent .meter-fill {
+    background-color: var(--color-accent);
+  }
+
   .tab-bar {
     padding-bottom: env(safe-area-inset-bottom);
   }

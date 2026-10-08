@@ -1,5 +1,6 @@
 import {
   Bookmark,
+  ClipboardList,
   Compass,
   FileText,
   LayoutDashboard,
@@ -18,7 +19,7 @@ export const ROUTE_ICONS: Partial<Record<RouteKey, LucideIcon>> = {
   applications: FileText,
   saved: Bookmark,
   record: Medal,
-  checkpoints: Medal,
+  checkpoints: ClipboardList,
   leaderboard: Trophy,
   profile: UserRound,
   settings: Settings,

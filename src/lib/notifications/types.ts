@@ -1,4 +1,4 @@
-import { isCheckpointKey, type CheckpointKey } from "@/lib/checkpoints/checkpoints";
+import { isCheckpointKey } from "@/lib/checkpoints/checkpoints";
 
 export type Notification = {
   id: string;
@@ -116,11 +116,9 @@ export function activityNotification(
   return null;
 }
 
-export const CHECKPOINT_NOTIFICATION_KIND = "checkpoint.completed";
 export const CHECKPOINT_READY_NOTIFICATION_KIND = "checkpoint.ready";
 
 export type CheckpointNotification = {
-  keys: Array<CheckpointKey | "username" | "telegram" | "second_sign_in">;
   xp: number;
   rewardState: "ready" | "claimed" | "exhausted";
 };
@@ -129,29 +127,17 @@ export function checkpointNotification(
   kind: string,
   data: Notification["data"],
 ): CheckpointNotification | null {
-  if (
-    kind !== CHECKPOINT_NOTIFICATION_KIND &&
-    kind !== CHECKPOINT_READY_NOTIFICATION_KIND
-  )
-    return null;
+  if (kind !== CHECKPOINT_READY_NOTIFICATION_KIND) return null;
   const awards = Array.isArray(data?.checkpoints) ? data.checkpoints : [];
-  const keys = awards.flatMap((award: unknown) => {
+  const known = awards.some((award: unknown) => {
     const key =
       award && typeof award === "object" ? (award as { key?: unknown }).key : undefined;
-    return typeof key === "string" &&
-      (isCheckpointKey(key) ||
-        key === "username" ||
-        key === "telegram" ||
-        key === "second_sign_in")
-      ? [key as CheckpointNotification["keys"][number]]
-      : [];
+    return typeof key === "string" && isCheckpointKey(key);
   });
   const xp = data?.xp;
-  if (keys.length === 0 || typeof xp !== "number" || !Number.isFinite(xp) || xp < 0)
-    return null;
+  if (!known || typeof xp !== "number" || !Number.isFinite(xp) || xp < 0) return null;
   const rewardState = data?.rewardState;
   return {
-    keys,
     xp,
     rewardState:
       rewardState === "claimed" || rewardState === "exhausted" ? rewardState : "ready",

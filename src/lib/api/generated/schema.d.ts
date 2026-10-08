@@ -2712,7 +2712,7 @@ export interface components {
              * @example start
              * @enum {string}
              */
-            group: "start" | "applying" | "events" | "hours" | "competitions";
+            group: "start";
             /** @example 1 */
             target: number;
             /**
@@ -2721,8 +2721,8 @@ export interface components {
              */
             progress: number;
             /**
-             * @description XP available to claim once reached; stored reward for completed checkpoints.
-             * @example 85
+             * @description XP the reward pays when claimed; the amount actually paid once claimed.
+             * @example 50
              */
             xp: number;
             /**
@@ -2736,33 +2736,34 @@ export interface components {
             rewardState: "locked" | "ready" | "claimed" | "exhausted";
             /** @example 1000 */
             rewardLimit: number | null;
+            /** @description Places left: the limit minus the rewards claimed so far. */
             rewardsRemaining: number | null;
-            /** @description A place is reserved on profile completion, even when none remain for new completers. */
+            /** @description This account holds one of the limited places, which a claim takes. */
             rewardReserved: boolean;
         };
         CheckpointListDto: {
-            /** @description Claiming opens after the production XP reset completes. */
+            /** @description The launch gate permits claims. */
             claimingEnabled: boolean;
             items: components["schemas"]["CheckpointDto"][];
-            /** @example 4 */
+            /** @example 1 */
             completed: number;
-            /** @example 2 */
+            /** @example 0 */
             claimed: number;
-            /** @example 14 */
+            /** @example 1 */
             total: number;
             /**
-             * @description XP this account has earned from checkpoints.
-             * @example 85
+             * @description XP this account has claimed from current rewards. Removed milestones no longer count.
+             * @example 0
              */
             xpEarned: number;
             /**
-             * @description XP every current checkpoint pays together.
-             * @example 1195
+             * @description XP every current reward pays together.
+             * @example 50
              */
             xpAvailable: number;
             /**
-             * @description XP from reached, unclaimed checkpoints in the current catalog.
-             * @example 40
+             * @description XP from reached, unclaimed rewards while places remain.
+             * @example 50
              */
             xpClaimable: number;
         };
@@ -2770,7 +2771,7 @@ export interface components {
         CheckpointClaimDto: {
             /** @example profile */
             key: string;
-            /** @example 85 */
+            /** @example 50 */
             xp: number;
             /** Format: date-time */
             claimedAt: string;
@@ -5852,7 +5853,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                key: "profile" | "first_saved" | "first_application" | "first_acceptance" | "events_1" | "events_3" | "events_8" | "events_20" | "hours_10" | "hours_25" | "hours_50" | "hours_100" | "competition_1" | "competition_win";
+                key: "profile";
             };
             cookie?: never;
         };
@@ -5898,7 +5899,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description checkpointNotReached: the checkpoint has not been reached. checkpointRewardExhausted: all 1,000 profile reward places are reserved. */
+            /** @description checkpointNotReached: the checkpoint has not been reached. checkpointRewardExhausted: all 1,000 profile rewards are claimed. */
             409: {
                 headers: {
                     [name: string]: unknown;

@@ -22,7 +22,7 @@ import {
   mergeNotificationName,
 } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
-import { isCheckpointKey } from "@/lib/checkpoints/checkpoints";
+import { PROFILE_TASK_ANCHOR } from "@/lib/checkpoints/checkpoints";
 import {
   applicationHref,
   historyHref,
@@ -74,44 +74,20 @@ export default async function VolunteerLayout({
     const time = format.relativeTime(new Date(item.at), now);
     const checkpoint = checkpointNotification(item.kind, item.data);
     if (checkpoint) {
-      const [only] = checkpoint.keys;
       const xp = format.number(checkpoint.xp);
-      const title = nav(
-        item.kind === "checkpoint.ready"
-          ? checkpoint.rewardState === "claimed"
-            ? "notifications.checkpoint.claimedTitle"
-            : checkpoint.rewardState === "exhausted"
-              ? "notifications.checkpoint.exhaustedTitle"
-              : "notifications.checkpoint.readyTitle"
-          : "notifications.checkpoint.title",
-        {
-          count: checkpoint.keys.length,
-        },
-      );
+      const title = nav(`notifications.checkpoint.${checkpoint.rewardState}Title`);
       const body =
-        item.kind === "checkpoint.ready" && checkpoint.rewardState === "exhausted"
-          ? nav("notifications.checkpoint.exhaustedBody")
-          : item.kind === "checkpoint.ready" && checkpoint.rewardState === "claimed"
+        checkpoint.rewardState === "ready"
+          ? nav("notifications.checkpoint.readyBody", {
+              name: checkpointsT("profile.title"),
+              xp,
+            })
+          : checkpoint.rewardState === "claimed"
             ? nav("notifications.checkpoint.claimedBody", { xp })
-            : checkpoint.keys.length === 1 && only
-              ? nav(
-                  item.kind === "checkpoint.ready"
-                    ? "notifications.checkpoint.readyOne"
-                    : "notifications.checkpoint.one",
-                  {
-                    name: checkpointsT(`items.${only}.title`),
-                    xp,
-                  },
-                )
-              : nav(
-                  item.kind === "checkpoint.ready"
-                    ? "notifications.checkpoint.readyMany"
-                    : "notifications.checkpoint.many",
-                  { xp },
-                );
+            : nav("notifications.checkpoint.exhaustedBody");
       if (
         item.unread &&
-        (item.kind !== "checkpoint.ready" || checkpoint.rewardState === "ready") &&
+        checkpoint.rewardState === "ready" &&
         now.getTime() - new Date(item.at).getTime() < CHECKPOINT_TOAST_WINDOW_MS
       ) {
         checkpointToasts.push({ id: item.id, title, body });
@@ -122,15 +98,14 @@ export default async function VolunteerLayout({
         body,
         time,
         unread: item.unread,
-        href: `${navHref("checkpoints")}${checkpoint.keys.length === 1 && only && isCheckpointKey(only) ? `#milestone-${only}` : ""}`,
+        href: `${navHref("checkpoints")}#${PROFILE_TASK_ANCHOR}`,
         category: "reward",
         action: nav(
-          checkpoint.rewardState === "ready" && item.kind === "checkpoint.ready"
+          checkpoint.rewardState === "ready"
             ? "notifications.viewReward"
-            : "notifications.viewMilestones",
+            : "notifications.viewTasks",
         ),
-        rewardState:
-          item.kind === "checkpoint.ready" ? checkpoint.rewardState : "claimed",
+        rewardState: checkpoint.rewardState,
       };
     }
     const merge = mergeNotificationName(item.kind);
