@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
+import { Archive, ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
 import { PAST_OPPORTUNITIES } from "@/lib/opportunities/archive";
@@ -16,9 +16,16 @@ export function PastOpportunitiesArchive() {
   const format = useFormatter();
 
   return (
-    <section aria-labelledby="past-opportunities-title" className="mt-12">
+    <section
+      aria-labelledby="past-opportunities-title"
+      className="mt-10 border-t-2 border-border-control pt-6"
+    >
       <header className="flex flex-col gap-5 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
+          <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-ink-muted">
+            <Archive aria-hidden="true" className="size-4" />
+            {t("closed")}
+          </p>
           <h2
             id="past-opportunities-title"
             className="text-title font-semibold text-ink"

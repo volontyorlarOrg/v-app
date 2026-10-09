@@ -4,6 +4,7 @@ import {
   DEFAULT_FILTERS,
   activeFilterCount,
   filterOpportunities,
+  filtersToApiQuery,
   filtersToQuery,
   parseOpportunityFilters,
 } from "@/lib/opportunities/filters";
@@ -54,6 +55,10 @@ describe("parseOpportunityFilters", () => {
 });
 
 describe("activeFilterCount and filtersToQuery", () => {
+  it("asks the API for newest publication order by default", () => {
+    expect(filtersToApiQuery(parseOpportunityFilters({})).sort).toBe("newest");
+    expect(parseOpportunityFilters({ sort: "newest" }).sort).toBe("newest");
+  });
   it("counts only the narrowing filters, not the sort", () => {
     expect(activeFilterCount(DEFAULT_FILTERS)).toBe(0);
     expect(activeFilterCount({ ...DEFAULT_FILTERS, sort: "start" })).toBe(0);
@@ -106,6 +111,7 @@ describe("filterOpportunities", () => {
       organization: reading,
       region: "tashkent-city",
       startsAt: "2026-06-27T09:00:00.000Z",
+      publishedAt: "2026-06-01T09:00:00.000Z",
       applicationDeadline: "2026-06-20T18:00:00.000Z",
     },
     {
@@ -116,6 +122,7 @@ describe("filterOpportunities", () => {
       organization: green,
       region: "samarkand",
       startsAt: "2026-06-25T04:00:00.000Z",
+      publishedAt: "2026-06-14T09:00:00.000Z",
       applicationDeadline: "2026-06-17T18:00:00.000Z",
     },
     {
@@ -127,6 +134,7 @@ describe("filterOpportunities", () => {
       region: "fergana",
       status: "full",
       startsAt: "2026-06-22T04:00:00.000Z",
+      publishedAt: "2026-06-10T09:00:00.000Z",
       applicationDeadline: "2026-06-18T18:00:00.000Z",
     },
     {
@@ -137,6 +145,7 @@ describe("filterOpportunities", () => {
       organization: reading,
       region: "tashkent-city",
       startsAt: "2026-06-16T04:00:00.000Z",
+      publishedAt: "2026-06-02T09:00:00.000Z",
       applicationDeadline: "2026-06-10T18:00:00.000Z",
     },
   ];
@@ -197,5 +206,14 @@ describe("filterOpportunities", () => {
       );
       expect(applicable.lastIndexOf(true)).toBeLessThan(applicable.indexOf(false));
     }
+  });
+
+  it("sorts saved opportunities by publication rather than event or deadline", () => {
+    expect(filterOpportunities(list, DEFAULT_FILTERS, NOW).map((o) => o.id)).toEqual([
+      "riverbank",
+      "planting",
+      "read-aloud",
+      "book-drive",
+    ]);
   });
 });

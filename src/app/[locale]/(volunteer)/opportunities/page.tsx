@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { Archive, ArrowDownWideNarrow, CalendarClock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -27,6 +28,7 @@ import {
   activeFilterCount,
   filterOpportunities,
   parseOpportunityFilters,
+  sortOpportunities,
   type OpportunityFilters as Filters,
 } from "@/lib/opportunities/filters";
 import {
@@ -35,6 +37,7 @@ import {
   toFilterState,
   type OpportunityView,
 } from "@/lib/opportunities/search-params";
+import { groupOpportunities } from "@/lib/opportunities/listing";
 import {
   OPPORTUNITY_KINDS,
   REGIONS,
@@ -80,7 +83,7 @@ export default async function OpportunitiesPage({
   const listing =
     catalogue === null
       ? savedListing(saved, filters, now)
-      : catalogueListing(catalogue);
+      : catalogueListing(catalogue, filters, now);
   const savedList = dataOf(saved);
 
   return (
@@ -107,11 +110,18 @@ function savedListing(
   return { status: "loaded", data: { items, total: items.length } };
 }
 
-function catalogueListing(catalogue: Loaded<OpportunityList>): Loaded<Listing> {
+function catalogueListing(
+  catalogue: Loaded<OpportunityList>,
+  filters: Filters,
+  now: Date,
+): Loaded<Listing> {
   if (catalogue.status === "failed") return catalogue;
   return {
     status: "loaded",
-    data: { items: catalogue.data.items, total: catalogue.data.total },
+    data: {
+      items: sortOpportunities(catalogue.data.items, filters.sort, now),
+      total: catalogue.data.total,
+    },
   };
 }
 
@@ -154,6 +164,8 @@ function Opportunities({
 
   const activeCount = activeFilterCount(filters);
   const showArchive = view === "all" && activeCount === 0 && filters.kind === null;
+  const groups =
+    listing.status === "loaded" ? groupOpportunities(listing.data.items, now) : null;
 
   return (
     <>
@@ -237,6 +249,10 @@ function Opportunities({
                 ? ` · ${t("showingOf", { shown: listing.data.items.length, total: listing.data.total })}`
                 : null}
             </p>
+            <p className="flex items-center gap-1.5 text-xs text-ink-muted">
+              <ArrowDownWideNarrow aria-hidden="true" className="size-3.5" />
+              {t(`sorting.${filters.sort}`)}
+            </p>
             {showArchive ? (
               <a
                 href="#past-opportunities-title"
@@ -265,20 +281,75 @@ function Opportunities({
                 }
               />
             </Panel>
-          ) : (
-            <ul className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {listing.data.items.map((opportunity) => (
-                <li key={opportunity.id} className="flex">
-                  <OpportunityCard
-                    opportunity={opportunity}
-                    saved={saved.has(opportunity.id)}
-                    application={applications.get(opportunity.id)}
-                    now={now}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
+          ) : groups ? (
+            <>
+              {(["current", "expired"] as const).map((group) => {
+                const items = groups[group];
+                if (group === "expired" && items.length === 0) return null;
+                const Icon = group === "current" ? CalendarClock : Archive;
+
+                return (
+                  <section
+                    key={group}
+                    aria-labelledby={`${group}-opportunities-title`}
+                    className={
+                      group === "current"
+                        ? "mt-5"
+                        : "mt-10 border-t-2 border-border-control pt-6"
+                    }
+                  >
+                    <header className="mb-4 flex items-start gap-3">
+                      <span
+                        className={
+                          group === "current"
+                            ? "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-soft text-primary-ink"
+                            : "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface text-ink-muted"
+                        }
+                      >
+                        <Icon aria-hidden="true" className="size-5" />
+                      </span>
+                      <div>
+                        <h2
+                          id={`${group}-opportunities-title`}
+                          className="flex items-center gap-2.5 text-base font-semibold text-ink"
+                        >
+                          {t(`sections.${group}.title`)}
+                          <span
+                            aria-hidden="true"
+                            className="tabular text-sm font-normal text-ink-muted"
+                          >
+                            {items.length}
+                          </span>
+                        </h2>
+                        <p className="mt-1 text-sm text-ink-muted">
+                          {t(`sections.${group}.description`)}
+                        </p>
+                      </div>
+                    </header>
+
+                    {items.length === 0 ? (
+                      <p className="rounded-xl border border-border bg-surface px-5 py-6 text-sm text-ink-muted">
+                        {t("sections.current.empty")}
+                      </p>
+                    ) : (
+                      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        {items.map((opportunity) => (
+                          <li key={opportunity.id} className="flex min-w-0">
+                            <OpportunityCard
+                              opportunity={opportunity}
+                              saved={saved.has(opportunity.id)}
+                              application={applications.get(opportunity.id)}
+                              now={now}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+                );
+              })}
+            </>
+          ) : null}
         </>
       )}
 

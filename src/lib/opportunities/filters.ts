@@ -9,7 +9,7 @@ import {
   type Region,
 } from "./types";
 
-export const OPPORTUNITY_SORTS = ["deadline", "start"] as const;
+export const OPPORTUNITY_SORTS = ["newest", "deadline", "start"] as const;
 export type OpportunitySort = (typeof OPPORTUNITY_SORTS)[number];
 
 export type OpportunityFilters = {
@@ -27,14 +27,15 @@ export const DEFAULT_FILTERS: OpportunityFilters = {
   region: null,
   format: null,
   openOnly: false,
-  sort: "deadline",
+  sort: "newest",
 };
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 const MAX_QUERY_LENGTH = 120;
 
-const API_SORTS: Record<OpportunitySort, "deadline" | "startDate"> = {
+const API_SORTS: Record<OpportunitySort, "newest" | "deadline" | "startDate"> = {
+  newest: "newest",
   deadline: "deadline",
   start: "startDate",
 };
@@ -114,14 +115,25 @@ export function filterOpportunities<T extends OpportunitySummary>(
     );
   });
 
+  return sortOpportunities(matches, filters.sort, now);
+}
+
+export function sortOpportunities<T extends OpportunitySummary>(
+  items: readonly T[],
+  sort: OpportunitySort,
+  now: Date,
+): T[] {
   const time = (opportunity: T) =>
     new Date(
-      filters.sort === "deadline"
-        ? opportunity.applicationDeadline
-        : opportunity.startsAt,
+      sort === "deadline" ? opportunity.applicationDeadline : opportunity.startsAt,
     ).getTime();
 
-  return matches.sort((a, b) => {
+  return [...items].sort((a, b) => {
+    if (sort === "newest") {
+      const postedA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const postedB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return postedB - postedA;
+    }
     const openA = canApply(a, now) ? 0 : 1;
     const openB = canApply(b, now) ? 0 : 1;
     return openA - openB || time(a) - time(b);

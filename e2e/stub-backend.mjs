@@ -52,6 +52,7 @@ const organizations = {
 const opportunities = [
   {
     id: "opp-debate",
+    publishedAt: at(-1, 10),
     slug: "city-youth-debate",
     kind: "competition",
     title: "City youth debate",
@@ -74,6 +75,7 @@ const opportunities = [
   },
   {
     id: "opp-book-drive",
+    publishedAt: at(-2, 10),
     imageUrl: "/logo/social/og-image-1200x630.png",
     slug: "winter-book-drive",
     title: "Winter book drive",
@@ -107,6 +109,7 @@ const opportunities = [
   },
   {
     id: "opp-riverbank",
+    publishedAt: at(-3, 10),
     slug: "riverbank-clean-up",
     title: "Riverbank clean-up",
     description: "Gloves and bags are provided. Wear shoes you can get muddy.",
@@ -128,6 +131,7 @@ const opportunities = [
   },
   {
     id: "opp-translation",
+    publishedAt: at(-4, 10),
     slug: "remote-translation-support",
     title: "Remote translation support",
     description: "Work from home in your own time over two weeks.",
@@ -175,6 +179,7 @@ const opportunities = [
   },
   {
     id: "opp-marathon",
+    publishedAt: at(-5, 10),
     slug: "city-marathon-water-stations",
     title: "City marathon water stations",
     description: "Shifts of three hours. Breakfast provided.",
@@ -197,6 +202,7 @@ const opportunities = [
   },
   {
     id: "opp-read-aloud",
+    publishedAt: at(-6, 10),
     slug: "read-aloud-day",
     title: "Read-aloud day",
     description: "Books are provided.",
@@ -237,6 +243,7 @@ function serializeOpportunity(item, detail) {
           ? "closed"
           : item.status,
     startsAt: item.startsAt,
+    publishedAt: item.publishedAt,
     endsAt: item.endsAt ?? undefined,
     applicationDeadline: item.applicationDeadline,
     imageUrl: item.imageUrl ?? undefined,
@@ -1008,7 +1015,12 @@ function listOpportunities(query) {
   items = items.sort((a, b) => {
     const openA = applicable(a) ? 0 : 1;
     const openB = applicable(b) ? 0 : 1;
-    return openA - openB || time(a) - time(b);
+    return (
+      openA - openB ||
+      (sort === "newest"
+        ? new Date(b.publishedAt) - new Date(a.publishedAt)
+        : time(a) - time(b))
+    );
   });
   const offset = (page - 1) * pageSize;
   return {
