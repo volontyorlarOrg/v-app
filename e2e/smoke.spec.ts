@@ -1075,6 +1075,47 @@ test.describe("opportunities", () => {
     await signIn(page);
   });
 
+  test("separates current and expired vacancies and orders current posts newest first", async ({
+    page,
+  }) => {
+    await gotoReady(page, "/en/opportunities");
+    const current = page.getByRole("region", { name: "Current vacancies" });
+    const expired = page.getByRole("region", { name: "Expired vacancies" });
+    await expect(page.getByText("Newest posts first", { exact: true })).toBeVisible();
+    await expect(current.getByRole("heading", { level: 3 })).toHaveText([
+      "City youth debate",
+      "Winter book drive",
+      "Riverbank clean-up",
+      "Remote translation support",
+      "City marathon water stations",
+    ]);
+    await expect(current.getByText(/^Posted /)).toHaveCount(5);
+    await expect(expired.getByRole("heading", { level: 3 })).toHaveText([
+      "Read-aloud day",
+    ]);
+    await expect(
+      expired.getByText("Applications have closed. You can still view the details."),
+    ).toBeVisible();
+
+    await gotoReady(page, "/en/opportunities?view=saved");
+    await expect(
+      page
+        .getByRole("region", { name: "Current vacancies" })
+        .getByRole("heading", { level: 3 }),
+    ).toHaveText(["Riverbank clean-up", "Remote translation support"]);
+    await expect(page.getByRole("region", { name: "Expired vacancies" })).toHaveCount(
+      0,
+    );
+
+    await gotoReady(page, "/en/opportunities?q=read-aloud");
+    await expect(page.getByRole("region", { name: "Current vacancies" })).toContainText(
+      "No current vacancies match these filters.",
+    );
+    await expect(
+      page.getByRole("region", { name: "Expired vacancies" }).getByRole("article"),
+    ).toHaveCount(1);
+  });
+
   test("shows three illustrated past events only in the unfiltered listing", async ({
     page,
   }, testInfo) => {
@@ -1096,6 +1137,11 @@ test.describe("opportunities", () => {
     await expect(page).toHaveURL(/#past-opportunities-title$/);
 
     if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll(".enter-rise")].every(
+          (element) => getComputedStyle(element).opacity === "1",
+        ),
+      );
       await page.screenshot({
         path: testInfo.outputPath("past-opportunities-light.png"),
         fullPage: true,
@@ -1111,6 +1157,11 @@ test.describe("opportunities", () => {
     await gotoReady(page, "/en/opportunities");
 
     if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll(".enter-rise")].every(
+          (element) => getComputedStyle(element).opacity === "1",
+        ),
+      );
       await page.screenshot({
         path: testInfo.outputPath("past-opportunities-dark.png"),
         fullPage: true,

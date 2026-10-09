@@ -652,7 +652,8 @@
       "save": "Saqlash",
       "saved": "Saqlangan",
       "sourced": "Volontyorlar topgan",
-      "saveError": "Saqlab boʻlmadi"
+      "saveError": "Saqlab boʻlmadi",
+      "posted": "Eʼlon qilingan: {date}"
     },
     "detail": {
       "back": "Barcha imkoniyatlar",
@@ -778,6 +779,23 @@
         "profession": "«Eng yaxshi kasb egasi — 2026» tanlovi",
         "amirsoy": "Amirsoy Paradiso — Open Air",
         "football": "Paxtakor stadionidagi xalqaro futbol uchrashuvi"
+      },
+      "closed": "Oʻtgan tadbirlar · Arizalar qabuli yopilgan"
+    },
+    "sorting": {
+      "newest": "Eng yangi eʼlonlar avval",
+      "deadline": "Eng yaqin ariza muddati avval",
+      "start": "Eng yaqin tadbir avval"
+    },
+    "sections": {
+      "current": {
+        "title": "Joriy vakansiyalar",
+        "description": "Kelgusi imkoniyatlar. Qabul holatini har bir kartadan tekshiring.",
+        "empty": "Bu filtrlarga mos joriy vakansiyalar yoʻq."
+      },
+      "expired": {
+        "title": "Muddati tugagan vakansiyalar",
+        "description": "Arizalar qabuli yopilgan. Tafsilotlarni hali ham koʻrishingiz mumkin."
       }
     }
   },

@@ -53,6 +53,7 @@ export type OpportunitySummary = {
   format: OpportunityFormat;
   status: OpportunityStatus;
   startsAt: string;
+  publishedAt?: string;
   endsAt?: string;
   applicationDeadline: string;
   imageUrl?: string;

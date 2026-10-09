@@ -55,6 +55,7 @@ export const opportunitySummarySchema = z.object({
   format: z.enum(OPPORTUNITY_FORMATS),
   status: z.enum(OPPORTUNITY_STATUSES),
   startsAt: isoDate,
+  publishedAt: optional(isoDate),
   endsAt: optional(isoDate),
   applicationDeadline: isoDate,
   imageUrl: optional(z.string()),

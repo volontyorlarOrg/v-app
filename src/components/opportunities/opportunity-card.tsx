@@ -155,6 +155,14 @@ export function OpportunityCard({
           </li>
         </ul>
 
+        {opportunity.publishedAt ? (
+          <p className="mt-3 text-xs text-ink-muted">
+            {t("card.posted", {
+              date: format.dateTime(new Date(opportunity.publishedAt), "day"),
+            })}
+          </p>
+        ) : null}
+
         <div className="mt-auto pt-4">
           <Link
             href={

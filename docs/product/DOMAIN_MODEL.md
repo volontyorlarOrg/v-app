@@ -54,6 +54,13 @@ tab shows it above the card content, and the detail page shows it below the
 title. Opportunities without an image keep their text-only layout. A
 coordinator revision temporarily hides the opportunity until renewed approval.
 
+The opportunities listing defaults to newest publication first (`sort=newest`).
+Cards display the backend `publishedAt` date when available, including in Saved.
+Current and expired vacancies have separate headings and counts; a closed status
+or a deadline at or before the request time puts a vacancy in Expired. A full
+vacancy with a future deadline remains Current. The sourced past-events archive
+has its own divider and stays outside filtered and saved results.
+
 ## Application
 
 One volunteer's application to one opportunity, in one of `draft`,

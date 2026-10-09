@@ -652,7 +652,8 @@
       "save": "Save",
       "saved": "Saved",
       "sourced": "Sourced by Volontyorlar",
-      "saveError": "Couldn't save"
+      "saveError": "Couldn't save",
+      "posted": "Posted {date}"
     },
     "detail": {
       "back": "All opportunities",
@@ -778,6 +779,23 @@
         "profession": "Best in the Profession 2026",
         "amirsoy": "Amirsoy Paradiso — Open Air",
         "football": "International football match at Paxtakor Stadium"
+      },
+      "closed": "Past events · Applications closed"
+    },
+    "sorting": {
+      "newest": "Newest posts first",
+      "deadline": "Soonest deadline first",
+      "start": "Soonest event first"
+    },
+    "sections": {
+      "current": {
+        "title": "Current vacancies",
+        "description": "Upcoming opportunities. Check each card for availability.",
+        "empty": "No current vacancies match these filters."
+      },
+      "expired": {
+        "title": "Expired vacancies",
+        "description": "Applications have closed. You can still view the details."
       }
     }
   },
