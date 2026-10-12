@@ -208,7 +208,21 @@ export const profileSchema = z.object({
   instagram: z.string().default(""),
   linkedin: z.string().default(""),
   links: z.array(z.string()).default([]),
+  hiddenFields: z.array(z.string()).default([]),
   updatedAt: optional(z.string()),
+});
+
+export const publicActivitySchema = z.object({
+  id: z.string().min(1),
+  source: z.enum(["attendance", "manual"]).default("manual"),
+  kind: z.enum(OPPORTUNITY_KINDS).default("volunteering"),
+  title: z.string(),
+  organization: z.string(),
+  eventDate: z.iso.date(),
+  hours: z.number().nonnegative().nullable().default(null),
+  placement: z.enum(PLACEMENTS).nullable().default(null),
+  xpAwarded: z.number().int().default(0),
+  countsTowardProgress: z.boolean().default(true),
 });
 
 export const publicProfileSchema = z.object({
@@ -226,7 +240,7 @@ export const publicProfileSchema = z.object({
   instagram: z.string().default(""),
   linkedin: z.string().default(""),
   links: z.array(z.url()).default([]),
-  joinedAt: isoDate,
+  joinedAt: isoDate.nullable().default(null),
   level: z.enum(LEVELS),
   xp: z.number().int().nonnegative(),
   stats: z.object({
@@ -246,6 +260,7 @@ export const publicProfileSchema = z.object({
       }),
     )
     .default([]),
+  activity: z.array(publicActivitySchema).optional(),
 });
 
 export const recordSchema = z.object({

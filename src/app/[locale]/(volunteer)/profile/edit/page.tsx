@@ -15,6 +15,11 @@ import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, type VolunteerProfile } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { initialsOf } from "@/lib/profile/initials";
+import {
+  OPTIONAL_PROFILE_PARTS,
+  hiddenProfileParts,
+  type OptionalProfilePart,
+} from "@/lib/profile/visibility";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -80,16 +85,23 @@ export default async function ProfileEditPage({
   };
 
   return (
-    <ProfileEditor values={values} locale={locale as Locale} avatarUrl={me.avatarUrl} />
+    <ProfileEditor
+      values={values}
+      hidden={[...hiddenProfileParts(profile?.hiddenFields)]}
+      locale={locale as Locale}
+      avatarUrl={me.avatarUrl}
+    />
   );
 }
 
 function ProfileEditor({
   values,
+  hidden,
   locale,
   avatarUrl,
 }: {
   values: VolunteerProfile;
+  hidden: readonly OptionalProfilePart[];
   locale: Locale;
   avatarUrl?: string;
 }) {
@@ -150,6 +162,19 @@ function ProfileEditor({
           value: region,
           label: opportunities(`regions.${region}`),
         }))}
+        visibility={{
+          hidden,
+          labels: {
+            title: t("visibility.title"),
+            help: t("visibility.help"),
+            parts: Object.fromEntries(
+              OPTIONAL_PROFILE_PARTS.map((part) => [
+                part,
+                t(`visibility.parts.${part}`),
+              ]),
+            ) as Record<OptionalProfilePart, string>,
+          },
+        }}
         headed={false}
         doneHref={navHref("profile")}
         cancelHref={navHref("profile")}

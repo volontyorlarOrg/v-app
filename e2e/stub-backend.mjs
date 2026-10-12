@@ -1187,41 +1187,79 @@ const server = createServer(async (request, response) => {
       return send(response, 404, { code: "publicProfileNotFound" });
     }
     const profile = isViewer ? state.profile : null;
+    const hidden = new Set(profile?.hiddenFields ?? []);
+    const shown = (part, value, empty) => (hidden.has(part) ? empty : value);
+    const activity = isViewer
+      ? state.history
+          .filter((item) => item.outcome === "attended")
+          .map((item) => ({
+            id: item.id,
+            source: item.source ?? "attendance",
+            kind: item.kind,
+            title: item.opportunityTitle,
+            organization: item.organization,
+            eventDate: item.eventDate.slice(0, 10),
+            hours: item.hours ?? null,
+            placement: item.placement ?? null,
+            xpAwarded: item.xpAwarded ?? 0,
+            countsTowardProgress: item.countsTowardProgress ?? true,
+          }))
+      : [
+          {
+            id: "roster-cleanup",
+            source: "attendance",
+            kind: "volunteering",
+            title: "Riverside cleanup",
+            organization: "Volunteer Support Desk",
+            eventDate: at(-30, 9).slice(0, 10),
+            hours: 3,
+            placement: null,
+            xpAwarded: 30,
+            countsTowardProgress: true,
+          },
+        ];
     return send(response, 200, {
       displayName: profile?.fullName ?? rosterEntry.displayName,
       username,
       avatarUrl: isViewer ? state.account.avatarUrl : rosterEntry.avatarUrl,
       bio: profile?.bio ?? "Community volunteer and student.",
-      region: profile?.region ?? "tashkent-city",
-      city: profile?.city ?? "Tashkent",
-      school: profile?.school ?? "Academic lyceum No. 2",
-      gradeYear: profile?.gradeYear ?? "2",
-      languages: profile?.languages ?? ["uz", "ru", "en"],
-      phone: profile?.phone || "+998 90 123 45 67",
-      telegram: profile?.telegram ?? username,
-      instagram: profile?.instagram ?? "volontyorlar.uz",
-      linkedin: profile?.linkedin ?? "https://www.linkedin.com/in/volontyorlar-uz",
-      links: profile?.links ?? ["https://portfolio.example/volunteer"],
-      joinedAt: state.user.createdAt,
+      region: shown("region", profile?.region ?? "tashkent-city", null),
+      city: shown("city", profile?.city ?? "Tashkent", ""),
+      school: shown("school", profile?.school ?? "Academic lyceum No. 2", ""),
+      gradeYear: shown("gradeYear", profile?.gradeYear ?? "2", ""),
+      languages: shown("languages", profile?.languages ?? ["uz", "ru", "en"], []),
+      phone: shown("phone", profile?.phone || "+998 90 123 45 67", ""),
+      telegram: shown("telegram", profile?.telegram ?? username, ""),
+      instagram: shown("instagram", profile?.instagram ?? "volontyorlar.uz", ""),
+      linkedin: shown(
+        "linkedin",
+        profile?.linkedin ?? "https://www.linkedin.com/in/volontyorlar-uz",
+        "",
+      ),
+      links: shown(
+        "links",
+        profile?.links ?? ["https://portfolio.example/volunteer"],
+        [],
+      ),
+      joinedAt: shown("joined", state.user.createdAt, null),
       level: isViewer ? state.record.level : "active",
       xp: isViewer ? VIEWER_XP : rosterEntry.xp,
       stats: {
         attendedEvents: isViewer ? state.record.counts.attended : 5,
         confirmedHours: isViewer ? (state.record.hours ?? 0) : 18,
       },
-      pastEvents: isViewer
-        ? state.history
-            .filter((item) => item.source === "manual")
-            .map((item) => ({
-              id: item.id,
-              title: item.opportunityTitle,
-              organization: item.organization,
-              eventDate: item.eventDate.slice(0, 10),
-              hours: item.hours,
-              xpAwarded: item.xpAwarded,
-              countsTowardProgress: item.countsTowardProgress,
-            }))
-        : [],
+      pastEvents: activity
+        .filter((item) => item.source === "manual" && !hidden.has("activity"))
+        .map((item) => ({
+          id: item.id,
+          title: item.title,
+          organization: item.organization,
+          eventDate: item.eventDate,
+          hours: item.hours ?? 0,
+          xpAwarded: item.xpAwarded,
+          countsTowardProgress: item.countsTowardProgress,
+        })),
+      activity: shown("activity", activity, []),
     });
   }
   if (path === "/me/username" && method === "PUT") {
@@ -1371,6 +1409,32 @@ const server = createServer(async (request, response) => {
       return send(response, 422, {
         code: "validationFailed",
         errors: { fullName: ["fullName must be longer than or equal to 2 characters"] },
+      });
+    }
+    const HIDEABLE = [
+      "region",
+      "city",
+      "school",
+      "gradeYear",
+      "languages",
+      "phone",
+      "telegram",
+      "instagram",
+      "linkedin",
+      "links",
+      "joined",
+      "activity",
+    ];
+    if (
+      body.hiddenFields !== undefined &&
+      !(
+        Array.isArray(body.hiddenFields) &&
+        body.hiddenFields.every((part) => HIDEABLE.includes(part))
+      )
+    ) {
+      return send(response, 422, {
+        code: "validationFailed",
+        errors: { hiddenFields: ["each value in hiddenFields must be a known part"] },
       });
     }
     const malformed = {

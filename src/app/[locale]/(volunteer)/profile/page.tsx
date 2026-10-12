@@ -17,7 +17,10 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
-import { PastEventsSection } from "@/components/profile/past-events-section";
+import {
+  ActivitySection,
+  type ProfileActivityEntry,
+} from "@/components/profile/activity-section";
 import { Link } from "@/i18n/navigation";
 import { getMe } from "@/lib/api/account.server";
 import { settle, type LoadFailure, type Loaded } from "@/lib/api/load.server";
@@ -34,6 +37,12 @@ import {
 import { initialsOf } from "@/lib/profile/initials";
 import { profileLinks } from "@/lib/profile/links";
 import { profileSocialLinks } from "@/lib/profile/social-links";
+import {
+  OPTIONAL_PROFILE_PARTS,
+  hiddenProfileParts,
+  withoutHiddenParts,
+  type OptionalProfilePart,
+} from "@/lib/profile/visibility";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import {
   hasParticipation,
@@ -87,6 +96,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       publicPage={publicPage(me.username, me.publicProfileEnabled)}
       joinedAt={me.createdAt}
       history={history}
+      hidden={hiddenProfileParts(profile.data?.hiddenFields)}
       errorLabels={loadErrorLabels(common)}
     />
   );
@@ -125,6 +135,7 @@ function Profile({
   publicPage,
   joinedAt,
   history,
+  hidden,
   errorLabels,
 }: {
   values: VolunteerProfile;
@@ -134,6 +145,7 @@ function Profile({
   publicPage: PublicPage;
   joinedAt: string;
   history: Loaded<History>;
+  hidden: ReadonlySet<OptionalProfilePart>;
   errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("profile");
@@ -188,24 +200,28 @@ function Profile({
 
   const text = (id: string, value: string): ProfileRow | null =>
     value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
-  const languages = languageDirectory.format(values.languages, locale);
-  const links = profileLinks(values.links);
-  const socials = profileSocialLinks(values);
+  const shown = withoutHiddenParts(values, hidden);
+  const languages = languageDirectory.format(shown.languages, locale);
+  const links = profileLinks(shown.links);
+  const socials = profileSocialLinks(shown);
+  const hiddenLabels = OPTIONAL_PROFILE_PARTS.filter((part) => hidden.has(part)).map(
+    (part) => t(`visibility.parts.${part}`),
+  );
 
   const rows = [
-    values.region
+    shown.region
       ? {
           id: "region",
           label: t("sheet.rows.region"),
-          value: opportunities(`regions.${values.region}`),
+          value: opportunities(`regions.${shown.region}`),
         }
       : null,
-    text("city", values.city),
-    text("school", values.school),
-    text("gradeYear", values.gradeYear),
+    text("city", shown.city),
+    text("school", shown.school),
+    text("gradeYear", shown.gradeYear),
     text("languages", languages),
-    text("phone", values.phone),
-    text("telegram", values.telegram.trim() ? `@${values.telegram.trim()}` : ""),
+    text("phone", shown.phone),
+    text("telegram", shown.telegram.trim() ? `@${shown.telegram.trim()}` : ""),
     links.length > 0
       ? {
           id: "links",
@@ -236,7 +252,7 @@ function Profile({
             ),
         }
       : null,
-    Number.isNaN(joinedOn.getTime())
+    hidden.has("joined") || Number.isNaN(joinedOn.getTime())
       ? null
       : {
           id: "joined",
@@ -256,26 +272,30 @@ function Profile({
       socials={socials}
       figures={figures}
       rows={rows}
-      pastEvents={
-        history.status === "failed" ? (
+      activity={
+        hidden.has("activity") ? null : history.status === "failed" ? (
           <div className="border-t border-border px-5 py-5 sm:px-8">
             <LoadErrorRows failure={history.failure} labels={errorLabels} />
           </div>
         ) : (
-          <PastEventsSection
-            events={history.data.items
-              .filter((entry) => entry.source === "manual")
-              .map((entry) => ({
-                id: entry.id,
-                title: entry.opportunityTitle,
-                organization: entry.organization,
-                eventDate: entry.eventDate,
-                hours: entry.hours ?? 0,
-                xpAwarded: entry.xpAwarded ?? 0,
-                countsTowardProgress: entry.countsTowardProgress ?? false,
-              }))}
-          />
+          <ActivitySection own entries={activityOf(history.data)} />
         )
+      }
+      note={
+        hiddenLabels.length > 0
+          ? t.rich("visibility.hiddenNote", {
+              parts: hiddenLabels.join(", "),
+              link: (chunks) => (
+                <Link
+                  href={`${navHref("profileEdit")}#visibility`}
+                  prefetch
+                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })
+          : null
       }
       completion={
         completion.complete
@@ -303,4 +323,21 @@ function Profile({
       }}
     />
   );
+}
+
+function activityOf(history: History): ProfileActivityEntry[] {
+  return history.items
+    .filter((entry) => entry.outcome === "attended")
+    .map((entry) => ({
+      id: entry.id,
+      source: entry.source,
+      kind: entry.kind,
+      title: entry.opportunityTitle,
+      organization: entry.organization,
+      eventDate: entry.eventDate,
+      hours: entry.hours ?? null,
+      placement: entry.placement ?? null,
+      xpAwarded: entry.xpAwarded ?? 0,
+      countsTowardProgress: entry.countsTowardProgress ?? true,
+    }));
 }
