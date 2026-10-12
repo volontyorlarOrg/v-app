@@ -17,6 +17,8 @@ reach you" panel, the completeness panel, the "Profile complete" tick and the
   languages, phone, Telegram, links, the public page address and the month
   the account was made each get a row when they have a value, and none when
   they do not. Nothing is marked private on the volunteer's own page.
+  (Changed on 2026-10-12: each of these rows is now the volunteer's choice;
+  see `the-volunteer-chooses-what-the-profile-shows.md`.)
 - **One action.** The button beside the avatar reads "Complete profile" while
   a completion field is missing and "Edit profile" once none is, the same
   wording the dashboard uses; both go to `/profile/edit`.

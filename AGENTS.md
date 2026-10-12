@@ -133,10 +133,19 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileSheet` — one read-only sheet: the avatar, the name as the
 `h1`, the username and the level, the bio, one line of figures from the record,
-and then every detail the volunteer entered (region, city, school, year,
-languages, phone, Telegram, Instagram, LinkedIn, portfolio links, the public
-page address with a copy button, the month they joined) as plain ruled rows,
-followed by administrator-added past events when present.
+and then the details the volunteer chose to show (region, city, school, year,
+languages, phone, Telegram, Instagram, LinkedIn, portfolio links, the month
+they joined) as plain ruled rows beside the public page address with its copy
+button, followed by **My activity**: the events they attended and their past
+events, each with its organisation, date, hours and XP.
+**The header is always shown; everything else is the volunteer's choice.**
+The photo, name, username, level, bio and figures cannot be hidden. The other
+twelve parts are one switch each in the "What others see" section of
+`/profile/edit`, saved with the form as `hiddenFields`; the vocabulary is
+`src/lib/profile/visibility.ts`. `/profile` shows exactly what others see,
+with one line at the foot naming what is hidden and linking back to the
+switches, and the backend, not this app, removes hidden parts from the public
+contract. An application still carries the whole profile.
 There is no cover, no stat band and
 no second panel; completeness is a thin meter along the sheet's top edge with
 one sentence, and it disappears once nothing is missing. It is the same sheet
@@ -153,8 +162,9 @@ the **Appearance** panel on `/settings` — the one place either is changed
 inside the app.
 **The record lives on the dashboard.** `/record` redirects to
 `/dashboard#history`; the dashboard carries the four figures, the level rail
-and the full participation history. The profile shows only the manually added
-past events, and the leaderboard is where "Your progress" leads. Nothing reads or writes
+and the full participation history, every outcome included. The profile's
+activity is the attended part of that same history, and the leaderboard is
+where "Your progress" leads. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
 privacy}` are unused and are kept only because that decision is
 reversible. `settings.appearance` is live: it labels the theme switch and the

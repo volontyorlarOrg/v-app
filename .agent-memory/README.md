@@ -75,3 +75,6 @@ folder. Never store secrets or unverified external claims.
   the password field exactly
 - `gotchas/the-stub-backend-remembers-between-runs.md` — why a reused stub
   makes the set-first-password smoke test fail on the second run
+- `decisions/the-volunteer-chooses-what-the-profile-shows.md` — the fixed
+  header and the twelve optional parts, why `/profile` shows only what others
+  see, and why the backend, not the interface, removes hidden parts
