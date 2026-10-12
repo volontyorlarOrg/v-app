@@ -843,13 +843,6 @@
       "hours": "{count, plural, one {<n>{value}</n> hour} other {<n>{value}</n> hours}}",
       "xp": "<n>{value}</n> XP"
     },
-    "pastEvents": {
-      "title": "Past events",
-      "hours": "h",
-      "adminAdded": "Added by an administrator",
-      "counted": "Counts toward progress",
-      "notCounted": "History only"
-    },
     "avatar": {
       "title": "Profile picture",
       "description": "Choose a JPEG, PNG or WebP up to 10 MB. Move and zoom it before saving.",
@@ -942,12 +935,39 @@
       "about": "Your name and a few lines an organiser reads first.",
       "education": "Where you study, so an organiser knows who is applying.",
       "location": "Organisers pick volunteers close to the event.",
-      "contact": "A Telegram username is needed to apply. A phone number is optional. Both are public when your public profile is on.",
+      "contact": "A Telegram username is needed to apply. A phone number is optional. Below you choose whether either one appears on your profile.",
       "links": "Social profiles and work you want anyone with your profile link to open."
     },
     "edit": {
       "back": "Back to profile",
       "cancel": "Cancel"
+    },
+    "activity": {
+      "title": "Activity",
+      "mine": "My activity",
+      "hours": "h",
+      "notCounted": "History only",
+      "empty": "Events you take part in will appear here.",
+      "more": "Show all {count}"
+    },
+    "visibility": {
+      "title": "What others see",
+      "help": "Your photo, name, username, level, bio and participation figures are always on your profile. Everything else is your choice. Organisers still see your full profile on an application you send.",
+      "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
+      "parts": {
+        "region": "Region",
+        "city": "City",
+        "school": "School",
+        "gradeYear": "Year or grade",
+        "languages": "Languages",
+        "phone": "Phone",
+        "telegram": "Telegram",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "links": "Portfolio links",
+        "joined": "Joined date",
+        "activity": "Activity"
+      }
     }
   },
   "languages": {

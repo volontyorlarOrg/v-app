@@ -843,13 +843,6 @@
       "hours": "{count, plural, other {<n>{value}</n> soat}}",
       "xp": "<n>{value}</n> XP"
     },
-    "pastEvents": {
-      "title": "Oʻtgan tadbirlar",
-      "hours": "soat",
-      "adminAdded": "Administrator qoʻshgan",
-      "counted": "Taraqqiyotga hisoblanadi",
-      "notCounted": "Faqat tarix"
-    },
     "avatar": {
       "title": "Profil rasmi",
       "description": "10 MB gacha JPEG, PNG yoki WebP tanlang. Saqlashdan oldin joyini va kattaligini sozlang.",
@@ -942,12 +935,39 @@
       "about": "Ismingiz va tashkilotchi birinchi oʻqiydigan bir necha satr.",
       "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
-      "contact": "Ariza berish uchun Telegram foydalanuvchi nomi kerak. Telefon ixtiyoriy. Ochiq profilingiz yoqilganida ikkalasi ham koʻrinadi.",
+      "contact": "Ariza berish uchun Telegram foydalanuvchi nomi kerak. Telefon ixtiyoriy. Ular profilda koʻrinish-koʻrinmasligini pastda tanlaysiz.",
       "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar."
     },
     "edit": {
       "back": "Profilga qaytish",
       "cancel": "Bekor qilish"
+    },
+    "activity": {
+      "title": "Faoliyat",
+      "mine": "Mening faoliyatim",
+      "hours": "soat",
+      "notCounted": "Faqat tarix",
+      "empty": "Qatnashgan tadbirlaringiz shu yerda koʻrinadi.",
+      "more": "Barchasini koʻrsatish: {count}"
+    },
+    "visibility": {
+      "title": "Boshqalarga koʻrinadigan qismlar",
+      "help": "Rasm, ism, foydalanuvchi nomi, daraja, oʻzingiz haqingizdagi matn va ishtirok koʻrsatkichlari profilda doim koʻrinadi. Qolganini oʻzingiz tanlaysiz. Ariza yuborganingizda tashkilotchi profilingizni toʻliq koʻradi.",
+      "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",
+      "parts": {
+        "region": "Hudud",
+        "city": "Shahar",
+        "school": "Oʻqish joyi",
+        "gradeYear": "Sinf yoki kurs",
+        "languages": "Tillar",
+        "phone": "Telefon",
+        "telegram": "Telegram",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "links": "Portfolio havolalari",
+        "joined": "Qoʻshilgan sana",
+        "activity": "Faoliyat"
+      }
     }
   },
   "languages": {

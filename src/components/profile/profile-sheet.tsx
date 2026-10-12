@@ -49,7 +49,8 @@ export function ProfileSheet({
   socials,
   figures,
   rows,
-  pastEvents,
+  activity,
+  note,
   completion,
   labels,
 }: {
@@ -62,7 +63,8 @@ export function ProfileSheet({
   socials: readonly ProfileSocialLink[];
   figures: readonly ProfileFigure[];
   rows: readonly ProfileRow[];
-  pastEvents?: ReactNode;
+  activity?: ReactNode;
+  note?: ReactNode;
   completion: ProfileCompletionLine | null;
   labels: {
     action?: string;
@@ -186,7 +188,12 @@ export function ProfileSheet({
       ) : (
         <div className="pb-6 sm:pb-8" />
       )}
-      {pastEvents}
+      {activity}
+      {note ? (
+        <p className="border-t border-border px-5 py-4 text-sm leading-relaxed text-ink-muted sm:px-8">
+          {note}
+        </p>
+      ) : null}
     </article>
   );
 }

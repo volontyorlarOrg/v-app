@@ -2,6 +2,10 @@ import { z } from "zod";
 
 import { REGIONS, type Region } from "@/lib/opportunities/types";
 import { linkedinProfileUrl } from "@/lib/profile/social-links";
+import {
+  hiddenPartsFromFormData,
+  type OptionalProfilePart,
+} from "@/lib/profile/visibility";
 
 export type ProfileInput = {
   fullName: string;
@@ -16,6 +20,7 @@ export type ProfileInput = {
   instagram: string;
   linkedin: string;
   links: string[];
+  hiddenFields?: OptionalProfilePart[];
 };
 
 const LIST_LIMITS = { languages: 10, links: 3 } as const;
@@ -140,6 +145,8 @@ function region(formData: FormData): Region | null {
 }
 
 export function profileInputFromFormData(formData: FormData): ProfileInput {
+  const hiddenFields = hiddenPartsFromFormData(formData);
+
   return {
     fullName: text(formData, "fullName"),
     bio: text(formData, "bio"),
@@ -153,5 +160,6 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     instagram: text(formData, "instagram").replace(/^@+/, ""),
     linkedin: linkedinProfileUrl(text(formData, "linkedin")) ?? "",
     links: list(formData, "links"),
+    ...(hiddenFields ? { hiddenFields } : {}),
   };
 }
