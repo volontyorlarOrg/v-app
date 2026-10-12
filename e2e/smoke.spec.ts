@@ -255,7 +255,9 @@ test.describe("welcome flow", () => {
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
-    await expect(page.getByLabel("Year or grade")).toHaveValue("10");
+    await expect(page.getByRole("textbox", { name: "Year or grade" })).toHaveValue(
+      "10",
+    );
     await expect(page.getByLabel("City or district")).toHaveValue("Chilonzor");
     await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
@@ -1524,6 +1526,61 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("button", { name: "Save profile" })).toBeVisible();
     await page.getByRole("link", { name: "Cancel" }).click();
     await expect(page).toHaveURL(/\/en\/profile$/);
+  });
+
+  test("the profile lists my activity, and each optional part can be kept off it", async ({
+    page,
+  }) => {
+    await gotoReady(page, "/en/profile");
+    const activity = page.getByRole("region", { name: "My activity" });
+    await expect(activity.getByRole("listitem")).toHaveCount(3);
+    await expect(activity.getByText("Winter clothing sorting day")).toBeVisible();
+    await expect(activity.getByText("Neighborhood reading day")).toBeVisible();
+    await expect(activity.getByText("Read-aloud day")).toHaveCount(0);
+    await expect(
+      page.getByRole("definition").filter({ hasText: "Academic lyceum No. 2" }),
+    ).toBeVisible();
+
+    await gotoReady(page, "/en/profile/edit");
+    const school = page.getByRole("switch", { name: "School", exact: true });
+    await expect(school).toBeChecked();
+    await school.click();
+    await page.getByRole("switch", { name: "Activity", exact: true }).click();
+    await page.getByRole("switch", { name: "Instagram", exact: true }).click();
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/en\/profile$/);
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
+    ).toBeVisible();
+    await expect(page.getByRole("list", { name: "Participation" })).toBeVisible();
+    await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "My activity" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
+    await expect(
+      page.getByText("Not shown on your profile: School, Instagram, Activity."),
+    ).toBeVisible();
+
+    await gotoReady(page, "/en/profiles/dilnoza_k");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
+    ).toBeVisible();
+    await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Activity" })).toHaveCount(0);
+    await expect(
+      page.getByRole("definition").filter({ hasText: "Tashkent City" }),
+    ).toBeVisible();
+
+    await page.goto("/en/profile");
+    await page.getByRole("link", { name: "Change" }).click();
+    await expect(page).toHaveURL(/\/en\/profile\/edit#visibility$/);
+    await expect(
+      page.getByRole("switch", { name: "School", exact: true }),
+    ).not.toBeChecked();
+    await expect(
+      page.getByRole("switch", { name: "Phone", exact: true }),
+    ).toBeChecked();
   });
 
   test("a profile picture can be cropped, saved and removed", async ({ page }) => {

@@ -13,7 +13,10 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
-import { PastEventsSection } from "@/components/profile/past-events-section";
+import {
+  ActivitySection,
+  type ProfileActivityEntry,
+} from "@/components/profile/activity-section";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { settle } from "@/lib/api/load.server";
@@ -100,7 +103,15 @@ export default async function MemberProfilePage({
     value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
   const portfolio = profileLinks(profile.links);
   const publicPage = publicProfileHref(profile.username);
-  const joinedOn = new Date(profile.joinedAt);
+  const joinedOn = profile.joinedAt ? new Date(profile.joinedAt) : null;
+  const activity: ProfileActivityEntry[] =
+    profile.activity ??
+    profile.pastEvents.map((event) => ({
+      ...event,
+      source: "manual" as const,
+      kind: "volunteering" as const,
+      placement: null,
+    }));
   const rows = [
     profile.region
       ? {
@@ -134,7 +145,7 @@ export default async function MemberProfilePage({
           ),
         }
       : null,
-    Number.isNaN(joinedOn.getTime())
+    joinedOn === null || Number.isNaN(joinedOn.getTime())
       ? null
       : {
           id: "joined",
@@ -163,7 +174,7 @@ export default async function MemberProfilePage({
           socials={profileSocialLinks(profile)}
           figures={figures}
           rows={rows}
-          pastEvents={<PastEventsSection events={profile.pastEvents} />}
+          activity={<ActivitySection entries={activity} />}
           completion={null}
           labels={{
             figures: t("sheet.figures"),

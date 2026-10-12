@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -29,6 +30,12 @@ import {
   type ProfileFormValues,
 } from "@/lib/profile/input";
 import type { LanguageOption } from "@/lib/profile/languages";
+import {
+  OPTIONAL_PROFILE_PARTS,
+  VISIBILITY_MARKER,
+  visibilityFieldName,
+  type OptionalProfilePart,
+} from "@/lib/profile/visibility";
 
 export type ProfileSection = "about" | "education" | "location" | "contact" | "links";
 
@@ -75,6 +82,15 @@ export type ProfileFormLabels = {
   cancel?: string;
 };
 
+export type ProfileVisibility = {
+  hidden: readonly OptionalProfilePart[];
+  labels: {
+    title: string;
+    help: string;
+    parts: Record<OptionalProfilePart, string>;
+  };
+};
+
 function ProfileField({
   id,
   label,
@@ -109,16 +125,21 @@ function ProfileField({
 }
 
 function FormSection({
+  id,
   title,
   help,
   children,
 }: {
+  id?: string;
   title: string;
   help: string;
   children: ReactNode;
 }) {
   return (
-    <div className="grid gap-4 border-t border-border pt-6 first:border-t-0 first:pt-0 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
+    <div
+      id={id}
+      className="grid scroll-mt-20 gap-4 border-t border-border pt-6 first:border-t-0 first:pt-0 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10"
+    >
       <div>
         <h3 className="font-sans text-sm font-semibold text-ink">{title}</h3>
         <p className="mt-1 text-sm leading-relaxed text-ink-muted">{help}</p>
@@ -133,6 +154,7 @@ export function ProfileForm({
   languageOptions,
   regions,
   labels,
+  visibility,
   headed = true,
   doneHref,
   cancelHref,
@@ -141,6 +163,7 @@ export function ProfileForm({
   languageOptions: readonly LanguageOption[];
   regions: readonly { value: string; label: string }[];
   labels: ProfileFormLabels;
+  visibility?: ProfileVisibility;
   headed?: boolean;
   doneHref?: string;
   cancelHref?: string;
@@ -375,6 +398,30 @@ export function ProfileForm({
               </ProfileField>
             </FieldGroup>
           </FormSection>
+
+          {visibility ? (
+            <FormSection
+              id="visibility"
+              title={visibility.labels.title}
+              help={visibility.labels.help}
+            >
+              <input type="hidden" name={VISIBILITY_MARKER} value="1" />
+              <ul
+                aria-label={visibility.labels.title}
+                className="grid gap-x-10 sm:grid-cols-2"
+              >
+                {OPTIONAL_PROFILE_PARTS.map((part) => (
+                  <li key={part} className="border-b border-border">
+                    <Switch
+                      name={visibilityFieldName(part)}
+                      label={visibility.labels.parts[part]}
+                      defaultChecked={!visibility.hidden.includes(part)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </FormSection>
+          ) : null}
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-6">
