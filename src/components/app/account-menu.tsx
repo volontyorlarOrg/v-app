@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, LogOut } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 import { routeIcon } from "@/components/app/route-icons";
@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link } from "@/i18n/navigation";
-import { signOut } from "@/lib/auth/actions";
 import type { RouteKey } from "@/lib/routing/routes";
 
 export type AccountMenuItem = {
@@ -20,7 +19,6 @@ export type AccountMenuItem = {
 export type AccountMenuLabels = {
   menu: string;
   profile: string;
-  signOut: string;
 };
 
 const ITEM_CLASS =
@@ -35,8 +33,6 @@ export function AccountMenu({
   level,
   profileHref,
   items,
-  signOutLocale,
-  loginHref,
 }: {
   labels: AccountMenuLabels;
   name: string;
@@ -46,8 +42,6 @@ export function AccountMenu({
   level: string;
   profileHref: string;
   items: readonly AccountMenuItem[];
-  signOutLocale: string | null;
-  loginHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
@@ -103,23 +97,6 @@ export function AccountMenu({
               );
             })}
           </ul>
-
-          <div className="mt-1.5 border-t border-border pt-1.5">
-            {signOutLocale ? (
-              <form action={signOut}>
-                <input type="hidden" name="locale" value={signOutLocale} />
-                <button type="submit" className={ITEM_CLASS}>
-                  <LogOut aria-hidden="true" className="size-4" />
-                  {labels.signOut}
-                </button>
-              </form>
-            ) : (
-              <Link href={loginHref} onClick={close} className={ITEM_CLASS}>
-                <LogOut aria-hidden="true" className="size-4" />
-                {labels.signOut}
-              </Link>
-            )}
-          </div>
         </nav>
       </PopoverContent>
     </Popover>

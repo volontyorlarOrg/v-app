@@ -21,7 +21,7 @@ It is not the marketing site's layout. The signed-in product is a **panel**: a
 navy sidebar that carries everything on desktop — the lockup and the
 notification bell, four sections (dashboard, opportunities, leaderboard, tasks), and
 at the foot the identity card, which is itself the profile's link, above
-settings and sign out — with no top bar; a slim header and a five-destination
+settings — with no top bar; a slim header and a five-destination
 tab bar on a phone; and panels of content on a flat workspace. **Every
 sidebar entry is a plain link — nothing in it collapses**, and the bell is the
 only tray. The theme switch and the
@@ -96,8 +96,8 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   or answered with an error, shows the request reference, and retries on its
   own three times (5, 10, 20 seconds) before leaving the button to the
   volunteer. `GET` requests also retry once on a transient failure inside the
-  client. `PanelErrorBoundary` only catches a render that throws. The palette
-  still defines no red: error states use the soft surface and ink;
+  client. `PanelErrorBoundary` only catches a render that throws. Error
+  states use the soft surface and ink, not the danger red;
 - **one account, two ways in.** `/settings` is the account page: it reads
   `/me` and `/me/account-merge-requests` on the server and shows Telegram,
   Google and email as separate connection states. A Google-owned address is
@@ -114,7 +114,8 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   rank and every experience total arrives from the backend and none is ever
   computed here, pagination is rendered from the response's own `page`,
   `pageSize` and `total`, and `viewer` shows the signed-in volunteer their
-  place even from a page they are not on. Each account has a public `username`
+  place even from a page they are not on — as one row that links to their own
+  row, with the distance to the place ahead as the only figure worked out here. Each account has a public `username`
   with a `source`: every username is renamed through
   `PUT /me/username` from `/settings` and from the welcome flow's first step,
   while a valid Telegram username is only the initial value and stops syncing
@@ -156,10 +157,10 @@ share address remains `volontyorlar.uz/<username>`.
 Editing is its own page, `/profile/edit`: "Edit profile", "Complete profile"
 and the welcome flow's "finish on your profile" all lead there, and a saved
 form returns to `/profile`. The profile carries nothing else: the
-account lives on `/settings`, sign-out at the foot of the sidebar (in the phone
-header's account menu on a phone), and the theme and the interface language in
-the **Appearance** panel on `/settings` — the one place either is changed
-inside the app.
+account lives on `/settings`, sign-out as the red button in the account card
+that opens `/settings` — nowhere in the shell — and the theme and the interface
+language in the **Appearance** panel on `/settings` — the one place either is
+changed inside the app.
 **The record lives on the dashboard.** `/record` redirects to
 `/dashboard#history`; the dashboard carries the four figures, the level rail
 and the full participation history, every outcome included. The profile's
@@ -300,8 +301,11 @@ docs/                           -> stable project documentation and the plan
   the record's figures, a completed profile, a saved opportunity. Blue and orange sit 1.25:1 apart
   and must never be combined; the logo's orange heart is the one exception,
   drawn by the kit as its own shape beside the blue. Each hue has a graphics
-  value and a text value. The palette defines no red; an error colour needs a decision
-  before it is used (see the plan). Use semantic tokens, never a literal hex.
+  value and a text value. The palette has one red, `danger`, the same
+  values as the three portals, and it marks an action that leaves or destroys —
+  today only sign out (`danger-outline`). It is not an error colour: error
+  states stay on the soft surface and ink, and a validation red still needs a
+  decision before it is used (see the plan). Use semantic tokens, never a literal hex.
   Solid fills use `action` and `band`, never `primary-ink`.
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add

@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
+import { VIEWER_ANCHOR } from "@/lib/leaderboard/standing";
 import { initialsOf } from "@/lib/profile/initials";
 import { memberProfileHref } from "@/lib/profile/public-routing";
 import { cn } from "@/lib/utils";
@@ -39,10 +40,11 @@ export function LeaderboardPodium({
           return (
             <li
               key={entry.username}
+              id={entry.isCurrentUser ? VIEWER_ANCHOR : undefined}
               data-place={entry.rank}
               aria-current={entry.isCurrentUser ? "true" : undefined}
               className={cn(
-                "medal flex min-w-0 flex-col items-center text-center",
+                "medal flex min-w-0 scroll-mt-24 flex-col items-center text-center",
                 ORDER[entry.rank] ?? "order-3",
               )}
             >
