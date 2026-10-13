@@ -120,6 +120,13 @@ export default async function MemberProfilePage({
           value: opportunities(`regions.${profile.region}`),
         }
       : null,
+    profile.hometownRegion
+      ? {
+          id: "hometownRegion",
+          label: t("sheet.rows.hometownRegion"),
+          value: opportunities(`regions.${profile.hometownRegion}`),
+        }
+      : null,
     text("city", profile.city),
     text("school", profile.school),
     text("gradeYear", profile.gradeYear),

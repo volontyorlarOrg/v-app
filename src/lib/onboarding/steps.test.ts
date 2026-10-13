@@ -70,6 +70,7 @@ describe("onboarding steps", () => {
       "school",
       "gradeYear",
       "region",
+      "hometownRegion",
       "city",
       "languages",
     ]);

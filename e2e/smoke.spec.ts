@@ -223,7 +223,13 @@ test.describe("welcome flow", () => {
       .getByLabel("School, college, or university")
       .fill("Academic lyceum No. 1");
     await page.getByLabel("Year or grade").fill("10");
-    await page.getByLabel("Region").selectOption("tashkent-city");
+    const regionNote = page.getByRole("note", {
+      name: "Two regions, two different questions",
+    });
+    await expect(regionNote).toContainText("Where you live now.");
+    await expect(regionNote).toContainText("It is optional");
+    await page.getByLabel("Current region").selectOption("tashkent-city");
+    await page.getByLabel("Hometown region").selectOption("samarkand");
     await page.getByLabel("City or district").fill("Chilonzor");
     const languages = page.getByRole("combobox", { name: "Languages you speak" });
     await languages.fill("uzb");
@@ -259,6 +265,14 @@ test.describe("welcome flow", () => {
       "10",
     );
     await expect(page.getByLabel("City or district")).toHaveValue("Chilonzor");
+    await expect(page.getByLabel("Current region")).toHaveValue("tashkent-city");
+    await expect(page.getByRole("combobox", { name: "Hometown region" })).toHaveValue(
+      "samarkand",
+    );
+    await expect(page.getByRole("switch", { name: "Hometown region" })).toBeChecked();
+    await expect(
+      page.getByRole("note", { name: "Two regions, two different questions" }),
+    ).toBeVisible();
     await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
     await expect(page.getByLabel("Bio")).toHaveValue(
@@ -1664,7 +1678,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(phone).toHaveValue("");
     await expect(page.getByText("Phone number", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Telegram username")).toHaveValue("dilnoza_k");
-    await expect(page.getByText("Optional", { exact: true })).toHaveCount(3);
+    await expect(page.getByText("Optional", { exact: true })).toHaveCount(4);
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
 
     await page.getByLabel("Bio").fill("Second-year student.");

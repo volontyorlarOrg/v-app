@@ -54,6 +54,7 @@ export type ProfileSnapshot = {
   fullName?: string;
   bio?: string;
   region?: string;
+  hometownRegion?: string;
   city?: string;
   school?: string;
   gradeYear?: string;

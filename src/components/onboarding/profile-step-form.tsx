@@ -6,9 +6,11 @@ import { ActionStatus } from "@/components/app/action-status";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { StepActions, StepField } from "@/components/onboarding/step-controls";
 import { LanguagePicker } from "@/components/profile/language-picker";
+import { RegionNote } from "@/components/profile/region-note";
+import { RegionOptions, type RegionOption } from "@/components/profile/region-options";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
 import { PROFILE_STEP_FIELDS, type ProfileStep } from "@/lib/onboarding/steps";
@@ -30,6 +32,7 @@ const ALL_FIELDS = [
   "school",
   "gradeYear",
   "region",
+  "hometownRegion",
   "city",
   "languages",
   "phone",
@@ -52,7 +55,7 @@ export function ProfileStepForm({
   step: ProfileStep;
   values: VolunteerProfile;
   languageOptions: readonly LanguageOption[];
-  regions: readonly { value: string; label: string }[];
+  regions: readonly RegionOption[];
   labels: OnboardingLabels;
   onSaved: (profile: VolunteerProfile) => void;
   onSkip: () => void;
@@ -175,17 +178,29 @@ export function ProfileStepForm({
                 />
               </StepField>
             </div>
+            <RegionNote labels={labels.regionNote} />
             <div className="grid gap-5 sm:grid-cols-2">
               <StepField id={fieldId("region")} label={labels.fields.region}>
                 <NativeSelect {...control("region")} defaultValue={defaults.region}>
-                  <NativeSelectOption value="">
-                    {labels.fields.regionAny}
-                  </NativeSelectOption>
-                  {regions.map((region) => (
-                    <NativeSelectOption key={region.value} value={region.value}>
-                      {region.label}
-                    </NativeSelectOption>
-                  ))}
+                  <RegionOptions
+                    placeholder={labels.fields.regionAny}
+                    regions={regions}
+                  />
+                </NativeSelect>
+              </StepField>
+              <StepField
+                id={fieldId("hometownRegion")}
+                label={labels.fields.hometownRegion}
+                optional={labels.optional}
+              >
+                <NativeSelect
+                  {...control("hometownRegion")}
+                  defaultValue={defaults.hometownRegion}
+                >
+                  <RegionOptions
+                    placeholder={labels.fields.regionAny}
+                    regions={regions}
+                  />
                 </NativeSelect>
               </StepField>
               <StepField

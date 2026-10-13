@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/app/page-header";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { regionNoteLabels } from "@/components/profile/region-note";
 import { AvatarEditor } from "@/components/profile/avatar-editor";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -31,6 +32,7 @@ const FIELD_KEYS = [
   "school",
   "gradeYear",
   "region",
+  "hometownRegion",
   "regionAny",
   "city",
   "languages",
@@ -190,6 +192,7 @@ function ProfileEditor({
           fields: Object.fromEntries(
             FIELD_KEYS.map((key) => [key, t(`fields.${key}`)]),
           ) as Record<(typeof FIELD_KEYS)[number], string>,
+          regionNote: regionNoteLabels(t),
           optional: t("optional"),
           save: t("save"),
           saving: t("saving"),

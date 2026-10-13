@@ -819,6 +819,7 @@
       "reliability": "<n>{value}</n> ishonchlilik",
       "rows": {
         "region": "Hudud",
+        "hometownRegion": "Asli qayerdan",
         "city": "Shahar",
         "school": "Oʻqish joyi",
         "gradeYear": "Sinf yoki kurs",
@@ -882,7 +883,8 @@
       "bioHelp": "Tashkilotchi birinchi oʻqiydigan bir necha jumla. Insho emas.",
       "school": "Maktab, kollej yoki universitet",
       "gradeYear": "Sinf yoki kurs",
-      "region": "Hudud",
+      "region": "Hozirgi hudud",
+      "hometownRegion": "Tugʻilib oʻsgan hudud",
       "regionAny": "Hududni tanlang",
       "city": "Shahar yoki tuman",
       "languages": "Biladigan tillaringiz",
@@ -915,6 +917,11 @@
       "languages": "Tillar",
       "phone": "Telefon",
       "telegram": "Telegram"
+    },
+    "regionNote": {
+      "title": "Ikki hudud — ikki xil savol",
+      "region": "Hozir yashayotgan joyingiz. Tashkilotchilar tadbirga yetib kela olishingizni shunga qarab biladi, ariza berish uchun ham kerak.",
+      "hometownRegion": "Asli qayerdan ekaningiz — oʻsgan yoki oilangiz yashaydigan joy. Oʻqish yoki ish uchun koʻchib kelgan boʻlsangiz, kiriting. Ixtiyoriy: usiz ham ariza bera olasiz."
     },
     "optional": "Ixtiyoriy",
     "save": "Profilni saqlash",
@@ -955,6 +962,7 @@
       "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",
       "parts": {
         "region": "Hudud",
+        "hometownRegion": "Tugʻilib oʻsgan hudud",
         "city": "Shahar",
         "school": "Oʻqish joyi",
         "gradeYear": "Sinf yoki kurs",

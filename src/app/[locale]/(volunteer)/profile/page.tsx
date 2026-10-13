@@ -216,6 +216,13 @@ function Profile({
           value: opportunities(`regions.${shown.region}`),
         }
       : null,
+    shown.hometownRegion
+      ? {
+          id: "hometownRegion",
+          label: t("sheet.rows.hometownRegion"),
+          value: opportunities(`regions.${shown.hometownRegion}`),
+        }
+      : null,
     text("city", shown.city),
     text("school", shown.school),
     text("gradeYear", shown.gradeYear),

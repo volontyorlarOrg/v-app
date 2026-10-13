@@ -14,6 +14,7 @@ const profile = {
   fullName: "Dilnoza Karimova",
   bio: "Hi",
   region: "samarkand" as string | null,
+  hometownRegion: "bukhara" as string | null,
   city: "Samarkand",
   school: "School 12",
   gradeYear: "10",
@@ -71,6 +72,17 @@ describe("profile visibility", () => {
       links: [],
       city: "Samarkand",
       telegram: "dilnoza_k",
+    });
+  });
+
+  it("hides the hometown and the current region independently", () => {
+    expect(withoutHiddenParts(profile, new Set(["hometownRegion"]))).toMatchObject({
+      region: "samarkand",
+      hometownRegion: null,
+    });
+    expect(withoutHiddenParts(profile, new Set(["region"]))).toMatchObject({
+      region: null,
+      hometownRegion: "bukhara",
     });
   });
 });

@@ -13,6 +13,7 @@ export type ProfileInput = {
   school: string;
   gradeYear: string;
   region: Region | null;
+  hometownRegion: Region | null;
   city: string;
   languages: string[];
   phone: string;
@@ -60,6 +61,7 @@ export const profileFormSchema = z.object({
   school: boundedText(PROFILE_TEXT_LIMITS.school),
   gradeYear: boundedText(PROFILE_TEXT_LIMITS.gradeYear),
   region: z.union([z.literal(""), z.enum(REGIONS)]),
+  hometownRegion: z.union([z.literal(""), z.enum(REGIONS)]),
   city: boundedText(PROFILE_TEXT_LIMITS.city),
   languages: z.array(z.string().trim().min(1).max(35)).max(LIST_LIMITS.languages),
   phone: z
@@ -98,6 +100,7 @@ export function profileFormValues(profile: {
   school: string;
   gradeYear: string;
   region: Region | null;
+  hometownRegion: Region | null;
   city: string;
   languages: readonly string[];
   phone: string;
@@ -112,6 +115,7 @@ export function profileFormValues(profile: {
     school: profile.school,
     gradeYear: profile.gradeYear,
     region: profile.region ?? "",
+    hometownRegion: profile.hometownRegion ?? "",
     city: profile.city,
     languages: [...profile.languages],
     phone: profile.phone,
@@ -139,8 +143,8 @@ function list(formData: FormData, name: keyof typeof LIST_LIMITS): string[] {
   ].slice(0, LIST_LIMITS[name]);
 }
 
-function region(formData: FormData): Region | null {
-  const value = text(formData, "region");
+function region(formData: FormData, name: "region" | "hometownRegion"): Region | null {
+  const value = text(formData, name);
   return (REGIONS as readonly string[]).includes(value) ? (value as Region) : null;
 }
 
@@ -152,7 +156,8 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     bio: text(formData, "bio"),
     school: text(formData, "school"),
     gradeYear: text(formData, "gradeYear"),
-    region: region(formData),
+    region: region(formData, "region"),
+    hometownRegion: region(formData, "hometownRegion"),
     city: text(formData, "city"),
     languages: list(formData, "languages"),
     phone: normalizePhone(text(formData, "phone")),
