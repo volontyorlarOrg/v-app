@@ -819,6 +819,7 @@
       "reliability": "<n>{value}</n> reliability",
       "rows": {
         "region": "Region",
+        "hometownRegion": "Hometown",
         "city": "City",
         "school": "School",
         "gradeYear": "Year or grade",
@@ -882,7 +883,8 @@
       "bioHelp": "A few sentences an organiser reads first. Not an essay.",
       "school": "School, college, or university",
       "gradeYear": "Year or grade",
-      "region": "Region",
+      "region": "Current region",
+      "hometownRegion": "Hometown region",
       "regionAny": "Choose a region",
       "city": "City or district",
       "languages": "Languages you speak",
@@ -915,6 +917,11 @@
       "languages": "Languages",
       "phone": "Phone",
       "telegram": "Telegram"
+    },
+    "regionNote": {
+      "title": "Two regions, two different questions",
+      "region": "Where you live now. Organisers use it to see whether you can get to an event, and you need it to apply.",
+      "hometownRegion": "Where you are from — where you grew up or your family lives. Add it if you moved away to study or work. It is optional and you can apply without it."
     },
     "optional": "Optional",
     "save": "Save profile",
@@ -955,6 +962,7 @@
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
       "parts": {
         "region": "Region",
+        "hometownRegion": "Hometown region",
         "city": "City",
         "school": "School",
         "gradeYear": "Year or grade",

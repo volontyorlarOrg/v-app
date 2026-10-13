@@ -58,6 +58,7 @@ export default async function ApplicationPage({
     fullName: profile?.fullName,
     bio: profile?.bio,
     region: profile?.region ?? undefined,
+    hometownRegion: profile?.hometownRegion ?? undefined,
     school: profile?.school,
     languages: profile?.languages,
     phone: profile?.phone,
@@ -164,6 +165,15 @@ function Application({
         ? opportunitiesT(`regions.${snapshot.region}`)
         : "—",
     },
+    ...(isRegion(snapshot.hometownRegion)
+      ? [
+          {
+            key: "hometownRegion",
+            label: profileT("fields.hometownRegion"),
+            value: opportunitiesT(`regions.${snapshot.hometownRegion}`),
+          },
+        ]
+      : []),
     ...(snapshot.city === undefined
       ? []
       : [

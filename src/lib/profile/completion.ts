@@ -60,6 +60,7 @@ export function profileCompletion(profile: ProfileFields): ProfileCompletion {
 }
 
 export type VolunteerProfile = ProfileFields & {
+  hometownRegion: Region | null;
   instagram: string;
   linkedin: string;
   links: string[];
@@ -69,6 +70,7 @@ export const EMPTY_PROFILE: VolunteerProfile = {
   fullName: "",
   bio: "",
   region: null,
+  hometownRegion: null,
   school: "",
   gradeYear: "",
   city: "",

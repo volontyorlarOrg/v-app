@@ -1,6 +1,7 @@
 import type { FormStep } from "@/lib/onboarding/steps";
 import type { ProfileFormValues } from "@/lib/profile/input";
 import type { RailState } from "@/components/onboarding/step-rail";
+import type { RegionNoteLabels } from "@/components/profile/region-note";
 
 export type OnboardingLabels = {
   stepCount: string;
@@ -38,6 +39,7 @@ export type OnboardingLabels = {
     | "regionAny",
     string
   >;
+  regionNote: RegionNoteLabels;
   optional: string;
   usernameStep: {
     field: string;

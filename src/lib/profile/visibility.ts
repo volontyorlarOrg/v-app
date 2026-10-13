@@ -1,5 +1,6 @@
 export const OPTIONAL_PROFILE_PARTS = [
   "region",
+  "hometownRegion",
   "city",
   "school",
   "gradeYear",
@@ -51,6 +52,7 @@ export function hiddenPartsFromFormData(
 export function withoutHiddenParts<
   T extends {
     region: unknown;
+    hometownRegion: unknown;
     city: string;
     school: string;
     gradeYear: string;
@@ -65,6 +67,7 @@ export function withoutHiddenParts<
   return {
     ...profile,
     region: hidden.has("region") ? null : profile.region,
+    hometownRegion: hidden.has("hometownRegion") ? null : profile.hometownRegion,
     city: hidden.has("city") ? "" : profile.city,
     school: hidden.has("school") ? "" : profile.school,
     gradeYear: hidden.has("gradeYear") ? "" : profile.gradeYear,

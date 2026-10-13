@@ -24,6 +24,7 @@ describe("profileInputFromFormData", () => {
         instagram: "@dilnoza.codes",
         linkedin: "linkedin.com/in/dilnoza-k",
         region: "samarkand",
+        hometownRegion: "bukhara",
         links:
           "https://a.example, https://b.example, https://c.example, https://d.example",
       }),
@@ -35,6 +36,7 @@ describe("profileInputFromFormData", () => {
     expect(input.instagram).toBe("dilnoza.codes");
     expect(input.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
     expect(input.region).toBe("samarkand");
+    expect(input.hometownRegion).toBe("bukhara");
     expect(input.links).toHaveLength(3);
   });
 
@@ -52,6 +54,7 @@ describe("profileInputFromFormData", () => {
   it("turns an unknown or empty region into null and missing fields into empty values", () => {
     const input = profileInputFromFormData(form({ fullName: "D", region: "atlantis" }));
     expect(input.region).toBeNull();
+    expect(input.hometownRegion).toBeNull();
     expect(input.bio).toBe("");
     expect(input.languages).toEqual([]);
   });
@@ -74,6 +77,7 @@ describe("profileFormSchema", () => {
     school: "",
     gradeYear: "",
     region: "",
+    hometownRegion: "",
     city: "",
     languages: [],
     phone: "",
@@ -127,6 +131,15 @@ describe("profileFormSchema", () => {
     expect(accepts({ telegram: "dilnoza.k" })).toBe(false);
   });
 
+  it("lets the hometown stay empty and rejects a region it does not know", () => {
+    const accepts = (hometownRegion: string) =>
+      profileFormSchema.safeParse({ ...valid, hometownRegion }).success;
+
+    expect(accepts("")).toBe(true);
+    expect(accepts("bukhara")).toBe(true);
+    expect(accepts("atlantis")).toBe(false);
+  });
+
   it("turns a stored profile into the form's default values", () => {
     const values = profileFormValues({
       fullName: "Dilnoza",
@@ -134,6 +147,7 @@ describe("profileFormSchema", () => {
       school: "",
       gradeYear: "",
       region: null,
+      hometownRegion: "bukhara",
       city: "",
       languages: ["uz", "ru"],
       phone: "",
@@ -143,6 +157,7 @@ describe("profileFormSchema", () => {
       links: [],
     });
     expect(values.region).toBe("");
+    expect(values.hometownRegion).toBe("bukhara");
     expect(values.languages).toEqual(["uz", "ru"]);
     expect(values.telegram).toBe("dilnoza_k");
     expect(values.instagram).toBe("dilnoza.codes");

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
+import { regionNoteLabels } from "@/components/profile/region-note";
 import type { Locale } from "@/i18n/routing";
 import { ACCOUNT_ERROR_KEYS } from "@/lib/account/types";
 import {
@@ -108,6 +109,7 @@ function Welcome({
     "school",
     "gradeYear",
     "region",
+    "hometownRegion",
     "regionAny",
     "city",
     "languages",
@@ -162,6 +164,7 @@ function Welcome({
     fields: Object.fromEntries(
       fieldKeys.map((key) => [key, profile(`fields.${key}`)]),
     ) as OnboardingLabels["fields"],
+    regionNote: regionNoteLabels(profile),
     optional: profile("optional"),
     usernameStep: {
       field: t("usernameStep.field"),
