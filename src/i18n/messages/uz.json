@@ -29,7 +29,6 @@
     "leaderboard": "Reyting",
     "profile": "Profil",
     "settings": "Sozlamalar",
-    "signOut": "Chiqish",
     "primaryLabel": "Asosiy navigatsiya",
     "secondaryLabel": "Hisob",
     "tabBarLabel": "Ilova boʻlimlari",
@@ -471,10 +470,10 @@
     "standing": {
       "rank": "Sizning oʻrningiz",
       "of": "reytingdagi {total} koʻngillidan",
-      "xp": "Tajriba",
-      "xpHelp": "Tasdiqlangan ishtirok uchun beriladi.",
-      "appearAs": "Siz shunday koʻrinasiz",
-      "changeUsername": "Foydalanuvchi nomini oʻzgartirish"
+      "show": "Jadvaldagi oʻrnimni koʻrsatish",
+      "leading": "Birinchi oʻrin",
+      "level": "{place}-oʻrin bilan teng",
+      "behind": "{place}-oʻringacha {xp} XP"
     },
     "table": {
       "title": "Reyting jadvali",
@@ -1218,9 +1217,6 @@
     },
     "password": {
       "label": "Parol"
-    },
-    "index": {
-      "label": "Sozlamalar boʻlimlari"
     }
   },
   "notFound": {

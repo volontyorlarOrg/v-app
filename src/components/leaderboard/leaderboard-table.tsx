@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
+import { VIEWER_ANCHOR } from "@/lib/leaderboard/standing";
 import { initialsOf } from "@/lib/profile/initials";
 import { memberProfileHref } from "@/lib/profile/public-routing";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,10 @@ export function LeaderboardTable({
             : null;
           const identity = (
             <span className="flex items-center gap-3">
-              <Avatar aria-hidden="true" className="size-9">
+              <Avatar
+                aria-hidden="true"
+                className={cn("size-9", isViewer && "ring-2 ring-accent/70")}
+              >
                 {entry.avatarUrl ? <AvatarImage src={entry.avatarUrl} alt="" /> : null}
                 <AvatarFallback className="text-xs">
                   {initialsOf(entry.displayName)}
@@ -71,8 +75,12 @@ export function LeaderboardTable({
           return (
             <TableRow
               key={entry.username}
+              id={isViewer ? VIEWER_ANCHOR : undefined}
               aria-current={isViewer ? "true" : undefined}
-              className={cn(isViewer && "bg-surface-soft")}
+              className={cn(
+                isViewer &&
+                  "scroll-mt-24 bg-surface-soft shadow-[inset_3px_0_0_0_var(--color-action)]",
+              )}
             >
               <TableCell className={cn(CELL, "py-2.5")}>
                 <span

@@ -160,7 +160,6 @@ export default async function VolunteerLayout({
         handle: me.username,
       }}
       notifications={notifications}
-      signOutLocale={locale}
     >
       <CheckpointToasts items={checkpointToasts} />
       <PanelErrorBoundary labels={errorLabels}>{children}</PanelErrorBoundary>

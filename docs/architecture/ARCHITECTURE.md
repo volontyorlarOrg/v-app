@@ -77,7 +77,7 @@ flowchart LR
 | `src/components/opportunities/`                       | Filters, card, rows, facts, save button                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `src/components/applications/`                        | The timeline                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `src/components/checkpoints/`                         | The checkpoint row, the summary meter, the dashboard panel, and the toast that celebrates a newly reached checkpoint                                                                                                                                                                                                                                                                                                                                                                                   |
-| `src/components/leaderboard/`                         | The standings table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `src/components/leaderboard/`                         | The viewer's place row, the podium and the standings table                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `src/components/account/`                             | The username section and rename form of the account page; the welcome step is its own                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `src/components/record/`                              | The participation history table                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `src/components/profile/`                             | The profile sheet, its public page link, and the profile form                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -104,8 +104,8 @@ props so no page-level translation reaches the browser:
 
 - `LocaleSwitcher` is a Radix dropdown menu (the sign-in and welcome
   headers); `AccountMenu` and `NotificationsMenu` are Radix popovers, the
-  first holding a `nav` landmark so the account links and the sign-out form
-  are ordinary links and a button; Radix owns the open state, Escape, focus
+  first holding a `nav` landmark so the account links are ordinary links;
+  Radix owns the open state, Escape, focus
   return and taps outside.
 - `SidebarNav` and `TabBar` need the pathname to mark the active section.
 - `ThemeToggle` and `ThemeSwitch` need the document's theme; both are the
@@ -146,7 +146,9 @@ request.
 `AppShell` lays out a sidebar and a column. The sidebar is a navy column from
 the large breakpoint, sticky and full height, and absent below it; there is no
 desktop top bar, because the sidebar carries the lockup and the notification
-bell, the sections, and at its foot the identity card, settings and sign out.
+bell, the sections, and at its foot the identity card and settings. Sign out
+is the red button in the account card at the top of `/settings`, the one place
+it lives.
 Every entry is a plain link — the bell is the sidebar's only popover, and the
 identity card is the profile's link (`IDENTITY_ROUTE`, lit on `/profile` and
 `/profile/edit`), never a menu trigger. The theme and
@@ -174,7 +176,7 @@ reads `application.submitted`, `application.reviewed` (with `data.status`) and
 application or to `/dashboard#history`. Joining accounts is handled the same
 way through `mergeNotificationName()`; any other kind falls back to the
 backend's own words. The user menu links to the consolidated
-profile and calls the sign-out action.
+profile and to settings, where the sign-out action is called.
 
 ## Filters live in the URL
 

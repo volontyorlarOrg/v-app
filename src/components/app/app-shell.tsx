@@ -11,12 +11,10 @@ import { navHref, tabBarRoutes } from "@/lib/routing/routes";
 export function AppShell({
   user,
   notifications,
-  signOutLocale,
   children,
 }: {
   user: ShellUser;
   notifications: readonly NotificationItem[];
-  signOutLocale: string | null;
   children: ReactNode;
 }) {
   const t = useTranslations("nav");
@@ -35,17 +33,9 @@ export function AppShell({
       >
         {t("skipToContent")}
       </a>
-      <Sidebar
-        user={user}
-        notifications={notifications}
-        signOutLocale={signOutLocale}
-      />
+      <Sidebar user={user} notifications={notifications} />
       <div className="workspace-backdrop flex min-h-full min-w-0 flex-1 flex-col bg-surface-sunk">
-        <MobileHeader
-          user={user}
-          notifications={notifications}
-          signOutLocale={signOutLocale}
-        />
+        <MobileHeader user={user} notifications={notifications} />
         <main
           id="main"
           className="mx-auto w-full max-w-[80rem] flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-10 lg:py-9 lg:pb-12"
