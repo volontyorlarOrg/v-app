@@ -87,8 +87,9 @@ this repository does not fork the palette. A product-only token (like
 `--text-figure`) is added in the same commit as its dark value and its
 assertion in `src/app/design-tokens.test.ts`. Before reaching for a colour,
 check the role split in `../../DESIGN.md`: blue is the institution, orange is
-the person, there is no third hue and no red until the plan's error-colour
-decision is made.
+the person, and there is no third hue. The one red, `danger`, is for an action
+that leaves or destroys (sign out); it is not an error colour, which still
+waits on the plan's error-colour decision.
 
 ## Add motion to a block
 

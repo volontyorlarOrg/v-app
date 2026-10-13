@@ -20,17 +20,26 @@ import {
 import { LeaderboardStanding } from "@/components/leaderboard/leaderboard-standing";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import type { Locale } from "@/i18n/routing";
-import { getMe } from "@/lib/api/account.server";
-import { usernameIdentity } from "@/lib/account/username";
 import { getLeaderboard } from "@/lib/api/leaderboard.server";
 import { settle, type LoadFailure } from "@/lib/api/load.server";
-import type { Leaderboard as LeaderboardPage } from "@/lib/api/schemas";
+import type {
+  Leaderboard as LeaderboardPage,
+  LeaderboardEntry,
+} from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { paginate, type Pagination as PageState } from "@/lib/leaderboard/pagination";
 import {
   leaderboardPageHref,
   leaderboardPageParser,
 } from "@/lib/leaderboard/search-params";
+import {
+  VIEWER_ANCHOR,
+  chaseOf,
+  entryAt,
+  pageOfRank,
+  placeAhead,
+  type Chase,
+} from "@/lib/leaderboard/standing";
 import { initialsOf } from "@/lib/profile/initials";
 import { localePath, navHref } from "@/lib/routing/routes";
 
@@ -53,9 +62,8 @@ export default async function LeaderboardRoute({
 
   const query = await searchParams;
   const requested = Math.max(1, leaderboardPageParser.parseServerSide(query.page));
-  const [, me, loaded, common] = await Promise.all([
+  const [, loaded, common] = await Promise.all([
     requireSession(),
-    getMe(),
     settle(() => getLeaderboard(requested)),
     getTranslations({ locale, namespace: "common" }),
   ]);
@@ -82,13 +90,27 @@ export default async function LeaderboardRoute({
     );
   }
 
-  return (
-    <Leaderboard
-      board={board}
-      state={state}
-      handleEditable={usernameIdentity(me).editable}
-    />
+  return <Leaderboard board={board} state={state} chase={await chaseFor(board)} />;
+}
+
+async function chaseFor(board: LeaderboardPage): Promise<Chase | null> {
+  const ahead = placeAhead(board.viewer.rank);
+  return chaseOf(
+    board.viewer,
+    entryAt(board.items, ahead) ?? (ahead ? await entryOnItsPage(board, ahead) : null),
   );
+}
+
+async function entryOnItsPage(
+  board: LeaderboardPage,
+  rank: number,
+): Promise<LeaderboardEntry | null> {
+  const page = pageOfRank(rank, board.pageSize);
+  if (page === board.page) return null;
+  const neighbours = await settle(() => getLeaderboard(page, board.pageSize));
+  if (neighbours.status === "failed") return null;
+  if (neighbours.data.viewer.rank !== board.viewer.rank) return null;
+  return entryAt(neighbours.data.items, rank);
 }
 
 function LeaderboardUnavailable({
@@ -111,11 +133,11 @@ function LeaderboardUnavailable({
 function Leaderboard({
   board,
   state,
-  handleEditable,
+  chase,
 }: {
   board: LeaderboardPage;
   state: PageState;
-  handleEditable: boolean;
+  chase: Chase | null;
 }) {
   const t = useTranslations("leaderboard");
   const format = useFormatter();
@@ -146,21 +168,16 @@ function Leaderboard({
 
       <div className="mt-6 flex flex-col gap-6">
         <LeaderboardStanding
-          name={viewer.displayName}
           initials={initialsOf(viewer.displayName)}
           avatarUrl={viewer.avatarUrl}
-          username={viewer.username}
           rank={viewer.rank}
           xp={viewer.xp}
           total={board.total}
-          scoring={{
-            hour: board.scoring.defaults?.xpPerHour ?? board.scoring.confirmedHourXp,
-            winner: board.scoring.defaults?.xpWinner ?? board.scoring.attendedEventXp,
-            contributor: board.scoring.defaults?.xpContributor ?? 30,
-            attendee: board.scoring.defaults?.xpAttendee ?? 10,
-            penalty: board.scoring.defaults?.xpNoShowPenalty ?? 10,
-          }}
-          handleEditable={handleEditable}
+          chase={chase}
+          href={`${leaderboardPageHref(
+            navHref("leaderboard"),
+            pageOfRank(viewer.rank, board.pageSize),
+          )}#${VIEWER_ANCHOR}`}
         />
 
         {podium.length > 0 ? <LeaderboardPodium entries={podium} /> : null}
@@ -201,6 +218,16 @@ function Leaderboard({
             </div>
           ) : null}
         </Panel>
+
+        <p className="px-1 text-xs leading-relaxed text-ink-muted">
+          {t("scoring", {
+            hour: board.scoring.defaults?.xpPerHour ?? board.scoring.confirmedHourXp,
+            winner: board.scoring.defaults?.xpWinner ?? board.scoring.attendedEventXp,
+            contributor: board.scoring.defaults?.xpContributor ?? 30,
+            attendee: board.scoring.defaults?.xpAttendee ?? 10,
+            penalty: board.scoring.defaults?.xpNoShowPenalty ?? 10,
+          })}
+        </p>
       </div>
     </>
   );

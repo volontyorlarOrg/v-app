@@ -29,7 +29,6 @@
     "leaderboard": "Leaderboard",
     "profile": "Profile",
     "settings": "Settings",
-    "signOut": "Sign out",
     "primaryLabel": "Main navigation",
     "secondaryLabel": "Account",
     "tabBarLabel": "App sections",
@@ -471,10 +470,10 @@
     "standing": {
       "rank": "Your place",
       "of": "of {total} on the leaderboard",
-      "xp": "Experience",
-      "xpHelp": "Earned from confirmed attendance.",
-      "appearAs": "You appear as",
-      "changeUsername": "Change your username"
+      "show": "Show my place in the standings",
+      "leading": "First place",
+      "level": "Level with place {place}",
+      "behind": "{xp} XP behind place {place}"
     },
     "table": {
       "title": "Standings",
@@ -1218,9 +1217,6 @@
     },
     "password": {
       "label": "Password"
-    },
-    "index": {
-      "label": "Settings sections"
     }
   },
   "notFound": {

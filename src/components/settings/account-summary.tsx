@@ -29,6 +29,7 @@ export function AccountSummary({
   username,
   connected,
   labels,
+  action,
 }: {
   id: string;
   name: string;
@@ -38,6 +39,7 @@ export function AccountSummary({
   username: string;
   connected: readonly { provider: ConnectionProvider; label: string }[];
   labels: AccountSummaryLabels;
+  action?: ReactNode;
 }) {
   return (
     <section
@@ -48,7 +50,7 @@ export function AccountSummary({
       <h2 id={`${id}-title`} className="sr-only">
         {labels.title}
       </h2>
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Avatar aria-hidden="true" className="size-14 shrink-0 ring-2 ring-accent/70">
             {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
@@ -71,23 +73,30 @@ export function AccountSummary({
           </div>
         </div>
 
-        <div className="sm:text-right">
-          <p className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-            {labels.signsInWith}
-          </p>
-          <ul className="mt-2 flex flex-wrap gap-1.5 sm:justify-end">
-            {connected.length === 0 ? (
-              <li className="text-sm text-ink-muted">{labels.nothingConnected}</li>
-            ) : (
-              connected.map((item) => (
-                <li key={item.provider}>
-                  <StateChip tone="structure" icon={MARKS[item.provider]}>
-                    {item.label}
-                  </StateChip>
-                </li>
-              ))
-            )}
-          </ul>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between xl:shrink-0 xl:justify-end xl:gap-6">
+          <div className="xl:text-right">
+            <p className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              {labels.signsInWith}
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-1.5 xl:justify-end">
+              {connected.length === 0 ? (
+                <li className="text-sm text-ink-muted">{labels.nothingConnected}</li>
+              ) : (
+                connected.map((item) => (
+                  <li key={item.provider}>
+                    <StateChip tone="structure" icon={MARKS[item.provider]}>
+                      {item.label}
+                    </StateChip>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+          {action ? (
+            <div className="shrink-0 xl:border-l xl:border-border xl:pl-6">
+              {action}
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

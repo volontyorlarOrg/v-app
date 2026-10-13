@@ -16,24 +16,33 @@ response's `volunteerTotal`, every active volunteer, including those who have
 not chosen a username yet and so are not ranked. The board itself lists only
 chosen usernames, which is why its own count, `total`, can be smaller.
 
-The page has three parts:
+The page has four parts:
 
-1. **Your standing** — two figures read straight from the response's `viewer`:
-   the place and the experience, with the ranked total as the place's note.
-   Beneath them, the username the volunteer appears under and a link to the
-   account page, which is where a username is changed.
-2. **Standings** — one page of the board: place, public display name, public
+1. **Your place** — one row, not a banner: the place and the experience read
+   straight from the response's `viewer`, the ranked total, and the distance
+   to the place ahead ("160 XP behind place 29", "Level with place 29",
+   "First place"). The whole row is a link to the page that holds the
+   volunteer's own row, anchored on it (`#you`), so the place is one tap from
+   anywhere on the board. It names no username: the username is shown and
+   changed on the account page.
+2. **The podium** — the first three places, on the first page only. The
+   reader's own step carries the same `#you` anchor.
+3. **Standings** — one page of the board: place, public display name, public
    username and experience. The name is the primary identifier; the `@username`
    sits beneath it in the smaller metadata role.
    The first three places and the volunteer's own row are in orange, the colour
    that belongs to the person; every other experience figure is plain ink so
    the orange keeps meaning something. The reader's own row is on the soft
-   surface, carries `aria-current`, and is marked with a chip.
-3. **Pagination** — rendered from the response's own `page`, `pageSize` and
+   surface with a blue edge, carries `aria-current` and the `#you` anchor, and
+   is marked with a chip.
+4. **Pagination** — rendered from the response's own `page`, `pageSize` and
    `total`, never from a count of the rows on screen.
 
 A page number past the end redirects to the last page, so the "showing 26–30
 of 30" line never contradicts an empty table.
+
+Under the board, one small line states how experience is usually earned, from
+the response's `scoring`.
 
 ## Nothing is calculated here
 
@@ -43,9 +52,19 @@ arrives from the backend with the record. The frontend retains the thresholds
 only to explain progress toward the next level; it does not substitute a
 locally calculated current level. → `src/lib/api/schemas.ts`
 
-The one thing the frontend does compute is which page is which — page count,
-the clamped current page, the window of page numbers, and the "showing
-first–last of total" range. → `src/lib/leaderboard/pagination.ts`
+The frontend does compute which page is which — page count, the clamped
+current page, the window of page numbers, and the "showing first–last of
+total" range. → `src/lib/leaderboard/pagination.ts`
+
+It also states one difference: the distance to the place ahead is the
+experience of the entry one place above the viewer minus the viewer's own,
+both the backend's figures. That entry is read from the page already loaded
+when it is there; otherwise the page that holds it is read once more
+(`GET /leaderboard` again, the same page size). The line is left out whenever
+that second read fails, the viewer's place moved between the two reads, or the
+entry is not the adjacent place — never guessed. A backend field for the place
+ahead would make the second read unnecessary.
+→ `src/lib/leaderboard/standing.ts`
 
 The backend marks the reader's row with `isCurrentUser`; the frontend does not
 infer identity from another field.
@@ -74,8 +93,8 @@ name from its current owner.
 
 Every username can be renamed in two places:
 
-- **the account page** (`/settings`), in its own panel under the connections
-  (`UsernameSection`);
+- **the account page** (`/settings`), in its own panel directly under the
+  account summary (`UsernameSection`), shown to every account;
 - **the first step of the welcome flow** (`UsernameStepForm`), which every new
   account passes through and a generated account cannot leave without choosing
   its own. A Telegram or custom username is prefilled there and kept without a

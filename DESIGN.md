@@ -177,7 +177,7 @@ The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
 a navy sidebar that names four sections — dashboard, opportunities, leaderboard,
 tasks — at the top and the account — who you are, which opens the
-profile, then settings and sign out — at the foot, and a flat workspace carrying panels of content, with
+profile, then settings — at the foot, and a flat workspace carrying panels of content, with
 no top bar between them. Every entry in the sidebar is a plain link: nothing
 in it expands, and the only tray is the notification bell beside the lockup.
 What used to hide inside the user card now has a place — the card itself is
@@ -201,7 +201,7 @@ volunteer into the room.
 **Key characteristics**
 
 - A 16.5rem navy sidebar (`shell`) with four sections at the top, the
-  identity card (the profile's link) above settings and sign out at the foot,
+  identity card (the profile's link) above settings at the foot,
   and no top bar on desktop; a 56px header and a five-tab bar (dashboard,
   opportunities, leaderboard, tasks, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
   `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
@@ -235,12 +235,12 @@ volunteer into the room.
 
 ## Layout
 
-| Region    | Desktop (≥ 64rem)                                                                                                                                                                         | Phone                                                                                                                       |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the four sections, then at the foot the identity card as the profile's link, settings and sign out — all plain links | Absent                                                                                                                      |
-| Header    | Absent                                                                                                                                                                                    | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings, sign out) |
-| Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                 | 16px gutters, one column, the aside stacks after the main column                                                            |
-| Tab bar   | Absent                                                                                                                                                                                    | Fixed, 56px, five destinations: dashboard, opportunities, leaderboard, tasks, profile                                       |
+| Region    | Desktop (≥ 64rem)                                                                                                                                                                                                                              | Phone                                                                                                             |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the four sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
+| Header    | Absent                                                                                                                                                                                                                                         | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings) |
+| Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                                                                      | 16px gutters, one column, the aside stacks after the main column                                                  |
+| Tab bar   | Absent                                                                                                                                                                                                                                         | Fixed, 56px, five destinations: dashboard, opportunities, leaderboard, tasks, profile                             |
 
 The dashboard is the decision screen and the record: a hero that greets the
 volunteer beside their pass and carries their progress in a ruled band, four
@@ -253,15 +253,18 @@ editor. The opportunities page is a title with an outline "Applications"
 link and its count on the right, one toolbar row (search, the All /
 Volunteering / Competitions switcher, region, "Saved only"), and a three-column
 grid of photo cards; the applications page keeps the section tabs and its pill
-filter inside its panel. The leaderboard opens on the viewer's standing card,
-the top three on a podium stage, and the ranked table from fourth place. The
+filter inside its panel. The leaderboard opens on the viewer's place as a single row that links to
+their own row in the board, the top three on a podium stage, and the ranked table from fourth place. The
 profile is the volunteer's own page: one read-only profile sheet, the same
 object the public page at `volontyorlar.uz/<username>` shows, with the
 volunteer's public profile details as more rows of it. Another volunteer's
 visible leaderboard identity opens that sheet inside the app at `/<username>`;
 editing is its own page, `/profile/edit`, a page header over the editor in titled sections
 with Save and Cancel, returning to the profile once saved. Settings opens on an
-account summary and an anchor index to its panels. Every other
+account summary that carries the sign-out button, then any account-joining
+requests waiting, then its panels in two columns from the extra-large
+breakpoint — username, privacy and appearance beside the ways to sign in and
+the password — with no index of its own. Every other
 section opens with the same `PageHeader` and composes the
 same `Panel`, so the panel reads as one product rather than seven pages.
 
@@ -301,10 +304,12 @@ dark. The metals never label a system state or a person's action elsewhere,
 and the experience figures stay orange even on the podium.
 
 Nothing orange sits on blue and nothing blue sits on orange. The level rail's
-reached nodes are orange on a `border-control` hairline. The palette still
-defines no red; a validation or destructive colour is a decision for the
-implementation plan. The "delete account" button is an outline button that is
-disabled, not a red one.
+reached nodes are orange on a `border-control` hairline. The palette has one
+red, `danger` (`danger`, `danger-ink`, `danger-muted`, the values the three
+portals use), for an action that leaves or destroys: the sign-out button in
+the settings account card is a `danger-outline` button. It never states an
+error and never sits beside an orange figure as a second accent; a validation
+colour is still a decision for the implementation plan.
 
 ## Surfaces
 
@@ -415,7 +420,8 @@ transition.
 - **Don't** nest a box inside a panel; rows and hairlines carry structure.
 - **Don't** bring the dot grid into the workspace; it belongs to the doorway
   and the welcome flow.
-- **Don't** put a literal hex value in a component, or reach for a red.
+- **Don't** put a literal hex value in a component, or reach for the danger
+  red for anything but an action that leaves or destroys.
 - **Don't** add a hover-only affordance; the audience is on a phone.
 - **Don't** let a failed read blank a page: settle the read and draw the failed
   panel in its place, with the retry inside it.

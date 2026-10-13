@@ -13,6 +13,8 @@ const buttonVariants = cva(
         outline:
           "border border-border-control bg-transparent text-ink hover:border-primary-ink hover:bg-surface-soft hover:text-primary-ink",
         ghost: "text-primary-ink hover:bg-surface-soft",
+        "danger-outline":
+          "border border-danger/55 bg-transparent text-danger-ink hover:border-danger hover:bg-danger-muted",
         inverse:
           "bg-knockout text-action hover:bg-primary-muted hover:text-primary-deep",
       },
