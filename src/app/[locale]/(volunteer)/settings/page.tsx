@@ -9,6 +9,7 @@ import {
 import { ActionStatus, type ActionTone } from "@/components/app/action-status";
 import { PageHeader } from "@/components/app/page-header";
 import { Panel } from "@/components/app/panel";
+import { SignOutForm } from "@/components/auth/sign-out-form";
 import { AccountSummary } from "@/components/settings/account-summary";
 import { AppearanceSection } from "@/components/settings/appearance-section";
 import { ConnectionList } from "@/components/settings/connection-list";
@@ -21,8 +22,8 @@ import {
   PasswordForm,
   type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
-import { SettingsIndex } from "@/components/settings/settings-index";
 import { PublicProfileSection } from "@/components/settings/public-profile-section";
+import { buttonClass } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
 import {
   connectionStates,
@@ -223,16 +224,6 @@ function Settings({
 
   const waiting = incoming.length + outgoing.length;
 
-  const index = [
-    { id: "account", label: t("account.title") },
-    { id: "appearance", label: t("appearance.title") },
-    { id: "privacy", label: t("privacy.title") },
-    { id: "connections", label: t("connections.title") },
-    { id: "password", label: t("password.label") },
-    ...(username.editable ? [{ id: "username", label: t("username.title") }] : []),
-    ...(waiting > 0 ? [{ id: "requests", label: t("merge.title") }] : []),
-  ];
-
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
@@ -249,98 +240,87 @@ function Settings({
         </ActionStatus>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[14rem_minmax(0,1fr)]">
-        <SettingsIndex label={t("index.label")} items={index} />
-
-        <div className="flex min-w-0 flex-col gap-6">
-          <AccountSummary
-            id="account"
-            name={displayName}
-            initials={initialsOf(displayName)}
-            avatarUrl={avatarUrl}
-            email={email}
-            username={username.username}
-            connected={states
-              .filter((state) => state.connected)
-              .map((state) => ({
-                provider: state.provider,
-                label: t(`connections.${state.provider}`),
-              }))}
-            labels={{
-              title: t("account.title"),
-              signsInWith: t("account.signsInWith"),
-              nothingConnected: t("account.nothingConnected"),
-              level: record(`level.${level}`),
-            }}
-          />
-
-          <Panel
-            id="appearance"
-            title={t("appearance.title")}
-            description={t("appearance.description")}
-            className="scroll-mt-20"
-          >
-            <AppearanceSection
-              labels={{
-                darkTheme: t("appearance.darkTheme"),
-                darkThemeHelp: t("appearance.darkThemeHelp"),
-                language: t("appearance.language"),
-                languageHelp: t("appearance.languageHelp"),
-              }}
-            />
-          </Panel>
-
-          <Panel
-            id="privacy"
-            title={t("privacy.title")}
-            description={t("privacy.description")}
-            className="scroll-mt-20"
-          >
-            <PublicProfileSection
-              initialEnabled={publicProfileEnabled}
-              labels={{
-                label: t("privacy.publicProfile"),
-                description: t("privacy.publicProfileHelp"),
-                visible: t("privacy.publicProfileVisible"),
-                hidden: t("privacy.publicProfileHidden"),
-                error: t("preferences.saveError"),
-              }}
-            />
-          </Panel>
-
-          <Panel
-            id="connections"
-            title={t("connections.title")}
-            description={t("connections.description")}
-            className="scroll-mt-20"
-          >
-            <ConnectionList
-              states={states}
+      <div className="mt-6 flex min-w-0 flex-col gap-6">
+        <AccountSummary
+          id="account"
+          name={displayName}
+          initials={initialsOf(displayName)}
+          avatarUrl={avatarUrl}
+          email={email}
+          username={username.username}
+          connected={states
+            .filter((state) => state.connected)
+            .map((state) => ({
+              provider: state.provider,
+              label: t(`connections.${state.provider}`),
+            }))}
+          labels={{
+            title: t("account.title"),
+            signsInWith: t("account.signsInWith"),
+            nothingConnected: t("account.nothingConnected"),
+            level: record(`level.${level}`),
+          }}
+          action={
+            <SignOutForm
               locale={locale}
-              googleConfigured={googleConfigured}
+              label={t("session.signOut")}
+              className={buttonClass({ variant: "danger-outline", size: "sm" })}
             />
-            <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-              {t("connections.handoff")}
-            </p>
-          </Panel>
+          }
+        />
 
-          <Panel
-            id="password"
-            title={passwordTitle}
-            description={passwordLabels.description}
-            className="scroll-mt-20"
-          >
-            <PasswordForm
-              key={passwordMode}
-              locale={locale}
-              mode={passwordMode}
-              email={email}
-              labels={passwordLabels}
-              headed={false}
-            />
-          </Panel>
+        {waiting > 0 ? (
+          <div id="requests" className="scroll-mt-20">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
+              <h2 className="font-sans text-base font-semibold text-ink">
+                {t("merge.title")}
+              </h2>
+              <p className="text-sm text-ink-muted">
+                {t("merge.waitingCount", { count: waiting })}
+              </p>
+            </div>
+            <div
+              className={
+                incoming.length > 0 && outgoing.length > 0
+                  ? "grid gap-6 xl:grid-cols-2 xl:items-start"
+                  : "grid gap-6"
+              }
+            >
+              {incoming.length > 0 ? (
+                <Panel
+                  id="incoming-requests"
+                  title={t("merge.incomingTitle")}
+                  description={t("merge.incomingDescription")}
+                >
+                  <MergeRequestList
+                    direction="incoming"
+                    items={incoming}
+                    locale={locale}
+                    labels={mergeLabels}
+                  />
+                </Panel>
+              ) : null}
 
-          {username.editable ? (
+              {outgoing.length > 0 ? (
+                <Panel
+                  id="outgoing-requests"
+                  title={t("merge.outgoingTitle")}
+                  description={t("merge.outgoingDescription")}
+                >
+                  <MergeRequestList
+                    direction="outgoing"
+                    items={outgoing}
+                    locale={locale}
+                    labels={mergeLabels}
+                  />
+                </Panel>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-2 xl:items-start">
+          <div className="flex min-w-0 flex-col gap-6">
             <Panel
               id="username"
               title={t("username.title")}
@@ -354,57 +334,75 @@ function Settings({
                 headed={false}
               />
             </Panel>
-          ) : null}
 
-          {waiting > 0 ? (
-            <div id="requests" className="scroll-mt-20">
-              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
-                <h2 className="font-sans text-base font-semibold text-ink">
-                  {t("merge.title")}
-                </h2>
-                <p className="text-sm text-ink-muted">
-                  {t("merge.waitingCount", { count: waiting })}
-                </p>
-              </div>
-              <div
-                className={
-                  incoming.length > 0 && outgoing.length > 0
-                    ? "grid gap-6 xl:grid-cols-2 xl:items-start"
-                    : "grid gap-6"
-                }
-              >
-                {incoming.length > 0 ? (
-                  <Panel
-                    id="incoming-requests"
-                    title={t("merge.incomingTitle")}
-                    description={t("merge.incomingDescription")}
-                  >
-                    <MergeRequestList
-                      direction="incoming"
-                      items={incoming}
-                      locale={locale}
-                      labels={mergeLabels}
-                    />
-                  </Panel>
-                ) : null}
+            <Panel
+              id="privacy"
+              title={t("privacy.title")}
+              description={t("privacy.description")}
+              className="scroll-mt-20"
+            >
+              <PublicProfileSection
+                initialEnabled={publicProfileEnabled}
+                labels={{
+                  label: t("privacy.publicProfile"),
+                  description: t("privacy.publicProfileHelp"),
+                  visible: t("privacy.publicProfileVisible"),
+                  hidden: t("privacy.publicProfileHidden"),
+                  error: t("preferences.saveError"),
+                }}
+              />
+            </Panel>
 
-                {outgoing.length > 0 ? (
-                  <Panel
-                    id="outgoing-requests"
-                    title={t("merge.outgoingTitle")}
-                    description={t("merge.outgoingDescription")}
-                  >
-                    <MergeRequestList
-                      direction="outgoing"
-                      items={outgoing}
-                      locale={locale}
-                      labels={mergeLabels}
-                    />
-                  </Panel>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
+            <Panel
+              id="appearance"
+              title={t("appearance.title")}
+              description={t("appearance.description")}
+              className="scroll-mt-20"
+            >
+              <AppearanceSection
+                labels={{
+                  darkTheme: t("appearance.darkTheme"),
+                  darkThemeHelp: t("appearance.darkThemeHelp"),
+                  language: t("appearance.language"),
+                  languageHelp: t("appearance.languageHelp"),
+                }}
+              />
+            </Panel>
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-6">
+            <Panel
+              id="connections"
+              title={t("connections.title")}
+              description={t("connections.description")}
+              className="scroll-mt-20"
+            >
+              <ConnectionList
+                states={states}
+                locale={locale}
+                googleConfigured={googleConfigured}
+              />
+              <p className="mt-4 text-xs leading-relaxed text-ink-muted">
+                {t("connections.handoff")}
+              </p>
+            </Panel>
+
+            <Panel
+              id="password"
+              title={passwordTitle}
+              description={passwordLabels.description}
+              className="scroll-mt-20"
+            >
+              <PasswordForm
+                key={passwordMode}
+                locale={locale}
+                mode={passwordMode}
+                email={email}
+                labels={passwordLabels}
+                headed={false}
+              />
+            </Panel>
+          </div>
         </div>
       </div>
     </>

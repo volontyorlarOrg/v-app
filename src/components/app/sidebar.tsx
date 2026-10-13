@@ -1,4 +1,3 @@
-import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import {
@@ -7,7 +6,6 @@ import {
 } from "@/components/app/notifications-menu";
 import { SidebarIdentity } from "@/components/app/sidebar-identity";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
-import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
@@ -27,9 +25,6 @@ export type ShellUser = {
   handle: string | null;
 };
 
-const FOOTER_ROW =
-  "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-shell-muted transition-colors hover:bg-shell-raised hover:text-shell-ink";
-
 function navItems(
   routes: typeof primaryNavRoutes,
   t: (key: string) => string,
@@ -44,11 +39,9 @@ function navItems(
 export function Sidebar({
   user,
   notifications,
-  signOutLocale,
 }: {
   user: ShellUser;
   notifications: readonly NotificationItem[];
-  signOutLocale: string | null;
 }) {
   const t = useTranslations("nav");
 
@@ -84,19 +77,6 @@ export function Sidebar({
             label={t("secondaryLabel")}
             lead={<SidebarIdentity user={user} label={t(IDENTITY_ROUTE)} />}
           />
-          {signOutLocale ? (
-            <SignOutForm
-              locale={signOutLocale}
-              label={t("signOut")}
-              className={FOOTER_ROW}
-              iconClassName="size-5"
-            />
-          ) : (
-            <Link href={navHref("login")} className={FOOTER_ROW}>
-              <LogOut aria-hidden="true" className="size-5 shrink-0" />
-              {t("signOut")}
-            </Link>
-          )}
         </div>
       </aside>
     </div>

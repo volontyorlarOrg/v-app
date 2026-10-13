@@ -139,9 +139,45 @@ describe("structural tokens", () => {
       AA_LARGE,
     );
   });
+});
 
-  it("defines no red, which would be indistinguishable from accent-ink", () => {
-    expect(CSS).not.toMatch(/--color-destructive|--color-danger/);
+describe("the danger red", () => {
+  it.each([
+    ["danger", "#b3261e"],
+    ["danger-ink", "#8f1e18"],
+    ["danger-muted", "#f7e3e2"],
+  ])("%s is the portals' %s", (name, value) => {
+    expect(token(name)).toBe(value);
+  });
+
+  it("is one red, defined under no second name", () => {
+    expect(CSS).not.toMatch(/--color-destructive|--color-error/);
+  });
+
+  it("keeps its label legible at rest and on its own hover fill in both themes", () => {
+    for (const read of [token, darkToken]) {
+      for (const surface of [...SURFACES, "danger-muted"]) {
+        expect(
+          contrast(read("danger-ink"), read(surface)),
+          `danger-ink on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    }
+  });
+
+  it("gives its border a visible 3:1 boundary on a panel in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(contrast(read("danger"), read("surface"))).toBeGreaterThanOrEqual(
+        AA_LARGE,
+      );
+    }
+  });
+
+  it("is redder than the person's orange, so the two are not one hue", () => {
+    for (const read of [token, darkToken]) {
+      const green = (hex: string) => parseInt(hex.slice(3, 5), 16);
+      expect(green(read("danger-ink"))).toBeLessThan(green(read("accent-ink")));
+    }
   });
 });
 

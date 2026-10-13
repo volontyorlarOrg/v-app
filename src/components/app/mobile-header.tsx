@@ -28,18 +28,15 @@ function accountMenuLabels(t: (key: string) => string): AccountMenuLabels {
   return {
     menu: t("userMenu.label"),
     profile: t(IDENTITY_ROUTE),
-    signOut: t("signOut"),
   };
 }
 
 export function MobileHeader({
   user,
   notifications,
-  signOutLocale,
 }: {
   user: ShellUser;
   notifications: readonly NotificationItem[];
-  signOutLocale: string | null;
 }) {
   const t = useTranslations("nav");
 
@@ -72,8 +69,6 @@ export function MobileHeader({
             level={user.level}
             profileHref={navHref(IDENTITY_ROUTE)}
             items={accountMenuItems(t)}
-            signOutLocale={signOutLocale}
-            loginHref={navHref("login")}
           />
         </div>
       </div>

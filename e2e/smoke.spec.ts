@@ -897,7 +897,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the sidebar carries notifications, the identity card as the profile link, settings and sign out; the phone header its menu", async ({
+  test("the sidebar carries notifications, the identity card as the profile link and settings, with no sign out; the phone header its menu", async ({
     page,
   }) => {
     const mobile = await isMobile(page);
@@ -927,7 +927,7 @@ test.describe("the panel", () => {
       "href",
       "/en/settings",
     );
-    await expect(sidebar.getByRole("button", { name: "Sign out" })).toBeVisible();
+    await expect(sidebar.getByRole("button", { name: "Sign out" })).toHaveCount(0);
   });
 
   test("the notifications menu shows the backend's messages and marks them read", async ({
@@ -966,7 +966,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the profile and the account are one click away, and sign out really signs out", async ({
+  test("the profile and the account are one click away, and sign out on settings really signs out", async ({
     page,
   }) => {
     const mobile = await isMobile(page);
@@ -981,7 +981,9 @@ test.describe("the panel", () => {
         "href",
         "/en/settings",
       );
-      await menu.getByRole("button", { name: "Sign out" }).click();
+      await expect(menu.getByRole("button", { name: "Sign out" })).toHaveCount(0);
+      await menu.getByRole("link", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/\/en\/settings$/);
     } else {
       const account = page.getByRole("navigation", { name: "Account" });
       const identity = account.getByRole("link", { name: "Profile: Dilnoza Karimova" });
@@ -993,8 +995,15 @@ test.describe("the panel", () => {
       await expect(identity).toHaveAttribute("aria-current", "page");
       await gotoReady(page, "/en/profile/edit");
       await expect(identity).toHaveAttribute("aria-current", "page");
-      await page.getByRole("button", { name: "Sign out" }).click();
+      await gotoReady(page, "/en/settings");
     }
+    await expect(page.getByRole("button", { name: "Sign out" })).toHaveCount(1);
+    await expect(page.getByRole("region", { name: "Session" })).toHaveCount(0);
+    const signOut = page
+      .getByRole("region", { name: "Your account" })
+      .getByRole("button", { name: "Sign out" });
+    await expect(signOut).toHaveCSS("color", "rgb(143, 30, 24)");
+    await signOut.click();
     await expect(page).toHaveURL(/\/en\/login$/);
 
     await gotoReady(page, "/en/dashboard");
@@ -2088,17 +2097,42 @@ test.describe("the leaderboard", () => {
     `);
   });
 
-  test("shows the signed-in volunteer even from a page they are not on", async ({
+  test("shows the signed-in volunteer their place in one row, even from a page they are not on", async ({
     page,
   }) => {
-    const standing = page.getByRole("region", { name: "Dilnoza Karimova" });
-    await expect(standing.getByRole("definition").first()).toHaveText("#30");
+    const standing = page.getByRole("region", { name: "Your place" });
+    await expect(standing).toContainText("#30");
     await expect(standing).toContainText("of 30 on the leaderboard");
-    await expect(standing).toContainText("@dilnoza_k");
-    await expect(standing).toContainText(
-      "Usually 10 XP for every verified volunteer hour",
+    await expect(standing).toContainText("160 XP behind place 29");
+    await expect(standing).toContainText("320 XP");
+    await expect(standing).not.toContainText("@dilnoza_k");
+    await expect(page.getByRole("link", { name: "Change your username" })).toHaveCount(
+      0,
     );
     await expect(page.getByRole("cell", { name: "@dilnoza_k" })).toHaveCount(0);
+    await expect(
+      page.getByText("Usually 10 XP for every verified volunteer hour"),
+    ).toBeVisible();
+
+    const box = await standing.boundingBox();
+    expect(box?.height ?? 0).toBeLessThan(120);
+  });
+
+  test("the place row jumps to the volunteer's own row", async ({ page }) => {
+    const jump = page
+      .getByRole("region", { name: "Your place" })
+      .getByRole("link", { name: /Show my place in the standings/ });
+    await expect(jump).toHaveAttribute("href", "/en/leaderboard?page=2#you");
+
+    await jump.click();
+    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2#you$/);
+    const own = page.getByRole("row").filter({ hasText: "@dilnoza_k" });
+    await expect(own).toHaveAttribute("id", "you");
+    await expect(own).toHaveAttribute("aria-current", "true");
+    await expect(own).toBeInViewport();
+    await expect(page.getByRole("region", { name: "Your place" })).toContainText(
+      "160 XP behind place 29",
+    );
   });
 
   test("pages through the standings from page, size and total", async ({ page }) => {
@@ -2136,8 +2170,15 @@ test.describe("the leaderboard username", () => {
     await signIn(page);
     await gotoReady(page, "/en/settings");
 
+    await expect(
+      page.getByRole("navigation", { name: "Settings sections" }),
+    ).toHaveCount(0);
+
     const panel = page.getByRole("region", { name: "Your username" });
     await expect(panel).toContainText("@dilnoza_k");
+    await expect(panel).toContainText(
+      "appears on the leaderboard and in your public profile address",
+    );
     await panel.getByLabel("New username").fill("dilnoza_custom");
     await panel.getByRole("button", { name: "Save username" }).click();
     await expect(panel.getByRole("status")).toContainText("Your username is saved.");
