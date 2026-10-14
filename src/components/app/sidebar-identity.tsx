@@ -40,9 +40,11 @@ export function SidebarIdentity({ user, label }: { user: ShellUser; label: strin
           {user.handle ? (
             <span className="truncate text-xs text-shell-muted">@{user.handle}</span>
           ) : null}
-          <Badge variant="achievement" className="shrink-0">
-            {user.level}
-          </Badge>
+          {user.level ? (
+            <Badge variant="achievement" className="shrink-0">
+              {user.level}
+            </Badge>
+          ) : null}
         </p>
       </div>
     </Link>

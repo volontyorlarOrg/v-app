@@ -1,6 +1,6 @@
 import { defineRouting } from "next-intl/routing";
 
-import { PREFERENCE_LOCALE_COOKIE } from "@/lib/preferences";
+import { LOCALE_COOKIE } from "@/lib/preferences";
 
 export const locales = ["uz", "ru", "en"] as const;
 
@@ -21,7 +21,7 @@ export function isLocale(value: unknown): value is Locale {
 export const routing = defineRouting({
   locales,
   defaultLocale,
-  localePrefix: "always",
-  localeCookie: PREFERENCE_LOCALE_COOKIE,
+  localePrefix: "never",
+  localeCookie: LOCALE_COOKIE,
   alternateLinks: false,
 });

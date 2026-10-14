@@ -32,7 +32,6 @@ export type AuthFormLabels = {
 };
 
 type FormContext = {
-  locale: string;
   next?: string | null;
   labels: AuthFormLabels;
 };
@@ -55,13 +54,8 @@ function rootError(result: ActionResult, labels: AuthFormLabels): string | null 
   return labels.errors[result.code] ?? labels.errors.unknown ?? null;
 }
 
-function Hidden({ locale, next }: { locale: string; next?: string | null }) {
-  return (
-    <>
-      <input type="hidden" name="locale" value={locale} />
-      {next ? <input type="hidden" name="next" value={next} /> : null}
-    </>
-  );
+function Hidden({ next }: { next?: string | null }) {
+  return next ? <input type="hidden" name="next" value={next} /> : null;
 }
 
 function SubmitRow({
@@ -83,7 +77,7 @@ function SubmitRow({
   );
 }
 
-export function LogInForm({ locale, next, labels }: FormContext) {
+export function LogInForm({ next, labels }: FormContext) {
   const id = useId();
   const { form, result, pending, formProps } = useActionForm({
     schema: logInSchema,
@@ -110,7 +104,7 @@ export function LogInForm({ locale, next, labels }: FormContext) {
 
   return (
     <form {...formProps}>
-      <Hidden locale={locale} next={next} />
+      <Hidden next={next} />
       <FieldGroup className="gap-4">
         <Field invalid={Boolean(emailError)}>
           <FieldLabel htmlFor={`${id}-email`}>{labels.email}</FieldLabel>
@@ -143,7 +137,7 @@ export function LogInForm({ locale, next, labels }: FormContext) {
   );
 }
 
-export function SignUpForm({ locale, next, labels }: FormContext) {
+export function SignUpForm({ next, labels }: FormContext) {
   const id = useId();
   const { form, result, pending, formProps } = useActionForm({
     schema: signUpSchema,
@@ -171,7 +165,7 @@ export function SignUpForm({ locale, next, labels }: FormContext) {
 
   return (
     <form {...formProps}>
-      <Hidden locale={locale} next={next} />
+      <Hidden next={next} />
       <FieldGroup className="gap-4">
         <Field invalid={Boolean(nameError)}>
           <FieldLabel htmlFor={`${id}-name`}>{labels.fullName}</FieldLabel>

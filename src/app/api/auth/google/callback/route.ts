@@ -1,6 +1,5 @@
 import type { NextRequest, NextResponse } from "next/server";
 
-import { defaultLocale, isLocale } from "@/i18n/routing";
 import { api } from "@/lib/api/client.server";
 import { AUTH_REQUEST_TIMEOUT_MS, isAuthConfigured } from "@/lib/auth/config";
 import {
@@ -12,7 +11,6 @@ import {
 } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import {
-  LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
   SESSION_COOKIE_NAME,
   encryptSession,
@@ -23,7 +21,7 @@ import {
 } from "@/lib/auth/session";
 import { onboardingPath } from "@/lib/onboarding/state";
 import { onboardingStartCookie } from "@/lib/onboarding/state.server";
-import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, HOME_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -31,7 +29,6 @@ export const maxDuration = 60;
 function clearHandoff(response: NextResponse) {
   response.cookies.delete(GOOGLE_STATE_COOKIE_NAME);
   response.cookies.delete(RETURN_TO_COOKIE_NAME);
-  response.cookies.delete(LOCALE_HINT_COOKIE_NAME);
   return response;
 }
 
@@ -41,9 +38,7 @@ function field(form: FormData, name: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const hintedLocale = request.cookies.get(LOCALE_HINT_COOKIE_NAME)?.value;
-  const locale = isLocale(hintedLocale) ? hintedLocale : defaultLocale;
-  const loginPath = localePath(locale, "login");
+  const loginPath = navHref(ENTRY_ROUTE);
   const backToLogin = (status: GoogleStatus) =>
     clearHandoff(relativeRedirect(withQuery(loginPath, { google: status })));
 
@@ -102,21 +97,17 @@ export async function POST(request: NextRequest) {
 
   const returnTo = safeReturnPath(request.cookies.get(RETURN_TO_COOKIE_NAME)?.value);
   const response = relativeRedirect(
-    session.isNewUser
-      ? onboardingPath(locale, returnTo)
-      : (returnTo ?? localePath(locale, HOME_ROUTE)),
+    session.isNewUser ? onboardingPath(returnTo) : (returnTo ?? navHref(HOME_ROUTE)),
   );
   response.cookies.set(SESSION_COOKIE_NAME, cookieValue, sessionCookieOptions());
   if (session.isNewUser) response.cookies.set(onboardingStartCookie());
   return clearHandoff(response);
 }
 
-export async function GET(request: NextRequest) {
-  const hintedLocale = request.cookies.get(LOCALE_HINT_COOKIE_NAME)?.value;
-  const locale = isLocale(hintedLocale) ? hintedLocale : defaultLocale;
+export function GET() {
   return clearHandoff(
     relativeRedirect(
-      withQuery(localePath(locale, "login"), {
+      withQuery(navHref(ENTRY_ROUTE), {
         google: "expired" satisfies GoogleStatus,
       }),
     ),

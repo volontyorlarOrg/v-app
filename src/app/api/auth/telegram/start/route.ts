@@ -8,7 +8,6 @@ import {
   isAuthConfigured,
 } from "@/lib/auth/config";
 import {
-  LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
   handoffCookieOptions,
   safeReturnPath,
@@ -19,7 +18,7 @@ import {
   telegramAuthorizationSchema,
 } from "@/lib/auth/telegram";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -28,7 +27,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const localeParam = url.searchParams.get("locale");
   const locale = isLocale(localeParam) ? localeParam : defaultLocale;
-  const loginPath = localePath(locale, "login");
+  const loginPath = navHref(ENTRY_ROUTE);
   const unavailable = () =>
     relativeRedirect(withQuery(loginPath, { telegram: "unavailable" }));
 
@@ -56,7 +55,6 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(login.authorizationUrl, 303);
   response.cookies.set(AUTH_STATE_COOKIE_NAME, login.state, handoffCookieOptions());
-  response.cookies.set(LOCALE_HINT_COOKIE_NAME, locale, handoffCookieOptions());
 
   const next = safeReturnPath(url.searchParams.get("next"));
   if (next) {

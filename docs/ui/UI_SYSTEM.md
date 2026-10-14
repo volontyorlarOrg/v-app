@@ -73,8 +73,10 @@ dot grid; the sign-in pages have no such wrapper and keep the grid.
 
 ## Localization behaviour
 
-- Three locales, `uz` (default), `ru`, `en`, one per URL, prefix always present,
-  no locale cookie, no language in storage.
+- Three locales, `uz` (default), `ru`, `en`. The language is the app's own
+  choice, saved in `localStorage` and mirrored to the app-only
+  `volontyorlar_locale` cookie, never a part of the address: every page has
+  one URL and renders in the chosen language.
 - The client provider carries locale context with `messages={null}`; every
   client component receives its labels as props, including the notification
   texts and the filter labels.

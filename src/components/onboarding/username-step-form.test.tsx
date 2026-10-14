@@ -36,7 +36,6 @@ function renderStep(
 ) {
   render(
     <UsernameStepForm
-      locale="en"
       identity={{ ...identity, editable: true }}
       addressPrefix="volontyorlar.uz/"
       labels={labels}

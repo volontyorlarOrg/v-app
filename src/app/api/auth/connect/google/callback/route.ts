@@ -1,13 +1,11 @@
 import type { NextRequest, NextResponse } from "next/server";
 
 import {
-  connectLocale,
   connectStatusForError,
   connectStatusForProviderError,
 } from "@/lib/account/connections";
 import {
   CONNECT_GOOGLE_STATE_COOKIE_NAME,
-  CONNECT_LOCALE_COOKIE_NAME,
   type ConnectStatus,
 } from "@/lib/account/types";
 import { completeGoogleConnection } from "@/lib/api/account.server";
@@ -16,8 +14,7 @@ import { isAcceptableGooglePostOrigin } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
-import { PREFERENCE_LOCALE_COOKIE } from "@/lib/preferences";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -25,7 +22,6 @@ export const maxDuration = 60;
 function clearHandoff(response: NextResponse) {
   const expired = { ...handoffCookieOptions({ crossSite: true }), maxAge: 0 };
   response.cookies.set(CONNECT_GOOGLE_STATE_COOKIE_NAME, "", expired);
-  response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, "", expired);
   return response;
 }
 
@@ -35,17 +31,13 @@ function field(form: FormData, name: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const locale = connectLocale(
-    request.cookies.get(CONNECT_LOCALE_COOKIE_NAME)?.value,
-    request.cookies.get(PREFERENCE_LOCALE_COOKIE.name)?.value,
-  );
-  const settingsPath = localePath(locale, "settings");
+  const settingsPath = navHref("settings");
   const backToSettings = (status: ConnectStatus) =>
     clearHandoff(relativeRedirect(withQuery(settingsPath, { connect: status })));
 
   const session = await getSession();
   if (!session) {
-    return clearHandoff(relativeRedirect(localePath(locale, "login")));
+    return clearHandoff(relativeRedirect(navHref(ENTRY_ROUTE)));
   }
 
   if (
@@ -95,14 +87,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const locale = connectLocale(
-    request.cookies.get(CONNECT_LOCALE_COOKIE_NAME)?.value,
-    request.cookies.get(PREFERENCE_LOCALE_COOKIE.name)?.value,
-  );
+export function GET() {
   return clearHandoff(
     relativeRedirect(
-      withQuery(localePath(locale, "settings"), {
+      withQuery(navHref("settings"), {
         connect: "expired" satisfies ConnectStatus,
       }),
     ),

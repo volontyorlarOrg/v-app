@@ -1,4 +1,4 @@
-import type { Locale } from "@/i18n/routing";
+import { isLocale, type Locale } from "@/i18n/routing";
 
 export type RouteKey =
   | "login"
@@ -203,24 +203,22 @@ export function historyHref(): string {
   return `${navHref("dashboard")}#${HISTORY_ANCHOR}`;
 }
 
-export function localePath(locale: Locale, key: RouteKey): string {
-  return `/${locale}${getRoute(key).path}`;
+export function legacyLocalePrefix(
+  pathname: string,
+): { locale: Locale; path: string } | null {
+  const [, segment, ...rest] = pathname.split("/");
+  if (!isLocale(segment)) return null;
+  return { locale: segment, path: `/${rest.join("/")}` };
 }
 
 export function isActivePath(pathname: string, path: string): boolean {
   return pathname === path || pathname.startsWith(`${path}/`);
 }
 
-function withoutLocale(pathname: string): string {
-  const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
-  return stripped === "" ? "/" : stripped;
-}
-
 export function routeFor(pathname: string): AppRoute | null {
-  const path = withoutLocale(pathname);
   let match: AppRoute | null = null;
   for (const route of appRoutes) {
-    if (!isActivePath(path, route.path)) continue;
+    if (!isActivePath(pathname, route.path)) continue;
     if (!match || route.path.length > match.path.length) match = route;
   }
   return match;

@@ -5,7 +5,6 @@ import { isSecureCookieTransport, sessionSecret } from "@/lib/auth/config";
 
 export const SESSION_COOKIE_NAME = "volontyorlar_session";
 export const RETURN_TO_COOKIE_NAME = "volontyorlar_return_to";
-export const LOCALE_HINT_COOKIE_NAME = "volontyorlar_auth_locale";
 
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 3;
 export const HANDOFF_MAX_AGE_SECONDS = 60 * 15;
@@ -117,12 +116,20 @@ export function handoffCookieOptions({ crossSite = false } = {}) {
   };
 }
 
+const RETURN_PATH_BASE = "https://return.invalid";
+const UNSAFE_RETURN_CHARACTERS = /[\u0000-\u0020\u007f\\]/;
+
 export function safeReturnPath(value: string | null | undefined): string | null {
   if (!value) return null;
   if (!value.startsWith("/")) return null;
   if (value.startsWith("//")) return null;
-  if (value.includes("\\")) return null;
-  return value;
+  if (UNSAFE_RETURN_CHARACTERS.test(value)) return null;
+
+  try {
+    return new URL(value, RETURN_PATH_BASE).origin === RETURN_PATH_BASE ? value : null;
+  } catch {
+    return null;
+  }
 }
 
 let cachedKey: Uint8Array | null = null;

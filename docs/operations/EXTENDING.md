@@ -41,21 +41,28 @@ A list too long for one screen pages through `Pagination` from
 `src/lib/leaderboard/pagination.ts` and a `nuqs` serializer beside it. Read
 `page`, `pageSize` and `total` from the backend's own response rather than
 counting the rows you were given, and build each page's href from the
-registry's path so the locale prefix is added once.
+registry's path.
 
 A detail page under a section gets a dynamic segment (`[slug]`, `[id]`), an
 href helper in the registry, `notFound()` for an unknown key, and is reached
 only through that helper.
 
-## Internal links: `navHref` vs `localePath`
+## Internal links: `navHref`
 
-| Helper                             | Returns                          | Use with                                                      |
-| ---------------------------------- | -------------------------------- | ------------------------------------------------------------- |
-| `navHref("dashboard")`             | `/dashboard`                     | `Link` from `@/i18n/navigation`, which adds the locale itself |
-| `localePath("uz", "dashboard")`    | `/uz/dashboard`                  | Plain anchors, and anything outside the locale segment        |
-| `marketingHref(locale, "privacy")` | `https://…/uz/privacy` or `null` | Links to the marketing site; render nothing when `null`       |
+| Helper                             | Returns                          | Use with                                                              |
+| ---------------------------------- | -------------------------------- | --------------------------------------------------------------------- |
+| `navHref("dashboard")`             | `/dashboard`                     | `Link`, plain anchors, redirects in route handlers and Server Actions |
+| `marketingHref(locale, "privacy")` | `https://…/uz/privacy` or `null` | Links to the marketing site; render nothing when `null`               |
 
-Passing a `localePath` result to the locale-aware `Link` produces `/uz/uz/…`.
+No address inside the app carries a language. The interface language is the
+app's own choice: `localStorage`, mirrored to the app-only `volontyorlar_locale`
+cookie. `src/proxy.ts` hands `next-intl` each request, and it renders the same
+address in whichever language that cookie (or, before any choice, the marketing
+site's `NEXT_LOCALE`, then `Accept-Language`) names. Never write or read
+`NEXT_LOCALE` anywhere else; it belongs to the marketing site. Never build a
+`/uz/…` path: the proxy treats one as an address from before the change and
+redirects it to the plain one. To change the language from a control, call
+`useLocaleSwitch()` from `src/hooks/use-locale-switch.ts`.
 
 ## Add or change copy
 

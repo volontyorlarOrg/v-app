@@ -262,7 +262,6 @@ function Settings({
           }}
           action={
             <SignOutForm
-              locale={locale}
               label={t("session.signOut")}
               className={buttonClass({ variant: "danger-outline", size: "sm" })}
             />
@@ -295,7 +294,6 @@ function Settings({
                   <MergeRequestList
                     direction="incoming"
                     items={incoming}
-                    locale={locale}
                     labels={mergeLabels}
                   />
                 </Panel>
@@ -310,7 +308,6 @@ function Settings({
                   <MergeRequestList
                     direction="outgoing"
                     items={outgoing}
-                    locale={locale}
                     labels={mergeLabels}
                   />
                 </Panel>
@@ -328,7 +325,6 @@ function Settings({
               className="scroll-mt-20"
             >
               <UsernameSection
-                locale={locale}
                 identity={username}
                 labels={usernameLabels}
                 headed={false}
@@ -395,7 +391,6 @@ function Settings({
             >
               <PasswordForm
                 key={passwordMode}
-                locale={locale}
                 mode={passwordMode}
                 email={email}
                 labels={passwordLabels}

@@ -1067,7 +1067,11 @@ const server = createServer(async (request, response) => {
     if (!pendingStates.delete(body.state))
       return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
-    if (!["e2e-code", "e2e-profile-exhausted"].includes(body.code))
+    if (
+      !["e2e-code", "e2e-profile-exhausted", "e2e-session-ends-on-write"].includes(
+        body.code,
+      )
+    )
       return send(response, 401, { code: "invalidAuthorizationCode" });
     const opened = freshState();
     if (body.code === "e2e-profile-exhausted") {
@@ -1075,6 +1079,7 @@ const server = createServer(async (request, response) => {
       opened.profileRewardsExhausted = true;
       opened.account.avatarUrl = `http://127.0.0.1:${PORT}/avatar.webp`;
     }
+    if (body.code === "e2e-session-ends-on-write") opened.endsOnWrite = true;
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
     opened.account.usernameSource = "telegram";
@@ -1149,6 +1154,10 @@ const server = createServer(async (request, response) => {
   const token = (request.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
   const state = sessions.get(token);
   if (!state) return send(response, 401, { code: "unauthenticated" });
+  if (state.endsOnWrite && method !== "GET") {
+    sessions.delete(token);
+    return send(response, 401, { code: "unauthenticated" });
+  }
 
   if (path === "/auth/logout" && method === "POST") {
     sessions.delete(token);

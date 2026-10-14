@@ -61,16 +61,22 @@ signed out rather than trusted.
 
 `src/proxy.ts` reads it on every app request and enforces the `guard` each
 route declares in `src/lib/routing/routes.ts`: a signed-out visitor to a
-volunteer route is redirected to `/{locale}/login?next=…`, a signed-in visitor
+volunteer route is redirected to `/login?next=…`, a signed-in visitor
 to an auth route is redirected to the dashboard, and signed-in responses carry
 `Cache-Control: private, no-store`. `(volunteer)/layout.tsx` checks the session
 again as defence in depth. `next` is filtered through `safeReturnPath`, which
-rejects anything that could leave this origin.
+rejects anything that could leave this origin: it must start with one `/`,
+carry no backslash, space or control character — a browser drops a tab or a
+newline, which turns `/<tab>/host` into `//host` — and still resolve to this
+origin when parsed as a URL.
 
 A token past its expiry is the end of the session: the proxy clears the cookie
-and redirects to `/{locale}/login?next=…`, and `authed()` does the same through
+and redirects to `/login?next=…`, and `authed()` does the same through
 `/api/auth/session/expired` when the backend answers `unauthenticated` — which
-it also does for a session revoked by signing out elsewhere. Nothing is
+it also does for a session revoked by signing out elsewhere. A Server Action
+reaches the same redirect because `resultFromError` rethrows it before turning
+anything into an error result; a write on an ended session goes to sign-in
+rather than failing in place. Nothing is
 rotated and nothing is retried, so there is no race to lose and no way to be
 signed out early.
 
@@ -105,9 +111,9 @@ nonce, and a refusal lands on `/login?google=…` with no session. The token
 arrives in a request body and is read by a route handler; it never reaches
 JavaScript, a query string or storage.
 
-Three short-lived `httpOnly` cookies carry the handoff into Telegram:
-`volontyorlar_auth_state`, `volontyorlar_return_to` and
-`volontyorlar_auth_locale`, all 15 minutes, all deleted on return. The callback
+Two short-lived `httpOnly` cookies carry the handoff into Telegram:
+`volontyorlar_auth_state` and `volontyorlar_return_to`, both 15 minutes, both
+deleted on return. The callback
 signs in only when the `state` Telegram echoes equals the one in this
 browser's cookie, and the backend consumes that state once, so a callback URL
 opened in another browser, or a second time, lands on `/login?telegram=expired`
@@ -118,16 +124,16 @@ without a session. Telegram's own `error=access_denied` becomes
 ### Joining a second account
 
 A signed-in volunteer connecting a second identity never touches the sign-in
-cookies. The handoff is carried by `volontyorlar_connect_state`,
-`volontyorlar_connect_google_state` and `volontyorlar_connect_locale`, three
-`httpOnly` cookies of their own: the Telegram pair is `SameSite=Lax` like the
-sign-in handoff, and the Google pair is `SameSite=None; Secure` because Google
+cookies. The handoff is carried by `volontyorlar_connect_state` and
+`volontyorlar_connect_google_state`, two `httpOnly` cookies of their own: the
+Telegram one is `SameSite=Lax` like the sign-in handoff, and the Google one is
+`SameSite=None; Secure` because Google
 posts its ID token cross-site to `/api/auth/connect/google/callback`. Both
 callbacks refuse to call the backend until the returned `state` equals the
 cookie this browser holds, and both clear the cookies on the way out, so a
 replayed callback is refused.
 
-A completion returns to `/{locale}/settings?connect=<status>` where the status
+A completion returns to `/settings?connect=<status>` where the status
 is one of eleven words the catalog translates. No email address, account id,
 provider name, merge-request id, token or provider state ever reaches a query
 string, a Client Component, browser storage or a log line; the page reads the
@@ -139,7 +145,7 @@ parses it with the same schema sign-in uses and writes the same encrypted
 `httpOnly` cookie. When the backend answers `recentAuthenticationRequired`
 instead, `/api/auth/connect/reauthenticate` ends the session on the backend,
 clears the cookie and returns the browser to sign-in with a same-origin
-`next=/{locale}/settings`.
+`next=/settings`.
 
 Setting or changing a password also replaces the encrypted session. The
 backend decides from the authenticated account whether the current password is
@@ -148,9 +154,11 @@ sessions and returns one replacement session. The browser never receives a
 password hash, and plaintext passwords stay inside the form POST and the
 server-to-server API request.
 
-The only stored values remain the light/dark theme choice and the interface
-language, both in readable cookies shared with the marketing site so a choice
-made on either origin holds on the other, and the welcome flow's progress
+The only stored values remain the light/dark theme choice, in a readable
+cookie shared with the marketing site so a choice made on either origin holds
+on the other; the interface language, the app's own, in `localStorage` and the
+readable app-only `volontyorlar_locale` cookie (a locale code and nothing
+else); and the welcome flow's progress
 (`volontyorlar_onboarding`): a status and a step name such as `pending:about`
 or `done`, app-only, ninety days, written by the sign-up action or an OAuth
 callback for a new account and advanced by the browser as the volunteer moves
