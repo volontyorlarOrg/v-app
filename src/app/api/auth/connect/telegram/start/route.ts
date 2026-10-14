@@ -1,17 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
-import {
-  CONNECT_LOCALE_COOKIE_NAME,
-  CONNECT_STATE_COOKIE_NAME,
-} from "@/lib/account/types";
+import { CONNECT_STATE_COOKIE_NAME } from "@/lib/account/types";
 import { authorizeTelegramConnection } from "@/lib/api/account.server";
 import { apiBaseUrl, isAuthConfigured } from "@/lib/auth/config";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 import { isTrustedAuthorizationUrl } from "@/lib/auth/telegram";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -20,10 +17,10 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const localeParam = url.searchParams.get("locale");
   const locale = isLocale(localeParam) ? localeParam : defaultLocale;
-  const settingsPath = localePath(locale, "settings");
+  const settingsPath = navHref("settings");
 
   const session = await getSession();
-  if (!session) return relativeRedirect(localePath(locale, "login"));
+  if (!session) return relativeRedirect(navHref(ENTRY_ROUTE));
   if (!isAuthConfigured()) {
     return relativeRedirect(withQuery(settingsPath, { connect: "unavailable" }));
   }
@@ -49,6 +46,5 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(authorization.authorizationUrl, 303);
   const handoff = handoffCookieOptions();
   response.cookies.set(CONNECT_STATE_COOKIE_NAME, authorization.state, handoff);
-  response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, locale, handoff);
   return response;
 }

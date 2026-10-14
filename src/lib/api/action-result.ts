@@ -1,3 +1,5 @@
+import { unstable_rethrow } from "next/navigation";
+
 import { isApiError, type FieldErrors } from "@/lib/api/errors";
 
 export type ActionResult =
@@ -13,6 +15,8 @@ export function failedResult(code: string, fields: FieldErrors = {}): ActionResu
 }
 
 export function resultFromError(error: unknown): ActionResult {
+  unstable_rethrow(error);
+
   if (isApiError(error)) {
     return failedResult(error.backendCode ?? error.code, error.fieldErrors);
   }

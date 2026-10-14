@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { loadErrorLabels } from "@/components/app/load-error";
 import { LocaleSwitcher } from "@/components/app/locale-switcher";
+import { PanelErrorBoundary } from "@/components/app/panel-error-boundary";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
@@ -16,7 +18,10 @@ export default async function OnboardingLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const t = await getTranslations({ locale, namespace: "nav" });
+  const [t, common] = await Promise.all([
+    getTranslations({ locale, namespace: "nav" }),
+    getTranslations({ locale, namespace: "common" }),
+  ]);
 
   return (
     <>
@@ -40,7 +45,9 @@ export default async function OnboardingLayout({
         </div>
       </header>
       <main id="main" className="container-page flex flex-1 flex-col py-6 lg:py-10">
-        {children}
+        <PanelErrorBoundary labels={loadErrorLabels(common)}>
+          {children}
+        </PanelErrorBoundary>
       </main>
     </>
   );

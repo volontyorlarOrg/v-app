@@ -39,7 +39,7 @@ export function AccountMenu({
   initials: string;
   avatarUrl?: string;
   handle: string | null;
-  level: string;
+  level: string | null;
   profileHref: string;
   items: readonly AccountMenuItem[];
 }) {
@@ -75,7 +75,7 @@ export function AccountMenu({
               </p>
               <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
                 {handle ? <span className="truncate">@{handle}</span> : null}
-                <Badge variant="achievement">{level}</Badge>
+                {level ? <Badge variant="achievement">{level}</Badge> : null}
               </p>
             </div>
             <ChevronRight

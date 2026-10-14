@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect, unstable_rethrow } from "next/navigation";
+import { redirect } from "next/navigation";
 
-import { defaultLocale, isLocale, type Locale } from "@/i18n/routing";
 import { isStaleMergeCode } from "@/lib/account/connections";
 import { usernameFormSchema, usernameFromFormData } from "@/lib/account/username";
 import {
@@ -29,29 +28,21 @@ import {
 } from "@/lib/auth/credentials";
 import { toSessionPayload } from "@/lib/auth/session";
 import { writeSession } from "@/lib/auth/session.server";
-import { localePath } from "@/lib/routing/routes";
-
-function localeOf(formData: FormData): Locale {
-  const requested = formData.get("locale");
-  return isLocale(requested) ? requested : defaultLocale;
-}
+import { navHref } from "@/lib/routing/routes";
 
 function requestIdOf(formData: FormData): string {
   const value = formData.get("requestId");
   return typeof value === "string" ? value.trim() : "";
 }
 
-function revalidateAccount(locale: Locale) {
-  revalidatePath(localePath(locale, "settings"));
+function revalidateAccount() {
   revalidatePath("/", "layout");
 }
 
-function resultForMergeFailure(error: unknown, locale: Locale): ActionResult {
-  unstable_rethrow(error);
-
+function resultForMergeFailure(error: unknown): ActionResult {
   const result = resultFromError(error);
   if (result.status === "error" && isStaleMergeCode(result.code)) {
-    revalidateAccount(locale);
+    revalidateAccount();
   }
   return result;
 }
@@ -60,7 +51,6 @@ export async function updateUsernameAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const locale = localeOf(formData);
   const parsed = usernameFormSchema.safeParse(usernameFromFormData(formData));
 
   if (!parsed.success) {
@@ -70,11 +60,10 @@ export async function updateUsernameAction(
   try {
     await updateUsername(parsed.data.username);
   } catch (error) {
-    unstable_rethrow(error);
     return resultFromError(error);
   }
 
-  revalidateAccount(locale);
+  revalidateAccount();
   return okResult;
 }
 
@@ -87,7 +76,6 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResu
   try {
     await uploadAvatar(avatar);
   } catch (error) {
-    unstable_rethrow(error);
     return resultFromError(error);
   }
   revalidatePath("/", "layout");
@@ -98,7 +86,6 @@ export async function removeAvatarAction(): Promise<ActionResult> {
   try {
     await removeAvatar();
   } catch (error) {
-    unstable_rethrow(error);
     return resultFromError(error);
   }
   revalidatePath("/", "layout");
@@ -109,7 +96,6 @@ export async function setPublicProfileAction(enabled: boolean): Promise<ActionRe
   try {
     await updatePublicProfilePreference(enabled);
   } catch (error) {
-    unstable_rethrow(error);
     return resultFromError(error);
   }
   revalidatePath("/", "layout");
@@ -120,7 +106,6 @@ export async function managePasswordAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const locale = localeOf(formData);
   const parsed = passwordManagementSchema.safeParse(
     passwordManagementFromFormData(formData),
   );
@@ -141,13 +126,12 @@ export async function managePasswordAction(
       return failedResult("passwordAuthUnavailable");
     }
   } catch (error) {
-    unstable_rethrow(error);
     return resultFromError(error);
   }
 
-  revalidateAccount(locale);
+  revalidateAccount();
   redirect(
-    `${localePath(locale, "settings")}?password=${parsed.data.mode === "change" ? "changed" : "set"}`,
+    `${navHref("settings")}?password=${parsed.data.mode === "change" ? "changed" : "set"}`,
   );
 }
 
@@ -155,7 +139,6 @@ export async function approveMergeRequestAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const locale = localeOf(formData);
   const requestId = requestIdOf(formData);
   if (!requestId) return failedResult("accountMergeRequestNotFound");
 
@@ -165,28 +148,27 @@ export async function approveMergeRequestAction(
       return failedResult("accountLinkingUnavailable");
     }
   } catch (error) {
-    return resultForMergeFailure(error, locale);
+    return resultForMergeFailure(error);
   }
 
-  revalidateAccount(locale);
-  redirect(localePath(locale, "settings"));
+  revalidateAccount();
+  redirect(navHref("settings"));
 }
 
 export async function rejectMergeRequestAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const locale = localeOf(formData);
   const requestId = requestIdOf(formData);
   if (!requestId) return failedResult("accountMergeRequestNotFound");
 
   try {
     await rejectMergeRequest(requestId);
   } catch (error) {
-    return resultForMergeFailure(error, locale);
+    return resultForMergeFailure(error);
   }
 
-  revalidateAccount(locale);
+  revalidateAccount();
   return okResult;
 }
 
@@ -194,16 +176,15 @@ export async function cancelMergeRequestAction(
   _previous: ActionResult,
   formData: FormData,
 ): Promise<ActionResult> {
-  const locale = localeOf(formData);
   const requestId = requestIdOf(formData);
   if (!requestId) return failedResult("accountMergeRequestNotFound");
 
   try {
     await cancelMergeRequest(requestId);
   } catch (error) {
-    return resultForMergeFailure(error, locale);
+    return resultForMergeFailure(error);
   }
 
-  revalidateAccount(locale);
+  revalidateAccount();
   return okResult;
 }

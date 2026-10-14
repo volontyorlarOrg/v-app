@@ -81,7 +81,7 @@ function Signup({
           googleUnavailable={t("providers.googleUnavailable")}
         />
 
-        <CredentialsSection mode="signup" locale={locale} next={next} />
+        <CredentialsSection mode="signup" next={next} />
 
         <p className="mt-4 text-xs leading-5 text-ink-muted">
           {terms && privacy

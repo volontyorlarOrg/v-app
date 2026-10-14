@@ -1,5 +1,5 @@
 import { ArrowLeft, BadgeCheck } from "lucide-react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -15,7 +15,6 @@ import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
@@ -29,7 +28,7 @@ import {
   profileCompletion,
   type ProfileCompletion,
 } from "@/lib/profile/completion";
-import { applicationHref, localePath, navHref } from "@/lib/routing/routes";
+import { applicationHref, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -97,7 +96,6 @@ function Opportunity({
   const applicationsT = useTranslations("applications");
   const profileT = useTranslations("profile");
   const format = useFormatter();
-  const locale = useLocale() as Locale;
   const applicable = canApply(opportunity, now);
   const photo = opportunityImageUrl(opportunity.imageUrl);
   const asksQuestions = opportunity.questions.length > 0;
@@ -288,7 +286,7 @@ function Opportunity({
                     },
                     fallback: t("detail.applyErrors.fallback"),
                     profileLink: {
-                      href: localePath(locale, "profileEdit"),
+                      href: navHref("profileEdit"),
                       label: t("detail.completeProfile"),
                     },
                   }}

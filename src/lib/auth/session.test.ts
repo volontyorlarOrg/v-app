@@ -72,8 +72,11 @@ describe("session cookie", () => {
 
 describe("safeReturnPath", () => {
   it("keeps an in-app path", () => {
-    expect(safeReturnPath("/en/applications?status=open")).toBe(
-      "/en/applications?status=open",
+    expect(safeReturnPath("/applications?status=open")).toBe(
+      "/applications?status=open",
+    );
+    expect(safeReturnPath("/opportunities?q=clean%20up#top")).toBe(
+      "/opportunities?q=clean%20up#top",
     );
   });
 
@@ -82,6 +85,11 @@ describe("safeReturnPath", () => {
       "//evil.example",
       "https://evil.example",
       "/\\evil.example",
+      "/\t/evil.example",
+      "/\n/evil.example",
+      "/\r/evil.example",
+      "/ /evil.example",
+      "/\u0000/evil.example",
       "evil",
       "",
       null,

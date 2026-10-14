@@ -1,22 +1,16 @@
 import type { NextRequest, NextResponse } from "next/server";
 
 import {
-  connectLocale,
   connectStatusForError,
   connectStatusForProviderError,
 } from "@/lib/account/connections";
-import {
-  CONNECT_LOCALE_COOKIE_NAME,
-  CONNECT_STATE_COOKIE_NAME,
-  type ConnectStatus,
-} from "@/lib/account/types";
+import { CONNECT_STATE_COOKIE_NAME, type ConnectStatus } from "@/lib/account/types";
 import { completeTelegramConnection } from "@/lib/api/account.server";
 import { isAuthConfigured } from "@/lib/auth/config";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
-import { PREFERENCE_LOCALE_COOKIE } from "@/lib/preferences";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -24,23 +18,18 @@ export const maxDuration = 60;
 function clearHandoff(response: NextResponse) {
   const expired = { ...handoffCookieOptions(), maxAge: 0 };
   response.cookies.set(CONNECT_STATE_COOKIE_NAME, "", expired);
-  response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, "", expired);
   return response;
 }
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
-  const locale = connectLocale(
-    request.cookies.get(CONNECT_LOCALE_COOKIE_NAME)?.value,
-    request.cookies.get(PREFERENCE_LOCALE_COOKIE.name)?.value,
-  );
-  const settingsPath = localePath(locale, "settings");
+  const settingsPath = navHref("settings");
   const backToSettings = (status: ConnectStatus) =>
     clearHandoff(relativeRedirect(withQuery(settingsPath, { connect: status })));
 
   const session = await getSession();
   if (!session) {
-    return clearHandoff(relativeRedirect(localePath(locale, "login")));
+    return clearHandoff(relativeRedirect(navHref(ENTRY_ROUTE)));
   }
 
   const providerError = url.searchParams.get("error");

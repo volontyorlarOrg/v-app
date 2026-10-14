@@ -27,14 +27,12 @@ const FIELD_MESSAGE_KEYS: Record<string, string> = {
 };
 
 export function UsernameStepForm({
-  locale,
   identity,
   addressPrefix,
   labels,
   onContinue,
   onBack,
 }: {
-  locale: string;
   identity: UsernameIdentity;
   addressPrefix: string | null;
   labels: OnboardingLabels;
@@ -78,8 +76,6 @@ export function UsernameStepForm({
 
   return (
     <form {...formProps} onSubmit={submit} className="mt-6">
-      <input type="hidden" name="locale" value={locale} />
-
       <Field invalid={Boolean(fieldError)}>
         <FieldLabel htmlFor={`${id}-username`}>{text.field}</FieldLabel>
         <div className="relative sm:max-w-sm">

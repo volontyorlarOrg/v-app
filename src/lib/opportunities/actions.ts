@@ -1,6 +1,5 @@
 "use server";
 
-import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -65,5 +64,5 @@ export async function applyAction(
   }
 
   revalidatePath("/", "layout");
-  redirect(`/${await getLocale()}${applicationHref(applicationId)}`);
+  redirect(applicationHref(applicationId));
 }

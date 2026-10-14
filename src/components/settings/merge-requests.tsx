@@ -39,10 +39,10 @@ export type MergeRequestLabels = {
   errors: Record<string, string>;
 };
 
-function useRequestForm(action: FormAction, item: MergeRequestItem, locale: string) {
+function useRequestForm(action: FormAction, item: MergeRequestItem) {
   return useActionForm({
     schema: mergeRequestFormSchema,
-    defaultValues: { requestId: item.id, locale },
+    defaultValues: { requestId: item.id },
     action,
   });
 }
@@ -50,18 +50,11 @@ function useRequestForm(action: FormAction, item: MergeRequestItem, locale: stri
 function HiddenFields({
   register,
   item,
-  locale,
 }: {
   register: ReturnType<typeof useRequestForm>["form"]["register"];
   item: MergeRequestItem;
-  locale: string;
 }) {
-  return (
-    <>
-      <input type="hidden" {...register("requestId")} defaultValue={item.id} />
-      <input type="hidden" {...register("locale")} defaultValue={locale} />
-    </>
-  );
+  return <input type="hidden" {...register("requestId")} defaultValue={item.id} />;
 }
 
 function Summary({ item }: { item: MergeRequestItem }) {
@@ -88,7 +81,7 @@ function failureOf(
   return { key, message: labels.errors[key] ?? labels.errors.unknown ?? "" };
 }
 
-function FreshAuth({ labels, locale }: { labels: MergeRequestLabels; locale: string }) {
+function FreshAuth({ labels }: { labels: MergeRequestLabels }) {
   return (
     <div
       role="alert"
@@ -99,7 +92,6 @@ function FreshAuth({ labels, locale }: { labels: MergeRequestLabels; locale: str
         {labels.freshAuthDescription}
       </p>
       <form action={REAUTHENTICATE_PATH} method="post">
-        <input type="hidden" name="locale" value={locale} />
         <button
           type="submit"
           className={buttonClass({ variant: "outline", size: "sm", className: "mt-3" })}
@@ -113,15 +105,13 @@ function FreshAuth({ labels, locale }: { labels: MergeRequestLabels; locale: str
 
 function IncomingRow({
   item,
-  locale,
   labels,
 }: {
   item: MergeRequestItem;
-  locale: string;
   labels: MergeRequestLabels;
 }) {
-  const approve = useRequestForm(approveMergeRequestAction, item, locale);
-  const reject = useRequestForm(rejectMergeRequestAction, item, locale);
+  const approve = useRequestForm(approveMergeRequestAction, item);
+  const reject = useRequestForm(rejectMergeRequestAction, item);
   const pending = approve.pending || reject.pending;
   const failure = failureOf(approve.result, labels) ?? failureOf(reject.result, labels);
 
@@ -131,17 +121,13 @@ function IncomingRow({
         <Summary item={item} />
         <div className="flex flex-wrap gap-2">
           <form {...approve.formProps} className="contents">
-            <HiddenFields
-              register={approve.form.register}
-              item={item}
-              locale={locale}
-            />
+            <HiddenFields register={approve.form.register} item={item} />
             <Button type="submit" size="sm" disabled={pending}>
               {approve.pending ? labels.approving : labels.approve}
             </Button>
           </form>
           <form {...reject.formProps} className="contents">
-            <HiddenFields register={reject.form.register} item={item} locale={locale} />
+            <HiddenFields register={reject.form.register} item={item} />
             <Button type="submit" size="sm" variant="outline" disabled={pending}>
               {reject.pending ? labels.rejecting : labels.reject}
             </Button>
@@ -149,7 +135,7 @@ function IncomingRow({
         </div>
       </div>
       {failure?.key === "recentAuthenticationRequired" ? (
-        <FreshAuth labels={labels} locale={locale} />
+        <FreshAuth labels={labels} />
       ) : failure ? (
         <ActionStatus tone="error">{failure.message}</ActionStatus>
       ) : null}
@@ -162,14 +148,12 @@ function IncomingRow({
 
 function OutgoingRow({
   item,
-  locale,
   labels,
 }: {
   item: MergeRequestItem;
-  locale: string;
   labels: MergeRequestLabels;
 }) {
-  const cancel = useRequestForm(cancelMergeRequestAction, item, locale);
+  const cancel = useRequestForm(cancelMergeRequestAction, item);
   const failure = failureOf(cancel.result, labels);
 
   return (
@@ -177,7 +161,7 @@ function OutgoingRow({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Summary item={item} />
         <form {...cancel.formProps} className="contents">
-          <HiddenFields register={cancel.form.register} item={item} locale={locale} />
+          <HiddenFields register={cancel.form.register} item={item} />
           <Button type="submit" size="sm" variant="outline" disabled={cancel.pending}>
             {cancel.pending ? labels.cancelling : labels.cancel}
           </Button>
@@ -194,12 +178,10 @@ function OutgoingRow({
 export function MergeRequestList({
   direction,
   items,
-  locale,
   labels,
 }: {
   direction: "incoming" | "outgoing";
   items: readonly MergeRequestItem[];
-  locale: string;
   labels: MergeRequestLabels;
 }) {
   if (items.length === 0) {
@@ -210,9 +192,9 @@ export function MergeRequestList({
     <ul className="divide-y divide-border">
       {items.map((item) =>
         direction === "incoming" ? (
-          <IncomingRow key={item.id} item={item} locale={locale} labels={labels} />
+          <IncomingRow key={item.id} item={item} labels={labels} />
         ) : (
-          <OutgoingRow key={item.id} item={item} locale={locale} labels={labels} />
+          <OutgoingRow key={item.id} item={item} labels={labels} />
         ),
       )}
     </ul>

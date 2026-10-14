@@ -11,11 +11,10 @@ import {
 } from "@/components/checkpoints/checkpoint-toasts";
 import { getMe } from "@/lib/api/account.server";
 import { isApiError } from "@/lib/api/errors";
-import { failureOf, type LoadFailure } from "@/lib/api/load.server";
+import { dataOf, failureOf, settle, type LoadFailure } from "@/lib/api/load.server";
 import { listNotifications } from "@/lib/api/notifications.server";
 import { getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
-import type { Locale } from "@/i18n/routing";
 import {
   activityNotification,
   checkpointNotification,
@@ -25,8 +24,8 @@ import { initialsOf } from "@/lib/profile/initials";
 import { PROFILE_TASK_ANCHOR } from "@/lib/checkpoints/checkpoints";
 import {
   applicationHref,
+  ONBOARDING_ROUTE,
   historyHref,
-  localePath,
   navHref,
 } from "@/lib/routing/routes";
 
@@ -62,15 +61,17 @@ export default async function VolunteerLayout({
     return <ShellError failure={failureOf(error)} labels={errorLabels} />;
   }
 
-  const [me, volunteerRecord, notificationList] = shell;
+  const [me, loadedRecord, loadedNotifications] = shell;
+  const volunteerRecord = dataOf(loadedRecord);
+  const notificationItems = dataOf(loadedNotifications)?.items ?? [];
   if (me.usernameSource === "generated") {
-    redirect(localePath(locale as Locale, "welcome"));
+    redirect(navHref(ONBOARDING_ROUTE));
   }
   const name =
     me.displayName?.trim() || session.displayName?.trim() || common("volunteer");
   const now = new Date();
   const checkpointToasts: CheckpointToast[] = [];
-  const notifications: NotificationItem[] = notificationList.items.map((item) => {
+  const notifications: NotificationItem[] = notificationItems.map((item) => {
     const time = format.relativeTime(new Date(item.at), now);
     const checkpoint = checkpointNotification(item.kind, item.data);
     if (checkpoint) {
@@ -156,7 +157,7 @@ export default async function VolunteerLayout({
         name,
         initials: initialsOf(name),
         avatarUrl: me.avatarUrl,
-        level: record(`level.${volunteerRecord.level}`),
+        level: volunteerRecord ? record(`level.${volunteerRecord.level}`) : null,
         handle: me.username,
       }}
       notifications={notifications}
@@ -182,5 +183,9 @@ function ShellError({
 }
 
 function loadShell() {
-  return Promise.all([getMe(), getRecord(), listNotifications()]);
+  return Promise.all([
+    getMe(),
+    settle(() => getRecord()),
+    settle(() => listNotifications()),
+  ]);
 }

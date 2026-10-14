@@ -2,10 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { GOOGLE_CONNECT_CALLBACK_PATH } from "@/lib/account/connections";
-import {
-  CONNECT_GOOGLE_STATE_COOKIE_NAME,
-  CONNECT_LOCALE_COOKIE_NAME,
-} from "@/lib/account/types";
+import { CONNECT_GOOGLE_STATE_COOKIE_NAME } from "@/lib/account/types";
 import { challengeGoogleConnection } from "@/lib/api/account.server";
 import { googleClientId, isAuthConfigured } from "@/lib/auth/config";
 import { googleAuthorizationUrl } from "@/lib/auth/google";
@@ -13,7 +10,7 @@ import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import { handoffCookieOptions } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 import { hasVerifiedSiteOrigin, siteOrigin } from "@/lib/seo/origin";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -22,10 +19,10 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const localeParam = url.searchParams.get("locale");
   const locale = isLocale(localeParam) ? localeParam : defaultLocale;
-  const settingsPath = localePath(locale, "settings");
+  const settingsPath = navHref("settings");
 
   const session = await getSession();
-  if (!session) return relativeRedirect(localePath(locale, "login"));
+  if (!session) return relativeRedirect(navHref(ENTRY_ROUTE));
 
   const clientId = googleClientId();
   if (!isAuthConfigured() || !clientId) {
@@ -58,6 +55,5 @@ export async function GET(request: NextRequest) {
 
   const handoff = handoffCookieOptions({ crossSite: true });
   response.cookies.set(CONNECT_GOOGLE_STATE_COOKIE_NAME, challenge.state, handoff);
-  response.cookies.set(CONNECT_LOCALE_COOKIE_NAME, locale, handoff);
   return response;
 }

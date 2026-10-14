@@ -7,7 +7,7 @@ import { BrandIcon } from "@/components/brand/logo";
 import uzMessages from "@/i18n/messages/uz.json";
 import { defaultLocale, localeNames, locales } from "@/i18n/routing";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
-import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
+import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
 import { siteOrigin } from "@/lib/seo/origin";
 import "./globals.css";
 
@@ -64,8 +64,7 @@ export default async function GlobalNotFound() {
                   </Heading>
                   <p className="mt-2 text-ink-muted">{t("description")}</p>
                   <a
-                    href={localePath(locale, HOME_ROUTE)}
-                    hrefLang={locale}
+                    href={navHref(HOME_ROUTE)}
                     className="mt-3 inline-flex min-h-11 items-center font-semibold text-primary-ink underline underline-offset-4"
                   >
                     {t("action")}

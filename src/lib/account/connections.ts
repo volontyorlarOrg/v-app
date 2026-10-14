@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { defaultLocale, isLocale, type Locale } from "@/i18n/routing";
 import {
   ACCOUNT_ERROR_CODES,
   CONNECT_STATUSES,
@@ -27,15 +26,6 @@ export function connectStartHref(
   locale: string,
 ): string {
   return `${CONNECT_START_PATHS[provider]}?${new URLSearchParams({ locale }).toString()}`;
-}
-
-export function connectLocale(
-  hinted: string | undefined,
-  preferred: string | undefined,
-): Locale {
-  if (isLocale(hinted)) return hinted;
-  if (isLocale(preferred)) return preferred;
-  return defaultLocale;
 }
 
 export function isConnectStatus(value: unknown): value is ConnectStatus {
@@ -145,7 +135,6 @@ export function isConnected(
 
 export const mergeRequestFormSchema = z.object({
   requestId: z.string().min(1),
-  locale: z.string().min(1),
 });
 
 export type MergeRequestFormValues = z.input<typeof mergeRequestFormSchema>;

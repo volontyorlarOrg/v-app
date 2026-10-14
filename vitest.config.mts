@@ -15,5 +15,6 @@ export default defineConfig({
     exclude: ["node_modules", ".next", "e2e", "docs"],
     restoreMocks: true,
     unstubEnvs: true,
+    server: { deps: { inline: ["next-intl"] } },
   },
 });
