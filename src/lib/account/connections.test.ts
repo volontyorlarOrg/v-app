@@ -5,7 +5,6 @@ import {
   GOOGLE_CONNECT_CALLBACK_PATH,
   REAUTHENTICATE_PATH,
   accountErrorKey,
-  connectLocale,
   connectStartHref,
   connectStatusForError,
   connectStatusForProviderError,
@@ -19,7 +18,6 @@ import {
   ACCOUNT_ERROR_CODES,
   ACCOUNT_ERROR_KEYS,
   CONNECT_GOOGLE_STATE_COOKIE_NAME,
-  CONNECT_LOCALE_COOKIE_NAME,
   CONNECT_STATE_COOKIE_NAME,
   CONNECT_STATUSES,
   STALE_MERGE_ERROR_CODES,
@@ -28,25 +26,16 @@ import { ApiError, type ApiErrorCode } from "@/lib/api/errors";
 import { meSchema } from "@/lib/api/schemas";
 import { GOOGLE_STATE_COOKIE_NAME as GOOGLE_LOGIN_STATE } from "@/lib/auth/google";
 import { AUTH_STATE_COOKIE_NAME } from "@/lib/auth/telegram";
-import {
-  LOCALE_HINT_COOKIE_NAME,
-  RETURN_TO_COOKIE_NAME,
-  SESSION_COOKIE_NAME,
-} from "@/lib/auth/session";
+import { RETURN_TO_COOKIE_NAME, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
 const LOGIN_COOKIES = [
   SESSION_COOKIE_NAME,
   AUTH_STATE_COOKIE_NAME,
   GOOGLE_LOGIN_STATE,
-  LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
 ];
 
-const CONNECT_COOKIES = [
-  CONNECT_STATE_COOKIE_NAME,
-  CONNECT_GOOGLE_STATE_COOKIE_NAME,
-  CONNECT_LOCALE_COOKIE_NAME,
-];
+const CONNECT_COOKIES = [CONNECT_STATE_COOKIE_NAME, CONNECT_GOOGLE_STATE_COOKIE_NAME];
 
 function apiError(code: ApiErrorCode, backendCode?: string) {
   return new ApiError(code, {
@@ -78,14 +67,6 @@ describe("connection handoff state", () => {
   it("returns to sign-in through a route of its own, not the sign-out action", () => {
     expect(REAUTHENTICATE_PATH).toBe("/api/auth/connect/reauthenticate");
     expect(REAUTHENTICATE_PATH).not.toMatch(/token|email|@|requestId|locale/i);
-  });
-
-  it("returns in the language the handoff started in, or the one the reader chose", () => {
-    expect(connectLocale("ru", "en")).toBe("ru");
-    expect(connectLocale(undefined, "en")).toBe("en");
-    expect(connectLocale("fr", "en")).toBe("en");
-    expect(connectLocale(undefined, undefined)).toBe("uz");
-    expect(connectLocale("../en", "fr")).toBe("uz");
   });
 
   it("accepts only the bounded status enum in a URL", () => {
@@ -229,13 +210,9 @@ describe("connection state", () => {
 });
 
 describe("the merge request form", () => {
-  it("needs a request and a locale", () => {
-    expect(
-      mergeRequestFormSchema.safeParse({ requestId: "m1", locale: "uz" }).success,
-    ).toBe(true);
-    expect(
-      mergeRequestFormSchema.safeParse({ requestId: "", locale: "uz" }).success,
-    ).toBe(false);
-    expect(mergeRequestFormSchema.safeParse({ requestId: "m1" }).success).toBe(false);
+  it("needs a request", () => {
+    expect(mergeRequestFormSchema.safeParse({ requestId: "m1" }).success).toBe(true);
+    expect(mergeRequestFormSchema.safeParse({ requestId: "" }).success).toBe(false);
+    expect(mergeRequestFormSchema.safeParse({}).success).toBe(false);
   });
 });

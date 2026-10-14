@@ -27,7 +27,6 @@ export type MergeRequestDirection = (typeof MERGE_REQUEST_DIRECTIONS)[number];
 
 export const CONNECT_STATE_COOKIE_NAME = "volontyorlar_connect_state";
 export const CONNECT_GOOGLE_STATE_COOKIE_NAME = "volontyorlar_connect_google_state";
-export const CONNECT_LOCALE_COOKIE_NAME = "volontyorlar_connect_locale";
 
 export const CONNECT_STATUSES = [
   "linked",

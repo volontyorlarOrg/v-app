@@ -15,12 +15,11 @@ import {
 } from "@/lib/auth/google";
 import { relativeRedirect, withQuery } from "@/lib/auth/redirect";
 import {
-  LOCALE_HINT_COOKIE_NAME,
   RETURN_TO_COOKIE_NAME,
   handoffCookieOptions,
   safeReturnPath,
 } from "@/lib/auth/session";
-import { localePath } from "@/lib/routing/routes";
+import { ENTRY_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -29,7 +28,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const localeParam = url.searchParams.get("locale");
   const locale = isLocale(localeParam) ? localeParam : defaultLocale;
-  const loginPath = localePath(locale, "login");
+  const loginPath = navHref(ENTRY_ROUTE);
   const unavailable = () =>
     relativeRedirect(withQuery(loginPath, { google: "unavailable" }));
 
@@ -64,7 +63,6 @@ export async function GET(request: NextRequest) {
 
   const handoff = handoffCookieOptions({ crossSite: true });
   response.cookies.set(GOOGLE_STATE_COOKIE_NAME, challenge.state, handoff);
-  response.cookies.set(LOCALE_HINT_COOKIE_NAME, locale, handoff);
 
   const next = safeReturnPath(url.searchParams.get("next"));
   if (next) response.cookies.set(RETURN_TO_COOKIE_NAME, next, handoff);

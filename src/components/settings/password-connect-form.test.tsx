@@ -54,7 +54,7 @@ describe("PasswordForm", () => {
 
   it("sets the first password and keeps it exactly as typed", async () => {
     const user = userEvent.setup();
-    render(<PasswordForm locale="uz" mode="set" email={null} labels={labels} />);
+    render(<PasswordForm mode="set" email={null} labels={labels} />);
 
     await user.type(screen.getByLabelText(labels.email), "dilnoza@example.org");
     await fillNewPassword(user, "  seven purple lanterns  ");
@@ -65,18 +65,11 @@ describe("PasswordForm", () => {
     expect(submitted().get("confirmPassword")).toBe("  seven purple lanterns  ");
     expect(submitted().get("email")).toBe("dilnoza@example.org");
     expect(submitted().get("mode")).toBe("set");
-    expect(submitted().get("locale")).toBe("uz");
+    expect(submitted().has("locale")).toBe(false);
   });
 
   it("uses the connected Google email without another visible email field", () => {
-    render(
-      <PasswordForm
-        locale="en"
-        mode="set"
-        email="dilnoza@example.org"
-        labels={labels}
-      />,
-    );
+    render(<PasswordForm mode="set" email="dilnoza@example.org" labels={labels} />);
 
     expect(screen.queryByLabelText(labels.email)).not.toBeInTheDocument();
     expect(document.querySelector('input[name="email"]')).toHaveValue(
@@ -87,7 +80,6 @@ describe("PasswordForm", () => {
   it("shows current password only when changing an existing password", () => {
     render(
       <PasswordForm
-        locale="en"
         mode="change"
         email="dilnoza@example.org"
         labels={{
@@ -108,14 +100,7 @@ describe("PasswordForm", () => {
 
   it("keeps passwords out of the document and URL", async () => {
     const user = userEvent.setup();
-    render(
-      <PasswordForm
-        locale="en"
-        mode="set"
-        email="dilnoza@example.org"
-        labels={labels}
-      />,
-    );
+    render(<PasswordForm mode="set" email="dilnoza@example.org" labels={labels} />);
 
     await fillNewPassword(user, "seven purple lanterns");
     const field = screen.getByLabelText(labels.newPassword);
@@ -127,14 +112,7 @@ describe("PasswordForm", () => {
 
   it("rejects mismatched confirmation before the server action", async () => {
     const user = userEvent.setup();
-    render(
-      <PasswordForm
-        locale="en"
-        mode="set"
-        email="dilnoza@example.org"
-        labels={labels}
-      />,
-    );
+    render(<PasswordForm mode="set" email="dilnoza@example.org" labels={labels} />);
 
     await user.type(screen.getByLabelText(labels.newPassword), "seven purple lanterns");
     await user.type(screen.getByLabelText(labels.confirmPassword), "different words");
@@ -155,14 +133,7 @@ describe("PasswordForm", () => {
           settle = resolve;
         }),
     );
-    render(
-      <PasswordForm
-        locale="en"
-        mode="set"
-        email="dilnoza@example.org"
-        labels={labels}
-      />,
-    );
+    render(<PasswordForm mode="set" email="dilnoza@example.org" labels={labels} />);
 
     await fillNewPassword(user, "seven purple lanterns");
     await user.click(screen.getByRole("button", { name: labels.submit }));
@@ -182,14 +153,7 @@ describe("PasswordForm", () => {
       code: "weakPassword",
       fields: {},
     } satisfies ActionResult);
-    render(
-      <PasswordForm
-        locale="en"
-        mode="set"
-        email="dilnoza@example.org"
-        labels={labels}
-      />,
-    );
+    render(<PasswordForm mode="set" email="dilnoza@example.org" labels={labels} />);
 
     await fillNewPassword(user, "seven purple lanterns");
     await user.click(screen.getByRole("button", { name: labels.submit }));

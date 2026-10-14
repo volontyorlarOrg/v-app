@@ -38,11 +38,9 @@ const FIELD_MESSAGE_KEYS: Record<string, string> = {
 };
 
 export function UsernameForm({
-  locale,
   identity,
   labels,
 }: {
-  locale: string;
   identity: UsernameIdentity;
   labels: UsernameLabels;
 }) {
@@ -71,8 +69,6 @@ export function UsernameForm({
 
   return (
     <form {...formProps}>
-      <input type="hidden" name="locale" value={locale} />
-
       <Field invalid={Boolean(fieldError)}>
         <FieldLabel htmlFor={`${id}-username`}>{labels.field}</FieldLabel>
         <Input

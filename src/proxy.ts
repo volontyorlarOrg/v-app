@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { defaultLocale, isLocale, routing } from "@/i18n/routing";
+import { isLocale, routing } from "@/i18n/routing";
 import { refreshSession } from "@/lib/auth/refresh";
 import {
   SESSION_COOKIE_NAME,
@@ -12,22 +12,62 @@ import {
   sessionCookieOptions,
   type SessionPayload,
 } from "@/lib/auth/session";
-import { ENTRY_ROUTE, HOME_ROUTE, guardFor, localePath } from "@/lib/routing/routes";
-import { LOCALE_COOKIE_NAME } from "@/lib/preferences";
+import {
+  ENTRY_ROUTE,
+  HOME_ROUTE,
+  guardFor,
+  legacyLocalePrefix,
+  navHref,
+} from "@/lib/routing/routes";
+import { LOCALE_COOKIE, MARKETING_LOCALE_COOKIE_NAME } from "@/lib/preferences";
 import {
   internalMemberProfileHref,
   internalProfileUsername,
   memberProfileHref,
-  preferredProfileLocale,
   publicProfileUsername,
 } from "@/lib/profile/public-routing";
 
 const intl = createMiddleware(routing);
-const PROFILE_REWRITE_MARKER = "_volontyorlar_app_profile";
+const INTL_LOCALE_HEADER = "x-next-intl-locale";
 
-function localeOf(pathname: string) {
-  const segment = pathname.split("/")[1];
-  return isLocale(segment) ? segment : defaultLocale;
+type PrefixedPath = NonNullable<ReturnType<typeof legacyLocalePrefix>>;
+
+function isOwnRewrite(request: NextRequest, prefixed: PrefixedPath) {
+  return request.headers.get(INTL_LOCALE_HEADER) === prefixed.locale;
+}
+
+function storedLocale(request: NextRequest) {
+  const value = request.cookies.get(LOCALE_COOKIE.name)?.value;
+  return isLocale(value) ? value : null;
+}
+
+function marketingLocale(request: NextRequest) {
+  const value = request.cookies.get(MARKETING_LOCALE_COOKIE_NAME)?.value;
+  return isLocale(value) ? value : null;
+}
+
+function rememberLocale(response: NextResponse, locale: string) {
+  const { name, ...options } = LOCALE_COOKIE;
+  response.cookies.set(name, locale, options);
+}
+
+function withoutLegacyLocale(request: NextRequest, legacy: PrefixedPath) {
+  const response = NextResponse.redirect(
+    new URL(`${legacy.path}${request.nextUrl.search}`, request.url),
+    307,
+  );
+  if (!storedLocale(request)) rememberLocale(response, legacy.locale);
+  return response;
+}
+
+function asMemberProfile(request: NextRequest, username: string) {
+  return new NextRequest(
+    new URL(
+      `${internalMemberProfileHref(username)}${request.nextUrl.search}`,
+      request.url,
+    ),
+    { headers: request.headers },
+  );
 }
 
 function isNavigation(request: NextRequest) {
@@ -55,19 +95,21 @@ function expireSessionCookie(response: NextResponse) {
 }
 
 export default async function proxy(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
-  const internalUsername = internalProfileUsername(pathname);
-  if (
-    internalUsername &&
-    request.nextUrl.searchParams.get(PROFILE_REWRITE_MARKER) !== "1"
-  ) {
+  const { search } = request.nextUrl;
+  const prefixed = legacyLocalePrefix(request.nextUrl.pathname);
+  const rewritten = prefixed !== null && isOwnRewrite(request, prefixed);
+  if (prefixed && !rewritten) return withoutLegacyLocale(request, prefixed);
+
+  const pathname = prefixed ? prefixed.path : request.nextUrl.pathname;
+  const internalUsername = rewritten ? null : internalProfileUsername(pathname);
+  if (internalUsername) {
     return NextResponse.redirect(
       new URL(memberProfileHref(internalUsername), request.url),
       307,
     );
   }
 
-  const rootUsername = publicProfileUsername(pathname);
+  const rootUsername = rewritten ? null : publicProfileUsername(pathname);
   if (rootUsername && pathname !== memberProfileHref(rootUsername)) {
     return NextResponse.redirect(
       new URL(memberProfileHref(rootUsername), request.url),
@@ -76,12 +118,6 @@ export default async function proxy(request: NextRequest) {
   }
 
   const guard = rootUsername ? "session" : guardFor(pathname);
-  const locale = rootUsername
-    ? preferredProfileLocale(
-        request.cookies.get(LOCALE_COOKIE_NAME)?.value,
-        request.headers.get("accept-language"),
-      )
-    : localeOf(pathname);
 
   const current = await decryptSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
   let session: SessionPayload | null = current;
@@ -95,29 +131,22 @@ export default async function proxy(request: NextRequest) {
   if (session && isAccessTokenExpired(session)) session = null;
 
   if (guard === "session" && !session) {
-    const loginUrl = new URL(localePath(locale, ENTRY_ROUTE), request.url);
+    const loginUrl = new URL(navHref(ENTRY_ROUTE), request.url);
     loginUrl.searchParams.set("next", `${pathname}${search}`);
     return expireSessionCookie(NextResponse.redirect(loginUrl, 307));
   }
 
   if (guard === "guest" && session) {
-    return NextResponse.redirect(
-      new URL(localePath(locale, HOME_ROUTE), request.url),
-      307,
-    );
+    return NextResponse.redirect(new URL(navHref(HOME_ROUTE), request.url), 307);
   }
 
-  const response = rootUsername
-    ? NextResponse.rewrite(
-        new URL(
-          `${internalMemberProfileHref(locale, rootUsername)}?${new URLSearchParams({
-            ...Object.fromEntries(request.nextUrl.searchParams),
-            [PROFILE_REWRITE_MARKER]: "1",
-          }).toString()}`,
-          request.url,
-        ),
-      )
-    : intl(request);
+  const seeded = rewritten || storedLocale(request) ? null : marketingLocale(request);
+  if (seeded) request.cookies.set(LOCALE_COOKIE.name, seeded);
+
+  const response = rewritten
+    ? NextResponse.next()
+    : intl(rootUsername ? asMemberProfile(request, rootUsername) : request);
+  if (seeded) rememberLocale(response, seeded);
 
   if (upgraded) {
     const value = await encryptSession(upgraded);
@@ -132,5 +161,5 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api/|_next/|_vercel/|.*\\..*).*)"],
 };

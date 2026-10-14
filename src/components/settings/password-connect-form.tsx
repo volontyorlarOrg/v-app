@@ -41,13 +41,11 @@ export type PasswordFormLabels = {
 };
 
 export function PasswordForm({
-  locale,
   mode,
   email,
   labels,
   headed = true,
 }: {
-  locale: string;
   mode: "set" | "change";
   email: string | null;
   labels: PasswordFormLabels;
@@ -89,7 +87,6 @@ export function PasswordForm({
 
   return (
     <form {...formProps}>
-      <input type="hidden" name="locale" value={locale} />
       <input type="hidden" {...register("mode")} />
       {headed ? (
         <>

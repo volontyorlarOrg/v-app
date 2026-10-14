@@ -1,48 +1,67 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { AnchorHTMLAttributes } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocaleSwitcher } from "@/components/app/locale-switcher";
 import { localeNames, locales } from "@/i18n/routing";
+import {
+  LOCALE_COOKIE_NAME,
+  LOCALE_STORAGE_KEY,
+  readPreferenceCookie,
+} from "@/lib/preferences";
 
-const usePathname = vi.fn(() => "/dashboard");
+const refresh = vi.fn();
 const useLocale = vi.fn(() => "ru");
 
 vi.mock("next-intl", () => ({
   useLocale: () => useLocale(),
 }));
 
-vi.mock("@/i18n/navigation", () => ({
-  usePathname: () => usePathname(),
-  Link: ({
-    href,
-    locale,
-    children,
-    ...rest
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & { locale?: string }) => (
-    <a href={`/${locale}${href === "/" ? "" : href}`} {...rest}>
-      {children}
-    </a>
-  ),
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh }),
 }));
 
 describe("LocaleSwitcher", () => {
   beforeEach(() => {
-    usePathname.mockReturnValue("/dashboard");
+    refresh.mockClear();
     useLocale.mockReturnValue("ru");
+    document.cookie = `${LOCALE_COOKIE_NAME}=; path=/; max-age=0`;
+    window.localStorage.clear();
   });
 
-  it("offers every locale by name and keeps the current route", async () => {
+  it("offers every locale by name", async () => {
     const user = userEvent.setup();
     render(<LocaleSwitcher label="Language" />);
     await user.click(screen.getByRole("button", { name: "Language: Русский" }));
 
     for (const locale of locales) {
-      const link = screen.getByRole("menuitem", { name: localeNames[locale] });
-      expect(link).toHaveAttribute("href", `/${locale}/dashboard`);
-      expect(link).toHaveAttribute("hreflang", locale);
+      const item = screen.getByRole("menuitem", { name: localeNames[locale] });
+      expect(item).toHaveAttribute("lang", locale);
+      expect(item).not.toHaveAttribute("href");
     }
+  });
+
+  it("saves the chosen language in this browser and re-reads the same address", async () => {
+    const user = userEvent.setup();
+    render(<LocaleSwitcher label="Language" />);
+    await user.click(screen.getByRole("button", { name: "Language: Русский" }));
+    await user.click(screen.getByRole("menuitem", { name: "English" }));
+
+    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe("en");
+    expect(readPreferenceCookie(LOCALE_COOKIE_NAME)).toBe("en");
+    expect(readPreferenceCookie("NEXT_LOCALE")).toBeNull();
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("does nothing when the active language is chosen again", async () => {
+    const user = userEvent.setup();
+    render(<LocaleSwitcher label="Language" />);
+    await user.click(screen.getByRole("button", { name: "Language: Русский" }));
+    await user.click(screen.getByRole("menuitem", { name: "Русский" }));
+
+    expect(window.localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
+    expect(readPreferenceCookie(LOCALE_COOKIE_NAME)).toBeNull();
+    expect(refresh).not.toHaveBeenCalled();
   });
 
   it("marks only the active locale", async () => {
@@ -52,7 +71,7 @@ describe("LocaleSwitcher", () => {
 
     expect(screen.getByRole("menuitem", { name: "Русский" })).toHaveAttribute(
       "aria-current",
-      "page",
+      "true",
     );
     expect(screen.getByRole("menuitem", { name: "O‘zbekcha" })).not.toHaveAttribute(
       "aria-current",

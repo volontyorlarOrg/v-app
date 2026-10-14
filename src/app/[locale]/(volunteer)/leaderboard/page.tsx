@@ -19,7 +19,6 @@ import {
 } from "@/components/leaderboard/leaderboard-podium";
 import { LeaderboardStanding } from "@/components/leaderboard/leaderboard-standing";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
-import type { Locale } from "@/i18n/routing";
 import { getLeaderboard } from "@/lib/api/leaderboard.server";
 import { settle, type LoadFailure } from "@/lib/api/load.server";
 import type {
@@ -41,7 +40,7 @@ import {
   type Chase,
 } from "@/lib/leaderboard/standing";
 import { initialsOf } from "@/lib/profile/initials";
-import { localePath, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -85,9 +84,7 @@ export default async function LeaderboardRoute({
   });
 
   if (board.items.length === 0 && board.total > 0 && requested !== state.pageCount) {
-    redirect(
-      leaderboardPageHref(localePath(locale as Locale, "leaderboard"), state.pageCount),
-    );
+    redirect(leaderboardPageHref(navHref("leaderboard"), state.pageCount));
   }
 
   return <Leaderboard board={board} state={state} chase={await chaseFor(board)} />;

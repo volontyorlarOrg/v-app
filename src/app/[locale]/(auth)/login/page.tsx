@@ -44,7 +44,6 @@ export default async function LoginPage({
 
   return (
     <Login
-      locale={locale}
       next={returnTo}
       telegramStatus={isTelegramStatus(telegram) ? telegram : null}
       googleStatus={isGoogleStatus(google) ? google : null}
@@ -56,7 +55,6 @@ export default async function LoginPage({
 }
 
 function Login({
-  locale,
   next,
   telegramStatus,
   googleStatus,
@@ -64,7 +62,6 @@ function Login({
   telegramHref,
   googleHref,
 }: {
-  locale: string;
   next: string | null;
   telegramStatus: TelegramStatus | null;
   googleStatus: GoogleStatus | null;
@@ -96,7 +93,7 @@ function Login({
           googleUnavailable={t("providers.googleUnavailable")}
         />
 
-        <CredentialsSection mode="login" locale={locale} next={next} />
+        <CredentialsSection mode="login" next={next} />
       </AuthPanel>
 
       <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">

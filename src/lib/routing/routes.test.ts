@@ -17,7 +17,7 @@ import {
   historyHref,
   isActivePath,
   isSectionActive,
-  localePath,
+  legacyLocalePrefix,
   navHref,
   primaryNavRoutes,
   onboardingRoutes,
@@ -64,8 +64,8 @@ describe("app route registry", () => {
     expect(profile.inTabBar).toBe(true);
     expect([...primaryNavRoutes, ...accountNavRoutes]).not.toContain(profile);
     expect(isSectionActive("/profile", IDENTITY_ROUTE)).toBe(true);
-    expect(isSectionActive("/en/profile/edit", IDENTITY_ROUTE)).toBe(true);
-    expect(isSectionActive("/en/settings", IDENTITY_ROUTE)).toBe(false);
+    expect(isSectionActive("/profile/edit", IDENTITY_ROUTE)).toBe(true);
+    expect(isSectionActive("/settings", IDENTITY_ROUTE)).toBe(false);
   });
 
   it("gives every navigation route one group, so nothing needs a collapsible menu", () => {
@@ -89,9 +89,7 @@ describe("app route registry", () => {
     expect(tabBarRoutes).toContain(leaderboard);
     expect(accountNavRoutes).not.toContain(leaderboard);
     expect(navHref("leaderboard")).toBe("/leaderboard");
-    for (const locale of locales) {
-      expect(guardFor(`/${locale}/leaderboard`)).toBe("session");
-    }
+    expect(guardFor("/leaderboard")).toBe("session");
   });
 
   it("keeps the sidebar's primary group to four sections", () => {
@@ -111,7 +109,7 @@ describe("app route registry", () => {
       expect(route.section).toBe("opportunities");
     }
     expect(sectionKeyFor("/applications")).toBe("opportunities");
-    expect(sectionKeyFor("/en/applications/app-1")).toBe("opportunities");
+    expect(sectionKeyFor("/applications/app-1")).toBe("opportunities");
     expect(sectionKeyFor("/saved")).toBe("opportunities");
     expect(isSectionActive("/applications/app-1", "opportunities")).toBe(true);
     expect(isSectionActive("/applications/app-1", "dashboard")).toBe(false);
@@ -124,9 +122,9 @@ describe("app route registry", () => {
     expect(checkpoints.guard).toBe("session");
     expect(checkpoints.navGroup).toBe("primary");
     expect(checkpoints.inTabBar).toBe(true);
-    expect(sectionKeyFor("/en/checkpoints")).toBe("checkpoints");
+    expect(sectionKeyFor("/checkpoints")).toBe("checkpoints");
     expect(isSectionActive("/checkpoints", "checkpoints")).toBe(true);
-    expect(guardFor("/uz/checkpoints")).toBe("session");
+    expect(guardFor("/checkpoints")).toBe("session");
   });
 
   it("keeps the profile editor under the profile", () => {
@@ -137,7 +135,7 @@ describe("app route registry", () => {
     expect(editor.navGroup).toBeNull();
     expect(editor.inTabBar).toBe(false);
     expect(sectionKeyFor("/profile/edit")).toBe("profile");
-    expect(guardFor("/uz/profile/edit")).toBe("session");
+    expect(guardFor("/profile/edit")).toBe("session");
   });
 
   it("keeps another volunteer's profile inside the signed-in leaderboard section", () => {
@@ -147,8 +145,8 @@ describe("app route registry", () => {
     expect(memberProfile.section).toBe("leaderboard");
     expect(memberProfile.navGroup).toBeNull();
     expect(memberProfile.inTabBar).toBe(false);
-    expect(sectionKeyFor("/en/profiles/dilnoza_k")).toBe("leaderboard");
-    expect(guardFor("/en/profiles/dilnoza_k")).toBe("session");
+    expect(sectionKeyFor("/profiles/dilnoza_k")).toBe("leaderboard");
+    expect(guardFor("/profiles/dilnoza_k")).toBe("session");
   });
 
   it("keeps the record reachable by URL but out of every navigation surface", () => {
@@ -174,8 +172,8 @@ describe("app route registry", () => {
 
   it("names no section for a path outside the registry", () => {
     expect(sectionKeyFor("/en")).toBeNull();
-    expect(sectionKeyFor("/en/unknown")).toBeNull();
-    expect(isSectionActive("/en/unknown", "dashboard")).toBe(false);
+    expect(sectionKeyFor("/unknown")).toBeNull();
+    expect(isSectionActive("/unknown", "dashboard")).toBe(false);
   });
 
   it("enters through sign-in and lands on the dashboard", () => {
@@ -192,7 +190,7 @@ describe("app route registry", () => {
     for (const route of [...primaryNavRoutes, ...tabBarRoutes, ...accountNavRoutes]) {
       expect(route).not.toBe(welcome);
     }
-    expect(guardFor("/uz/welcome")).toBe("session");
+    expect(guardFor("/welcome")).toBe("session");
   });
 
   it("reaches the account, the theme and the language from settings at the foot of the sidebar", () => {
@@ -219,8 +217,8 @@ describe("app route registry", () => {
   });
 });
 
-describe("locale-aware paths", () => {
-  it("gives next-intl an unprefixed href", () => {
+describe("paths without a language", () => {
+  it("builds every href without a locale", () => {
     expect(navHref("dashboard")).toBe("/dashboard");
     expect(opportunityHref("winter-book-drive")).toBe(
       "/opportunities/winter-book-drive",
@@ -228,9 +226,23 @@ describe("locale-aware paths", () => {
     expect(applicationHref("app-1")).toBe("/applications/app-1");
   });
 
-  it("prefixes every locale", () => {
-    expect(localePath("uz", "login")).toBe("/uz/login");
-    expect(localePath("en", "dashboard")).toBe("/en/dashboard");
+  it("recognises a link from before the language left the address", () => {
+    expect(legacyLocalePrefix("/uz/login")).toEqual({ locale: "uz", path: "/login" });
+    expect(legacyLocalePrefix("/en/opportunities/book-drive")).toEqual({
+      locale: "en",
+      path: "/opportunities/book-drive",
+    });
+    expect(legacyLocalePrefix("/ru")).toEqual({ locale: "ru", path: "/" });
+    expect(legacyLocalePrefix("/ru/")).toEqual({ locale: "ru", path: "/" });
+  });
+
+  it("leaves every other address alone", () => {
+    for (const path of ["/", "/dashboard", "/english", "/de/dashboard", "/uzbek_fan"]) {
+      expect(legacyLocalePrefix(path), path).toBeNull();
+    }
+    for (const locale of locales) {
+      expect(legacyLocalePrefix(`/profiles/${locale}`)).toBeNull();
+    }
   });
 
   it("marks a section active for its own path and its children only", () => {
@@ -247,20 +259,18 @@ describe("route guards", () => {
     for (const route of authRoutes) expect(route.guard).toBe("guest");
   });
 
-  it("reads the guard through the locale prefix", () => {
-    for (const locale of locales) {
-      expect(guardFor(`/${locale}/dashboard`)).toBe("session");
-      expect(guardFor(`/${locale}/login`)).toBe("guest");
-    }
+  it("reads the guard from the address as the browser shows it", () => {
+    expect(guardFor("/dashboard")).toBe("session");
+    expect(guardFor("/login")).toBe("guest");
   });
 
   it("reads the guard for a detail page from its section", () => {
-    expect(guardFor("/en/applications/abc123")).toBe("session");
-    expect(guardFor("/en/opportunities/community-library-day")).toBe("session");
+    expect(guardFor("/applications/abc123")).toBe("session");
+    expect(guardFor("/opportunities/community-library-day")).toBe("session");
   });
 
   it("leaves an unregistered path unguarded rather than guessing", () => {
     expect(guardFor("/en")).toBeNull();
-    expect(guardFor("/en/unknown")).toBeNull();
+    expect(guardFor("/unknown")).toBeNull();
   });
 });

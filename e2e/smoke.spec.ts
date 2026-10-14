@@ -42,15 +42,25 @@ async function shellIdentity(page: Page, name: string) {
     : page.getByRole("complementary").getByText(name, { exact: true });
 }
 
-async function signIn(page: Page, locale = "en") {
+type Language = (typeof LOCALES)[number];
+
+async function readIn(page: Page, locale: Language) {
+  const { baseURL } = test.info().project.use;
+  await page
+    .context()
+    .addCookies([{ name: "volontyorlar_locale", value: locale, url: baseURL ?? "" }]);
+}
+
+async function signIn(page: Page, locale: Language = "en") {
+  await readIn(page, locale);
   await gotoReady(page, `/api/auth/telegram/start?locale=${locale}`);
-  await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
+  await expect(page).toHaveURL(/\/dashboard$/);
 }
 
 const PASSPHRASE = "seven purple lanterns";
 
 async function postGoogleAnswer(page: Page, state: string) {
-  await gotoReady(page, "/en/login");
+  await gotoReady(page, "/login");
   await page.evaluate(
     (posted) => {
       const form = document.createElement("form");
@@ -96,9 +106,10 @@ async function submitPasswordLogin(page: Page, destination: RegExp) {
   await expect(page).toHaveURL(destination);
 }
 
-async function signInWithPassword(page: Page, locale = "en") {
-  await gotoReady(page, `/${locale}/login`);
-  await submitPasswordLogin(page, new RegExp(`/${locale}/dashboard$`));
+async function signInWithPassword(page: Page, locale: Language = "en") {
+  await readIn(page, locale);
+  await gotoReady(page, "/login");
+  await submitPasswordLogin(page, /\/dashboard$/);
 }
 
 async function connectState(
@@ -123,7 +134,7 @@ async function completeTelegramConnection(page: Page, code: string, state?: stri
 }
 
 async function postGoogleConnection(page: Page, state: string, credential: string) {
-  await gotoReady(page, "/en/settings");
+  await gotoReady(page, "/settings");
   await page.evaluate(
     (posted) => {
       const form = document.createElement("form");
@@ -151,12 +162,12 @@ function requestRow(page: Page, panel: string, provider: string) {
 }
 
 async function createAccount(page: Page, email: string) {
-  await gotoReady(page, "/en/signup");
+  await gotoReady(page, "/signup");
   await page.getByLabel("Full name").fill("Malika Karimova");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page).toHaveURL(/\/en\/welcome$/);
+  await expect(page).toHaveURL(/\/welcome$/);
 }
 
 test.describe("welcome flow", () => {
@@ -173,7 +184,7 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Skip for now" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     const start = page.getByRole("region", {
       name: "Start with your first opportunity",
     });
@@ -181,7 +192,7 @@ test.describe("welcome flow", () => {
     await expect(start.getByText("Apply with your profile")).toBeVisible();
     await expect(
       start.getByRole("link", { name: "Browse opportunities" }),
-    ).toHaveAttribute("href", "/en/opportunities");
+    ).toHaveAttribute("href", "/opportunities");
     for (const name of ["Next up", "Your applications", "Participation history"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toHaveCount(0);
     }
@@ -255,9 +266,9 @@ test.describe("welcome flow", () => {
       page.getByText("Your profile is complete.", { exact: false }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Find your first opportunity" }).click();
-    await expect(page).toHaveURL(/\/en\/opportunities$/);
+    await expect(page).toHaveURL(/\/opportunities$/);
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await expect(page.getByLabel("School, college, or university")).toHaveValue(
       "Academic lyceum No. 1",
     );
@@ -281,12 +292,12 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Remove: English" })).toBeVisible();
 
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     await expect(page.getByRole("region", { name: "Your username" })).toContainText(
       "@malika_reads",
     );
 
-    await gotoReady(page, "/en/dashboard");
+    await gotoReady(page, "/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
       0,
     );
@@ -294,8 +305,8 @@ test.describe("welcome flow", () => {
 
   test("a generated username cannot bypass onboarding", async ({ page }, info) => {
     await createAccount(page, `skip-${info.project.name}@example.org`);
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/welcome$/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/welcome$/);
     await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
     await page.getByRole("button", { name: "Start" }).click();
 
@@ -317,7 +328,7 @@ test.describe("welcome flow", () => {
     await page.evaluate(() =>
       window.localStorage.setItem("volontyorlar_onboarding", "skipped:contact"),
     );
-    await gotoReady(page, "/en/welcome");
+    await gotoReady(page, "/welcome");
     await expect(
       page.getByRole("heading", { level: 2, name: "Choose your username" }),
     ).toBeVisible();
@@ -328,12 +339,12 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await page.getByRole("link", { name: "Skip for now" }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 
   test("a Telegram username is kept with one tap", async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/en/welcome");
+    await gotoReady(page, "/welcome");
     await page.getByRole("button", { name: "Start" }).click();
 
     const username = page.getByLabel("Username", { exact: true });
@@ -346,7 +357,7 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     await expect(page.getByRole("region", { name: "Your username" })).toContainText(
       "@dilnoza_k",
     );
@@ -354,39 +365,157 @@ test.describe("welcome flow", () => {
 
   test("a returning volunteer is not interrupted", async ({ page }) => {
     await signIn(page);
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole("region", { name: "Finish your pass" })).toHaveCount(0);
   });
 });
 
-test.describe("locale routing", () => {
+test.describe("language", () => {
   for (const locale of LOCALES) {
-    test(`the ${locale} sign-in page renders in ${locale}`, async ({ page }) => {
-      await gotoReady(page, `/${locale}/login`);
+    test(`the sign-in page renders in ${locale} at the same address`, async ({
+      page,
+    }) => {
+      await readIn(page, locale);
+      await gotoReady(page, "/login");
+      await expect(page).toHaveURL(/\/login$/);
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     });
   }
 
-  test("the prefix-less root lands on sign-in in a locale", async ({ page }) => {
+  test("the root lands on sign-in, and on the dashboard once signed in", async ({
+    page,
+  }) => {
     await gotoReady(page, "/");
     const destination = new URL(page.url());
-    expect(destination.pathname).toMatch(/^\/(uz|ru|en)\/login$/);
-    expect(destination.searchParams.get("next")).toMatch(/^\/(uz|ru|en)$/);
+    expect(destination.pathname).toBe("/login");
+    expect(destination.searchParams.get("next")).toBeNull();
+
+    await signIn(page);
+    await gotoReady(page, "/");
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 
-  test("switching language keeps the same page", async ({ page }) => {
+  test("an address from before the language left it moves to the plain one", async ({
+    page,
+  }) => {
+    await gotoReady(page, "/ru/login?telegram=expired");
+    await expect(page).toHaveURL(/\/login\?telegram=expired$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+  });
+
+  test("an old address never undoes a chosen language", async ({ page }) => {
+    await readIn(page, "en");
     await gotoReady(page, "/uz/login");
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  });
+
+  test("switching language keeps the same page and address", async ({ page }) => {
+    await readIn(page, "uz");
+    await gotoReady(page, "/login");
     await page.getByRole("button", { name: /Til: O‘zbekcha/ }).click();
     await page.getByRole("menuitem", { name: "English", exact: true }).click();
-    await expect(page).toHaveURL(/\/en\/login$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page).toHaveURL(/\/login$/);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  });
+
+  test("going back after a change keeps the language that was chosen", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await gotoReady(page, "/opportunities");
+    await page.locator("html[data-app-hydrated='true']").waitFor();
+    await page.locator('a[href="/leaderboard"]:visible').first().click();
+    await expect(page).toHaveURL(/\/leaderboard$/);
+    if (await isMobile(page)) {
+      await page.getByRole("button", { name: /Account menu/ }).click();
+    }
+    await page.locator('a[href="/settings"]:visible').first().click();
+    await expect(page).toHaveURL(/\/settings$/);
+
+    await page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("button", { name: "Русский", exact: true })
+      .click();
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Настройки");
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/leaderboard$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Рейтинг");
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/opportunities$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Возможности");
+
+    await page.locator('a[href="/leaderboard"]:visible').first().click();
+    await expect(page).toHaveURL(/\/leaderboard$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Рейтинг");
+  });
+
+  test("going back across a full page load keeps the chosen language too", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await gotoReady(page, "/opportunities");
+    await gotoReady(page, "/settings");
+    await page
+      .getByRole("region", { name: "Appearance" })
+      .getByRole("button", { name: "Русский", exact: true })
+      .click();
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/opportunities$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Возможности");
+  });
+
+  test("the marketing site's language starts the app but never overrides its choice", async ({
+    page,
+  }) => {
+    const { baseURL } = test.info().project.use;
+    const marketing = (value: Language) =>
+      page.context().addCookies([{ name: "NEXT_LOCALE", value, url: baseURL ?? "" }]);
+
+    await marketing("ru");
+    await gotoReady(page, "/login");
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+
+    await page.getByRole("button", { name: /Язык: Русский/ }).click();
+    await page.getByRole("menuitem", { name: "English", exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+
+    await marketing("uz");
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    expect(
+      await page.evaluate(() => window.localStorage.getItem("volontyorlar_locale")),
+    ).toBe("en");
+  });
+
+  test("a page the browser restores from memory follows a language chosen since", async ({
+    page,
+  }) => {
+    await gotoReady(page, "/login");
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+
+    await readIn(page, "ru");
+    await page.evaluate(() =>
+      window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true })),
+    );
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
+    await expect(page).toHaveURL(/\/login$/);
   });
 });
 
 test.describe("sign-in", () => {
   test("offers Telegram, Google and the email form", async ({ page }) => {
-    await gotoReady(page, "/en/login");
+    await gotoReady(page, "/login");
     await expect(
       page.getByRole("link", { name: "Continue with Telegram" }),
     ).toHaveAttribute("href", "/api/auth/telegram/start?locale=en");
@@ -429,10 +558,34 @@ test.describe("sign-in", () => {
     );
     await googleState(page);
     await postGoogleAnswer(page, "e2e-google-state-9999-never-minted-here");
-    await expect(page).toHaveURL(/\/en\/login\?google=expired$/);
+    await expect(page).toHaveURL(/\/login\?google=expired$/);
 
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/login\?next=/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=/);
+  });
+
+  test("a write made after the session ended goes to sign-in, not an error in place", async ({
+    page,
+  }) => {
+    const state = await startedState(page);
+    await gotoReady(
+      page,
+      `/api/auth/telegram/callback?code=e2e-session-ends-on-write&state=${encodeURIComponent(state)}`,
+    );
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await gotoReady(page, "/opportunities");
+    await page.locator("html[data-app-hydrated='true']").waitFor();
+    await page.locator("button[aria-pressed='false']").first().click();
+    await expect(page).toHaveURL(/\/login\?session=expired$/);
+  });
+
+  test("sign-in never returns to an address off this site", async ({ page }) => {
+    await gotoReady(
+      page,
+      "/api/auth/telegram/start?locale=en&next=/%09/evil.example/landing",
+    );
+    await expect(page).toHaveURL(/\/dashboard$/);
+    expect(new URL(page.url()).origin).toBe(test.info().project.use.baseURL);
   });
 
   test("completing Google sign-in lands on the dashboard", async ({
@@ -445,16 +598,16 @@ test.describe("sign-in", () => {
     );
     const state = await googleState(page);
     await postGoogleAnswer(page, state);
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
 
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 
   test("the email form names a malformed address before it reaches the backend", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/login");
+    await gotoReady(page, "/login");
     await page.getByLabel("Email").fill("not-an-email");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Log in" }).click();
@@ -462,22 +615,22 @@ test.describe("sign-in", () => {
     await expect(
       page.getByText("Enter an email address, like name@example.com."),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/en\/login$/);
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test("email and password sign-in lands on the dashboard", async ({ page }) => {
-    await gotoReady(page, "/en/login");
+    await gotoReady(page, "/login");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Log in" }).click();
 
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 
   test("a wrong password is refused without naming which half was wrong", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/login");
+    await gotoReady(page, "/login");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill("not the passphrase");
     await page.getByRole("button", { name: "Log in" }).click();
@@ -487,13 +640,13 @@ test.describe("sign-in", () => {
         exact: false,
       }),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/en\/login$/);
+    await expect(page).toHaveURL(/\/login$/);
   });
 
   test("a short password is refused in the browser, with the rule in words", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/signup");
+    await gotoReady(page, "/signup");
     await page.getByLabel("Full name").fill("Malika Karimova");
     await page.getByLabel("Email").fill("malika@example.org");
     await page.getByLabel("Password", { exact: true }).fill("ab");
@@ -502,13 +655,13 @@ test.describe("sign-in", () => {
     await expect(
       page.getByText(`Use at least ${PASSWORD_MIN_LENGTH} characters.`),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/en\/signup$/);
+    await expect(page).toHaveURL(/\/signup$/);
   });
 
   test("an address that already has an account is named by the backend", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/signup");
+    await gotoReady(page, "/signup");
     await page.getByLabel("Full name").fill("Dilnoza Karimova");
     await page.getByLabel("Email").fill("dilnoza@example.org");
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
@@ -522,13 +675,13 @@ test.describe("sign-in", () => {
   test("creating an account with an email opens the welcome flow", async ({
     page,
   }, info) => {
-    await gotoReady(page, "/en/signup");
+    await gotoReady(page, "/signup");
     await page.getByLabel("Full name").fill("Malika Karimova");
     await page.getByLabel("Email").fill(`malika-${info.project.name}@example.org`);
     await page.getByLabel("Password", { exact: true }).fill(PASSPHRASE);
     await page.getByRole("button", { name: "Create account" }).click();
 
-    await expect(page).toHaveURL(/\/en\/welcome$/);
+    await expect(page).toHaveURL(/\/welcome$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Malika");
   });
 
@@ -550,9 +703,9 @@ test.describe("sign-in", () => {
   test("create account offers the same three ways in, plus a name", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/login");
+    await gotoReady(page, "/login");
     await page.getByRole("link", { name: "Create an account" }).click();
-    await expect(page).toHaveURL(/\/en\/signup$/);
+    await expect(page).toHaveURL(/\/signup$/);
     await expect(
       page.getByRole("link", { name: "Continue with Telegram" }),
     ).toBeVisible();
@@ -564,7 +717,7 @@ test.describe("sign-in", () => {
   });
 
   test("the password reset route no longer exists", async ({ page }) => {
-    const response = await gotoReady(page, "/en/forgot-password");
+    const response = await gotoReady(page, "/forgot-password");
     expect(response?.status()).toBe(404);
   });
 
@@ -576,11 +729,11 @@ test.describe("sign-in", () => {
       page,
       "/api/auth/telegram/callback?code=e2e-code&state=e2e-state-0000-never-minted-here",
     );
-    await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
+    await expect(page).toHaveURL(/\/login\?telegram=expired$/);
     await expect(page.getByRole("status")).toContainText(/expired/i);
 
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/login\?next=/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=/);
   });
 
   test("a state can be redeemed only once", async ({ page }) => {
@@ -589,12 +742,12 @@ test.describe("sign-in", () => {
       (cookie) => cookie.name !== "volontyorlar_session",
     );
     await gotoReady(page, `/api/auth/telegram/callback?code=e2e-code&state=${state}`);
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
 
     await page.context().clearCookies();
     await page.context().addCookies(handoff);
     await gotoReady(page, `/api/auth/telegram/callback?code=e2e-code&state=${state}`);
-    await expect(page).toHaveURL(/\/en\/login\?telegram=expired$/);
+    await expect(page).toHaveURL(/\/login\?telegram=expired$/);
   });
 
   test("a sign-in that did not share a phone number is refused with a message", async ({
@@ -602,17 +755,17 @@ test.describe("sign-in", () => {
   }) => {
     const state = await startedState(page);
     await gotoReady(page, `/api/auth/telegram/callback?code=no-phone&state=${state}`);
-    await expect(page).toHaveURL(/\/en\/login\?telegram=phoneRequired$/);
+    await expect(page).toHaveURL(/\/login\?telegram=phoneRequired$/);
     await expect(page.getByRole("status")).toContainText(/phone number/i);
 
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/login\?next=/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=/);
   });
 
   test("declining in Telegram returns to sign-in as cancelled", async ({ page }) => {
     await startedState(page);
     await gotoReady(page, "/api/auth/telegram/callback?error=access_denied");
-    await expect(page).toHaveURL(/\/en\/login\?telegram=cancelled$/);
+    await expect(page).toHaveURL(/\/login\?telegram=cancelled$/);
     await expect(page.getByRole("status")).toContainText(/cancelled/i);
   });
 
@@ -625,22 +778,22 @@ test.describe("sign-in", () => {
   });
 
   test("sign-in returns to the page that required it", async ({ page }) => {
-    await gotoReady(page, "/en/profile");
-    await expect(page).toHaveURL(/\/en\/login\?next=%2Fen%2Fprofile$/);
+    await gotoReady(page, "/profile");
+    await expect(page).toHaveURL(/\/login\?next=%2Fprofile$/);
     await page.getByRole("link", { name: "Continue with Telegram" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
   });
 
   test("the panel is not reachable without a session", async ({ page }) => {
     for (const path of [
-      "/en/dashboard",
-      "/en/opportunities",
-      "/en/profile",
-      "/en/record",
-      "/en/leaderboard",
+      "/dashboard",
+      "/opportunities",
+      "/profile",
+      "/record",
+      "/leaderboard",
     ]) {
       await gotoReady(page, path);
-      await expect(page, path).toHaveURL(/\/en\/login\?next=/);
+      await expect(page, path).toHaveURL(/\/login\?next=/);
     }
   });
 
@@ -648,17 +801,17 @@ test.describe("sign-in", () => {
     page,
   }) => {
     await signIn(page);
-    await gotoReady(page, "/en/login");
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
+    await gotoReady(page, "/login");
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 
   test("an ended session returns to sign-in with a message", async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/api/auth/session/expired?locale=en");
-    await expect(page).toHaveURL(/\/en\/login\?session=expired$/);
+    await gotoReady(page, "/api/auth/session/expired");
+    await expect(page).toHaveURL(/\/login\?session=expired$/);
     await expect(page.getByRole("status")).toContainText(/session ended/i);
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/login\?next=/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=/);
   });
 });
 
@@ -671,14 +824,15 @@ test.describe("profile reward availability", () => {
       page,
       `/api/auth/telegram/callback?code=e2e-profile-exhausted&state=${encodeURIComponent(state)}`,
     );
-    await expect(page).toHaveURL(/\/en\/dashboard$/);
-    await gotoReady(page, "/ru/checkpoints");
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await readIn(page, "ru");
+    await gotoReady(page, "/checkpoints");
     const reward = page.locator("#task-profile");
     await expect(reward.getByText(/Все 1.000 наград уже получены/)).toBeVisible();
     await expect(reward.getByText(/Получено наград: 1.000 из 1.000/)).toBeVisible();
     await expect(reward.getByRole("button")).toHaveCount(0);
     await expect(reward.getByRole("link")).toHaveCount(0);
-    await gotoReady(page, "/ru/dashboard");
+    await gotoReady(page, "/dashboard");
     await expect(page.getByRole("region", { name: "Задания" })).toHaveCount(0);
     await page.screenshot({
       path: testInfo.outputPath("sold-out.png"),
@@ -718,7 +872,7 @@ test.describe("the panel", () => {
     });
 
     await navigation.getByRole("link", { name: "Opportunities" }).click();
-    await expect(page).toHaveURL(/\/en\/opportunities$/);
+    await expect(page).toHaveURL(/\/opportunities$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
@@ -728,7 +882,7 @@ test.describe("the panel", () => {
     ).toHaveCount(3);
     await expect(page.getByRole("switch", { name: "Saved only" })).toBeVisible();
     await page.getByRole("link", { name: /^Applications/ }).click();
-    await expect(page).toHaveURL(/\/en\/applications$/);
+    await expect(page).toHaveURL(/\/applications$/);
     await expect(
       page.getByRole("heading", { level: 2, name: "Your applications" }),
     ).toBeVisible();
@@ -738,7 +892,7 @@ test.describe("the panel", () => {
     ).toHaveAttribute("aria-current", "page");
 
     await navigation.getByRole("link", { name: "Tasks" }).click();
-    await expect(page).toHaveURL(/\/en\/checkpoints$/);
+    await expect(page).toHaveURL(/\/checkpoints$/);
     await expect(navigation.getByRole("link", { name: "Tasks" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -746,12 +900,12 @@ test.describe("the panel", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
 
     await navigation.getByRole("link", { name: "Leaderboard" }).click();
-    await expect(page).toHaveURL(/\/en\/leaderboard$/);
+    await expect(page).toHaveURL(/\/leaderboard$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Leaderboard" }),
     ).toBeVisible();
 
-    for (const path of ["/en/profile", "/en/profile/edit", "/en/settings"]) {
+    for (const path of ["/profile", "/profile/edit", "/settings"]) {
       await gotoReady(page, path);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     }
@@ -760,7 +914,7 @@ test.describe("the panel", () => {
   test("the profile task unlocks with the profile and pays 50 XP only once claimed", async ({
     page,
   }, testInfo) => {
-    await gotoReady(page, "/en/checkpoints");
+    await gotoReady(page, "/checkpoints");
     await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
     const task = page.locator("#task-profile");
     await expect(
@@ -776,16 +930,16 @@ test.describe("the panel", () => {
     await expect(task.getByRole("button")).toHaveCount(0);
     await expect(task.getByRole("link", { name: "Add profile photo" })).toHaveAttribute(
       "href",
-      "/en/profile/edit",
+      "/profile/edit",
     );
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await page.getByLabel("Bio").fill("I volunteer at community events.");
     await page.getByLabel("Phone number").fill("+998901234567");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
 
-    await gotoReady(page, "/en/checkpoints");
+    await gotoReady(page, "/checkpoints");
     await expect(task.getByText("Your profile: 7 of 8 complete")).toBeVisible();
     await expect(task.getByText("Still missing: Profile photo")).toBeVisible();
     await expect(task.getByRole("button")).toHaveCount(0);
@@ -812,27 +966,27 @@ test.describe("the panel", () => {
       });
     }
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await uploadProfilePhoto(page);
-    await gotoReady(page, "/en/checkpoints");
+    await gotoReady(page, "/checkpoints");
     await expect(
       task.getByRole("button", { name: "Claim 50 XP for Complete your profile" }),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     const photo = page.getByRole("region", { name: "Profile picture" });
     await photo.getByRole("button", { name: "Remove picture" }).click();
     await expect(photo.getByRole("status")).toContainText(
       "Your profile picture was removed.",
     );
-    await gotoReady(page, "/en/checkpoints");
+    await gotoReady(page, "/checkpoints");
     await expect(task.getByText("Still missing: Profile photo")).toBeVisible();
     await expect(task.getByRole("button")).toHaveCount(0);
     await task.getByRole("link", { name: "Add profile photo" }).click();
-    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await expect(page).toHaveURL(/\/profile\/edit$/);
     await uploadProfilePhoto(page);
 
-    await gotoReady(page, "/en/dashboard");
+    await gotoReady(page, "/dashboard");
     const panel = page.getByRole("region", { name: "Tasks" });
     await expect(panel.getByText(/^Your reward is ready\./)).toBeVisible();
     await expect(
@@ -844,14 +998,14 @@ test.describe("the panel", () => {
       .click();
     await expect(
       page.getByRole("link", { name: /^Reward ready to claim/ }),
-    ).toHaveAttribute("href", "/en/checkpoints#task-profile");
+    ).toHaveAttribute("href", "/checkpoints#task-profile");
     await expect(
       page.getByText("Complete your profile: claim 50 XP in Tasks."),
     ).toBeVisible();
     await page.keyboard.press("Escape");
 
     await panel.getByRole("link", { name: "Open tasks" }).click();
-    await expect(page).toHaveURL(/\/en\/checkpoints#task-profile$/);
+    await expect(page).toHaveURL(/\/checkpoints#task-profile$/);
     await expect(task.getByText("Your profile: 8 of 8 complete")).toBeVisible();
     await expect(task.getByText("100%", { exact: true })).toBeVisible();
     await expect(task.getByText("Every required detail is filled in.")).toBeVisible();
@@ -873,7 +1027,7 @@ test.describe("the panel", () => {
       fullPage: true,
     });
 
-    await gotoReady(page, "/en/dashboard");
+    await gotoReady(page, "/dashboard");
     await expect(page.getByRole("region", { name: "Tasks" })).toHaveCount(0);
     await page
       .getByRole("button", { name: /^Notifications/ })
@@ -890,7 +1044,7 @@ test.describe("the panel", () => {
   test("opening a notification marks it read and closes the tray", async ({ page }) => {
     await page.getByRole("button", { name: "Notifications (1)" }).click();
     await page.getByRole("link", { name: /^You were accepted/ }).click();
-    await expect(page).toHaveURL(/\/en\/applications\/app-riverbank$/);
+    await expect(page).toHaveURL(/\/applications\/app-riverbank$/);
     await expect(
       page.getByRole("button", { name: "Notifications", exact: true }),
     ).toBeVisible();
@@ -904,8 +1058,8 @@ test.describe("the panel", () => {
   });
 
   test("the old record URL lands on the dashboard's history", async ({ page }) => {
-    await gotoReady(page, "/en/record");
-    await expect(page).toHaveURL(/\/en\/dashboard#history$/);
+    await gotoReady(page, "/record");
+    await expect(page).toHaveURL(/\/dashboard#history$/);
     await expect(
       page.getByRole("heading", { level: 2, name: "Participation history" }),
     ).toBeVisible();
@@ -932,14 +1086,14 @@ test.describe("the panel", () => {
     const account = page.getByRole("navigation", { name: "Account" });
     await expect(account.getByRole("link")).toHaveCount(2);
     const identity = account.getByRole("link", { name: "Profile: Dilnoza Karimova" });
-    await expect(identity).toHaveAttribute("href", "/en/profile");
+    await expect(identity).toHaveAttribute("href", "/profile");
     await expect(identity).toContainText("Dilnoza Karimova");
     await expect(
       account.getByRole("link", { name: "Profile", exact: true }),
     ).toHaveCount(0);
     await expect(account.getByRole("link", { name: "Settings" })).toHaveAttribute(
       "href",
-      "/en/settings",
+      "/settings",
     );
     await expect(sidebar.getByRole("button", { name: "Sign out" })).toHaveCount(0);
   });
@@ -951,18 +1105,18 @@ test.describe("the panel", () => {
     await bell.click();
     await expect(
       page.getByRole("link", { name: /^You were accepted/ }),
-    ).toHaveAttribute("href", "/en/applications/app-riverbank");
+    ).toHaveAttribute("href", "/applications/app-riverbank");
     await expect(
       page.getByText("Open your application for the date and place."),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /^Attendance confirmed/ }),
-    ).toHaveAttribute("href", "/en/dashboard#history");
+    ).toHaveAttribute("href", "/dashboard#history");
     await expect(page.getByText(/status is now/)).toHaveCount(0);
     await expect(page.getByText("An account asked to join yours")).toBeVisible();
     await expect(
       page.getByRole("link", { name: /^An account asked to join yours/ }),
-    ).toHaveAttribute("href", "/en/settings");
+    ).toHaveAttribute("href", "/settings");
     await expect(page.getByText("bekzod@example.org")).toHaveCount(0);
     await expect(page.getByText("merge-incoming")).toHaveCount(0);
     await expect(
@@ -990,26 +1144,26 @@ test.describe("the panel", () => {
       await expect(menu.getByRole("link")).toHaveCount(2);
       await expect(
         menu.getByRole("link", { name: "Profile: Dilnoza Karimova" }),
-      ).toHaveAttribute("href", "/en/profile");
+      ).toHaveAttribute("href", "/profile");
       await expect(menu.getByRole("link", { name: "Settings" })).toHaveAttribute(
         "href",
-        "/en/settings",
+        "/settings",
       );
       await expect(menu.getByRole("button", { name: "Sign out" })).toHaveCount(0);
       await menu.getByRole("link", { name: "Settings" }).click();
-      await expect(page).toHaveURL(/\/en\/settings$/);
+      await expect(page).toHaveURL(/\/settings$/);
     } else {
       const account = page.getByRole("navigation", { name: "Account" });
       const identity = account.getByRole("link", { name: "Profile: Dilnoza Karimova" });
       await account.getByRole("link", { name: "Settings" }).click();
-      await expect(page).toHaveURL(/\/en\/settings$/);
+      await expect(page).toHaveURL(/\/settings$/);
       await expect(identity).not.toHaveAttribute("aria-current");
       await identity.click();
-      await expect(page).toHaveURL(/\/en\/profile$/);
+      await expect(page).toHaveURL(/\/profile$/);
       await expect(identity).toHaveAttribute("aria-current", "page");
-      await gotoReady(page, "/en/profile/edit");
+      await gotoReady(page, "/profile/edit");
       await expect(identity).toHaveAttribute("aria-current", "page");
-      await gotoReady(page, "/en/settings");
+      await gotoReady(page, "/settings");
     }
     await expect(page.getByRole("button", { name: "Sign out" })).toHaveCount(1);
     await expect(page.getByRole("region", { name: "Session" })).toHaveCount(0);
@@ -1018,16 +1172,16 @@ test.describe("the panel", () => {
       .getByRole("button", { name: "Sign out" });
     await expect(signOut).toHaveCSS("color", "rgb(143, 30, 24)");
     await signOut.click();
-    await expect(page).toHaveURL(/\/en\/login$/);
+    await expect(page).toHaveURL(/\/login$/);
 
-    await gotoReady(page, "/en/dashboard");
-    await expect(page).toHaveURL(/\/en\/login\?next=/);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=/);
   });
 
   test("the theme switch lives in settings and flips the document theme", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     const appearance = page.getByRole("region", { name: "Appearance" });
     const toggle = appearance.getByRole("switch", { name: "Dark theme" });
     const before = await page.locator("html").getAttribute("data-theme");
@@ -1040,7 +1194,7 @@ test.describe("the panel", () => {
 
     test("the switch reads on before anyone has chosen a theme", async ({ page }) => {
       await page.context().clearCookies({ name: "theme" });
-      await gotoReady(page, "/en/settings");
+      await gotoReady(page, "/settings");
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
       await expect(
         page
@@ -1053,24 +1207,27 @@ test.describe("the panel", () => {
   test("settings carries the interface language, and switching it keeps the page", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     const appearance = page.getByRole("region", { name: "Appearance" });
     await expect(
-      appearance.getByRole("link", { name: "English", exact: true }),
-    ).toHaveAttribute("aria-current", "page");
-    await appearance.getByRole("link", { name: "O‘zbekcha", exact: true }).click();
-    await expect(page).toHaveURL(/\/uz\/settings$/);
+      appearance.getByRole("button", { name: "English", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await appearance.getByRole("button", { name: "O‘zbekcha", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "uz");
+    await expect(page).toHaveURL(/\/settings$/);
+    await expect(
+      page.getByRole("button", { name: "O‘zbekcha", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
   });
 
   test("nothing overflows horizontally", async ({ page }) => {
     for (const path of [
-      "/en/dashboard",
-      "/en/opportunities",
-      "/en/leaderboard",
-      "/en/profile",
-      "/en/settings",
-      "/en/applications/app-book-drive",
+      "/dashboard",
+      "/opportunities",
+      "/leaderboard",
+      "/profile",
+      "/settings",
+      "/applications/app-book-drive",
     ]) {
       await gotoReady(page, path);
       const overflow = await page.evaluate(
@@ -1083,7 +1240,7 @@ test.describe("the panel", () => {
 
   test("renders complete with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoReady(page, "/en/dashboard");
+    await gotoReady(page, "/dashboard");
     const hidden = await page.evaluate(
       () =>
         [...document.querySelectorAll<HTMLElement>("[data-scene]")].filter(
@@ -1103,7 +1260,7 @@ test.describe("opportunities", () => {
   test("separates current and expired vacancies and orders current posts newest first", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
     const current = page.getByRole("region", { name: "Current vacancies" });
     const expired = page.getByRole("region", { name: "Expired vacancies" });
     await expect(page.getByText("Newest posts first", { exact: true })).toBeVisible();
@@ -1122,7 +1279,7 @@ test.describe("opportunities", () => {
       expired.getByText("Applications have closed. You can still view the details."),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/opportunities?view=saved");
+    await gotoReady(page, "/opportunities?view=saved");
     await expect(
       page
         .getByRole("region", { name: "Current vacancies" })
@@ -1132,7 +1289,7 @@ test.describe("opportunities", () => {
       0,
     );
 
-    await gotoReady(page, "/en/opportunities?q=read-aloud");
+    await gotoReady(page, "/opportunities?q=read-aloud");
     await expect(page.getByRole("region", { name: "Current vacancies" })).toContainText(
       "No current vacancies match these filters.",
     );
@@ -1144,7 +1301,7 @@ test.describe("opportunities", () => {
   test("shows three illustrated past events only in the unfiltered listing", async ({
     page,
   }, testInfo) => {
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
     const archive = page.getByRole("region", { name: "Past opportunities" });
 
     await expect(archive.getByRole("article")).toHaveCount(3);
@@ -1173,13 +1330,13 @@ test.describe("opportunities", () => {
       });
     }
 
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     await page
       .getByRole("region", { name: "Appearance" })
       .getByRole("switch", { name: "Dark theme" })
       .click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
 
     if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
       await page.waitForFunction(() =>
@@ -1194,11 +1351,11 @@ test.describe("opportunities", () => {
     }
 
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
     await expect(page.locator("#past-opportunities-title")).toBeVisible();
     expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
 
-    await gotoReady(page, "/en/opportunities?kind=competition");
+    await gotoReady(page, "/opportunities?kind=competition");
     await expect(page.getByRole("region", { name: "Past opportunities" })).toHaveCount(
       0,
     );
@@ -1207,7 +1364,7 @@ test.describe("opportunities", () => {
   test("competition type filters the catalogue and opens an individual application", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities?kind=competition");
+    await gotoReady(page, "/opportunities?kind=competition");
     await expect(page.getByRole("article")).toHaveCount(1);
     await expect(page.getByRole("link", { name: "City youth debate" })).toBeVisible();
     await expect(page.getByText("Riverbank clean-up")).toHaveCount(0);
@@ -1219,16 +1376,16 @@ test.describe("opportunities", () => {
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
-    await gotoReady(page, "/en/opportunities/city-youth-debate");
+    await gotoReady(page, "/opportunities/city-youth-debate");
     await page.getByRole("button", { name: "Apply" }).click();
-    await expect(page).toHaveURL(/\/en\/applications\/app-city-youth-debate$/);
+    await expect(page).toHaveURL(/\/applications\/app-city-youth-debate$/);
     await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
   });
 
   test("shows a vacancy photo on its card and detail while keeping other cards text-only", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
     const photographed = page.getByRole("article").filter({
       has: page.getByRole("link", { name: "Winter book drive" }),
     });
@@ -1238,7 +1395,7 @@ test.describe("opportunities", () => {
     });
     await expect(textOnly.locator("img")).toHaveCount(0);
 
-    await gotoReady(page, "/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/opportunities/winter-book-drive");
     await expect(
       page.locator('main img[src="/logo/social/og-image-1200x630.png"]'),
     ).toBeVisible();
@@ -1247,14 +1404,15 @@ test.describe("opportunities", () => {
   test("saved opportunities are a view and the old route redirects to it", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/saved");
-    await expect(page).toHaveURL(/\/en\/opportunities\?view=saved$/);
+    await gotoReady(page, "/saved");
+    await expect(page).toHaveURL(/\/opportunities\?view=saved$/);
     const savedOnly = page.getByRole("switch", { name: "Saved only" });
     await expect(savedOnly).toHaveAttribute("aria-checked", "true");
     await expect(page.getByRole("article")).toHaveCount(2);
 
+    await page.locator("html[data-app-hydrated='true']").waitFor();
     await savedOnly.click();
-    await expect(page).toHaveURL(/\/en\/opportunities$/);
+    await expect(page).toHaveURL(/\/opportunities$/);
     await expect(savedOnly).toHaveAttribute("aria-checked", "false");
     await expect.poll(() => page.getByRole("article").count()).toBeGreaterThan(2);
   });
@@ -1262,7 +1420,7 @@ test.describe("opportunities", () => {
   test("a listing that fails to load keeps the section standing and offers a retry", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities?q=__fail__");
+    await gotoReady(page, "/opportunities?q=__fail__");
     await expect(
       page.getByRole("heading", { level: 1, name: "Opportunities" }),
     ).toBeVisible();
@@ -1284,7 +1442,7 @@ test.describe("opportunities", () => {
   test("filtering by region puts the filter in the URL and asks the backend", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities");
+    await gotoReady(page, "/opportunities");
     await expect.poll(() => page.getByRole("article").count()).toBeGreaterThan(3);
 
     await page.getByLabel("Region").selectOption("samarkand");
@@ -1298,11 +1456,11 @@ test.describe("opportunities", () => {
   test("the search and the saved-only switch both round-trip through the URL", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities?open=1&q=book");
+    await gotoReady(page, "/opportunities?open=1&q=book");
     await expect(page.getByLabel("Search", { exact: true })).toHaveValue("book");
     await expect(page.getByRole("article")).toHaveCount(1);
 
-    await gotoReady(page, "/en/opportunities?view=saved&q=river");
+    await gotoReady(page, "/opportunities?view=saved&q=river");
     await expect(page.getByRole("switch", { name: "Saved only" })).toHaveAttribute(
       "aria-checked",
       "true",
@@ -1312,16 +1470,13 @@ test.describe("opportunities", () => {
   });
 
   test("an unknown filter value degrades instead of erroring", async ({ page }) => {
-    const response = await gotoReady(
-      page,
-      "/en/opportunities?region=atlantis&sort=abc",
-    );
+    const response = await gotoReady(page, "/opportunities?region=atlantis&sort=abc");
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("article").first()).toBeVisible();
   });
 
   test("saving an opportunity persists on the backend", async ({ page }) => {
-    await gotoReady(page, "/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/opportunities/winter-book-drive");
     const save = page.getByRole("button", { name: /^Save$|^Saved$/ }).first();
     await expect(save).toHaveAttribute("aria-pressed", "false");
     await save.click();
@@ -1332,14 +1487,14 @@ test.describe("opportunities", () => {
     await expect(
       page.getByRole("button", { name: /^Save$|^Saved$/ }).first(),
     ).toHaveAttribute("aria-pressed", "true");
-    await gotoReady(page, "/en/opportunities?view=saved");
+    await gotoReady(page, "/opportunities?view=saved");
     await expect(page.getByRole("article")).toHaveCount(3);
   });
 
   test("opening an opportunity shows the facts, requirements and questions", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities/winter-book-drive");
+    await gotoReady(page, "/opportunities/winter-book-drive");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("book drive");
     for (const name of ["At a glance", "What you need", "What you will be asked"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
@@ -1352,7 +1507,7 @@ test.describe("opportunities", () => {
   test("applying creates a draft and submitting it needs the required answer", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities/remote-translation-support");
+    await gotoReady(page, "/opportunities/remote-translation-support");
     await expect(
       page.getByText("Complete your profile before applying. Still missing: Bio."),
     ).toBeVisible();
@@ -1360,9 +1515,9 @@ test.describe("opportunities", () => {
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await gotoReady(page, "/en/opportunities/remote-translation-support");
+    await gotoReady(page, "/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
-    await expect(page).toHaveURL(/\/en\/applications\/app-remote-translation-support$/);
+    await expect(page).toHaveURL(/\/applications\/app-remote-translation-support$/);
 
     await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page.getByRole("alert").first()).toContainText(/required/i);
@@ -1380,14 +1535,14 @@ test.describe("opportunities", () => {
   test("applying to an opportunity that accepts automatically is accepted in one step", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/opportunities/city-marathon-water-stations");
     await page.getByRole("link", { name: "Complete profile" }).click();
     await page.getByLabel("Bio").fill("I help at city events.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
 
-    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/opportunities/city-marathon-water-stations");
     await expect(
       page.getByRole("heading", { level: 2, name: "What you will be asked" }),
     ).toHaveCount(0);
@@ -1402,9 +1557,7 @@ test.describe("opportunities", () => {
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Apply" }).click();
-    await expect(page).toHaveURL(
-      /\/en\/applications\/app-city-marathon-water-stations$/,
-    );
+    await expect(page).toHaveURL(/\/applications\/app-city-marathon-water-stations$/);
     const timeline = page.getByRole("region", { name: "Progress", exact: true });
     await expect(timeline.getByText("Accepted instantly")).toBeVisible();
     await expect(timeline.getByText("Under review")).toHaveCount(0);
@@ -1420,7 +1573,7 @@ test.describe("opportunities", () => {
       page.getByText("The profile you applied with.", { exact: false }),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/opportunities/city-marathon-water-stations");
+    await gotoReady(page, "/opportunities/city-marathon-water-stations");
     await expect(
       page.getByRole("link", { name: "View your application" }),
     ).toBeVisible();
@@ -1428,7 +1581,7 @@ test.describe("opportunities", () => {
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {
-    await gotoReady(page, "/en/opportunities/read-aloud-day");
+    await gotoReady(page, "/opportunities/read-aloud-day");
     await expect(
       page.getByRole("button", { name: "Applications are closed" }),
     ).toBeDisabled();
@@ -1437,13 +1590,13 @@ test.describe("opportunities", () => {
   test("an unknown opportunity shows the not-found panel inside the shell", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/opportunities/does-not-exist");
+    await gotoReady(page, "/opportunities/does-not-exist");
     await expect(
       page.getByRole("heading", { level: 1, name: "Page not found" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Go to the dashboard" }),
-    ).toHaveAttribute("href", "/en/dashboard");
+    ).toHaveAttribute("href", "/dashboard");
   });
 });
 
@@ -1453,7 +1606,7 @@ test.describe("applications, record, profile and settings", () => {
   });
 
   test("applications filter by group and a draft can be saved", async ({ page }) => {
-    await gotoReady(page, "/en/applications?group=drafts");
+    await gotoReady(page, "/applications?group=drafts");
     await expect(page.getByRole("link", { name: /Drafts/ })).toHaveAttribute(
       "aria-current",
       "page",
@@ -1462,7 +1615,7 @@ test.describe("applications, record, profile and settings", () => {
       .getByRole("link", { name: /book drive/i })
       .first()
       .click();
-    await expect(page).toHaveURL(/\/en\/applications\/app-book-drive$/);
+    await expect(page).toHaveURL(/\/applications\/app-book-drive$/);
     await expect(
       page.getByRole("heading", { level: 2, name: "Progress" }),
     ).toBeVisible();
@@ -1482,7 +1635,7 @@ test.describe("applications, record, profile and settings", () => {
   test("an accepted application can be withdrawn after confirming", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/applications/app-riverbank");
+    await gotoReady(page, "/applications/app-riverbank");
     await expect(
       page.getByRole("heading", { level: 2, name: "Attendance" }),
     ).toHaveCount(0);
@@ -1498,7 +1651,7 @@ test.describe("applications, record, profile and settings", () => {
   });
 
   test("an unknown application shows the not-found panel", async ({ page }) => {
-    await gotoReady(page, "/en/applications/does-not-exist");
+    await gotoReady(page, "/applications/does-not-exist");
     await expect(
       page.getByRole("heading", { level: 1, name: "Page not found" }),
     ).toBeVisible();
@@ -1510,7 +1663,7 @@ test.describe("applications, record, profile and settings", () => {
   test("the dashboard shows the history table with the awaiting-confirmation rule", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/dashboard");
+    await gotoReady(page, "/dashboard");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("Neighborhood reading day")).toBeVisible();
@@ -1520,7 +1673,7 @@ test.describe("applications, record, profile and settings", () => {
   test("the profile opens on the volunteer's own record and hands editing to its own page", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/profile");
+    await gotoReady(page, "/profile");
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
@@ -1540,21 +1693,21 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByLabel("Bio")).toHaveCount(0);
     await expect(page.getByText("Neighborhood reading day")).toBeVisible();
     const edit = page.getByRole("link", { name: "Complete profile" });
-    await expect(edit).toHaveAttribute("href", "/en/profile/edit");
+    await expect(edit).toHaveAttribute("href", "/profile/edit");
     await edit.click();
-    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await expect(page).toHaveURL(/\/profile\/edit$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "Edit your profile" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Save profile" })).toBeVisible();
     await page.getByRole("link", { name: "Cancel" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
   });
 
   test("the profile lists my activity, and each optional part can be kept off it", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/profile");
+    await gotoReady(page, "/profile");
     const activity = page.getByRole("region", { name: "My activity" });
     await expect(activity.getByRole("listitem")).toHaveCount(3);
     await expect(activity.getByText("Winter clothing sorting day")).toBeVisible();
@@ -1564,14 +1717,14 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("definition").filter({ hasText: "Academic lyceum No. 2" }),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     const school = page.getByRole("switch", { name: "School", exact: true });
     await expect(school).toBeChecked();
     await school.click();
     await page.getByRole("switch", { name: "Activity", exact: true }).click();
     await page.getByRole("switch", { name: "Instagram", exact: true }).click();
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
@@ -1585,7 +1738,7 @@ test.describe("applications, record, profile and settings", () => {
       page.getByText("Not shown on your profile: School, Instagram, Activity."),
     ).toBeVisible();
 
-    await gotoReady(page, "/en/profiles/dilnoza_k");
+    await gotoReady(page, "/profiles/dilnoza_k");
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
@@ -1595,9 +1748,9 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("definition").filter({ hasText: "Tashkent City" }),
     ).toBeVisible();
 
-    await page.goto("/en/profile");
+    await page.goto("/profile");
     await page.getByRole("link", { name: "Change" }).click();
-    await expect(page).toHaveURL(/\/en\/profile\/edit#visibility$/);
+    await expect(page).toHaveURL(/\/profile\/edit#visibility$/);
     await expect(
       page.getByRole("switch", { name: "School", exact: true }),
     ).not.toBeChecked();
@@ -1608,7 +1761,7 @@ test.describe("applications, record, profile and settings", () => {
 
   test("a profile picture can be cropped, saved and removed", async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
 
     const editor = page.getByRole("region", { name: "Profile picture" });
     const chooser = page.waitForEvent("filechooser");
@@ -1634,7 +1787,7 @@ test.describe("applications, record, profile and settings", () => {
 
   test("the public profile can be hidden from settings", async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     const toggle = page.getByRole("switch", {
       name: "Show my public profile",
@@ -1650,29 +1803,29 @@ test.describe("applications, record, profile and settings", () => {
   test("the profile form saves to the backend and completes the profile", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/profile");
+    await gotoReady(page, "/profile");
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveAttribute("aria-valuenow", "88");
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await page.getByLabel("Bio").fill("Second-year student.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
     await expect(page.getByText("Second-year student.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Edit profile" })).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Profile completeness" }),
     ).toHaveCount(0);
 
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
   });
 
   test("applying needs Telegram but allows an empty phone number", async ({ page }) => {
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     const phone = page.getByLabel("Phone number");
     await expect(phone).not.toHaveAttribute("required", "");
     await expect(phone).toHaveValue("");
@@ -1685,24 +1838,24 @@ test.describe("applications, record, profile and settings", () => {
     await phone.fill("90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(phone).toHaveAttribute("aria-invalid", "true");
-    await expect(page).toHaveURL(/\/en\/profile\/edit$/);
+    await expect(page).toHaveURL(/\/profile\/edit$/);
 
     await phone.fill("");
     await page.getByLabel("Telegram username").fill("");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
     await expect(
       page.getByText("Still missing: Telegram", { exact: false }),
     ).toBeVisible();
-    await gotoReady(page, "/en/profile/edit");
+    await gotoReady(page, "/profile/edit");
     await page.getByLabel("Telegram username").fill("dilnoza_k");
     await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/en\/profile$/);
+    await expect(page).toHaveURL(/\/profile$/);
     await expect(page.getByText("Still missing:", { exact: false })).toHaveCount(0);
   });
 
   test("the profile carries no settings of its own", async ({ page }) => {
-    await gotoReady(page, "/en/profile");
+    await gotoReady(page, "/profile");
     await expect(page.getByRole("switch", { name: "Telegram messages" })).toHaveCount(
       0,
     );
@@ -1712,10 +1865,10 @@ test.describe("applications, record, profile and settings", () => {
   test("the theme is switched from settings, not from the profile", async ({
     page,
   }) => {
-    await gotoReady(page, "/en/profile");
+    await gotoReady(page, "/profile");
     await expect(page.getByRole("switch", { name: "Dark theme" })).toHaveCount(0);
 
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     const dark = page
       .getByRole("region", { name: "Appearance" })
       .getByRole("switch", { name: "Dark theme" });
@@ -1728,7 +1881,7 @@ test.describe("applications, record, profile and settings", () => {
 test.describe("account connections and merges", () => {
   test.beforeEach(async ({ page }) => {
     await signInWithPassword(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
   });
 
   test("shows every way in and offers to connect what is missing", async ({ page }) => {
@@ -1754,7 +1907,7 @@ test.describe("account connections and merges", () => {
   }) => {
     await page.getByRole("link", { name: "Connect Telegram" }).click();
 
-    await expect(page).toHaveURL("/en/settings?connect=linked");
+    await expect(page).toHaveURL("/settings?connect=linked");
     await expect(
       page.getByText("Connected. Both ways in now open this account."),
     ).toBeVisible();
@@ -1773,7 +1926,7 @@ test.describe("account connections and merges", () => {
   }) => {
     await completeTelegramConnection(page, "connect-already");
 
-    await expect(page).toHaveURL("/en/settings?connect=alreadyLinked");
+    await expect(page).toHaveURL("/settings?connect=alreadyLinked");
     await expect(
       page.getByText("That was already connected to this account."),
     ).toBeVisible();
@@ -1789,7 +1942,7 @@ test.describe("account connections and merges", () => {
   }) => {
     await completeTelegramConnection(page, "connect-approval");
 
-    await expect(page).toHaveURL("/en/settings?connect=approvalRequired");
+    await expect(page).toHaveURL("/settings?connect=approvalRequired");
     await expect(
       page.getByText(
         "That account belongs to someone else, so it was asked to approve joining yours.",
@@ -1824,7 +1977,7 @@ test.describe("account connections and merges", () => {
       "/api/auth/connect/telegram/callback?code=connect-link&state=not-the-state-this-browser-started",
     );
 
-    await expect(page).toHaveURL("/en/settings?connect=expired");
+    await expect(page).toHaveURL("/settings?connect=expired");
     await expect(
       page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
         name: "Connect Telegram",
@@ -1838,9 +1991,9 @@ test.describe("account connections and merges", () => {
     await connectState(page, "google");
     await postGoogleConnection(page, "e2e-connect-google-9999-minted-by-the-stub", "x");
 
-    await expect(page).toHaveURL(/\/(uz|en)\/settings\?connect=expired$/);
+    await expect(page).toHaveURL(/\/settings\?connect=expired$/);
 
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
     await expect(
       page.getByRole("region", { name: "Ways to sign in" }).getByRole("link", {
         name: "Connect Google",
@@ -1851,23 +2004,26 @@ test.describe("account connections and merges", () => {
   test("a connection state cannot be redeemed twice", async ({ page }) => {
     const state = await connectState(page, "telegram");
     await completeTelegramConnection(page, "connect-link", state);
-    await expect(page).toHaveURL("/en/settings?connect=linked");
+    await expect(page).toHaveURL("/settings?connect=linked");
 
     await completeTelegramConnection(page, "connect-link", state);
-    await expect(page).toHaveURL(/\/(uz|en)\/settings\?connect=expired$/);
+    await expect(page).toHaveURL(/\/settings\?connect=expired$/);
   });
 
   test("a replayed callback returns in the language the reader was reading", async ({
     page,
   }) => {
-    await gotoReady(page, "/ru/settings");
+    await readIn(page, "ru");
+    await gotoReady(page, "/settings");
     const state = await connectState(page, "telegram", "ru");
 
     await completeTelegramConnection(page, "connect-link", state);
-    await expect(page).toHaveURL("/ru/settings?connect=linked");
+    await expect(page).toHaveURL("/settings?connect=linked");
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
 
     await completeTelegramConnection(page, "connect-link", state);
-    await expect(page).toHaveURL("/ru/settings?connect=expired");
+    await expect(page).toHaveURL("/settings?connect=expired");
+    await expect(page.locator("html")).toHaveAttribute("lang", "ru");
   });
 
   test("the handoff carries a bounded status and nothing about the account", async ({
@@ -1911,7 +2067,7 @@ test.describe("account connections and merges", () => {
     await requestRow(page, "Waiting for your approval", "Google")
       .getByRole("button", { name: "Approve" })
       .click();
-    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(page).toHaveURL(/\/settings$/);
 
     const connections = page.getByRole("region", { name: "Ways to sign in" });
     await expect(
@@ -1935,7 +2091,7 @@ test.describe("account connections and merges", () => {
     page,
   }, testInfo) => {
     await signIn(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     await page
       .getByLabel("Email")
@@ -1972,7 +2128,7 @@ test.describe("account connections and merges", () => {
       .getByRole("button", { name: "Approve" })
       .click();
 
-    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(page).toHaveURL(/\/settings$/);
     await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
     await expect(page.getByText("Dilnoza Karimova")).toHaveCount(0);
     await expect(
@@ -1987,7 +2143,7 @@ test.describe("account connections and merges", () => {
     await row.getByRole("button", { name: "Approve" }).click();
 
     await expect(row).toHaveCount(0);
-    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(page).toHaveURL(/\/settings$/);
     await page.reload();
     await expect(requestRow(page, "Waiting for your approval", "Email")).toHaveCount(0);
   });
@@ -2004,9 +2160,9 @@ test.describe("account connections and merges", () => {
     await expect(alert).toBeVisible();
 
     await alert.getByRole("button", { name: "Sign in again" }).click();
-    await expect(page).toHaveURL("/en/login?next=%2Fen%2Fsettings");
+    await expect(page).toHaveURL("/login?next=%2Fsettings");
 
-    await submitPasswordLogin(page, /\/en\/settings$/);
+    await submitPasswordLogin(page, /\/settings$/);
     await expect(requestRow(page, "Waiting for your approval", "Telegram")).toHaveCount(
       1,
     );
@@ -2022,7 +2178,7 @@ test.describe("account connections and merges", () => {
     await approve.click();
     await expect(reject).toBeDisabled();
 
-    await expect(page).toHaveURL(/\/en\/settings$/);
+    await expect(page).toHaveURL(/\/settings$/);
     await expect(await shellIdentity(page, "Bekzod Rustamov")).toBeVisible();
   });
 
@@ -2030,7 +2186,7 @@ test.describe("account connections and merges", () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     const approve = requestRow(page, "Waiting for your approval", "Google").getByRole(
       "button",
@@ -2053,7 +2209,7 @@ test.describe("account connections and merges", () => {
 test.describe("the leaderboard", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/en/leaderboard");
+    await gotoReady(page, "/leaderboard");
   });
 
   test("ranks volunteers on the backend's own numbers", async ({ page }) => {
@@ -2136,10 +2292,10 @@ test.describe("the leaderboard", () => {
     const jump = page
       .getByRole("region", { name: "Your place" })
       .getByRole("link", { name: /Show my place in the standings/ });
-    await expect(jump).toHaveAttribute("href", "/en/leaderboard?page=2#you");
+    await expect(jump).toHaveAttribute("href", "/leaderboard?page=2#you");
 
     await jump.click();
-    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2#you$/);
+    await expect(page).toHaveURL(/\/leaderboard\?page=2#you$/);
     const own = page.getByRole("row").filter({ hasText: "@dilnoza_k" });
     await expect(own).toHaveAttribute("id", "you");
     await expect(own).toHaveAttribute("aria-current", "true");
@@ -2158,7 +2314,7 @@ test.describe("the leaderboard", () => {
     ).toHaveAttribute("aria-current", "page");
 
     await pages.getByRole("link", { name: "Next" }).click();
-    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
+    await expect(page).toHaveURL(/\/leaderboard\?page=2$/);
     await expect(page.getByRole("status")).toContainText("Showing 26\u201330 of 30");
     await expect(page.getByRole("row").filter({ hasText: "@dilnoza_k" })).toContainText(
       "You",
@@ -2166,8 +2322,8 @@ test.describe("the leaderboard", () => {
   });
 
   test("a page beyond the last one returns to the last page", async ({ page }) => {
-    await gotoReady(page, "/en/leaderboard?page=9");
-    await expect(page).toHaveURL(/\/en\/leaderboard\?page=2$/);
+    await gotoReady(page, "/leaderboard?page=9");
+    await expect(page).toHaveURL(/\/leaderboard\?page=2$/);
     await expect(page.getByRole("status")).toContainText("Showing 26\u201330 of 30");
   });
 
@@ -2182,7 +2338,7 @@ test.describe("the leaderboard", () => {
 test.describe("the leaderboard username", () => {
   test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     await expect(
       page.getByRole("navigation", { name: "Settings sections" }),
@@ -2203,7 +2359,7 @@ test.describe("the leaderboard username", () => {
     page,
   }) => {
     await signInWithPassword(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     await panel.getByLabel("New username").fill("Chilonzor_Reader");
@@ -2211,7 +2367,7 @@ test.describe("the leaderboard username", () => {
     await expect(panel.getByRole("status")).toContainText("Your username is saved.");
     await expect(panel).toContainText("@chilonzor_reader");
 
-    await gotoReady(page, "/en/leaderboard?page=2");
+    await gotoReady(page, "/leaderboard?page=2");
     await expect(
       page.getByRole("row").filter({ hasText: "@chilonzor_reader" }),
     ).toContainText("You");
@@ -2219,7 +2375,7 @@ test.describe("the leaderboard username", () => {
 
   test("a username another volunteer holds is refused by name", async ({ page }) => {
     await signInWithPassword(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     await panel.getByLabel("New username").fill("volunteer_01");
@@ -2231,7 +2387,7 @@ test.describe("the leaderboard username", () => {
     page,
   }) => {
     await signInWithPassword(page);
-    await gotoReady(page, "/en/settings");
+    await gotoReady(page, "/settings");
 
     const panel = page.getByRole("region", { name: "Your username" });
     const field = panel.getByLabel("New username");
@@ -2278,9 +2434,48 @@ test.describe("the leaderboard username", () => {
   });
 });
 
+test.describe("a member's address", () => {
+  test("opens inside the panel under the plain username", async ({ page }) => {
+    await signIn(page);
+    await gotoReady(page, "/profiles/dilnoza_k");
+    await expect(page).toHaveURL(/\/dilnoza_k$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
+    ).toBeVisible();
+  });
+
+  test("reaches the panel for a username that starts like a system path", async ({
+    page,
+  }) => {
+    await signIn(page);
+    for (const path of ["/apiuser1", "/_next_volunteer"]) {
+      const response = await gotoReady(page, path);
+      expect(response?.status(), path).toBe(200);
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Page not found" }),
+        path,
+      ).toBeVisible();
+    }
+  });
+
+  test("says a missing member is missing in the reader's language", async ({
+    page,
+  }) => {
+    await signIn(page, "ru");
+    await gotoReady(page, "/nobody_here_1");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Страница не найдена" }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "На главную панель" })).toHaveAttribute(
+      "href",
+      "/dashboard",
+    );
+  });
+});
+
 test.describe("privacy and hardening", () => {
   test("every page is kept out of search engines", async ({ request }) => {
-    for (const path of ["/uz/login", "/uz/dashboard", "/robots.txt"]) {
+    for (const path of ["/login", "/dashboard", "/robots.txt"]) {
       const response = await request.get(path);
       expect(response.headers()["x-robots-tag"]).toContain("noindex");
     }
@@ -2290,7 +2485,7 @@ test.describe("privacy and hardening", () => {
   test("security headers are present and the framework is not advertised", async ({
     request,
   }) => {
-    const headers = (await request.get("/en/login")).headers();
+    const headers = (await request.get("/login")).headers();
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["content-security-policy"]).not.toContain(
@@ -2301,7 +2496,7 @@ test.describe("privacy and hardening", () => {
   });
 
   test("an unknown URL returns a 404 page", async ({ page }) => {
-    const response = await gotoReady(page, "/uz/does-not-exist");
+    const response = await gotoReady(page, "/does-not-exist");
     expect(response?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
   });

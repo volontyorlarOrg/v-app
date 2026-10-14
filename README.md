@@ -15,7 +15,8 @@ npm ci
 npm run dev
 ```
 
-http://localhost:3001 redirects to `/uz/login`. Sign-in is Telegram: the
+http://localhost:3001 redirects to `/login`; the language is a stored choice,
+not part of the address. Sign-in is Telegram: the
 button hands off to Telegram's sign-in page, and the callback route writes
 the session cookie.
 `npm run dev` loads the shared local environment, so everything behind sign-in
