@@ -201,7 +201,6 @@ function Welcome({
 
   return (
     <OnboardingFlow
-      locale={locale}
       title={firstName ? t("title", { name: firstName }) : t("titleAnonymous")}
       lead={t("lead")}
       initialStep={initialStep}

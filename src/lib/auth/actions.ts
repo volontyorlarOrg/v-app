@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { defaultLocale, isLocale } from "@/i18n/routing";
 import {
   failedResult,
   resultFromError,
@@ -26,20 +25,15 @@ import {
 import { clearSession, getSession, writeSession } from "@/lib/auth/session.server";
 import { onboardingPath } from "@/lib/onboarding/state";
 import { onboardingStartCookie } from "@/lib/onboarding/state.server";
-import { HOME_ROUTE, localePath } from "@/lib/routing/routes";
-
-function localeOf(formData: FormData) {
-  const requested = formData.get("locale");
-  return isLocale(requested) ? requested : defaultLocale;
-}
+import { ENTRY_ROUTE, HOME_ROUTE, navHref } from "@/lib/routing/routes";
 
 function returnPathOf(formData: FormData) {
   const next = formData.get("next");
   return safeReturnPath(typeof next === "string" ? next : null);
 }
 
-function destinationOf(formData: FormData, locale: ReturnType<typeof localeOf>) {
-  return returnPathOf(formData) ?? localePath(locale, HOME_ROUTE);
+function destinationOf(formData: FormData) {
+  return returnPathOf(formData) ?? navHref(HOME_ROUTE);
 }
 
 async function openSession(
@@ -80,7 +74,7 @@ export async function logInAction(
   const result = await openSession("/auth/password/login", parsed.data);
   if (result.status !== "ok") return result;
 
-  redirect(destinationOf(formData, localeOf(formData)));
+  redirect(destinationOf(formData));
 }
 
 export async function createAccountAction(
@@ -97,11 +91,10 @@ export async function createAccountAction(
 
   const store = await cookies();
   store.set(onboardingStartCookie());
-  redirect(onboardingPath(localeOf(formData), returnPathOf(formData)));
+  redirect(onboardingPath(returnPathOf(formData)));
 }
 
-export async function signOut(formData: FormData) {
-  const locale = localeOf(formData);
+export async function signOut() {
   const session = await getSession();
 
   if (session) {
@@ -117,5 +110,5 @@ export async function signOut(formData: FormData) {
 
   await clearSession();
   revalidatePath("/", "layout");
-  redirect(localePath(locale, "login"));
+  redirect(navHref(ENTRY_ROUTE));
 }

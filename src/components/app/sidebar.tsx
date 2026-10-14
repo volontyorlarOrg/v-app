@@ -21,7 +21,7 @@ export type ShellUser = {
   name: string;
   initials: string;
   avatarUrl?: string;
-  level: string;
+  level: string | null;
   handle: string | null;
 };
 

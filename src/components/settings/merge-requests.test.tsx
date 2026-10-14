@@ -62,12 +62,7 @@ function failure(code: string): ActionResult {
 
 function renderIncoming() {
   return render(
-    <MergeRequestList
-      direction="incoming"
-      items={[incoming]}
-      locale="uz"
-      labels={labels}
-    />,
+    <MergeRequestList direction="incoming" items={[incoming]} labels={labels} />,
   );
 }
 
@@ -89,7 +84,6 @@ describe("MergeRequestList", () => {
       <MergeRequestList
         direction="incoming"
         items={[incoming, { ...outgoing, id: "merge-request-3" }]}
-        locale="uz"
         labels={labels}
       />,
     );
@@ -101,9 +95,7 @@ describe("MergeRequestList", () => {
   });
 
   it("says plainly when nothing is waiting", () => {
-    render(
-      <MergeRequestList direction="incoming" items={[]} locale="uz" labels={labels} />,
-    );
+    render(<MergeRequestList direction="incoming" items={[]} labels={labels} />);
     expect(screen.getByText(catalog.merge.empty)).toBeInTheDocument();
   });
 
@@ -116,7 +108,7 @@ describe("MergeRequestList", () => {
     await waitFor(() => expect(actions.approve).toHaveBeenCalledTimes(1));
     expect(actions.reject).not.toHaveBeenCalled();
     expect(submitted(actions.approve).get("requestId")).toBe(incoming.id);
-    expect(submitted(actions.approve).get("locale")).toBe("uz");
+    expect(submitted(actions.approve).has("locale")).toBe(false);
   });
 
   it("rejects an incoming request through the reject action alone", async () => {
@@ -133,12 +125,7 @@ describe("MergeRequestList", () => {
   it("cancels an outgoing request through the cancel action alone", async () => {
     const user = userEvent.setup();
     render(
-      <MergeRequestList
-        direction="outgoing"
-        items={[outgoing]}
-        locale="ru"
-        labels={labels}
-      />,
+      <MergeRequestList direction="outgoing" items={[outgoing]} labels={labels} />,
     );
 
     expect(screen.queryByRole("button", { name: catalog.merge.approve })).toBeNull();
@@ -189,7 +176,7 @@ describe("MergeRequestList", () => {
       .closest("form");
     expect(form).toHaveAttribute("action", "/api/auth/connect/reauthenticate");
     expect(form).toHaveAttribute("method", "post");
-    expect(form?.querySelector('input[name="locale"]')).toHaveValue("uz");
+    expect(form?.querySelector("input")).toBeNull();
   });
 
   it("keeps the buttons usable after a failure and never shows the backend's code", async () => {

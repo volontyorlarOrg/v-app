@@ -1,6 +1,8 @@
 export const PREFERENCE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
-export const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
+export const LOCALE_COOKIE_NAME = "volontyorlar_locale";
+export const LOCALE_STORAGE_KEY = "volontyorlar_locale";
+export const MARKETING_LOCALE_COOKIE_NAME = "NEXT_LOCALE";
 
 function hostname(value: string | undefined): string | null {
   const raw = value?.trim();
@@ -47,21 +49,35 @@ export const PREFERENCE_COOKIE_SECURE = CONFIGURED_ORIGINS.some(
   (origin) => origin?.trim().startsWith("https:") === true,
 );
 
-export const PREFERENCE_LOCALE_COOKIE: {
+export const LOCALE_COOKIE: {
   name: string;
   path: string;
   sameSite: "lax";
   maxAge: number;
-  domain?: string;
   secure?: boolean;
 } = {
   name: LOCALE_COOKIE_NAME,
   path: "/",
   sameSite: "lax",
   maxAge: PREFERENCE_COOKIE_MAX_AGE,
-  ...(PREFERENCE_COOKIE_DOMAIN ? { domain: PREFERENCE_COOKIE_DOMAIN } : {}),
   ...(PREFERENCE_COOKIE_SECURE ? { secure: true } : {}),
 };
+
+export const LOCALE_COOKIE_ATTRIBUTES = [
+  "path=/",
+  `max-age=${PREFERENCE_COOKIE_MAX_AGE}`,
+  "samesite=lax",
+  ...(PREFERENCE_COOKIE_SECURE ? ["secure"] : []),
+].join("; ");
+
+export function writeLocaleChoice(locale: string) {
+  try {
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  } catch {}
+  try {
+    document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; ${LOCALE_COOKIE_ATTRIBUTES}`;
+  } catch {}
+}
 
 export function preferenceCookie(name: string, value: string): string {
   const parts = [

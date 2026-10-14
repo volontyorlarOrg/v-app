@@ -68,7 +68,8 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   [`docs/operations/GOOGLE_SIGN_IN_SETUP.md`](docs/operations/GOOGLE_SIGN_IN_SETUP.md)
   is how it is set. **Email and password** are two Server Actions over
   `POST /auth/password/login` and `POST /auth/password/signup`; a new password
-  is at least 15 characters because the backend measures its strength. The
+  is at least 8 characters and the backend also refuses one that is too easy
+  to guess (`weakPassword`). The
   backend creates the account on the first sign-in. There is still no password
   reset and no email verification — the backend has neither — so nothing on
   screen offers one and `/forgot-password` is a 404. A **new** account (the
@@ -246,7 +247,8 @@ src/lib/auth/                   -> config, session cookie, refresh, sign-out act
 src/lib/api/                    -> the server-only client on openapi-fetch, the generated API types,
                                    per-domain reads, the Zod schemas, error codes, ActionResult
 src/hooks/                      -> useServerAction and useActionForm: TanStack Query and React Hook Form
-                                   around the Server Actions
+                                   around the Server Actions, and useLocaleSwitch for the
+                                   language controls
 src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
 src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
                                    applications[/id], saved and record (redirects),
@@ -284,6 +286,13 @@ docs/                           -> stable project documentation and the plan
 - Every user-facing string exists in `uz`, `ru`, and `en`. Uzbek uses the turned
   comma `ʻ` (U+02BB), Russian uses Cyrillic, and a test enforces key and ICU
   argument parity.
+- **The language is a setting, not an address.** Every page has one URL and
+  renders in the language this browser saved for the app (`localePrefix:
+"never"`): `localStorage`, mirrored to the app-only `volontyorlar_locale`
+  cookie so the server can render it. A volunteer who changes it on
+  `/settings` and goes back must stay in the language they chose, and nothing
+  the marketing site or a portal does may change it. The reason and the rules for old `/uz/…` links
+  are in `.agent-memory/decisions/the-language-is-a-cookie-not-a-path.md`.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
   the tab bar, the phone's account menu, the proxy's `guard` and the tests all
   read from it. `navGroup` says where in the sidebar a route lands —
@@ -319,9 +328,10 @@ docs/                           -> stable project documentation and the plan
   query string), no credentials in a URL — the email forms are gated by client
   validation before they submit, no tokens in browser storage; the theme, the
   interface language, and the welcome flow's progress are the only stored
-  values. The first two live in readable cookies shared with the marketing
-  site (`src/lib/preferences.ts`) rather than in `localStorage`, which cannot
-  cross the two origins; the third is an app-only readable cookie holding a
+  values. The theme lives in a readable cookie shared with the marketing site
+  (`src/lib/preferences.ts`); the interface language is the app's own,
+  `localStorage` plus the app-only `volontyorlar_locale` cookie the server
+  reads; the welcome flow's progress is an app-only readable cookie holding a
   step name and nothing else (`src/lib/onboarding/state.ts`). Session tokens live only in the encrypted
   `httpOnly` cookie and must never be passed to a Client Component.
 - Reputation is high-trust data. Every threshold lives in
@@ -348,9 +358,11 @@ docs/                           -> stable project documentation and the plan
   state, browser APIs, or an interactive primitive, with the boundary as low as
   practical. Client components receive their labels as props; the root layout
   gives `NextIntlClientProvider` `messages={null}`.
-- Internal links use `navHref()` with `Link` from `@/i18n/navigation`, which
-  adds the locale prefix itself. `localePath()` is for plain anchors outside
-  the locale tree. Mixing them yields `/uz/uz/...`.
+- Internal links use `navHref()`, with `Link` from `@/i18n/navigation` or as a
+  plain path in a redirect. No address carries a language: the interface
+  language is the app's own stored choice, changed through `useLocaleSwitch()`,
+  and `src/proxy.ts` redirects any `/uz/…`, `/ru/…` or `/en/…` address to the
+  plain one. Never build a path with a locale in it.
 - Domain logic lives under `src/lib/<domain>/` with its tests beside it and no
   JSX. Components under `src/components/<surface>/` compose it.
 - No literal hex, no hard-coded origin, no fabricated fact.

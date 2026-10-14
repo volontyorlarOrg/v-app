@@ -249,7 +249,7 @@ export async function apiMultipart<TSchema extends z.ZodType>(
   }
 
   const requestId = crypto.randomUUID();
-  const request = new Request(new URL(path, `${baseUrl}/`), {
+  const request = new Request(`${baseUrl}${path}`, {
     method: "PUT",
     headers: {
       Accept: "application/json",

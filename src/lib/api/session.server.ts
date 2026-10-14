@@ -1,6 +1,5 @@
 import "server-only";
 
-import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 
@@ -11,18 +10,13 @@ import { getSession } from "@/lib/auth/session.server";
 
 export const SESSION_EXPIRED_PATH = "/api/auth/session/expired";
 
-export function sessionExpiredHref(locale: string): string {
-  const params = new URLSearchParams({ locale });
-  return `${SESSION_EXPIRED_PATH}?${params.toString()}`;
-}
-
-async function endSession(): Promise<never> {
-  redirect(sessionExpiredHref(await getLocale()));
+function endSession(): never {
+  redirect(SESSION_EXPIRED_PATH);
 }
 
 export async function requireSession(): Promise<SessionPayload> {
   const session = await getSession();
-  if (!session) await endSession();
+  if (!session) endSession();
   return session as SessionPayload;
 }
 

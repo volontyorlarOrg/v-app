@@ -1,6 +1,8 @@
-import type { Locale } from "@/i18n/routing";
-import { isLocale } from "@/i18n/routing";
-import { USERNAME_PATTERN } from "@/lib/account/username";
+import {
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_PATTERN,
+} from "@/lib/account/username";
 
 export const RESERVED_PROFILE_SEGMENTS = new Set([
   "_next",
@@ -37,38 +39,27 @@ export function publicProfileUsername(pathname: string): string | null {
   } catch {
     return null;
   }
-  if (!USERNAME_PATTERN.test(username)) return null;
+  if (!isUsername(username)) return null;
   return RESERVED_PROFILE_SEGMENTS.has(username) ? null : username;
 }
 
+function isUsername(value: string): boolean {
+  return (
+    value.length >= USERNAME_MIN_LENGTH &&
+    value.length <= USERNAME_MAX_LENGTH &&
+    USERNAME_PATTERN.test(value)
+  );
+}
+
 export function internalProfileUsername(pathname: string): string | null {
-  const match = /^\/(?:uz|ru|en)\/profiles\/([a-z0-9_]{5,32})\/?$/.exec(pathname);
-  return match?.[1] ?? null;
+  const match = /^\/profiles\/([^/]+)\/?$/.exec(pathname);
+  return match?.[1] && isUsername(match[1]) ? match[1] : null;
 }
 
 export function memberProfileHref(username: string): string {
   return `/${encodeURIComponent(username.toLowerCase())}`;
 }
 
-export function internalMemberProfileHref(locale: Locale, username: string): string {
-  return `/${locale}/profiles/${encodeURIComponent(username.toLowerCase())}`;
-}
-
-export function preferredProfileLocale(
-  cookie: string | undefined,
-  acceptLanguage: string | null,
-): Locale {
-  if (isLocale(cookie)) return cookie;
-  const requested = (acceptLanguage ?? "")
-    .split(",")
-    .map((part) => {
-      const [tag = "", quality = "q=1"] = part.trim().split(";");
-      return {
-        locale: tag.toLowerCase().split("-")[0],
-        quality: Number(quality.replace(/^q=/, "")) || 0,
-      };
-    })
-    .sort((a, b) => b.quality - a.quality)
-    .find((item) => isLocale(item.locale))?.locale;
-  return isLocale(requested) ? requested : "uz";
+export function internalMemberProfileHref(username: string): string {
+  return `/profiles/${encodeURIComponent(username.toLowerCase())}`;
 }

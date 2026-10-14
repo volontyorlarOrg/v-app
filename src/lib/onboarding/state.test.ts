@@ -77,10 +77,10 @@ describe("onboarding state cookie", () => {
     expect(isOnboardingOpen({ status: "skipped", step: "about" })).toBe(true);
   });
 
-  it("builds the welcome path with the locale and an optional return path", () => {
-    expect(onboardingPath("uz")).toBe("/uz/welcome");
-    expect(onboardingPath("en", "/en/opportunities/book-drive")).toBe(
-      "/en/welcome?next=%2Fen%2Fopportunities%2Fbook-drive",
+  it("builds the welcome path with an optional return path", () => {
+    expect(onboardingPath()).toBe("/welcome");
+    expect(onboardingPath("/opportunities/book-drive")).toBe(
+      "/welcome?next=%2Fopportunities%2Fbook-drive",
     );
   });
 

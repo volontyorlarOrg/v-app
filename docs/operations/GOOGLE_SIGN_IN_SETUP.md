@@ -19,7 +19,7 @@ Google -> POST /api/auth/google/callback            id_token + state
   -> POST v-backend /auth/google/complete           { state, credential }
   -> v-backend verifies the signature against Google's published keys, the
      issuer, the audience and its own stored nonce, then issues a session
-  -> 303 /{locale}/dashboard with the encrypted session cookie
+  -> 303 /dashboard with the encrypted session cookie
 ```
 
 Two consequences worth knowing before you start:
@@ -131,11 +131,11 @@ extra configuration.
 ## 4. Check it
 
 1. `npm run dev` in `v-app`, `npm run start:dev` in `v-backend`.
-2. Open `http://localhost:3001/uz/login`. The Google button appears only when
+2. Open `http://localhost:3001/login`. The Google button appears only when
    the client id is set; if it is missing, that variable is the reason.
 3. Press it. Google asks which account to use (`prompt=select_account`, so it
    asks every time rather than silently reusing the last one).
-4. You land on the dashboard. `/uz/login?google=…` instead means the flow was
+4. You land on the dashboard. `/login?google=…` instead means the flow was
    refused, and the words on the page say which of the five reasons it was:
    `cancelled`, `expired`, `disabled`, `tooMany`, or `unavailable`.
 

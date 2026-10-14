@@ -27,7 +27,7 @@ import {
 import { canApply } from "@/lib/opportunities/deadline";
 import { isRegion, type ApplicationQuestion } from "@/lib/opportunities/types";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
-import { localePath, navHref, opportunityHref } from "@/lib/routing/routes";
+import { navHref, opportunityHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -275,7 +275,7 @@ function Application({
                 essay={application.essay ?? ""}
                 questions={fields}
                 answers={answers}
-                labels={answersLabels(t, localePath(locale, "profileEdit"))}
+                labels={answersLabels(t, navHref("profileEdit"))}
               />
             </Panel>
           ) : sendable ? (
@@ -287,7 +287,7 @@ function Application({
                 questions={fields}
                 answers={answers}
                 labels={{
-                  ...answersLabels(t, localePath(locale, "profileEdit")),
+                  ...answersLabels(t, navHref("profileEdit")),
                   ...(essayPrompt ? { essayLabel: essayPrompt } : {}),
                 }}
               />

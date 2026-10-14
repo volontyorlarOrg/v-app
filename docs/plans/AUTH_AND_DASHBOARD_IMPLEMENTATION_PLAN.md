@@ -71,7 +71,7 @@ sequenceDiagram
   API->>API: require phone_number; bind TelegramIdentity, write verified phone to the profile
   API-->>A: { accessToken, refreshToken, accessTokenExpiresAt, userId, displayName?, roles }
   A->>A: encrypt session cookie (httpOnly, secure, lax); delete the handoff cookies
-  A-->>B: 303 /{locale}/dashboard (or safe `next`)
+  A-->>B: 303 /dashboard (or safe `next`)
 ```
 
 The property that must survive any redesign: **a callback signs in only the
@@ -100,7 +100,7 @@ sequenceDiagram
   G-->>API: id_token, access_token
   API->>API: verify id_token (iss, aud, exp, nonce, email_verified), upsert GoogleIdentity + User
   API-->>A: { accessToken, refreshToken, expiresIn, user }
-  A-->>B: session cookie + 302 /{locale}/dashboard
+  A-->>B: session cookie + 302 /dashboard
 ```
 
 Decisions this needs:
@@ -361,11 +361,10 @@ Setup is [`../operations/GOOGLE_SIGN_IN_SETUP.md`](../operations/GOOGLE_SIGN_IN_
    and never poll.
 3. `TELEGRAM_OIDC_REDIRECT_URI` in `v-backend` points at
    `/api/auth/telegram/callback` **without** a locale in the path, because it
-   must equal the URL registered in BotFather. The locale travels in the
-   `volontyorlar_auth_locale` cookie set by the start route, and the default
-   locale is the fallback; the callback happens in the same browser, so the
-   cookie is there.
-4. An unknown, expired or reused state redirects to `/{locale}/login?telegram=expired`
+   must equal the URL registered in BotFather. No address in the app carries a
+   language any more: the callback returns to `/login` or `/dashboard`, and the
+   page renders in the language the `NEXT_LOCALE` cookie names.
+4. An unknown, expired or reused state redirects to `/login?telegram=expired`
    with translated copy. The starting tab never receives a session; only the
    browser that opens the one-time link does.
 
@@ -381,12 +380,12 @@ account approves after a fresh sign-in, and the requesting account survives.
    the preferences.
 2. Connecting from a signed-in session is the same two-hop handoff as sign-in
    over `/api/auth/connect/*`, on `volontyorlar_connect_*` cookies of their own,
-   returning to `/{locale}/settings?connect=<status>`.
+   returning to `/settings?connect=<status>`.
 3. Verifying an email connection reuses the sign-in credentials schema; there is
    no new password, no email delivery and no verification here.
 4. Approval writes the canonical session the backend returns into the existing
    encrypted cookie; `recentAuthenticationRequired` routes through
-   `/api/auth/connect/reauthenticate` and back to `/{locale}/settings`.
+   `/api/auth/connect/reauthenticate` and back to `/settings`.
 5. Unlinking, unmerging, deletion and data export still wait for the retention
    policy the backend lists as an open decision.
 

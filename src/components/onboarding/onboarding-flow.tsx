@@ -11,7 +11,6 @@ import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
 import { UsernameStepForm } from "@/components/onboarding/username-step-form";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import type { UsernameIdentity } from "@/lib/account/username";
 import { writeOnboardingStateToClient } from "@/lib/onboarding/state";
 import {
@@ -34,7 +33,7 @@ import {
   type VolunteerProfile,
 } from "@/lib/profile/completion";
 import type { LanguageOption } from "@/lib/profile/languages";
-import { localePath, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
 function fill(template: string, values: Record<string, string | number>): string {
@@ -48,7 +47,6 @@ function usernameGate(step: OnboardingStep): OnboardingStep {
 }
 
 export function OnboardingFlow({
-  locale,
   title,
   lead,
   initialStep,
@@ -62,7 +60,6 @@ export function OnboardingFlow({
   labels,
   completionFields,
 }: {
-  locale: Locale;
   title: string;
   lead: string;
   initialStep: OnboardingStep;
@@ -98,8 +95,8 @@ export function OnboardingFlow({
     headingRef.current?.focus();
   }, [step]);
 
-  const exitHref = next ?? localePath(locale, "dashboard");
-  const ctaHref = next ?? localePath(locale, "opportunities");
+  const exitHref = next ?? navHref("dashboard");
+  const ctaHref = next ?? navHref("opportunities");
 
   function go(to: OnboardingStep, dir: StepDirection) {
     setDirection(dir);
@@ -194,7 +191,6 @@ export function OnboardingFlow({
             <>
               <StepLead>{labels.steps.username.lead}</StepLead>
               <UsernameStepForm
-                locale={locale}
                 identity={username}
                 addressPrefix={addressPrefix}
                 labels={labels}

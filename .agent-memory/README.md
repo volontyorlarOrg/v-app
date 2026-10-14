@@ -36,6 +36,10 @@ folder. Never store secrets or unverified external claims.
   protects, and why the phone number is required
 - `decisions/planned-sections-render-instead-of-404.md` — why the app became
   a real panel with every section on mock data, and what stayed from `v-web`
+- `decisions/the-language-is-a-cookie-not-a-path.md` — why no address carries
+  a language any more, why the language is kept in `localStorage` with an
+  app-only cookie instead of the cookie shared with the marketing site, and
+  why an old `/uz/…` link never overrides a chosen language
 - `decisions/error-codes-not-messages.md` — errors are codes the catalog
   translates, never sentences from a server
 - `decisions/no-comments-in-source.md` — where the explanations went

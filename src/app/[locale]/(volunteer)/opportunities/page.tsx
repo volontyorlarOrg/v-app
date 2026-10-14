@@ -1,4 +1,4 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Archive, ArrowDownWideNarrow, CalendarClock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
@@ -16,7 +16,6 @@ import { OpportunityFilters } from "@/components/opportunities/opportunity-filte
 import { PastOpportunitiesArchive } from "@/components/opportunities/past-opportunities-archive";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import { listApplications } from "@/lib/api/applications.server";
 import { dataOf, settle, type Loaded } from "@/lib/api/load.server";
 import { listOpportunities } from "@/lib/api/opportunities.server";
@@ -43,7 +42,7 @@ import {
   REGIONS,
   type OpportunitySummary,
 } from "@/lib/opportunities/types";
-import { localePath, navHref } from "@/lib/routing/routes";
+import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -160,7 +159,6 @@ function Opportunities({
   errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("opportunities");
-  const locale = useLocale() as Locale;
 
   const activeCount = activeFilterCount(filters);
   const showArchive = view === "all" && activeCount === 0 && filters.kind === null;
@@ -186,7 +184,7 @@ function Opportunities({
 
       <div className="enter-rise mt-6 [--enter-delay:90ms]">
         <OpportunityFilters
-          action={localePath(locale, "opportunities")}
+          action={navHref("opportunities")}
           labels={{
             legend: t("filters.legend"),
             search: t("filters.search"),

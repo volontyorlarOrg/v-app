@@ -1,11 +1,10 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useLocale } from "next-intl";
 
 import { ThemeToggle } from "@/components/app/theme-toggle";
-import { Link, usePathname } from "@/i18n/navigation";
-import { localeNames, locales, type Locale } from "@/i18n/routing";
+import { useLocaleSwitch } from "@/hooks/use-locale-switch";
+import { localeNames, locales } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
 export type AppearanceLabels = {
@@ -16,8 +15,7 @@ export type AppearanceLabels = {
 };
 
 export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
-  const active = useLocale() as Locale;
-  const pathname = usePathname();
+  const { active, pending, choose } = useLocaleSwitch();
 
   return (
     <div className="flex flex-col gap-6">
@@ -35,14 +33,14 @@ export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
             const isActive = locale === active;
             return (
               <li key={locale}>
-                <Link
-                  href={pathname}
-                  locale={locale}
-                  hrefLang={locale}
+                <button
+                  type="button"
                   lang={locale}
-                  aria-current={isActive ? "page" : undefined}
+                  aria-pressed={isActive}
+                  disabled={pending}
+                  onClick={() => choose(locale)}
                   className={cn(
-                    "flex min-h-11 items-center justify-between gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors",
+                    "flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors disabled:opacity-70",
                     isActive
                       ? "border-action bg-action text-knockout"
                       : "border-border text-ink hover:border-primary hover:text-primary-ink",
@@ -59,7 +57,7 @@ export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
                       {locale}
                     </span>
                   )}
-                </Link>
+                </button>
               </li>
             );
           })}

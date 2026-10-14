@@ -1,11 +1,10 @@
-import type { Locale } from "@/i18n/routing";
 import type { UsernameSource } from "@/lib/account/username";
 import {
   isOnboardingStep,
   stepIndex,
   type OnboardingStep,
 } from "@/lib/onboarding/steps";
-import { localePath } from "@/lib/routing/routes";
+import { ONBOARDING_ROUTE, navHref } from "@/lib/routing/routes";
 
 export const ONBOARDING_COOKIE_NAME = "volontyorlar_onboarding";
 export const ONBOARDING_STORAGE_KEY = "volontyorlar_onboarding";
@@ -57,8 +56,8 @@ export function isOnboardingOpen(state: OnboardingState | null): boolean {
   return state !== null && state.status !== "done";
 }
 
-export function onboardingPath(locale: Locale, next: string | null = null): string {
-  const path = localePath(locale, "welcome");
+export function onboardingPath(next: string | null = null): string {
+  const path = navHref(ONBOARDING_ROUTE);
   return next ? `${path}?next=${encodeURIComponent(next)}` : path;
 }
 
