@@ -5,8 +5,10 @@ the redesigned dashboard and its "Volunteer levels" dialog. The backend half
 is
 [`../../../v-backend/docs/plans/VOLUNTEER_LEVELS_IMPLEMENTATION_PLAN.md`](../../../v-backend/docs/plans/VOLUNTEER_LEVELS_IMPLEMENTATION_PLAN.md)
 (branch `feat/volunteer-levels` in `v-backend`), and the contract below is
-copied from it. This app is built against that contract before the backend
-exists; the e2e stub implements it.
+copied from it. This app was built against that contract before the backend
+existed, and the e2e stub implements it. The backend implemented it the same
+day; real responses from it parse here, and the dashboard was checked live
+against it on the development database.
 
 ## What the mocks ask for
 

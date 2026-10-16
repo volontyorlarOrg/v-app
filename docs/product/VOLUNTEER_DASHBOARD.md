@@ -83,14 +83,14 @@ data so the panel can be judged as a product:
 
 ## Where the data comes from
 
-| Block                 | Read                                                                 | Status in `v-backend`                             |
-| --------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
-| Hero, levels, figures | `GET /record/progress`                                               | Planned on `feat/volunteer-levels` (backend plan) |
-| Recent participation  | `GET /record/history` (+ `applicationId`, `imageUrl`, `eventEndsAt`) | Implemented; the three fields are planned         |
-| Next up               | `GET /applications` (with opportunity summaries)                     | Implemented                                       |
-| Pass                  | `GET /me`, `GET /profile`                                            | Implemented                                       |
-| Tasks                 | `GET /checkpoints`                                                   | Implemented                                       |
-| Profile figures       | `GET /record` (counts, hours)                                        | Implemented                                       |
+| Block                 | Read                                                                 | Status in `v-backend`                                         |
+| --------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Hero, levels, figures | `GET /record/progress`                                               | Implemented on `feat/volunteer-levels`                        |
+| Recent participation  | `GET /record/history` (+ `applicationId`, `imageUrl`, `eventEndsAt`) | Implemented, with the three fields on `feat/volunteer-levels` |
+| Next up               | `GET /applications` (with opportunity summaries)                     | Implemented                                                   |
+| Pass                  | `GET /me`, `GET /profile`                                            | Implemented                                                   |
+| Tasks                 | `GET /checkpoints`                                                   | Implemented                                                   |
+| Profile figures       | `GET /record` (counts, hours)                                        | Implemented                                                   |
 
 ## Open decisions
 
