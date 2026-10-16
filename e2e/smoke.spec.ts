@@ -193,9 +193,16 @@ test.describe("welcome flow", () => {
     await expect(
       start.getByRole("link", { name: "Browse opportunities" }),
     ).toHaveAttribute("href", "/opportunities");
-    for (const name of ["Next up", "Your applications", "Participation history"]) {
+    for (const name of ["Next up", "Recent participation"]) {
       await expect(page.getByRole("heading", { level: 2, name })).toHaveCount(0);
     }
+    const hero = page.getByRole("region", { name: /^Hi/ });
+    await expect(hero.getByText("Newcomer", { exact: true }).first()).toBeVisible();
+    await expect(hero.getByText("Next: Volunteer")).toBeVisible();
+    await expect(hero.getByText("10 verified hours to go")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /^0 h Verified volunteer hours/ }),
+    ).toHaveAttribute("href", "/record");
   });
 
   test("saves every step to the profile and ends on the first opportunity", async ({
@@ -851,18 +858,87 @@ test.describe("the panel", () => {
     await signIn(page);
   });
 
-  test("shows the three dashboard decisions on the volunteer's own data", async ({
+  test("leads with the volunteer's level, the next step and the hours it needs", async ({
     page,
   }) => {
-    for (const name of ["Next up", "Your applications", "Your progress"]) {
-      await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
-    }
+    const hero = page.getByRole("region", { name: "Hi, Dilnoza." });
+    await expect(hero.getByRole("heading", { level: 1 })).toHaveText("Hi, Dilnoza.");
+    await expect(hero.getByText("Volunteer", { exact: true }).first()).toBeVisible();
+    await expect(hero.getByText("Next: Supervisor")).toBeVisible();
+    await expect(hero.getByText("28 verified hours to go")).toBeVisible();
+    const meter = hero.getByRole("progressbar", { name: "Progress to Supervisor" });
+    await expect(meter).toHaveAttribute("aria-valuenow", "12");
+    await expect(meter).toHaveAttribute("aria-valuemax", "40");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your applications" }),
+    ).toHaveCount(0);
+  });
+
+  test("links each figure to where it comes from, the rank to the volunteer's own row", async ({
+    page,
+  }) => {
+    const figures = page.getByRole("region", { name: "Your progress in numbers" });
+    await expect(
+      figures.getByRole("link", { name: /^22 h Verified volunteer hours/ }),
+    ).toHaveAttribute("href", "/record");
+    await expect(figures.getByRole("link", { name: /^320 XP/ })).toHaveAttribute(
+      "href",
+      "/leaderboard",
+    );
+    await expect(
+      figures.getByRole("link", { name: /^#30 Overall XP rank/ }),
+    ).toHaveAttribute("href", "/leaderboard?page=2#you");
+  });
+
+  test("shows recent participation that has ended, while the event ahead stays in Next up", async ({
+    page,
+  }) => {
     await expect(
       page.getByRole("link", { name: "Riverbank clean-up" }).first(),
     ).toBeVisible();
+    const recent = page.getByRole("table", { name: "Recent participation" });
+    const rows = recent.getByRole("rowgroup").nth(1).getByRole("row");
+    await expect(rows).toHaveCount(4);
+    await expect(rows.first()).toContainText("Read-aloud day");
+    await expect(rows.first()).toContainText("Awaiting verification");
+    await expect(rows.first()).toContainText("Pending");
+    await expect(recent.getByText("Riverbank clean-up")).toHaveCount(0);
+    await expect(rows.nth(1)).toContainText("Verified");
+    await expect(rows.nth(1)).toContainText("Volunteering");
+    await expect(rows.nth(1)).toContainText("+40");
+    await expect(rows.nth(2)).toContainText("Contributor");
+    await expect(rows.nth(2)).toContainText("+30");
+    await recent
+      .getByRole("link", { name: "Open Winter clothing sorting day" })
+      .click();
+    await expect(page).toHaveURL(/\/applications\/app-book-drive$/);
+  });
+
+  test("opens the levels with the volunteer's place on the ladder and closes again", async ({
+    page,
+  }) => {
+    const open = page.getByRole("button", { name: "View levels" });
+    await open.click();
+    const dialog = page.getByRole("dialog", { name: "Volunteer levels" });
+    await expect(dialog).toBeVisible();
+    const steps = dialog.getByRole("list", {
+      name: "Levels and the hours each one starts at",
+    });
+    await expect(steps.getByRole("listitem")).toHaveCount(5);
+    await expect(steps.getByRole("listitem").nth(0)).toContainText("Reached");
+    const current = steps.locator("[aria-current='step']");
+    await expect(current).toContainText("Volunteer");
+    await expect(current).toContainText("Starts at 10 h");
+    await expect(current).toContainText("Current level");
+    await expect(steps.getByRole("listitem").nth(2)).toContainText("28 h to go");
+    await expect(steps.getByRole("listitem").nth(4)).toContainText("Starts at 250 h");
+    await expect(dialog.getByText("Next: Supervisor")).toBeVisible();
     await expect(
-      page.getByRole("progressbar", { name: "Profile completeness" }),
-    ).toHaveAttribute("aria-valuenow", "88");
+      dialog.getByText("Organisation roles are assigned separately.", { exact: false }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(open).toBeFocused();
   });
 
   test("reaches every section from the shell, with an h1 on each", async ({ page }) => {
@@ -898,6 +974,26 @@ test.describe("the panel", () => {
       "page",
     );
     await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
+
+    if (mobile) {
+      await gotoReady(page, "/record");
+    } else {
+      await navigation.getByRole("link", { name: "My activity" }).click();
+    }
+    await expect(page).toHaveURL(/\/record$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "My activity" }),
+    ).toBeVisible();
+    if (mobile) {
+      await expect(navigation.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    } else {
+      await expect(
+        navigation.getByRole("link", { name: "My activity" }),
+      ).toHaveAttribute("aria-current", "page");
+    }
 
     await navigation.getByRole("link", { name: "Leaderboard" }).click();
     await expect(page).toHaveURL(/\/leaderboard$/);
@@ -1057,12 +1153,33 @@ test.describe("the panel", () => {
     ).toBeVisible();
   });
 
-  test("the old record URL lands on the dashboard's history", async ({ page }) => {
-    await gotoReady(page, "/record");
-    await expect(page).toHaveURL(/\/dashboard#history$/);
+  test("My activity holds every event, the upcoming one and the awaiting rule included", async ({
+    page,
+  }) => {
+    await page
+      .getByRole("region", { name: "Recent participation" })
+      .getByRole("link", { name: "View all" })
+      .click();
+    await expect(page).toHaveURL(/\/record$/);
+    const table = page.getByRole("table", { name: "My activity" });
+    const rows = table.getByRole("rowgroup").nth(1).getByRole("row");
+    await expect(rows).toHaveCount(6);
+    await expect(rows.first()).toContainText("Riverbank clean-up");
+    await expect(rows.first()).toContainText("Upcoming");
+    await expect(rows.last()).toContainText("Neighborhood reading day");
+    await expect(rows.last()).toContainText("History only");
     await expect(
-      page.getByRole("heading", { level: 2, name: "Participation history" }),
+      page.getByText("Events waiting for verification never count against you."),
     ).toBeVisible();
+  });
+
+  test("a level reached arrives in the bell in the volunteer's language", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: /^Notifications/ }).click();
+    const reached = page.getByRole("link", { name: /^New level: Volunteer/ });
+    await expect(reached).toHaveAttribute("href", "/dashboard");
+    await expect(reached).toContainText("You have 10 verified volunteer hours.");
   });
 
   test("the sidebar carries notifications, the identity card as the profile link and settings, with no sign out; the phone header its menu", async ({
@@ -1079,7 +1196,7 @@ test.describe("the panel", () => {
     const sidebar = page.getByRole("complementary");
     await expect(
       page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-    ).toHaveCount(4);
+    ).toHaveCount(5);
     await expect(page.getByRole("banner")).toHaveCount(0);
     await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
 
@@ -1111,7 +1228,7 @@ test.describe("the panel", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /^Attendance confirmed/ }),
-    ).toHaveAttribute("href", "/dashboard#history");
+    ).toHaveAttribute("href", "/record");
     await expect(page.getByText(/status is now/)).toHaveCount(0);
     await expect(page.getByText("An account asked to join yours")).toBeVisible();
     await expect(
@@ -1223,6 +1340,7 @@ test.describe("the panel", () => {
   test("nothing overflows horizontally", async ({ page }) => {
     for (const path of [
       "/dashboard",
+      "/record",
       "/opportunities",
       "/leaderboard",
       "/profile",
@@ -1660,14 +1778,17 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveCount(0);
   });
 
-  test("the dashboard shows the history table with the awaiting-confirmation rule", async ({
+  test("the old record URL is My activity, with every outcome and the awaiting rule", async ({
     page,
   }) => {
-    await gotoReady(page, "/dashboard");
-    await expect(page.getByRole("table")).toBeVisible();
+    await gotoReady(page, "/record");
+    await expect(page).toHaveURL(/\/record$/);
+    await expect(page.getByRole("table", { name: "My activity" })).toBeVisible();
     await expect(page.getByText("Photo archive digitisation")).toBeVisible();
     await expect(page.getByText("Neighborhood reading day")).toBeVisible();
-    await expect(page.getByText("They never count against you.").first()).toBeVisible();
+    await expect(
+      page.getByText("Events waiting for verification never count against you."),
+    ).toBeVisible();
   });
 
   test("the profile opens on the volunteer's own record and hands editing to its own page", async ({
@@ -1709,8 +1830,9 @@ test.describe("applications, record, profile and settings", () => {
   }) => {
     await gotoReady(page, "/profile");
     const activity = page.getByRole("region", { name: "My activity" });
-    await expect(activity.getByRole("listitem")).toHaveCount(3);
+    await expect(activity.getByRole("listitem")).toHaveCount(4);
     await expect(activity.getByText("Winter clothing sorting day")).toBeVisible();
+    await expect(activity.getByText("Youth Ideas Competition")).toBeVisible();
     await expect(activity.getByText("Neighborhood reading day")).toBeVisible();
     await expect(activity.getByText("Read-aloud day")).toHaveCount(0);
     await expect(

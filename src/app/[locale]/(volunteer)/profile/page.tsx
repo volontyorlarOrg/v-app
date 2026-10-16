@@ -26,7 +26,7 @@ import { getMe } from "@/lib/api/account.server";
 import { settle, type LoadFailure, type Loaded } from "@/lib/api/load.server";
 import type { History } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
-import { getHistory, getRecord } from "@/lib/api/record.server";
+import { getHistory, getProgress, getRecord } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import type { Locale } from "@/i18n/routing";
 import {
@@ -48,6 +48,7 @@ import {
   hasParticipation,
   isReliabilityMeaningful,
   reliabilityPercent,
+  type Level,
   type VolunteerRecord,
 } from "@/lib/record/levels";
 import { navHref } from "@/lib/routing/routes";
@@ -67,14 +68,16 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, me, volunteerRecord, history, common] = await Promise.all([
-    requireSession(),
-    settle(() => getProfile()),
-    getMe(),
-    getRecord(),
-    settle(() => getHistory()),
-    getTranslations({ locale, namespace: "common" }),
-  ]);
+  const [session, profile, me, volunteerRecord, progress, history, common] =
+    await Promise.all([
+      requireSession(),
+      settle(() => getProfile()),
+      getMe(),
+      getRecord(),
+      settle(() => getProgress()),
+      settle(() => getHistory()),
+      getTranslations({ locale, namespace: "common" }),
+    ]);
 
   if (profile.status === "failed") {
     return (
@@ -91,6 +94,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
     <Profile
       values={values}
       record={volunteerRecord}
+      level={progress.status === "loaded" ? progress.data.level : null}
       handle={me.username}
       avatarUrl={me.avatarUrl}
       publicPage={publicPage(me.username, me.publicProfileEnabled)}
@@ -130,6 +134,7 @@ function ProfileUnavailable({
 function Profile({
   values,
   record,
+  level,
   handle,
   avatarUrl,
   publicPage,
@@ -140,6 +145,7 @@ function Profile({
 }: {
   values: VolunteerProfile;
   record: VolunteerRecord;
+  level: Level | null;
   handle: string | null;
   avatarUrl?: string;
   publicPage: PublicPage;
@@ -274,7 +280,7 @@ function Profile({
       initials={initialsOf(name)}
       avatarUrl={avatarUrl}
       handle={handle}
-      level={recordLabels(`level.${record.level}`)}
+      level={level ? recordLabels(`level.${level}`) : null}
       bio={values.bio.trim()}
       socials={socials}
       figures={figures}

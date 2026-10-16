@@ -565,31 +565,71 @@ function freshState() {
     },
     history: [
       {
+        id: "h-riverbank",
+        source: "attendance",
+        opportunityTitle: "Riverbank clean-up",
+        organization: "Green Tashkent Initiative",
+        eventDate: at(10, 8),
+        eventEndsAt: at(10, 12),
+        outcome: "awaiting_confirmation",
+        kind: "volunteering",
+        applicationId: "app-riverbank",
+        imageUrl: null,
+      },
+      {
         id: "h-read-aloud",
+        source: "attendance",
         opportunityTitle: "Read-aloud day",
         organization: "Chilonzor Reading Corners",
         eventDate: at(-1, 9),
+        eventEndsAt: at(-1, 12),
         outcome: "awaiting_confirmation",
         kind: "volunteering",
         hours: undefined,
+        applicationId: null,
+        imageUrl: null,
       },
       {
         id: "h-sorting",
+        source: "attendance",
         opportunityTitle: "Winter clothing sorting day",
         organization: "Volunteer Support Desk",
         eventDate: at(-12, 9),
+        eventEndsAt: at(-12, 13),
         outcome: "attended",
         kind: "volunteering",
         hours: 4,
+        xpAwarded: 40,
+        applicationId: "app-book-drive",
+        imageUrl: "/logo/social/og-image-1200x630.png",
+      },
+      {
+        id: "h-ideas",
+        source: "attendance",
+        opportunityTitle: "Youth Ideas Competition",
+        organization: "Volunteer Support Desk",
+        eventDate: at(-16, 10),
+        eventEndsAt: at(-16, 17),
+        outcome: "attended",
+        kind: "competition",
+        placement: "contributor",
+        xpAwarded: 30,
+        applicationId: null,
+        imageUrl: null,
       },
       {
         id: "h-archive",
+        source: "attendance",
         opportunityTitle: "Photo archive digitisation",
         organization: "Chilonzor Reading Corners",
         eventDate: at(-20, 9),
+        eventEndsAt: at(-20, 15),
         outcome: "attended",
         kind: "volunteering",
         hours: 6,
+        xpAwarded: 60,
+        applicationId: null,
+        imageUrl: null,
       },
       {
         id: "h-past-reading",
@@ -597,11 +637,14 @@ function freshState() {
         opportunityTitle: "Neighborhood reading day",
         organization: "Chilonzor Reading Corners",
         eventDate: at(-45, 9),
+        eventEndsAt: null,
         outcome: "attended",
         kind: "volunteering",
         hours: 2,
         xpAwarded: 0,
         countsTowardProgress: false,
+        applicationId: null,
+        imageUrl: null,
       },
     ],
     notifications: [
@@ -648,6 +691,20 @@ function freshState() {
         data: null,
         readAt: at(-1, 20),
         createdAt: at(-1, 19),
+      },
+      {
+        id: "n-level",
+        kind: "level.reached",
+        title: "New level reached",
+        body: "You reached the Volunteer level with 10 verified volunteer hours.",
+        data: {
+          userId: "user-dilnoza",
+          level: "volunteer",
+          minHours: 10,
+          verifiedHours: 10,
+        },
+        readAt: at(-12, 18),
+        createdAt: at(-12, 17),
       },
       {
         id: "n-checkpoints",
@@ -918,6 +975,42 @@ const leaderboardRoster = Array.from({ length: 29 }, (_, index) => ({
 }));
 
 const VIEWER_XP = 320;
+
+const LEVEL_LADDER = [
+  { key: "newcomer", minHours: 0 },
+  { key: "volunteer", minHours: 10 },
+  { key: "supervisor", minHours: 50 },
+  { key: "coordinator", minHours: 100 },
+  { key: "leader", minHours: 250 },
+];
+
+function levelOfHours(hours) {
+  return LEVEL_LADDER.filter((step) => step.minHours <= hours).at(-1).key;
+}
+
+function progressOf(state) {
+  const verifiedHours = Math.max(0, state.record.hours ?? 0);
+  const index = LEVEL_LADDER.findIndex(
+    (step) => step.key === levelOfHours(verifiedHours),
+  );
+  const next = LEVEL_LADDER[index + 1] ?? null;
+  const viewer = GENERATED_USERNAME.test(state.account.username)
+    ? null
+    : leaderboard(state, new URLSearchParams()).viewer;
+  return {
+    verifiedHours,
+    xp: viewer?.xp ?? 0,
+    rank: viewer?.rank ?? null,
+    level: LEVEL_LADDER[index].key,
+    nextLevel: next
+      ? {
+          ...next,
+          hoursToGo: Math.round((next.minHours - verifiedHours) * 100) / 100,
+        }
+      : null,
+    levels: LEVEL_LADDER,
+  };
+}
 const VOLUNTEERS_WITHOUT_HANDLE = 12;
 const GENERATED_USERNAME = /^user_[0-9a-f]{20}$/;
 
@@ -1251,7 +1344,7 @@ const server = createServer(async (request, response) => {
         [],
       ),
       joinedAt: shown("joined", state.user.createdAt, null),
-      level: isViewer ? state.record.level : "active",
+      level: isViewer ? progressOf(state).level : "volunteer",
       xp: isViewer ? VIEWER_XP : rosterEntry.xp,
       stats: {
         attendedEvents: isViewer ? state.record.counts.attended : 5,
@@ -1472,6 +1565,8 @@ const server = createServer(async (request, response) => {
     return send(response, 200, state.profile);
   }
   if (path === "/record" && method === "GET") return send(response, 200, state.record);
+  if (path === "/record/progress" && method === "GET")
+    return send(response, 200, progressOf(state));
   if (
     path.startsWith("/checkpoints/") &&
     path.endsWith("/claim") &&

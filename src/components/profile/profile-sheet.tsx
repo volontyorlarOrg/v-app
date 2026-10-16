@@ -58,7 +58,7 @@ export function ProfileSheet({
   initials: string;
   avatarUrl?: string;
   handle: string | null;
-  level: string;
+  level: string | null;
   bio: string;
   socials: readonly ProfileSocialLink[];
   figures: readonly ProfileFigure[];
@@ -136,7 +136,7 @@ export function ProfileSheet({
               @{handle}
             </span>
           ) : null}
-          <Badge variant="achievement">{level}</Badge>
+          {level ? <Badge variant="achievement">{level}</Badge> : null}
         </p>
 
         {bio || socials.length > 0 ? (

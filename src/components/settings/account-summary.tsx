@@ -17,7 +17,7 @@ export type AccountSummaryLabels = {
   title: string;
   signsInWith: string;
   nothingConnected: string;
-  level: string;
+  level: string | null;
 };
 
 export function AccountSummary({
@@ -67,9 +67,11 @@ export function AccountSummary({
                 </>
               ) : null}
             </p>
-            <p className="mt-1">
-              <Badge variant="achievement">{labels.level}</Badge>
-            </p>
+            {labels.level ? (
+              <p className="mt-1">
+                <Badge variant="achievement">{labels.level}</Badge>
+              </p>
+            ) : null}
           </div>
         </div>
 
