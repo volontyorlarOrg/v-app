@@ -17,6 +17,7 @@ import {
   opportunityDetailSchema,
   opportunityListSchema,
   profileSchema,
+  progressSchema,
   publicProfileSchema,
   recordSchema,
   savedListSchema,
@@ -191,10 +192,11 @@ describe("account schemas", () => {
       linkedin: "https://www.linkedin.com/in/dilnoza-k",
       links: ["https://portfolio.example/dilnoza"],
       joinedAt: "2026-09-01T10:00:00.000Z",
-      level: "active",
+      level: "volunteer",
       xp: 240,
       stats: { attendedEvents: 5, confirmedHours: 18 },
     });
+    expect(parsed.level).toBe("volunteer");
     expect(parsed.phone).toBe("+998901234567");
     expect(parsed.instagram).toBe("dilnoza.codes");
     expect(parsed.links).toEqual(["https://portfolio.example/dilnoza"]);
@@ -249,6 +251,51 @@ describe("record and notification schemas", () => {
       }).items[0]?.outcome,
     ).toBe("attended");
     expect(savedListSchema.parse({ items: [summary], total: 1 }).items).toHaveLength(1);
+  });
+
+  it("reads the history's application, photo and end, and their absence on a past event", () => {
+    const [attended, manual] = historySchema.parse({
+      items: [
+        {
+          id: "h1",
+          source: "attendance",
+          opportunityTitle: "Book Donation Drive",
+          kind: "volunteering",
+          organization: "Reading Corners",
+          eventDate: "2026-09-28T05:00:00.000Z",
+          eventEndsAt: "2026-09-28T09:00:00.000Z",
+          outcome: "attended",
+          hours: 4,
+          xpAwarded: 40,
+          applicationId: "app-1",
+          imageUrl: "https://cdn.example/books.jpg",
+        },
+        {
+          id: "h2",
+          source: "manual",
+          opportunityTitle: "Neighborhood reading day",
+          kind: "volunteering",
+          organization: "Reading Corners",
+          eventDate: "2026-08-01T00:00:00.000Z",
+          eventEndsAt: null,
+          outcome: "attended",
+          hours: 2,
+          xpAwarded: 0,
+          countsTowardProgress: false,
+          applicationId: null,
+          imageUrl: null,
+        },
+      ],
+      total: 2,
+    }).items;
+    expect(attended).toMatchObject({
+      applicationId: "app-1",
+      imageUrl: "https://cdn.example/books.jpg",
+      eventEndsAt: "2026-09-28T09:00:00.000Z",
+    });
+    expect(manual?.applicationId).toBeUndefined();
+    expect(manual?.imageUrl).toBeUndefined();
+    expect(manual?.eventEndsAt).toBeUndefined();
   });
 
   it("turns the backend's readAt into an unread flag", () => {
@@ -719,5 +766,63 @@ describe("checkpoints", () => {
     const withoutTotal: Record<string, unknown> = { ...list };
     delete withoutTotal.total;
     expect(checkpointListSchema.safeParse(withoutTotal).success).toBe(false);
+  });
+});
+
+describe("the volunteer's progress", () => {
+  const ladder = [
+    { key: "newcomer", minHours: 0 },
+    { key: "volunteer", minHours: 10 },
+    { key: "supervisor", minHours: 50 },
+    { key: "coordinator", minHours: 100 },
+    { key: "leader", minHours: 250 },
+  ];
+  const progress = {
+    verifiedHours: 12,
+    xp: 170,
+    rank: 42,
+    level: "volunteer",
+    nextLevel: { key: "supervisor", minHours: 50, hoursToGo: 38 },
+    levels: ladder,
+  };
+
+  it("reads hours, XP, rank, the level and the ladder exactly as served", () => {
+    expect(progressSchema.parse(progress)).toEqual(progress);
+  });
+
+  it("reads a volunteer the leaderboard does not rank and one on the top step", () => {
+    expect(progressSchema.parse({ ...progress, rank: null }).rank).toBeNull();
+    expect(
+      progressSchema.parse({
+        ...progress,
+        verifiedHours: 312.5,
+        level: "leader",
+        nextLevel: null,
+      }).nextLevel,
+    ).toBeNull();
+  });
+
+  it("refuses a level this build cannot name", () => {
+    expect(() => progressSchema.parse({ ...progress, level: "active" })).toThrow();
+    expect(() =>
+      progressSchema.parse({
+        ...progress,
+        levels: [...ladder, { key: "legend", minHours: 500 }],
+      }),
+    ).toThrow();
+  });
+
+  it("refuses a ladder or a next level that cannot be true", () => {
+    expect(() =>
+      progressSchema.parse({ ...progress, levels: [...ladder].reverse() }),
+    ).toThrow();
+    expect(() =>
+      progressSchema.parse({
+        ...progress,
+        nextLevel: { key: "leader", minHours: 250, hoursToGo: 238 },
+      }),
+    ).toThrow();
+    expect(() => progressSchema.parse({ ...progress, verifiedHours: -1 })).toThrow();
+    expect(() => progressSchema.parse({ ...progress, rank: 0 })).toThrow();
   });
 });

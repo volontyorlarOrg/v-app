@@ -5,6 +5,7 @@ import {
   activityNotification,
   checkpointNotification,
   isMergeNotificationKind,
+  levelNotification,
   mergeNotificationName,
 } from "@/lib/notifications/types";
 
@@ -119,5 +120,35 @@ describe("profile reward notifications", () => {
       }),
     ).toBeNull();
     expect(checkpointNotification("checkpoint.ready", null)).toBeNull();
+  });
+});
+
+describe("level notifications", () => {
+  it("reads the level reached and the verified hours that reached it", () => {
+    expect(
+      levelNotification("level.reached", {
+        userId: "user-1",
+        level: "supervisor",
+        minHours: 50,
+        verifiedHours: 52.5,
+      }),
+    ).toEqual({ level: "supervisor", verifiedHours: 52.5 });
+  });
+
+  it("leaves a level this build cannot name, or broken hours, to the backend's own words", () => {
+    expect(
+      levelNotification("level.reached", { level: "legend", verifiedHours: 600 }),
+    ).toBeNull();
+    expect(
+      levelNotification("level.reached", { level: "volunteer", verifiedHours: -1 }),
+    ).toBeNull();
+    expect(levelNotification("level.reached", { level: "volunteer" })).toBeNull();
+    expect(levelNotification("level.reached", null)).toBeNull();
+    expect(
+      levelNotification("attendance.resolved", {
+        level: "volunteer",
+        verifiedHours: 12,
+      }),
+    ).toBeNull();
   });
 });

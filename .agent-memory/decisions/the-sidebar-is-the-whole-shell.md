@@ -13,7 +13,9 @@ leaderboard there, because the tab bar is capped at four thumbs.
 
 `/record` is no longer a section. It redirects to `/dashboard#history`; the
 dashboard shows the four figures, the level rail and the participation history,
-and "Your progress" leads to the leaderboard. The leaderboard opens on the
+and "Your progress" leads to the leaderboard. (Superseded 2026-10-16: `/record`
+is My activity again, a sidebar section — see
+`levels-are-the-backends-ladder-of-hours.md`.) The leaderboard opens on the
 viewer's standing card (rank, experience, scoring), a podium of the top three,
 and the ranked table from fourth place.
 

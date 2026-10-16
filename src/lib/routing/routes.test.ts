@@ -17,6 +17,7 @@ import {
   historyHref,
   isActivePath,
   isSectionActive,
+  isTabActive,
   legacyLocalePrefix,
   navHref,
   primaryNavRoutes,
@@ -76,7 +77,14 @@ describe("app route registry", () => {
     }
     expect(
       appRoutes.filter((route) => route.navGroup !== null).map((route) => route.key),
-    ).toEqual(["dashboard", "opportunities", "leaderboard", "checkpoints", "settings"]);
+    ).toEqual([
+      "dashboard",
+      "opportunities",
+      "record",
+      "leaderboard",
+      "checkpoints",
+      "settings",
+    ]);
   });
 
   it("puts the leaderboard in the sidebar and the phone tab bar, never the account group", () => {
@@ -92,10 +100,11 @@ describe("app route registry", () => {
     expect(guardFor("/leaderboard")).toBe("session");
   });
 
-  it("keeps the sidebar's primary group to four sections", () => {
+  it("keeps the sidebar's primary group to five sections, My activity after opportunities", () => {
     expect(primaryNavRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
+      "record",
       "leaderboard",
       "checkpoints",
     ]);
@@ -149,15 +158,21 @@ describe("app route registry", () => {
     expect(guardFor("/profiles/dilnoza_k")).toBe("session");
   });
 
-  it("keeps the record reachable by URL but out of every navigation surface", () => {
+  it("gives the whole history, My activity, a sidebar section on the record URL but no phone tab", () => {
     const record = getRoute("record");
+    expect(record.path).toBe("/record");
     expect(record.area).toBe("volunteer");
     expect(record.guard).toBe("session");
-    expect(record.navGroup).toBeNull();
+    expect(record.navGroup).toBe("primary");
     expect(record.inTabBar).toBe(false);
-    expect(record.section).toBe("dashboard");
-    expect(sectionKeyFor("/record")).toBe("dashboard");
-    expect(historyHref()).toBe("/dashboard#history");
+    expect(record.section).toBeNull();
+    expect(tabBarRoutes).not.toContain(record);
+    expect(sectionKeyFor("/record")).toBe("record");
+    expect(isSectionActive("/record", "record")).toBe(true);
+    expect(isTabActive("/record", "dashboard")).toBe(true);
+    expect(isTabActive("/record", "record")).toBe(false);
+    expect(isTabActive("/applications/app-1", "opportunities")).toBe(true);
+    expect(historyHref()).toBe("/record");
   });
 
   it("keeps the mobile tab bar to five essential destinations", () => {

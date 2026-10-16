@@ -1,26 +1,98 @@
-export const LEVELS = ["newcomer", "active", "trusted", "core"] as const;
+export const LEVELS = [
+  "newcomer",
+  "volunteer",
+  "supervisor",
+  "coordinator",
+  "leader",
+] as const;
 export type Level = (typeof LEVELS)[number];
+
+export function isLevel(value: unknown): value is Level {
+  return LEVELS.some((level) => level === value);
+}
+
+export type LevelStep = { key: Level; minHours: number };
+
+export type NextLevel = LevelStep & { hoursToGo: number };
+
+export type VolunteerProgress = {
+  verifiedHours: number;
+  xp: number;
+  rank: number | null;
+  level: Level;
+  nextLevel: NextLevel | null;
+  levels: readonly LevelStep[];
+};
+
+export function ladderProblem(progress: VolunteerProgress): string | null {
+  const { levels, level, nextLevel } = progress;
+  if (levels[0]?.minHours !== 0) return "the ladder must start at 0 hours";
+  for (let index = 1; index < levels.length; index += 1) {
+    if (levels[index]!.minHours <= levels[index - 1]!.minHours) {
+      return "the ladder must rise step by step";
+    }
+  }
+  if (new Set(levels.map((step) => step.key)).size !== levels.length) {
+    return "every level must appear once";
+  }
+  const current = levels.findIndex((step) => step.key === level);
+  if (current < 0) return "the current level must be on the ladder";
+  const following = levels[current + 1];
+  if (!following) return nextLevel === null ? null : "the top level has no next level";
+  if (nextLevel?.key !== following.key || nextLevel.minHours !== following.minHours) {
+    return "the next level must be the step after the current one";
+  }
+  return null;
+}
+
+export type LevelState = "reached" | "current" | "next" | "ahead";
+
+export type LevelRow = LevelStep & { state: LevelState; hoursToGo: number | null };
+
+export function levelRows(progress: VolunteerProgress): LevelRow[] {
+  const current = progress.levels.findIndex((step) => step.key === progress.level);
+  return progress.levels.map((step, index) => {
+    const isNext = step.key === progress.nextLevel?.key;
+    return {
+      ...step,
+      state:
+        index < current
+          ? "reached"
+          : index === current
+            ? "current"
+            : isNext
+              ? "next"
+              : "ahead",
+      hoursToGo: isNext ? (progress.nextLevel?.hoursToGo ?? null) : null,
+    };
+  });
+}
+
+export type LevelMeter = { value: number; max: number };
+
+export function nextLevelMeter(progress: VolunteerProgress): LevelMeter | null {
+  if (!progress.nextLevel) return null;
+  const floor =
+    progress.levels.find((step) => step.key === progress.level)?.minHours ?? 0;
+  const max = progress.nextLevel.minHours - floor;
+  if (max <= 0) return null;
+  return {
+    value: Math.min(max, Math.max(0, progress.verifiedHours - floor)),
+    max,
+  };
+}
 
 export type RecordCounts = {
   attended: number;
   acceptedResolved: number;
   acceptedUnconfirmed: number;
-  standoutReviews: boolean;
 };
 
 export type VolunteerRecord = {
   counts: RecordCounts;
-  level: Level;
   hours?: number;
   hoursVerified: boolean;
 };
-
-export const LEVEL_THRESHOLDS = {
-  newcomer: { events: 0, reliability: 0 },
-  active: { events: 3, reliability: 0 },
-  trusted: { events: 8, reliability: 0.85 },
-  core: { events: 20, reliability: 0.9 },
-} as const satisfies Record<Level, { events: number; reliability: number }>;
 
 export const MIN_EVENTS_FOR_RELIABILITY = 3;
 
@@ -47,71 +119,6 @@ export function reliabilityPercent(counts: RecordCounts): number | null {
   return ratio === null ? null : Math.round(ratio * 100);
 }
 
-export function levelFor(counts: RecordCounts): Level {
-  const ratio = reliability(counts) ?? 0;
-  const events = counts.attended;
-
-  if (
-    events >= LEVEL_THRESHOLDS.core.events &&
-    ratio >= LEVEL_THRESHOLDS.core.reliability &&
-    counts.standoutReviews
-  ) {
-    return "core";
-  }
-
-  if (
-    events >= LEVEL_THRESHOLDS.trusted.events &&
-    ratio >= LEVEL_THRESHOLDS.trusted.reliability
-  ) {
-    return "trusted";
-  }
-
-  if (events >= LEVEL_THRESHOLDS.active.events) return "active";
-
-  return "newcomer";
-}
-
-export type LevelProgress = {
-  current: Level;
-  next: Level | null;
-  eventsNeeded: number | null;
-  blockedByReliability: boolean;
-  blockedByReview: boolean;
-};
-
-export function levelProgress(
-  counts: RecordCounts,
-  current: Level = levelFor(counts),
-): LevelProgress {
-  const next = LEVELS[LEVELS.indexOf(current) + 1] ?? null;
-
-  if (!next) {
-    return {
-      current,
-      next: null,
-      eventsNeeded: null,
-      blockedByReliability: false,
-      blockedByReview: false,
-    };
-  }
-
-  const threshold = LEVEL_THRESHOLDS[next];
-  const ratio = reliability(counts) ?? 0;
-  const shortfall = Math.max(0, threshold.events - counts.attended);
-
-  return {
-    current,
-    next,
-    eventsNeeded: shortfall > 0 ? shortfall : null,
-    blockedByReliability: shortfall === 0 && ratio < threshold.reliability,
-    blockedByReview: next === "core" && shortfall === 0 && !counts.standoutReviews,
-  };
-}
-
-export function reachedLevels(current: Level): Level[] {
-  return LEVELS.slice(0, LEVELS.indexOf(current) + 1);
-}
-
 export const ATTENDANCE_OUTCOMES = [
   "attended",
   "excused",
@@ -133,9 +140,12 @@ export type ParticipationEntry = {
   kind: import("@/lib/opportunities/types").OpportunityKind;
   organization: string;
   eventDate: string;
+  eventEndsAt?: string;
   outcome: AttendanceOutcome;
   hours?: number;
   placement?: Placement;
   xpAwarded?: number;
   countsTowardProgress?: boolean;
+  applicationId?: string;
+  imageUrl?: string;
 };

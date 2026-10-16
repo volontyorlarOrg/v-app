@@ -44,7 +44,7 @@ describe("TabBar", () => {
     );
   });
 
-  it("marks the dashboard for the old record URL", () => {
+  it("marks the dashboard on My activity, which has no tab of its own", () => {
     usePathname.mockReturnValue("/record");
     render(<TabBar items={items} label="App sections" />);
     expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(

@@ -13,11 +13,12 @@ import { getMe } from "@/lib/api/account.server";
 import { isApiError } from "@/lib/api/errors";
 import { dataOf, failureOf, settle, type LoadFailure } from "@/lib/api/load.server";
 import { listNotifications } from "@/lib/api/notifications.server";
-import { getRecord } from "@/lib/api/record.server";
+import { getProgress } from "@/lib/api/record.server";
 import { requireSession } from "@/lib/api/session.server";
 import {
   activityNotification,
   checkpointNotification,
+  levelNotification,
   mergeNotificationName,
 } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
@@ -61,8 +62,8 @@ export default async function VolunteerLayout({
     return <ShellError failure={failureOf(error)} labels={errorLabels} />;
   }
 
-  const [me, loadedRecord, loadedNotifications] = shell;
-  const volunteerRecord = dataOf(loadedRecord);
+  const [me, loadedProgress, loadedNotifications] = shell;
+  const progress = dataOf(loadedProgress);
   const notificationItems = dataOf(loadedNotifications)?.items ?? [];
   if (me.usernameSource === "generated") {
     redirect(navHref(ONBOARDING_ROUTE));
@@ -107,6 +108,23 @@ export default async function VolunteerLayout({
             : "notifications.viewTasks",
         ),
         rewardState: checkpoint.rewardState,
+      };
+    }
+    const level = levelNotification(item.kind, item.data);
+    if (level) {
+      return {
+        id: item.id,
+        title: nav("notifications.level.title", {
+          level: record(`level.${level.level}`),
+        }),
+        body: nav("notifications.level.body", {
+          hours: format.number(level.verifiedHours, { maximumFractionDigits: 2 }),
+        }),
+        time,
+        unread: item.unread,
+        href: navHref("dashboard"),
+        category: "level",
+        action: nav("notifications.viewLevel"),
       };
     }
     const merge = mergeNotificationName(item.kind);
@@ -157,7 +175,7 @@ export default async function VolunteerLayout({
         name,
         initials: initialsOf(name),
         avatarUrl: me.avatarUrl,
-        level: volunteerRecord ? record(`level.${volunteerRecord.level}`) : null,
+        level: progress ? record(`level.${progress.level}`) : null,
         handle: me.username,
       }}
       notifications={notifications}
@@ -185,7 +203,7 @@ function ShellError({
 function loadShell() {
   return Promise.all([
     getMe(),
-    settle(() => getRecord()),
+    settle(() => getProgress()),
     settle(() => listNotifications()),
   ]);
 }
