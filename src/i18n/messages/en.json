@@ -24,7 +24,7 @@
     "opportunities": "Opportunities",
     "applications": "Applications",
     "saved": "Saved",
-    "record": "My record",
+    "record": "My activity",
     "checkpoints": "Tasks",
     "leaderboard": "Leaderboard",
     "profile": "Profile",
@@ -89,6 +89,10 @@
         "exhaustedTitle": "No profile rewards left",
         "exhaustedBody": "All 1,000 profile rewards have been claimed. You can still complete your profile and apply."
       },
+      "level": {
+        "title": "New level: {level}",
+        "body": "You have {hours} verified volunteer hours. The next step is on your dashboard."
+      },
       "close": "Close notifications",
       "allRead": "All caught up",
       "marking": "Marking…",
@@ -99,6 +103,7 @@
       "viewReward": "Claim reward",
       "viewTasks": "View tasks",
       "viewAccount": "View account",
+      "viewLevel": "See your progress",
       "unreadLabel": "Unread"
     },
     "userMenu": {
@@ -193,21 +198,6 @@
     },
     "metaTitle": "Dashboard",
     "greeting": "Hi, {name}.",
-    "browse": "Browse opportunities",
-    "levelLead": {
-      "events": "You are {level}. {events, plural, one {# more confirmed event} other {# more confirmed events}} and you are {next}.",
-      "reliability": "You are {level}. {next} needs reliability of {percent}% or more.",
-      "review": "You are {level}. {next} is granted by the team for standout reviews.",
-      "top": "You are {level}, the highest level."
-    },
-    "tiles": {
-      "level": "Level",
-      "events": "Volunteer events completed",
-      "reliability": "Reliability",
-      "reliabilityPending": "Shown after 3 confirmed events",
-      "hours": "Hours",
-      "hoursUnverified": "Recorded, not yet verified"
-    },
     "nextUp": {
       "title": "Next up",
       "description": "Accepted applications with the event still ahead.",
@@ -233,35 +223,34 @@
       },
       "cta": "Browse opportunities"
     },
-    "applications": {
-      "title": "Your applications",
-      "viewAll": "All applications"
-    },
-    "progress": {
-      "title": "Your progress",
-      "description": "Your confirmed record and profile readiness in one place.",
-      "leaderboard": "See where you rank"
-    },
-    "record": {
-      "title": "Your record",
-      "viewAll": "Full record"
-    },
     "profile": {
       "title": "Your profile",
       "cta": "Complete profile",
       "edit": "Edit profile"
     },
-    "closingSoon": {
-      "title": "Closing soon near you",
-      "viewAll": "All opportunities",
-      "empty": "Nothing is closing soon in your region."
+    "greetingAnonymous": "Hello.",
+    "hero": {
+      "next": "Next: {level}",
+      "toGo": "{hours, plural, one {# verified hour to go} other {# verified hours to go}}",
+      "top": "You have reached the highest level.",
+      "meterLabel": "Progress to {level}"
     },
-    "saved": {
-      "title": "Saved for later",
-      "viewAll": "All saved",
-      "empty": "Save an opportunity while browsing and it waits for you here."
+    "figures": {
+      "label": "Your progress in numbers",
+      "hours": "Verified volunteer hours",
+      "hoursValue": "{hours} h",
+      "xp": "XP",
+      "rank": "Overall XP rank",
+      "rankValue": "#{rank}",
+      "unranked": "Not ranked yet"
     },
-    "greetingAnonymous": "Hello."
+    "participation": {
+      "title": "Recent participation",
+      "viewAll": "View all"
+    },
+    "pass": {
+      "role": "Volunteer"
+    }
   },
   "onboarding": {
     "metaTitle": "Welcome",
@@ -344,66 +333,68 @@
     }
   },
   "record": {
-    "metaTitle": "My record",
-    "title": "Your record",
-    "description": "What you have actually done, confirmed by organisers.",
+    "metaTitle": "My activity",
+    "title": "My activity",
+    "description": "Every event you were accepted to, and what was verified.",
     "level": {
       "label": "Level",
       "newcomer": "Newcomer",
-      "active": "Active",
-      "trusted": "Trusted",
-      "core": "Core",
-      "railLabel": "Level progress",
-      "current": "current level",
-      "explain": "Levels come from confirmed participation. Nothing here is anyone’s opinion of you."
+      "volunteer": "Volunteer",
+      "supervisor": "Supervisor",
+      "coordinator": "Coordinator",
+      "leader": "Leader"
     },
-    "next": {
-      "label": "Next: {level}",
-      "progress": "{done} of {needed} confirmed events.",
-      "reliability": "Needs reliability of {percent}% or more.",
-      "review": "Granted by the team for standout reviews.",
-      "top": "You are at the highest level."
-    },
-    "figures": {
-      "events": "Events completed",
-      "reliability": "Reliability",
-      "reliabilityHelp": "Share of accepted events you attended",
-      "reliabilityPending": "Shown after 3 confirmed events",
+    "participation": {
+      "event": "Event",
+      "date": "Date",
+      "result": "Result",
       "hours": "Hours",
-      "hoursUnverified": "Recorded, not yet verified",
-      "awaiting": "Awaiting confirmation",
-      "awaitingHelp": "Events the organiser has not confirmed yet. They never count against you."
+      "xp": "XP",
+      "hoursValue": "{hours} h",
+      "pending": "Pending",
+      "pastEvent": "Past event",
+      "open": "Open {title}",
+      "details": "Details",
+      "status": {
+        "verified": "Verified",
+        "historyOnly": "History only",
+        "awaiting": "Awaiting verification",
+        "upcoming": "Upcoming",
+        "excused": "Excused",
+        "cancelled": "Cancelled",
+        "no_show": "Unexcused no-show"
+      },
+      "awaitingNote": "Events waiting for verification never count against you.",
+      "empty": "Your activity starts with your first event.",
+      "count": "{count, plural, one {# event} other {# events}}"
     },
     "history": {
-      "title": "Participation history",
-      "description": "Every event you were accepted to, and what the organiser said.",
-      "date": "Date",
-      "event": "Event",
-      "outcome": "Outcome",
-      "hours": "Hours",
-      "empty": "Your record starts with your first confirmed event.",
-      "adminAdded": "Added by an administrator",
-      "manual": "Past event",
-      "counted": "Counts toward progress",
-      "notCounted": "History only",
       "kinds": {
         "volunteering": "Volunteering",
         "competition": "Competition"
       },
-      "xp": "XP",
       "placements": {
         "winner": "Winner",
         "contributor": "Contributor",
         "attendee": "Took part"
       }
-    },
-    "outcomes": {
-      "attended": "Attended",
-      "excused": "Excused",
-      "cancelled": "Cancelled",
-      "no_show": "Unexcused no-show",
-      "awaiting_confirmation": "Awaiting confirmation"
     }
+  },
+  "levels": {
+    "title": "Volunteer levels",
+    "description": "Progress through verified volunteer hours.",
+    "open": "View levels",
+    "close": "Close",
+    "listLabel": "Levels and the hours each one starts at",
+    "startsAt": "Starts at {hours} h",
+    "reached": "Reached",
+    "current": "Current level",
+    "toGo": "{hours} h to go",
+    "ahead": "Not reached yet",
+    "next": "Next: {level}",
+    "nextToGo": "{hours, plural, one {# verified hour to go} other {# verified hours to go}}",
+    "top": "You have reached the highest level.",
+    "note": "Levels recognise verified volunteering hours. Organisation roles are assigned separately."
   },
   "checkpoints": {
     "metaTitle": "Tasks",

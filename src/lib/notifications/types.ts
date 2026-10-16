@@ -1,4 +1,5 @@
 import { isCheckpointKey } from "@/lib/checkpoints/checkpoints";
+import { isLevel, type Level } from "@/lib/record/levels";
 
 export type Notification = {
   id: string;
@@ -142,4 +143,29 @@ export function checkpointNotification(
     rewardState:
       rewardState === "claimed" || rewardState === "exhausted" ? rewardState : "ready",
   };
+}
+
+export const LEVEL_REACHED_NOTIFICATION_KIND = "level.reached";
+
+export type LevelNotification = {
+  level: Level;
+  verifiedHours: number;
+};
+
+export function levelNotification(
+  kind: string,
+  data: Notification["data"],
+): LevelNotification | null {
+  if (kind !== LEVEL_REACHED_NOTIFICATION_KIND) return null;
+  const level = data?.level;
+  const verifiedHours = data?.verifiedHours;
+  if (
+    !isLevel(level) ||
+    typeof verifiedHours !== "number" ||
+    !Number.isFinite(verifiedHours) ||
+    verifiedHours < 0
+  ) {
+    return null;
+  }
+  return { level, verifiedHours };
 }

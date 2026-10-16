@@ -7,6 +7,7 @@ import {
   Check,
   Gift,
   ShieldCheck,
+  Star,
   X,
 } from "lucide-react";
 import { useId, useState } from "react";
@@ -27,7 +28,7 @@ export type NotificationItem = {
   unread: boolean;
   href?: string;
   action?: string;
-  category?: "reward" | "account" | "activity";
+  category?: "reward" | "account" | "activity" | "level";
   rewardState?: "ready" | "claimed" | "exhausted";
 };
 
@@ -155,16 +156,20 @@ export function NotificationsMenu({
               const Icon =
                 item.category === "reward"
                   ? Gift
-                  : item.category === "account"
-                    ? ShieldCheck
-                    : BellRing;
+                  : item.category === "level"
+                    ? Star
+                    : item.category === "account"
+                      ? ShieldCheck
+                      : BellRing;
               const content = (
                 <>
                   <span
                     aria-hidden="true"
                     className={cn(
                       "mt-0.5 inline-grid size-9 shrink-0 place-items-center rounded-full",
-                      item.category === "reward" && item.rewardState !== "exhausted"
+                      (item.category === "reward" &&
+                        item.rewardState !== "exhausted") ||
+                        item.category === "level"
                         ? "bg-surface-sunk text-accent-ink"
                         : "bg-surface-sunk text-ink-muted",
                     )}

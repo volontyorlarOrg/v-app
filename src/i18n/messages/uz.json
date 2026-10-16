@@ -24,7 +24,7 @@
     "opportunities": "Imkoniyatlar",
     "applications": "Arizalar",
     "saved": "Saqlanganlar",
-    "record": "Mening tarixim",
+    "record": "Mening faoliyatim",
     "checkpoints": "Vazifalar",
     "leaderboard": "Reyting",
     "profile": "Profil",
@@ -89,6 +89,10 @@
         "exhaustedTitle": "Profil mukofotlari qolmadi",
         "exhaustedBody": "Profil uchun barcha 1 000 ta mukofot olib boʻlingan. Profilingizni toʻldirish va ariza yuborish hali ham mumkin."
       },
+      "level": {
+        "title": "Yangi daraja: {level}",
+        "body": "Sizda {hours} soat tasdiqlangan volontyorlik bor. Keyingi qadam bosh panelda."
+      },
       "close": "Bildirishnomalarni yopish",
       "allRead": "Barchasi oʻqildi",
       "marking": "Belgilanmoqda…",
@@ -99,6 +103,7 @@
       "viewReward": "Mukofotni olish",
       "viewTasks": "Vazifalarni ochish",
       "viewAccount": "Akkauntni ochish",
+      "viewLevel": "Natijangizni koʻrish",
       "unreadLabel": "Oʻqilmagan"
     },
     "userMenu": {
@@ -193,21 +198,6 @@
     },
     "metaTitle": "Bosh panel",
     "greeting": "Salom, {name}.",
-    "browse": "Imkoniyatlarni koʻrish",
-    "levelLead": {
-      "events": "Siz {level} darajadasiz. Yana {events, plural, other {# ta tasdiqlangan tadbir}} — va siz {next} boʻlasiz.",
-      "reliability": "Siz {level} darajadasiz. {next} uchun ishonchlilik kamida {percent}% boʻlishi kerak.",
-      "review": "Siz {level} darajadasiz. {next} darajasini jamoa alohida eʼtirof uchun beradi.",
-      "top": "Siz {level} darajadasiz — bu eng yuqori daraja."
-    },
-    "tiles": {
-      "level": "Daraja",
-      "events": "Yakunlangan volontyorlik tadbirlari",
-      "reliability": "Ishonchlilik",
-      "reliabilityPending": "3 ta tasdiqlangan tadbirdan soʻng koʻrsatiladi",
-      "hours": "Soatlar",
-      "hoursUnverified": "Yozilgan, hali tasdiqlanmagan"
-    },
     "nextUp": {
       "title": "Navbatdagi",
       "description": "Tadbiri hali oldinda boʻlgan qabul qilingan arizalar.",
@@ -233,35 +223,34 @@
       },
       "cta": "Imkoniyatlarni koʻrish"
     },
-    "applications": {
-      "title": "Arizalaringiz",
-      "viewAll": "Barcha arizalar"
-    },
-    "progress": {
-      "title": "Oʻsishingiz",
-      "description": "Tasdiqlangan tarixingiz va profil tayyorligi bir joyda.",
-      "leaderboard": "Reytingdagi oʻrningiz"
-    },
-    "record": {
-      "title": "Tarixingiz",
-      "viewAll": "Toʻliq tarix"
-    },
     "profile": {
       "title": "Profilingiz",
       "cta": "Profilni toʻldirish",
       "edit": "Profilni tahrirlash"
     },
-    "closingSoon": {
-      "title": "Hududingizda tez yopiladi",
-      "viewAll": "Barcha imkoniyatlar",
-      "empty": "Hududingizda tez orada yopiladigan imkoniyat yoʻq."
+    "greetingAnonymous": "Salom.",
+    "hero": {
+      "next": "Keyingisi: {level}",
+      "toGo": "{hours, plural, one {Keyingi darajagacha # tasdiqlangan soat qoldi} other {Keyingi darajagacha # tasdiqlangan soat qoldi}}",
+      "top": "Siz eng yuqori darajaga yetdingiz.",
+      "meterLabel": "{level} darajasigacha"
     },
-    "saved": {
-      "title": "Keyinga saqlangan",
-      "viewAll": "Barcha saqlanganlar",
-      "empty": "Koʻrib chiqayotganda imkoniyatni saqlang — u sizni shu yerda kutadi."
+    "figures": {
+      "label": "Natijangiz raqamlarda",
+      "hours": "Tasdiqlangan volontyorlik soatlari",
+      "hoursValue": "{hours} soat",
+      "xp": "XP",
+      "rank": "Umumiy XP reytingi",
+      "rankValue": "#{rank}",
+      "unranked": "Hali reytingda emas"
     },
-    "greetingAnonymous": "Salom."
+    "participation": {
+      "title": "Soʻnggi ishtiroklar",
+      "viewAll": "Barchasi"
+    },
+    "pass": {
+      "role": "Volontyor"
+    }
   },
   "onboarding": {
     "metaTitle": "Xush kelibsiz",
@@ -344,66 +333,68 @@
     }
   },
   "record": {
-    "metaTitle": "Mening tarixim",
-    "title": "Tarixingiz",
-    "description": "Haqiqatan qilganlaringiz — tashkilotchilar tasdigʻi bilan.",
+    "metaTitle": "Mening faoliyatim",
+    "title": "Mening faoliyatim",
+    "description": "Siz qabul qilingan har bir tadbir va undagi tasdiqlangan natija.",
     "level": {
       "label": "Daraja",
       "newcomer": "Yangi kelgan",
-      "active": "Faol",
-      "trusted": "Ishonchli",
-      "core": "Asosiy jamoa",
-      "railLabel": "Daraja boʻyicha oʻsish",
-      "current": "joriy daraja",
-      "explain": "Daraja tasdiqlangan ishtirokdan hisoblanadi. Bu yerda hech narsa kimningdir siz haqingizdagi fikri emas."
+      "volunteer": "Volontyor",
+      "supervisor": "Supervayzer",
+      "coordinator": "Koordinator",
+      "leader": "Yetakchi"
     },
-    "next": {
-      "label": "Keyingisi: {level}",
-      "progress": "{needed} ta tasdiqlangan tadbirdan {done} tasi.",
-      "reliability": "Ishonchlilik kamida {percent}% boʻlishi kerak.",
-      "review": "Jamoa alohida eʼtirof uchun beradi.",
-      "top": "Siz eng yuqori darajadasiz."
-    },
-    "figures": {
-      "events": "Yakunlangan tadbirlar",
-      "reliability": "Ishonchlilik",
-      "reliabilityHelp": "Qabul qilingan tadbirlardan qatnashganlaringiz ulushi",
-      "reliabilityPending": "3 ta tasdiqlangan tadbirdan soʻng koʻrsatiladi",
-      "hours": "Soatlar",
-      "hoursUnverified": "Yozilgan, hali tasdiqlanmagan",
-      "awaiting": "Tasdiq kutilmoqda",
-      "awaitingHelp": "Tashkilotchi hali tasdiqlamagan tadbirlar. Ular hech qachon sizga qarshi hisoblanmaydi."
+    "participation": {
+      "event": "Tadbir",
+      "date": "Sana",
+      "result": "Natija",
+      "hours": "Soat",
+      "xp": "XP",
+      "hoursValue": "{hours} soat",
+      "pending": "Kutilmoqda",
+      "pastEvent": "Oʻtgan tadbir",
+      "open": "Ochish: {title}",
+      "details": "Batafsil",
+      "status": {
+        "verified": "Tasdiqlangan",
+        "historyOnly": "Faqat tarix",
+        "awaiting": "Tasdiq kutilmoqda",
+        "upcoming": "Oldinda",
+        "excused": "Uzrli sabab",
+        "cancelled": "Bekor qilingan",
+        "no_show": "Sababsiz kelmadi"
+      },
+      "awaitingNote": "Tasdiq kutayotgan tadbirlar hech qachon sizga qarshi hisoblanmaydi.",
+      "empty": "Faoliyatingiz birinchi tadbiringizdan boshlanadi.",
+      "count": "{count, plural, one {# ta tadbir} other {# ta tadbir}}"
     },
     "history": {
-      "title": "Ishtirok tarixi",
-      "description": "Siz qabul qilingan har bir tadbir va tashkilotchining javobi.",
-      "date": "Sana",
-      "event": "Tadbir",
-      "outcome": "Natija",
-      "hours": "Soat",
-      "empty": "Tarixingiz birinchi tasdiqlangan tadbirdan boshlanadi.",
-      "adminAdded": "Administrator qoʻshgan",
-      "manual": "Oʻtgan tadbir",
-      "counted": "Taraqqiyotga hisoblanadi",
-      "notCounted": "Faqat tarix",
       "kinds": {
         "volunteering": "Volontyorlik",
         "competition": "Tanlov"
       },
-      "xp": "XP",
       "placements": {
         "winner": "Gʻolib",
         "contributor": "Faol ishtirokchi",
         "attendee": "Ishtirok etdi"
       }
-    },
-    "outcomes": {
-      "attended": "Qatnashgan",
-      "excused": "Uzrli sabab",
-      "cancelled": "Bekor qilingan",
-      "no_show": "Sababsiz kelmadi",
-      "awaiting_confirmation": "Tasdiq kutilmoqda"
     }
+  },
+  "levels": {
+    "title": "Volontyorlik darajalari",
+    "description": "Tasdiqlangan volontyorlik soatlari bilan oʻsib boring.",
+    "open": "Darajalarni koʻrish",
+    "close": "Yopish",
+    "listLabel": "Darajalar va har biri boshlanadigan soat",
+    "startsAt": "{hours} soatdan boshlanadi",
+    "reached": "Erishilgan",
+    "current": "Joriy daraja",
+    "toGo": "Yana {hours} soat",
+    "ahead": "Hali erishilmagan",
+    "next": "Keyingisi: {level}",
+    "nextToGo": "{hours, plural, one {Keyingi darajagacha # tasdiqlangan soat qoldi} other {Keyingi darajagacha # tasdiqlangan soat qoldi}}",
+    "top": "Siz eng yuqori darajaga yetdingiz.",
+    "note": "Darajalar tasdiqlangan volontyorlik soatlarini eʼtirof etadi. Tashkilotdagi rollar alohida tayinlanadi."
   },
   "checkpoints": {
     "metaTitle": "Vazifalar",

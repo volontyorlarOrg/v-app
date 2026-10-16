@@ -2,7 +2,7 @@
 
 import { routeIcon } from "@/components/app/route-icons";
 import { Link, usePathname } from "@/i18n/navigation";
-import { isSectionActive, type RouteKey } from "@/lib/routing/routes";
+import { isTabActive, type RouteKey } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
 export type TabBarItem = { key: RouteKey; href: string; label: string };
@@ -27,7 +27,7 @@ export function TabBar({
       >
         {items.map((item) => {
           const Icon = routeIcon(item.key);
-          const active = isSectionActive(pathname, item.key);
+          const active = isTabActive(pathname, item.key);
           return (
             <li key={item.key}>
               <Link
