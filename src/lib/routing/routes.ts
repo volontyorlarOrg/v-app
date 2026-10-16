@@ -30,6 +30,7 @@ export type AppRoute = {
   navGroup: NavGroup | null;
   inTabBar: boolean;
   section: RouteKey | null;
+  tabSection?: RouteKey;
 };
 
 export const appRoutes: readonly AppRoute[] = [
@@ -70,6 +71,16 @@ export const appRoutes: readonly AppRoute[] = [
     section: null,
   },
   {
+    key: "record",
+    path: "/record",
+    area: "volunteer",
+    guard: "session",
+    navGroup: "primary",
+    inTabBar: false,
+    section: null,
+    tabSection: "dashboard",
+  },
+  {
     key: "applications",
     path: "/applications",
     area: "volunteer",
@@ -86,15 +97,6 @@ export const appRoutes: readonly AppRoute[] = [
     navGroup: null,
     inTabBar: false,
     section: "opportunities",
-  },
-  {
-    key: "record",
-    path: "/record",
-    area: "volunteer",
-    guard: "session",
-    navGroup: null,
-    inTabBar: false,
-    section: "dashboard",
   },
   {
     key: "leaderboard",
@@ -197,10 +199,8 @@ export function applicationHref(id: string): string {
   return `${navHref("applications")}/${id}`;
 }
 
-export const HISTORY_ANCHOR = "history";
-
 export function historyHref(): string {
-  return `${navHref("dashboard")}#${HISTORY_ANCHOR}`;
+  return navHref("record");
 }
 
 export function legacyLocalePrefix(
@@ -231,6 +231,11 @@ export function sectionKeyFor(pathname: string): RouteKey | null {
 
 export function isSectionActive(pathname: string, key: RouteKey): boolean {
   return sectionKeyFor(pathname) === key;
+}
+
+export function isTabActive(pathname: string, key: RouteKey): boolean {
+  const route = routeFor(pathname);
+  return (route?.tabSection ?? sectionKeyFor(pathname)) === key;
 }
 
 export function guardFor(pathname: string): RouteGuard | null {

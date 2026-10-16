@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, four sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, five sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -123,11 +123,17 @@ components:
     borderColor: "{colors.border}"
     rounded: "{rounded.xl}"
     padding: "16px 20px"
-  stat-tile:
+  figures-strip:
     backgroundColor: "{colors.surface}"
     borderColor: "{colors.border}"
     rounded: "{rounded.xl}"
-    padding: "16px 20px"
+    padding: "16px 24px"
+  level-chip:
+    backgroundColor: "color-mix(accent 10%, surface)"
+    borderColor: "{colors.accent}"
+    textColor: "{colors.accent-ink}"
+    rounded: "{rounded.lg}"
+    padding: "6px 12px"
   sidebar:
     backgroundColor: "{colors.shell}"
     textColor: "{colors.shell-ink}"
@@ -175,8 +181,8 @@ components:
 
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
-a navy sidebar that names four sections — dashboard, opportunities, leaderboard,
-tasks — at the top and the account — who you are, which opens the
+a navy sidebar that names five sections — dashboard, opportunities, my
+activity, leaderboard, tasks — at the top and the account — who you are, which opens the
 profile, then settings — at the foot, and a flat workspace carrying panels of content, with
 no top bar between them. Every entry in the sidebar is a plain link: nothing
 in it expands, and the only tray is the notification bell beside the lockup.
@@ -200,7 +206,7 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 16.5rem navy sidebar (`shell`) with four sections at the top, the
+- A 16.5rem navy sidebar (`shell`) with five sections at the top, the
   identity card (the profile's link) above settings at the foot,
   and no top bar on desktop; a 56px header and a five-tab bar (dashboard,
   opportunities, leaderboard, tasks, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
@@ -222,10 +228,10 @@ volunteer into the room.
   the type chip in its top-left corner and the bookmark in its top-right.
 - Washes of the two hues where a surface is the volunteer's own: the dashboard
   hero, the leaderboard's standing card and the podium stage. A wash never carries text contrast; the tokens beneath do.
-- Panels, stat tiles and cards with a `border` edge and a 20px radius. Content
-  inside a panel is ruled rows, never nested boxes.
-- A serif page title at 30 to 36px, sans panel titles at 16px, and serif
-  figures in stat tiles.
+- Panels, the figures strip and cards with a `border` edge and a 20px radius.
+  Content inside a panel is ruled rows, never nested boxes.
+- A serif page title at 30 to 36px (the dashboard's greeting larger), sans
+  panel titles at 16px, and serif figures.
 - Switches, segmented filters, selects and a search field that all clear 44px
   and take the global focus ring.
 - Orange for what the person did: the level, an acceptance, a confirmed
@@ -237,19 +243,23 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                                                                                                                                              | Phone                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the four sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the five sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
 | Header    | Absent                                                                                                                                                                                                                                         | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                                                                      | 16px gutters, one column, the aside stacks after the main column                                                  |
 | Tab bar   | Absent                                                                                                                                                                                                                                         | Fixed, 56px, five destinations: dashboard, opportunities, leaderboard, tasks, profile                             |
 
-The dashboard is the decision screen and the record: a hero that greets the
-volunteer beside their pass and carries their progress in a ruled band, four
-stat tiles, then the next commitment and applications side by side from the
-extra-large breakpoint, and the participation history across both columns.
-The band has two cells built the same way — a title and its action, a rail,
-a labelled meter, one sentence — the level rail and next-level meter leading
-to the leaderboard, the profile's eight fields and completeness leading to the
-editor. The opportunities page is a title with an outline "Applications"
+The dashboard is the volunteer's progress: a hero that greets them by first
+name over the orange level chip, "Next: …", a wide meter inside the current
+step and "N verified hours to go", with "View levels" opening the levels
+dialog; the volunteer's pass hangs from the hero's top edge on its strap, the
+logo's heart and a faint blue ring behind it. Below it one panel of three
+linked figures — verified hours, XP, the overall XP rank — then whatever only
+appears while it has something to say (Next up, the profile reward), and
+"Recent participation": the four latest events that have ended, as a table of
+event, date, result, hours and XP whose rows open their application. On a
+phone the pass shrinks to the hero's corner without its wordmark, the figures
+stack, and the table becomes stacked rows. My activity (`/record`) is the same
+table with every event, the upcoming one included, under a page header. The opportunities page is a title with an outline "Applications"
 link and its count on the right, one toolbar row (search, the All /
 Volunteering / Competitions switcher, region, "Saved only"), and a three-column
 grid of photo cards; the applications page keeps the section tabs and its pill
@@ -272,7 +282,7 @@ same `Panel`, so the panel reads as one product rather than seven pages.
 
 `h1` takes the serif from the base layer at page-title size. Panel titles are
 `h2` and opt into `font-sans` at 16px semibold, because a panel title is a
-label, not a headline. Figures in stat tiles are serif at figure size with
+label, not a headline. The dashboard's figures are serif with
 `tabular-nums`, so a count reads as evidence. Nothing sets the serif bold; the
 typography test refuses it.
 
@@ -285,15 +295,16 @@ things the institution did.
 
 **Orange** appears where a person did something, and nowhere else:
 
-| Surface                                                                   | Treatment                          |
-| ------------------------------------------------------------------------- | ---------------------------------- |
-| The level in the sidebar identity card, the dashboard tile and the record | `text-accent-ink`                  |
-| Events completed, hours, reliability on the record                        | `text-accent-ink` at figure size   |
-| Reached nodes and labels on the level rail                                | `bg-accent` / `text-accent-ink`    |
-| The "accepted" chip and the "attended" outcome                            | `border-accent/50 text-accent-ink` |
-| The decision node on an accepted application's timeline                   | `bg-accent`                        |
-| A completed profile, and the preview "saved" status                       | `text-accent-ink`                  |
-| Activity dots for a confirmation, an acceptance, a level                  | `bg-accent`                        |
+| Surface                                                          | Treatment                          |
+| ---------------------------------------------------------------- | ---------------------------------- |
+| The level chip in the hero, on the pass and in the identity card | `level-chip` / `text-accent-ink`   |
+| The XP figure's star tile and the XP a verified row earned       | `bg-accent/12 text-accent`         |
+| Reached and current steps in the levels dialog                   | orange hexagon, "Reached" tick     |
+| Events and reliability on the profile                            | `text-accent-ink` at figure size   |
+| The "accepted" chip, the "attended" outcome, a "Verified" result | `border-accent/50 text-accent-ink` |
+| The decision node on an accepted application's timeline          | `bg-accent`                        |
+| A completed profile, and the preview "saved" status              | `text-accent-ink`                  |
+| Activity dots for a confirmation, an acceptance, a level         | `bg-accent`                        |
 
 **Gold, silver and bronze** appear in exactly one place: the top three on the
 leaderboard. Each place owns a metal (`gold`, `silver`, `bronze`) for its
@@ -303,8 +314,13 @@ one; the badge label is `medal-label`, white by day and the page ground after
 dark. The metals never label a system state or a person's action elsewhere,
 and the experience figures stay orange even on the podium.
 
-Nothing orange sits on blue and nothing blue sits on orange. The level rail's
-reached nodes are orange on a `border-control` hairline. The palette has one
+Nothing orange sits on blue and nothing blue sits on orange. The pass is the
+one blue field near an orange mark, and its level chip sits on its own
+`surface` pill, as the identity card's level does on the navy shell. The
+levels dialog keeps the next step blue (the goal the institution sets) and the
+steps already climbed orange. There is no green: a verified result and a
+reached level are the person's, so they are orange, and "Awaiting
+verification" is a system state, so it is blue with the clock. The palette has one
 red, `danger` (`danger`, `danger-ink`, `danger-muted`, the values the three
 portals use), for an action that leaves or destroys: the sign-out button in
 the settings account card is a `danger-outline` button. It never states an
@@ -341,7 +357,13 @@ colour is still a decision for the implementation plan.
   error) glyph, a title, one sentence, the retry button and a live countdown
   beneath it, and the request reference in small tabular type. The rest of the
   page stays up around it.
-- **Stat tile** — the same box carrying one label, one figure and one note.
+- **Figures strip** — one panel of three linked cells divided by hairlines:
+  a 48px icon tile, a serif figure, a label and an arrow; stacked on a phone.
+- **Levels dialog** — a 36rem raised surface over a `shell` scrim: the title,
+  one sentence, a row per step (hexagon glyph, name, "Starts at N h", and
+  Reached / Current level / "N h to go" / —) with the current row ringed in
+  blue, the next step's meter, and the note that organisation roles are
+  assigned separately.
 - **Card** — the opportunity card in a grid, photo first: the vacancy photo at
   2:1 (or, without one, `surface-soft` with the dot grid and the type's glyph),
   the type chip on a translucent `surface` pill in its top-left corner and the
@@ -354,8 +376,10 @@ colour is still a decision for the implementation plan.
   page.
 - **Rows** — hairline-separated, the first flush to the panel edge; the same
   row shape on the dashboard, in the applications list and in "closing soon".
-- **Table** — the participation history only, scrolling inside its panel below
-  40rem so the page never scrolls sideways.
+- **Participation table** — recent participation and My activity: a real
+  table from a 44rem container, stacked grid rows below it (event and XP,
+  result and hours, date), so neither the panel nor the page scrolls
+  sideways. A row with an application is one stretched link.
 
 The sign-in panel (`AuthPanel`, 28px radius on the dot grid) and the welcome
 flow's step panel, the same 28px surface holding one step at a time, are the
@@ -375,14 +399,15 @@ two surfaces that are not a `Panel`.
 
 ## Motion
 
-The page header and stat tiles use the `enter-*` keyframes because they are
+The page header, the hero's greeting and level, and the figures use the
+`enter-*` keyframes because they are
 above the fold. Panels are always visible and never depend on JavaScript to
 enter the page. The welcome pass is the one authored loop: it
 pauses when offscreen or hidden, reads its colours from the tokens, and keeps a
 static composition under reduced motion or without WebGL. On the dashboard the
-same badge is drawn in SVG, hangs from the hero's top edge, shows the parts the
-profile has filled, and settles once on arrival with a short swing that
-reduced motion removes. The pass is
+volunteer's own pass — photo, name, role and level, drawn in HTML and CSS —
+hangs from the hero's top edge at a slight tilt and settles once on arrival
+with a short swing that reduced motion removes. The pass is
 the flow's one authored moment: a saved step prints a line on the badge and
 nudges it on its lanyard, the last screen stamps it with the orange seal, and
 each step panel slides in the direction the volunteer moved. Menus open and

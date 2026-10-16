@@ -21,7 +21,12 @@ import {
   QUESTION_TYPES,
   REGIONS,
 } from "@/lib/opportunities/types";
-import { ATTENDANCE_OUTCOMES, LEVELS, PLACEMENTS } from "@/lib/record/levels";
+import {
+  ATTENDANCE_OUTCOMES,
+  LEVELS,
+  PLACEMENTS,
+  ladderProblem,
+} from "@/lib/record/levels";
 
 function optional<T extends z.ZodTypeAny>(schema: T) {
   return schema.nullish().transform((value) => value ?? undefined);
@@ -271,12 +276,30 @@ export const recordSchema = z.object({
     attended: z.number().int().nonnegative(),
     acceptedResolved: z.number().int().nonnegative(),
     acceptedUnconfirmed: z.number().int().nonnegative(),
-    standoutReviews: z.boolean().default(false),
   }),
-  level: z.enum(LEVELS),
   hours: optional(z.number()),
   hoursVerified: z.boolean().default(true),
 });
+
+const levelStepSchema = z.object({
+  key: z.enum(LEVELS),
+  minHours: z.number().nonnegative(),
+});
+
+export const progressSchema = z
+  .object({
+    verifiedHours: z.number().nonnegative(),
+    xp: z.number().int().nonnegative(),
+    rank: z.number().int().positive().nullable(),
+    level: z.enum(LEVELS),
+    nextLevel: levelStepSchema.extend({ hoursToGo: z.number().positive() }).nullable(),
+    levels: z.array(levelStepSchema).min(1),
+  })
+  .superRefine((progress, context) => {
+    const problem = ladderProblem(progress);
+    if (problem)
+      context.addIssue({ code: "custom", message: problem, path: ["levels"] });
+  });
 
 export const participationEntrySchema = z.object({
   id: z.string().min(1),
@@ -285,11 +308,14 @@ export const participationEntrySchema = z.object({
   kind: z.enum(OPPORTUNITY_KINDS),
   organization: z.string(),
   eventDate: isoDate,
+  eventEndsAt: optional(isoDate),
   outcome: z.enum(ATTENDANCE_OUTCOMES),
   hours: optional(z.number()),
   placement: optional(z.enum(PLACEMENTS)),
   xpAwarded: optional(z.number().int()),
   countsTowardProgress: z.boolean().optional(),
+  applicationId: optional(z.string().min(1)),
+  imageUrl: optional(z.string()),
 });
 
 export const historySchema = z.object({
@@ -526,3 +552,4 @@ export type SavedList = z.infer<typeof savedListSchema>;
 export type NotificationList = z.infer<typeof notificationListSchema>;
 export type CheckpointList = z.infer<typeof checkpointListSchema>;
 export type History = z.infer<typeof historySchema>;
+export type Progress = z.infer<typeof progressSchema>;

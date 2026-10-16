@@ -32,25 +32,38 @@ own side — see [`docs/product/VOLUNTEER_DASHBOARD.md`](docs/product/VOLUNTEER_
 
 ## Volunteer levels
 
-Implemented once, in `src/lib/record/levels.ts`, and tested there:
+A level is a step on a ladder of **verified volunteer hours**. The backend owns
+the ladder and serves it with the volunteer's standing (`GET /record/progress`);
+this app keeps only the level keys, their names in the three catalogs, and
+`src/lib/record/levels.ts`, which checks that a served ladder is coherent and
+works out where the volunteer stands on it.
 
-| Level    | Qualification                                                       |
-| -------- | ------------------------------------------------------------------- |
-| Newcomer | Joined                                                              |
-| Active   | 3 completed events                                                  |
-| Trusted  | 8 completed events with at least 85% reliability                    |
-| Core     | 20 completed events, at least 90% reliability, and standout reviews |
+| Level       | Starts at |
+| ----------- | --------- |
+| Newcomer    | 0 h       |
+| Volunteer   | 10 h      |
+| Supervisor  | 50 h      |
+| Coordinator | 100 h     |
+| Leader      | 250 h     |
 
-**Reliability** is the share of _resolved_ accepted events the volunteer
-attended. Two rules follow from that word:
+Verified hours are the confirmed hours of attended volunteering, counted past
+events and the team's hour adjustments. Competitions earn XP, not hours, and
+nothing counts until results are verified, so an event an organiser has not
+confirmed never holds a volunteer back. Levels recognise volunteering; they
+are not roles in an organisation, which are assigned separately, and the
+levels dialog says so.
+
+XP is separate: it ranks the leaderboard and comes from hours, competition
+placings, the profile reward and adjustments. The dashboard shows both.
+
+**Reliability** — the share of _resolved_ accepted events the volunteer
+attended — is no longer part of a level. The profile still shows it, under the
+same two rules:
 
 1. An event an organiser never confirmed is excluded from the calculation
    entirely. A volunteer is never penalised for someone else's inaction.
 2. Reliability is not shown below three resolved events, because one absence
    out of two would read as a 50% score.
-
-"Standout reviews" is not computable and there is no review system, so `core`
-is reachable only when the backend grants an explicit recognition flag.
 
 ## Audience and its consequences
 

@@ -38,7 +38,8 @@ import {
   type UsernameIdentity,
 } from "@/lib/account/username";
 import { getMe, listMergeRequests } from "@/lib/api/account.server";
-import { getRecord } from "@/lib/api/record.server";
+import { settle } from "@/lib/api/load.server";
+import { getProgress } from "@/lib/api/record.server";
 import type { MergeRequest } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { isGoogleConfigured } from "@/lib/auth/config";
@@ -76,11 +77,11 @@ export default async function SettingsPage({
   setRequestLocale(locale);
 
   const { connect, password } = await searchParams;
-  const [session, me, requests, volunteerRecord, format, t] = await Promise.all([
+  const [session, me, requests, progress, format, t] = await Promise.all([
     requireSession(),
     getMe(),
     listMergeRequests(),
-    getRecord(),
+    settle(() => getProgress()),
     getFormatter({ locale }),
     getTranslations({ locale, namespace: "settings" }),
   ]);
@@ -105,7 +106,7 @@ export default async function SettingsPage({
       locale={locale as Locale}
       name={me.displayName?.trim() || session.displayName?.trim() || ""}
       avatarUrl={me.avatarUrl}
-      level={volunteerRecord.level}
+      level={progress.status === "loaded" ? progress.data.level : null}
       states={connectionStates(me)}
       username={usernameIdentity(me)}
       publicProfileEnabled={me.publicProfileEnabled}
@@ -145,7 +146,7 @@ function Settings({
   locale: Locale;
   name: string;
   avatarUrl?: string;
-  level: Level;
+  level: Level | null;
   states: readonly ConnectionState[];
   username: UsernameIdentity;
   publicProfileEnabled: boolean;
@@ -258,7 +259,7 @@ function Settings({
             title: t("account.title"),
             signsInWith: t("account.signsInWith"),
             nothingConnected: t("account.nothingConnected"),
-            level: record(`level.${level}`),
+            level: level ? record(`level.${level}`) : null,
           }}
           action={
             <SignOutForm

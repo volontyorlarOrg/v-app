@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import {
   hasParticipation,
   isReliabilityMeaningful,
-  levelFor,
-  levelProgress,
-  reachedLevels,
+  ladderProblem,
+  levelRows,
+  nextLevelMeter,
   reliability,
   reliabilityPercent,
+  type LevelStep,
   type RecordCounts,
+  type VolunteerProgress,
 } from "@/lib/record/levels";
 
 function counts(overrides: Partial<RecordCounts> = {}): RecordCounts {
@@ -16,7 +18,26 @@ function counts(overrides: Partial<RecordCounts> = {}): RecordCounts {
     attended: 0,
     acceptedResolved: 0,
     acceptedUnconfirmed: 0,
-    standoutReviews: false,
+    ...overrides,
+  };
+}
+
+const LADDER: LevelStep[] = [
+  { key: "newcomer", minHours: 0 },
+  { key: "volunteer", minHours: 10 },
+  { key: "supervisor", minHours: 50 },
+  { key: "coordinator", minHours: 100 },
+  { key: "leader", minHours: 250 },
+];
+
+function progress(overrides: Partial<VolunteerProgress> = {}): VolunteerProgress {
+  return {
+    verifiedHours: 12,
+    xp: 170,
+    rank: 42,
+    level: "volunteer",
+    nextLevel: { key: "supervisor", minHours: 50, hoursToGo: 38 },
+    levels: LADDER,
     ...overrides,
   };
 }
@@ -54,80 +75,134 @@ describe("reliability", () => {
   });
 });
 
-describe("levelFor", () => {
-  it("starts at newcomer", () => {
-    expect(levelFor(counts())).toBe("newcomer");
+describe("the ladder the backend serves", () => {
+  it("accepts a ladder that rises from zero with the next step after the current one", () => {
+    expect(ladderProblem(progress())).toBeNull();
+    expect(
+      ladderProblem(progress({ verifiedHours: 300, level: "leader", nextLevel: null })),
+    ).toBeNull();
   });
 
-  it("reaches active at three completed events regardless of reliability", () => {
-    expect(levelFor(counts({ attended: 2, acceptedResolved: 2 }))).toBe("newcomer");
-    expect(levelFor(counts({ attended: 3, acceptedResolved: 3 }))).toBe("active");
+  it("refuses a ladder that does not start at zero", () => {
+    expect(
+      ladderProblem(
+        progress({ levels: [{ key: "newcomer", minHours: 1 }, ...LADDER] }),
+      ),
+    ).not.toBeNull();
   });
 
-  it("requires eight events and 85% reliability for trusted", () => {
-    expect(levelFor(counts({ attended: 8, acceptedResolved: 8 }))).toBe("trusted");
-    expect(levelFor(counts({ attended: 8, acceptedResolved: 11 }))).toBe("active");
+  it("refuses a ladder that falls or repeats a step", () => {
+    expect(
+      ladderProblem(
+        progress({
+          levels: [LADDER[0]!, LADDER[2]!, LADDER[1]!, LADDER[3]!, LADDER[4]!],
+        }),
+      ),
+    ).not.toBeNull();
+    expect(
+      ladderProblem(
+        progress({ levels: [...LADDER, { key: "leader", minHours: 500 }] }),
+      ),
+    ).not.toBeNull();
   });
 
-  it("does not award core without an explicit standout-review recognition", () => {
-    const qualified = counts({ attended: 25, acceptedResolved: 26 });
-    expect(levelFor(qualified)).toBe("trusted");
-    expect(levelFor({ ...qualified, standoutReviews: true })).toBe("core");
+  it("refuses a current level that is not on the ladder", () => {
+    expect(ladderProblem(progress({ levels: LADDER.slice(0, 1) }))).not.toBeNull();
+  });
+
+  it("refuses a next level that skips a step or disagrees with the ladder", () => {
+    expect(
+      ladderProblem(
+        progress({ nextLevel: { key: "coordinator", minHours: 100, hoursToGo: 88 } }),
+      ),
+    ).not.toBeNull();
+    expect(
+      ladderProblem(
+        progress({ nextLevel: { key: "supervisor", minHours: 40, hoursToGo: 28 } }),
+      ),
+    ).not.toBeNull();
+    expect(ladderProblem(progress({ nextLevel: null }))).not.toBeNull();
+    expect(
+      ladderProblem(
+        progress({
+          level: "leader",
+          nextLevel: { key: "supervisor", minHours: 50, hoursToGo: 1 },
+        }),
+      ),
+    ).not.toBeNull();
   });
 });
 
-describe("levelProgress", () => {
-  it("reports how many more events the next level needs", () => {
-    const progress = levelProgress(counts({ attended: 1, acceptedResolved: 1 }));
-    expect(progress.current).toBe("newcomer");
-    expect(progress.next).toBe("active");
-    expect(progress.eventsNeeded).toBe(2);
-    expect(progress.blockedByReliability).toBe(false);
+describe("the rows of the levels dialog", () => {
+  it("marks the steps below as reached, the current one, the next one and the rest", () => {
+    expect(
+      levelRows(progress()).map(({ key, state, hoursToGo }) => [key, state, hoursToGo]),
+    ).toEqual([
+      ["newcomer", "reached", null],
+      ["volunteer", "current", null],
+      ["supervisor", "next", 38],
+      ["coordinator", "ahead", null],
+      ["leader", "ahead", null],
+    ]);
   });
 
-  it("distinguishes a reliability block from an event-count block", () => {
-    const progress = levelProgress(counts({ attended: 8, acceptedResolved: 11 }));
-    expect(progress.current).toBe("active");
-    expect(progress.next).toBe("trusted");
-    expect(progress.eventsNeeded).toBeNull();
-    expect(progress.blockedByReliability).toBe(true);
-  });
-
-  it("flags the review requirement separately from the countable ones", () => {
-    const progress = levelProgress(counts({ attended: 30, acceptedResolved: 30 }));
-    expect(progress.next).toBe("core");
-    expect(progress.eventsNeeded).toBeNull();
-    expect(progress.blockedByReliability).toBe(false);
-    expect(progress.blockedByReview).toBe(true);
-  });
-
-  it("has no next level at core", () => {
-    const progress = levelProgress(
-      counts({ attended: 30, acceptedResolved: 30, standoutReviews: true }),
+  it("has nothing ahead on the top step", () => {
+    const rows = levelRows(
+      progress({ verifiedHours: 260, level: "leader", nextLevel: null }),
     );
-    expect(progress.current).toBe("core");
-    expect(progress.next).toBeNull();
+    expect(rows.map((row) => row.state)).toEqual([
+      "reached",
+      "reached",
+      "reached",
+      "reached",
+      "current",
+    ]);
+  });
+
+  it("keeps the hours of each step from the ladder", () => {
+    expect(levelRows(progress()).map((row) => row.minHours)).toEqual([
+      0, 10, 50, 100, 250,
+    ]);
   });
 });
 
-describe("reachedLevels", () => {
-  it("lists the current level and every one below it, in order", () => {
-    expect(reachedLevels("newcomer")).toEqual(["newcomer"]);
-    expect(reachedLevels("trusted")).toEqual(["newcomer", "active", "trusted"]);
+describe("the meter toward the next level", () => {
+  it("measures the hours made inside the current step, not from zero", () => {
+    expect(nextLevelMeter(progress())).toEqual({ value: 2, max: 40 });
+  });
+
+  it("starts empty on a new step and keeps decimals", () => {
+    expect(
+      nextLevelMeter(
+        progress({
+          verifiedHours: 0,
+          level: "newcomer",
+          nextLevel: { key: "volunteer", minHours: 10, hoursToGo: 10 },
+        }),
+      ),
+    ).toEqual({ value: 0, max: 10 });
+    expect(
+      nextLevelMeter(
+        progress({
+          verifiedHours: 52.5,
+          level: "supervisor",
+          nextLevel: { key: "coordinator", minHours: 100, hoursToGo: 47.5 },
+        }),
+      ),
+    ).toEqual({ value: 2.5, max: 50 });
+  });
+
+  it("is absent on the top step", () => {
+    expect(
+      nextLevelMeter(
+        progress({ verifiedHours: 300, level: "leader", nextLevel: null }),
+      ),
+    ).toBeNull();
   });
 });
 
 describe("hasParticipation", () => {
-  const empty = {
-    level: "newcomer" as const,
-    counts: {
-      attended: 0,
-      acceptedResolved: 0,
-      acceptedUnconfirmed: 0,
-      standoutReviews: false,
-    },
-    hoursVerified: true,
-  };
+  const empty = { counts: counts(), hoursVerified: true };
 
   it("is false for a volunteer with nothing on the record yet", () => {
     expect(hasParticipation(empty)).toBe(false);
@@ -136,13 +211,10 @@ describe("hasParticipation", () => {
 
   it("is true once any event is accepted, resolved or attended", () => {
     expect(
-      hasParticipation({
-        ...empty,
-        counts: { ...empty.counts, acceptedUnconfirmed: 1 },
-      }),
+      hasParticipation({ ...empty, counts: counts({ acceptedUnconfirmed: 1 }) }),
     ).toBe(true);
     expect(
-      hasParticipation({ ...empty, counts: { ...empty.counts, acceptedResolved: 1 } }),
+      hasParticipation({ ...empty, counts: counts({ acceptedResolved: 1 }) }),
     ).toBe(true);
     expect(hasParticipation({ ...empty, hours: 2 })).toBe(true);
   });

@@ -91,14 +91,21 @@ decision reads "Accepted instantly"; an organiser can still overturn it, which
 then reads as an ordinary decision. The opportunity no longer has a short
 description: `description` is the only text.
 
-## VolunteerRecord and AttendanceRecord
+## VolunteerProgress, VolunteerRecord and AttendanceRecord
 
-Counts and the resulting level come from the backend — attended,
-accepted-and-resolved, accepted-but-unconfirmed, and a standout flag — so
-exactly one formula exists. Attendance has four outcomes (`attended`,
-`excused`, `cancelled`, `awaiting_confirmation`), and the fourth is excluded
-from reliability entirely. Hours are shown as recorded, not verified, until the
-backend says otherwise. → `src/lib/record/levels.ts`
+The level is the backend's: `GET /record/progress` returns the verified hours,
+the XP, the leaderboard rank (or `null`), the level key, the next step with
+the hours still to go, and the whole ladder. The schema refuses a ladder that
+does not rise from zero or a next step that is not the one after the current
+level, so the dialog never draws an impossible ladder.
+→ `src/lib/record/levels.ts`
+
+The record's counts — attended, accepted-and-resolved, accepted-but-unconfirmed
+— still come from `GET /record` and feed the profile's figures and reliability.
+Attendance has five outcomes (`attended`, `excused`, `cancelled`, `no_show`,
+`awaiting_confirmation`); the last is excluded from reliability entirely, and a
+history row reads it as "Upcoming" until the event's end (`eventEndsAt`) and
+"Awaiting verification" after it. → `src/lib/record/participation.ts`
 
 ## Username and experience
 

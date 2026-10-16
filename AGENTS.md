@@ -19,7 +19,8 @@ from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
 navy sidebar that carries everything on desktop — the lockup and the
-notification bell, four sections (dashboard, opportunities, leaderboard, tasks), and
+notification bell, five sections (dashboard, opportunities, my activity,
+leaderboard, tasks), and
 at the foot the identity card, which is itself the profile's link, above
 settings — with no top bar; a slim header and a five-destination
 tab bar on a phone; and panels of content on a flat workspace. **Every
@@ -162,11 +163,18 @@ account lives on `/settings`, sign-out as the red button in the account card
 that opens `/settings` — nowhere in the shell — and the theme and the interface
 language in the **Appearance** panel on `/settings` — the one place either is
 changed inside the app.
-**The record lives on the dashboard.** `/record` redirects to
-`/dashboard#history`; the dashboard carries the four figures, the level rail
-and the full participation history, every outcome included. The profile's
-activity is the attended part of that same history, and the leaderboard is
-where "Your progress" leads. Nothing reads or writes
+**The dashboard is the volunteer's progress; the record is My activity.** The
+dashboard opens on the greeting, the level and the next step on the ladder of
+verified hours (the "Volunteer levels" dialog behind "View levels"), the pass,
+and one panel of three figures — verified hours, XP and the overall XP rank —
+each a link; then the blocks that appear only when they have something to say
+(the welcome-flow resume, "Add Telegram", Next up, the profile reward), and the
+four most recent events that have ended. `/record` is **My activity**, the
+whole participation history, every outcome included. The level, its ladder and
+the figures are `GET /record/progress`, the backend's arithmetic shown, as
+described in
+[`docs/plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md`](docs/plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md).
+The profile's activity is the attended part of that same history. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
 privacy}` are unused and are kept only because that decision is
 reversible. `settings.appearance` is live: it labels the theme switch and the
@@ -203,7 +211,8 @@ There is no theme or general animation library. Light and dark are one token
 set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
 CSS — the profile's rolling figures included (`RollingNumber` in
 `src/components/motion/`) — and `three` is isolated to one lazy object: the
-welcome flow's pass. The dashboard draws the same pass as an SVG. The one
+welcome flow's pass. The dashboard draws the volunteer's own pass — photo,
+name, level — in HTML and CSS, hanging on its strap. The one
 shared-element transition, the profile photo travelling into the editor and
 back, is React's `<ViewTransition>` behind `SharedElement`: the App Router
 ships the React canary that exports it, `src/types/react-canary.d.ts` brings
@@ -250,9 +259,9 @@ src/hooks/                      -> useServerAction and useActionForm: TanStack Q
                                    around the Server Actions, and useLocaleSwitch for the
                                    language controls
 src/app/[locale]/(onboarding)/  -> welcome: the four-step flow a new account lands on
-src/app/[locale]/(volunteer)/   -> the panel: dashboard (with the record), opportunities[/slug],
-                                   applications[/id], saved and record (redirects),
-                                   checkpoints, leaderboard, profile, profile/edit, settings
+src/app/[locale]/(volunteer)/   -> the panel: dashboard, opportunities[/slug], applications[/id],
+                                   record (My activity), saved (redirects), checkpoints,
+                                   leaderboard, profile, profile/edit, settings
 src/app/global-not-found.tsx    -> 404 for unmatched URLs (root layout is dynamic)
 src/app/robots.ts               -> disallows everything; every screen is private
 src/i18n/                       -> routing, navigation, request config, catalogs
@@ -263,7 +272,7 @@ src/lib/onboarding/             -> the welcome flow's steps, pass parts, and pro
 src/lib/seo/origin.ts           -> this origin and the marketing origin, never guessed
 src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
-src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,checkpoints,opportunities,applications,record,leaderboard,profile,settings}/
+src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,levels,checkpoints,opportunities,applications,record,leaderboard,profile,settings}/
 e2e/                            -> Playwright smoke suite
 docs/                           -> stable project documentation and the plan
 .agent-memory/                  -> durable decisions, discoveries, gotchas
@@ -302,7 +311,8 @@ docs/                           -> stable project documentation and the plan
   in the phone's account menu alike, so it is never a second row. A route that
   belongs inside a section names it in `section`, which is what keeps the
   sidebar and the tab bar lit on `/applications` and
-  `/profile/edit`. Detail pages hang off a section through `opportunityHref`
+  `/profile/edit`; a sidebar section with no phone tab names the tab to light
+  in `tabSection`, as My activity (`/record`) lights the dashboard's. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.
 - Two brand colours with a role each. **Blue is the institution**: navigation,
   structure, chips for a system state, primary actions. **Orange is the
@@ -334,10 +344,13 @@ docs/                           -> stable project documentation and the plan
   reads; the welcome flow's progress is an app-only readable cookie holding a
   step name and nothing else (`src/lib/onboarding/state.ts`). Session tokens live only in the encrypted
   `httpOnly` cookie and must never be passed to a Client Component.
-- Reputation is high-trust data. Every threshold lives in
-  `src/lib/record/levels.ts`. Never duplicate a formula into JSX, never invent
-  one, never count unconfirmed attendance against a volunteer, and never show
-  reliability below three resolved events.
+- Reputation is high-trust data. The level ladder and every threshold on it
+  arrive from the backend (`GET /record/progress`); `src/lib/record/levels.ts`
+  holds the level keys, refuses a ladder that cannot be true, and derives only
+  the dialog's rows and the meter inside the current step. Never hard-code a
+  threshold, never duplicate a formula into JSX, never count unconfirmed
+  attendance against a volunteer, and never show reliability below three
+  resolved events.
 - Backend data is never re-shaped in JSX. A response is parsed once by a schema
   in `src/lib/api/schemas.ts`; a page renders the schema's output or the
   load-error panel, never a fallback value it made up.
