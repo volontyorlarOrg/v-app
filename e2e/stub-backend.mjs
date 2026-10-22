@@ -1231,6 +1231,22 @@ const server = createServer(async (request, response) => {
     refreshTokens.delete(body.refreshToken);
     return send(response, 201, issueSession(state));
   }
+  if (path === "/past-events" && method === "GET")
+    return send(response, 200, {
+      items: [
+        {
+          id: "past-event-reading-day",
+          title: "Neighborhood reading day",
+          eventDate: at(-45, 9).slice(0, 10),
+          organization: organizations.reading,
+          volunteers: 12,
+          hours: 30.5,
+        },
+      ],
+      page: 1,
+      pageSize: Number(url.searchParams.get("pageSize") ?? 12),
+      total: 1,
+    });
   if (path === "/opportunities" && method === "GET")
     return url.searchParams.get("q") === FAILING_SEARCH
       ? send(response, 500, SERVER_ERROR)

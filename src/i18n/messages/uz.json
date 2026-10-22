@@ -93,6 +93,10 @@
         "title": "Yangi daraja: {level}",
         "body": "Sizda {hours} soat tasdiqlangan volontyorlik bor. Keyingi qadam bosh panelda."
       },
+      "pastEvent": {
+        "title": "Oʻtgan tadbir qoʻshildi",
+        "body": "{organization} bilan “{event}” faoliyatingizga qoʻshildi{xp, plural, =0 {.} other {: +# XP.}}"
+      },
       "close": "Bildirishnomalarni yopish",
       "allRead": "Barchasi oʻqildi",
       "marking": "Belgilanmoqda…",
@@ -335,7 +339,7 @@
   "record": {
     "metaTitle": "Mening faoliyatim",
     "title": "Mening faoliyatim",
-    "description": "Siz qabul qilingan har bir tadbir va undagi tasdiqlangan natija.",
+    "description": "Siz qabul qilingan yoki qayd etilgan har bir tadbir va undagi tasdiqlangan natija.",
     "level": {
       "label": "Daraja",
       "newcomer": "Yangi kelgan",
@@ -770,7 +774,9 @@
         "amirsoy": "Amirsoy Paradiso — Open Air",
         "football": "Paxtakor stadionidagi xalqaro futbol uchrashuvi"
       },
-      "closed": "Oʻtgan tadbirlar · Arizalar qabuli yopilgan"
+      "closed": "Oʻtgan tadbirlar · Arizalar qabuli yopilgan",
+      "recorded": "Tashkilotlar qayd etgan oʻtgan tadbirlar",
+      "took": "{count, plural, one {# volontyor} other {# volontyor}} · {hours} soat"
     },
     "sorting": {
       "newest": "Eng yangi eʼlonlar avval",

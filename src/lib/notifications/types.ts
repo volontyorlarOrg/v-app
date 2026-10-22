@@ -169,3 +169,27 @@ export function levelNotification(
   }
   return { level, verifiedHours };
 }
+
+export const PAST_EVENT_NOTIFICATION_KIND = "past_event.credited";
+
+export type PastEventNotification = {
+  event: string;
+  organization: string;
+  xp: number;
+};
+
+export function pastEventNotification(
+  kind: string,
+  data: Notification["data"],
+): PastEventNotification | null {
+  if (kind !== PAST_EVENT_NOTIFICATION_KIND) return null;
+  const event = textOf(data, "title");
+  const organization = textOf(data, "organization");
+  if (!event || !organization) return null;
+  const xp = data?.xpAwarded;
+  return {
+    event,
+    organization,
+    xp: typeof xp === "number" && Number.isInteger(xp) && xp > 0 ? xp : 0,
+  };
+}

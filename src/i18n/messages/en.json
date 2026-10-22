@@ -93,6 +93,10 @@
         "title": "New level: {level}",
         "body": "You have {hours} verified volunteer hours. The next step is on your dashboard."
       },
+      "pastEvent": {
+        "title": "Past event added",
+        "body": "“{event}” with {organization} is now in your activity{xp, plural, =0 {.} other {: +# XP.}}"
+      },
       "close": "Close notifications",
       "allRead": "All caught up",
       "marking": "Marking…",
@@ -335,7 +339,7 @@
   "record": {
     "metaTitle": "My activity",
     "title": "My activity",
-    "description": "Every event you were accepted to, and what was verified.",
+    "description": "Every event you were accepted to or credited for, and what was verified.",
     "level": {
       "label": "Level",
       "newcomer": "Newcomer",
@@ -770,7 +774,9 @@
         "amirsoy": "Amirsoy Paradiso — Open Air",
         "football": "International football match at Paxtakor Stadium"
       },
-      "closed": "Past events · Applications closed"
+      "closed": "Past events · Applications closed",
+      "recorded": "Past events organizations recorded",
+      "took": "{count, plural, one {# volunteer} other {# volunteers}} · {hours} h"
     },
     "sorting": {
       "newest": "Newest posts first",
