@@ -126,6 +126,22 @@ export const opportunityListSchema = z.object({
   total: z.number().int(),
 });
 
+export const pastEventSchema = z.object({
+  id: z.string().min(1),
+  title: z.string(),
+  eventDate: z.string().min(1),
+  organization: organizationSchema,
+  volunteers: z.number().int().min(0),
+  hours: z.number().min(0),
+});
+
+export const pastEventListSchema = z.object({
+  items: z.array(pastEventSchema),
+  page: z.number().int().default(1),
+  pageSize: z.number().int().default(0),
+  total: z.number().int(),
+});
+
 export const applicationSummarySchema = z.object({
   id: z.string().min(1),
   status: z.enum(APPLICATION_STATUSES),
@@ -547,6 +563,8 @@ export type MergeCounterparty = z.infer<typeof mergeCounterpartySchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type PublicProfile = z.infer<typeof publicProfileSchema>;
 export type OpportunityList = z.infer<typeof opportunityListSchema>;
+export type PastEvent = z.infer<typeof pastEventSchema>;
+export type PastEventList = z.infer<typeof pastEventListSchema>;
 export type ApplicationList = z.infer<typeof applicationListSchema>;
 export type SavedList = z.infer<typeof savedListSchema>;
 export type NotificationList = z.infer<typeof notificationListSchema>;

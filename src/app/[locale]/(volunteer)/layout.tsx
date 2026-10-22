@@ -20,6 +20,7 @@ import {
   checkpointNotification,
   levelNotification,
   mergeNotificationName,
+  pastEventNotification,
 } from "@/lib/notifications/types";
 import { initialsOf } from "@/lib/profile/initials";
 import { PROFILE_TASK_ANCHOR } from "@/lib/checkpoints/checkpoints";
@@ -138,6 +139,24 @@ export default async function VolunteerLayout({
         href: navHref("settings"),
         category: "account",
         action: nav("notifications.viewAccount"),
+      };
+    }
+
+    const pastEvent = pastEventNotification(item.kind, item.data);
+    if (pastEvent) {
+      return {
+        id: item.id,
+        title: nav("notifications.pastEvent.title"),
+        body: nav("notifications.pastEvent.body", {
+          event: pastEvent.event,
+          organization: pastEvent.organization,
+          xp: pastEvent.xp,
+        }),
+        time,
+        unread: item.unread,
+        href: historyHref(),
+        category: "activity",
+        action: nav("notifications.viewDetails"),
       };
     }
 

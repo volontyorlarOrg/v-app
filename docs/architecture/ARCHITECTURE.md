@@ -182,7 +182,10 @@ reads `application.submitted`, `application.reviewed` (with `data.status`) and
 `nav.notifications.activity` copy in the interface language, linked to the
 application or to My activity (`/record`). `level.reached` (with `data.level`
 and `data.verifiedHours`) is read by `levelNotification()` and links to the
-dashboard. Joining accounts is handled the same
+dashboard. `past_event.credited` (with `data.title`, `data.organization` and
+`data.xpAwarded`), sent when an administrator approves the volunteer's part in
+an organization's past event, is read by `pastEventNotification()` and links to
+My activity. Joining accounts is handled the same
 way through `mergeNotificationName()`; any other kind falls back to the
 backend's own words. The user menu links to the consolidated
 profile and to settings, where the sign-out action is called.
