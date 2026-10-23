@@ -1441,6 +1441,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/record/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get verified volunteer hours, level, XP and overall rank */
+        get: operations["AttendanceController_progress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/record": {
         parameters: {
             query?: never;
@@ -1519,6 +1536,23 @@ export interface paths {
         get?: never;
         /** Resolve attendance for an owned vacancy in bulk */
         put: operations["StaffOpportunityAttendanceController_resolve"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active volunteers by experience points */
+        get: operations["LeaderboardController_list"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -2390,23 +2424,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/org/participants/{id}/past-events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Propose a past event for a participant; an administrator decides */
-        post: operations["OrgPastEventsController_proposeCreate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/org/past-events/{eventId}": {
         parameters: {
             query?: never;
@@ -2526,15 +2543,135 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/leaderboard": {
+    "/admin/past-events": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List active volunteers by experience points */
-        get: operations["LeaderboardController_list"];
+        /** Past events organizations created, waiting ones first */
+        get: operations["AdminPastEventsController_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/past-events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One past event and every participant on it */
+        get: operations["AdminPastEventsController_event"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/past-events/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve every waiting participant with the proposed hours and XP, all or none */
+        post: operations["AdminPastEventsController_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/past-events/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Turn down every waiting participant with one reason */
+        post: operations["AdminPastEventsController_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/past-event-rosters/volunteer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Find an active volunteer by exact public username */
+        get: operations["OrgPastEventRostersController_volunteer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/past-event-rosters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historical events and participant review totals for this organization */
+        get: operations["OrgPastEventRostersController_list"];
+        put?: never;
+        /** Submit a historical event with participant hours and XP for admin review */
+        post: operations["OrgPastEventRostersController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/past-event-rosters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One historical event and its participant proposals */
+        get: operations["OrgPastEventRostersController_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/past-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Past events organizations held, once an administrator approved a participant */
+        get: operations["PastEventsController_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3374,6 +3511,72 @@ export interface components {
             };
             essay?: string;
         };
+        VolunteerNextLevelDto: {
+            /** @enum {string} */
+            key: "newcomer" | "volunteer" | "supervisor" | "coordinator" | "leader";
+            minHours: number;
+            hoursToGo: number;
+        };
+        VolunteerLevelStepDto: {
+            /** @enum {string} */
+            key: "newcomer" | "volunteer" | "supervisor" | "coordinator" | "leader";
+            minHours: number;
+        };
+        VolunteerProgressDto: {
+            verifiedHours: number;
+            xp: number;
+            rank: number | null;
+            /** @enum {string} */
+            level: "newcomer" | "volunteer" | "supervisor" | "coordinator" | "leader";
+            nextLevel: components["schemas"]["VolunteerNextLevelDto"] | null;
+            levels: components["schemas"]["VolunteerLevelStepDto"][];
+        };
+        RecordCountsDto: {
+            attended: number;
+            acceptedResolved: number;
+            acceptedUnconfirmed: number;
+            standoutReviews: boolean;
+        };
+        VolunteerRecordDto: {
+            counts: components["schemas"]["RecordCountsDto"];
+            /**
+             * @deprecated
+             * @description Legacy event-based level. Use GET /record/progress instead.
+             * @enum {string}
+             */
+            level: "newcomer" | "active" | "trusted" | "core";
+            hours?: number;
+            hoursVerified: boolean;
+        };
+        ParticipationEntryDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            source: "attendance" | "manual";
+            /** Format: uuid */
+            applicationId: string | null;
+            /** Format: uri */
+            imageUrl: string | null;
+            /** Format: date-time */
+            eventEndsAt: string | null;
+            opportunityTitle: string;
+            /** @enum {string} */
+            kind: "volunteering" | "competition";
+            organization: string;
+            /** Format: date-time */
+            eventDate: string;
+            /** @enum {string} */
+            outcome: "attended" | "excused" | "cancelled" | "no_show" | "awaiting_confirmation";
+            hours?: number;
+            /** @enum {string} */
+            placement?: "winner" | "contributor" | "attendee";
+            xpAwarded?: number;
+            countsTowardProgress?: boolean;
+        };
+        ParticipationHistoryDto: {
+            items: components["schemas"]["ParticipationEntryDto"][];
+            total: number;
+        };
         ResolveAttendanceDto: {
             /** @enum {string} */
             outcome: "attended" | "excused" | "cancelled" | "no_show" | "awaiting_confirmation";
@@ -3397,6 +3600,84 @@ export interface components {
         };
         ResolveVacancyAttendanceDto: {
             records: components["schemas"]["AttendanceResolutionDto"][];
+        };
+        LeaderboardEntryDto: {
+            /** @example 1 */
+            rank: number;
+            /** @example Aziza Karimova */
+            displayName: string;
+            /** @example aziza_uz */
+            username: string;
+            /** Format: uri */
+            avatarUrl?: Record<string, never> | null;
+            profileVisible: boolean;
+            /** @example 365 */
+            xp: number;
+            isCurrentUser: boolean;
+        };
+        LeaderboardViewerDto: {
+            /** @example 42 */
+            rank: number;
+            /** @example Dilnoza Karimova */
+            displayName: string;
+            /** @example dilnoza_k */
+            username: string;
+            /** Format: uri */
+            avatarUrl?: Record<string, never> | null;
+            profileVisible: boolean;
+            /** @example 0 */
+            xp: number;
+        };
+        LeaderboardXpRulesDto: {
+            /** @example 10 */
+            xpPerHour: number;
+            /** @example 50 */
+            xpWinner: number;
+            /** @example 30 */
+            xpContributor: number;
+            /** @example 10 */
+            xpAttendee: number;
+            /** @example 10 */
+            xpNoShowPenalty: number;
+        };
+        LeaderboardScoringDto: {
+            /**
+             * @deprecated
+             * @description The rule results recorded before per-vacancy rewards were paid by. Read defaults instead.
+             * @example 50
+             */
+            attendedEventXp: number;
+            /**
+             * @deprecated
+             * @example 10
+             */
+            confirmedHourXp: number;
+            /**
+             * @deprecated
+             * @enum {string}
+             */
+            rounding: "nearest-total";
+            /** @description The rewards a new vacancy starts with. Each vacancy can change them before it is published. */
+            defaults: components["schemas"]["LeaderboardXpRulesDto"];
+        };
+        LeaderboardResponseDto: {
+            items: components["schemas"]["LeaderboardEntryDto"][];
+            viewer: components["schemas"]["LeaderboardViewerDto"];
+            /** @example 1 */
+            page: number;
+            /** @example 50 */
+            pageSize: number;
+            /**
+             * @description Ranked volunteers: active accounts with a chosen username.
+             * @example 240
+             */
+            total: number;
+            /**
+             * @description Every active volunteer account, including those not ranked until they choose a username.
+             * @example 310
+             */
+            volunteerTotal: number;
+            scoring: components["schemas"]["LeaderboardScoringDto"];
         };
         ReplacePasswordDto: {
             temporaryPassword: string;
@@ -3719,6 +4000,8 @@ export interface components {
         PastEventRequestDto: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            rosterId?: string | null;
             /** @enum {string} */
             kind: "create" | "update" | "remove";
             /** @enum {string} */
@@ -3753,19 +4036,6 @@ export interface components {
             pastEvents: components["schemas"]["ParticipantPastEventDto"][];
             requests: components["schemas"]["PastEventRequestDto"][];
         };
-        PastEventProposalDto: {
-            /** Format: uuid */
-            submissionId: string;
-            title: string;
-            /**
-             * Format: date
-             * @example 2026-09-20
-             */
-            eventDate: string;
-            hours: number;
-            xpAwarded: number;
-            note?: string;
-        };
         PastEventChangeDto: {
             /** Format: uuid */
             submissionId: string;
@@ -3796,6 +4066,8 @@ export interface components {
         AdminPastEventRequestDto: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            rosterId?: string | null;
             /** @enum {string} */
             kind: "create" | "update" | "remove";
             /** @enum {string} */
@@ -3835,98 +4107,134 @@ export interface components {
         RejectPastEventRequestDto: {
             note: string;
         };
-        LeaderboardEntryDto: {
-            /** @example 1 */
-            rank: number;
-            /** @example Aziza Karimova */
-            displayName: string;
-            /** @example aziza_uz */
-            username: string;
-            /** Format: uri */
-            avatarUrl?: Record<string, never> | null;
-            profileVisible: boolean;
-            /** @example 365 */
-            xp: number;
-            isCurrentUser: boolean;
+        AdminPastEventSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            eventDate: string;
+            note?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            participants: number;
+            pending: number;
+            approved: number;
+            rejected: number;
+            cancelled: number;
+            organization: components["schemas"]["PastEventRequestOrganizationDto"];
         };
-        LeaderboardViewerDto: {
-            /** @example 42 */
-            rank: number;
-            /** @example Dilnoza Karimova */
-            displayName: string;
-            /** @example dilnoza_k */
-            username: string;
-            /** Format: uri */
-            avatarUrl?: Record<string, never> | null;
-            profileVisible: boolean;
-            /** @example 0 */
-            xp: number;
-        };
-        LeaderboardXpRulesDto: {
-            /** @example 10 */
-            xpPerHour: number;
-            /** @example 50 */
-            xpWinner: number;
-            /** @example 30 */
-            xpContributor: number;
-            /** @example 10 */
-            xpAttendee: number;
-            /** @example 10 */
-            xpNoShowPenalty: number;
-        };
-        LeaderboardScoringDto: {
-            /**
-             * @deprecated
-             * @description The rule results recorded before per-vacancy rewards were paid by. Read defaults instead.
-             * @example 50
-             */
-            attendedEventXp: number;
-            /**
-             * @deprecated
-             * @example 10
-             */
-            confirmedHourXp: number;
-            /**
-             * @deprecated
-             * @enum {string}
-             */
-            rounding: "nearest-total";
-            /** @description The rewards a new vacancy starts with. Each vacancy can change them before it is published. */
-            defaults: components["schemas"]["LeaderboardXpRulesDto"];
-        };
-        LeaderboardResponseDto: {
-            items: components["schemas"]["LeaderboardEntryDto"][];
-            viewer: components["schemas"]["LeaderboardViewerDto"];
-            /** @example 1 */
+        AdminPastEventPageDto: {
+            items: components["schemas"]["AdminPastEventSummaryDto"][];
             page: number;
-            /** @example 50 */
             pageSize: number;
-            /**
-             * @description Ranked volunteers: active accounts with a chosen username.
-             * @example 240
-             */
             total: number;
-            /**
-             * @description Every active volunteer account, including those not ranked until they choose a username.
-             * @example 310
-             */
-            volunteerTotal: number;
-            scoring: components["schemas"]["LeaderboardScoringDto"];
+            /** @description Events with a participant still waiting. */
+            waiting: number;
         };
-        PublicProfileStatsDto: {
-            attendedEvents: number;
-            confirmedHours: number;
+        AdminPastEventDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            eventDate: string;
+            note?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            participants: number;
+            pending: number;
+            approved: number;
+            rejected: number;
+            cancelled: number;
+            organization: components["schemas"]["PastEventRequestOrganizationDto"];
+            requests: components["schemas"]["PastEventRequestDto"][];
+        };
+        PastEventVolunteerDto: {
+            /** Format: uuid */
+            id: string;
+            displayName?: string | null;
+            username: string;
+            /** Format: uri */
+            avatarUrl?: string | null;
+        };
+        PastEventRosterSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            eventDate: string;
+            note?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            participants: number;
+            pending: number;
+            approved: number;
+            rejected: number;
+            cancelled: number;
+        };
+        PastEventRosterPageDto: {
+            items: components["schemas"]["PastEventRosterSummaryDto"][];
+            page: number;
+            pageSize: number;
+            total: number;
+        };
+        PastEventRosterDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            eventDate: string;
+            note?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            requests: components["schemas"]["PastEventRequestDto"][];
+        };
+        PastEventRosterParticipantDto: {
+            hours: number;
+            xpAwarded: number;
+            /** Format: uuid */
+            volunteerId: string;
+        };
+        CreatePastEventRosterDto: {
+            /** Format: uuid */
+            submissionId: string;
+            title: string;
+            /**
+             * Format: date
+             * @example 2026-09-20
+             */
+            eventDate: string;
+            note?: string;
+            participants: components["schemas"]["PastEventRosterParticipantDto"][];
+        };
+        PublicPastEventOrganizationDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            slug: string;
+            logoUrl?: string | null;
+            verified: boolean;
         };
         PublicPastEventDto: {
             /** Format: uuid */
             id: string;
             title: string;
-            organization: string;
             /** Format: date */
             eventDate: string;
+            organization: components["schemas"]["PublicPastEventOrganizationDto"];
+            /** @description Volunteers whose participation an administrator approved. */
+            volunteers: number;
+            /** @description Their approved hours together. */
             hours: number;
-            xpAwarded: number;
-            countsTowardProgress: boolean;
+        };
+        PublicPastEventPageDto: {
+            items: components["schemas"]["PublicPastEventDto"][];
+            page: number;
+            pageSize: number;
+            total: number;
+        };
+        PublicProfileStatsDto: {
+            attendedEvents: number;
+            confirmedHours: number;
         };
         PublicActivityDto: {
             /** Format: uuid */
@@ -3980,7 +4288,7 @@ export interface components {
              */
             joinedAt?: string | null;
             /** @enum {string} */
-            level: "newcomer" | "active" | "trusted" | "core";
+            level: "newcomer" | "volunteer" | "supervisor" | "coordinator" | "leader";
             xp: number;
             stats: components["schemas"]["PublicProfileStatsDto"];
             pastEvents: components["schemas"]["PublicPastEventDto"][];
@@ -11228,6 +11536,60 @@ export interface operations {
             };
         };
     };
+    AttendanceController_progress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VolunteerProgressDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AttendanceController_record: {
         parameters: {
             query?: never;
@@ -11241,7 +11603,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["VolunteerRecordDto"];
+                };
             };
             /** @description Missing or invalid credentials */
             401: {
@@ -11293,7 +11657,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ParticipationHistoryDto"];
+                };
             };
             /** @description Missing or invalid credentials */
             401: {
@@ -11576,6 +11942,70 @@ export interface operations {
             };
             /** @description Request body exceeds the configured limit */
             413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeaderboardController_list: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                pageSize?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardResponseDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16136,94 +16566,6 @@ export interface operations {
             };
         };
     };
-    OrgPastEventsController_proposeCreate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PastEventProposalDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PastEventRequestDto"];
-                };
-            };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid credentials */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Authenticated account cannot perform this operation */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Requested resource was not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Request body exceeds the configured limit */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Request validation failed */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Request rate limit exceeded */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unexpected server error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Authentication or an upstream dependency is unavailable */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     OrgPastEventsController_proposeUpdate: {
         parameters: {
             query?: never;
@@ -16776,11 +17118,14 @@ export interface operations {
             };
         };
     };
-    LeaderboardController_list: {
+    AdminPastEventsController_events: {
         parameters: {
             query?: {
+                q?: string;
                 page?: components["schemas"]["Object"];
                 pageSize?: components["schemas"]["Object"];
+                /** @description waiting: at least one participant still needs a decision; reviewed: none does. */
+                view?: "waiting" | "reviewed";
             };
             header?: never;
             path?: never;
@@ -16793,7 +17138,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeaderboardResponseDto"];
+                    "application/json": components["schemas"]["AdminPastEventPageDto"];
                 };
             };
             /** @description Missing or invalid credentials */
@@ -16833,6 +17178,555 @@ export interface operations {
             };
             /** @description Authentication or an upstream dependency is unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminPastEventsController_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPastEventDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminPastEventsController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPastEventDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminPastEventsController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectPastEventRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPastEventDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgPastEventRostersController_volunteer: {
+        parameters: {
+            query: {
+                /** @description An exact public username, without @. */
+                username: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastEventVolunteerDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgPastEventRostersController_list: {
+        parameters: {
+            query?: {
+                q?: string;
+                page?: components["schemas"]["Object"];
+                pageSize?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastEventRosterPageDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgPastEventRostersController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePastEventRosterDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastEventRosterDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgPastEventRostersController_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastEventRosterDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PastEventsController_list: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                pageSize?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPastEventPageDto"];
+                };
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };

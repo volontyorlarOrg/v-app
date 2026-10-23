@@ -19,8 +19,14 @@ import { Link } from "@/i18n/navigation";
 import { listApplications } from "@/lib/api/applications.server";
 import { dataOf, settle, type Loaded } from "@/lib/api/load.server";
 import { listOpportunities } from "@/lib/api/opportunities.server";
+import { listPastEvents } from "@/lib/api/past-events.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
-import type { ApplicationList, OpportunityList, SavedList } from "@/lib/api/schemas";
+import type {
+  ApplicationList,
+  OpportunityList,
+  PastEventList,
+  SavedList,
+} from "@/lib/api/schemas";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import {
   DEFAULT_FILTERS,
@@ -72,11 +78,14 @@ export default async function OpportunitiesPage({
   const filters = parseOpportunityFilters(query);
   const view = opportunityViewParser.parseServerSide(query.view);
   const now = new Date();
+  const archiveShown =
+    view === "all" && activeFilterCount(filters) === 0 && filters.kind === null;
 
-  const [saved, applications, catalogue, common] = await Promise.all([
+  const [saved, applications, catalogue, pastEvents, common] = await Promise.all([
     settle(() => listSaved()),
     settle(() => listApplications()),
     view === "all" ? settle(() => listOpportunities(filters)) : Promise.resolve(null),
+    archiveShown ? settle(() => listPastEvents()) : Promise.resolve(null),
     getTranslations({ locale, namespace: "common" }),
   ]);
   const listing =
@@ -93,6 +102,7 @@ export default async function OpportunitiesPage({
       saved={savedList ? savedIds(savedList) : new Set()}
       applications={applicationsByOpportunity(dataOf(applications))}
       applicationCount={dataOf(applications)?.items.length ?? null}
+      pastEvents={pastEvents}
       now={now}
       errorLabels={loadErrorLabels(common)}
     />
@@ -146,6 +156,7 @@ function Opportunities({
   saved,
   applications,
   applicationCount,
+  pastEvents,
   now,
   errorLabels,
 }: {
@@ -155,13 +166,14 @@ function Opportunities({
   saved: ReadonlySet<string>;
   applications: ApplicationByOpportunity;
   applicationCount: number | null;
+  pastEvents: Loaded<PastEventList> | null;
   now: Date;
   errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("opportunities");
 
   const activeCount = activeFilterCount(filters);
-  const showArchive = view === "all" && activeCount === 0 && filters.kind === null;
+  const showArchive = pastEvents !== null;
   const groups =
     listing.status === "loaded" ? groupOpportunities(listing.data.items, now) : null;
 
@@ -351,7 +363,9 @@ function Opportunities({
         </>
       )}
 
-      {showArchive ? <PastOpportunitiesArchive /> : null}
+      {pastEvents ? (
+        <PastOpportunitiesArchive events={pastEvents} errorLabels={errorLabels} />
+      ) : null}
     </>
   );
 }

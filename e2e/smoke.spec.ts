@@ -1416,13 +1416,22 @@ test.describe("opportunities", () => {
     ).toHaveCount(1);
   });
 
-  test("shows three illustrated past events only in the unfiltered listing", async ({
+  test("shows approved organization events and three illustrated past events only in the unfiltered listing", async ({
     page,
   }, testInfo) => {
     await gotoReady(page, "/opportunities");
     const archive = page.getByRole("region", { name: "Past opportunities" });
 
-    await expect(archive.getByRole("article")).toHaveCount(3);
+    const recorded = archive.getByRole("list", {
+      name: "Past events organizations recorded",
+    });
+    await expect(recorded.getByRole("article")).toHaveCount(1);
+    await expect(
+      recorded.getByRole("heading", { level: 3, name: "Neighborhood reading day" }),
+    ).toBeVisible();
+    await expect(recorded).toContainText("Chilonzor Reading Corners");
+    await expect(recorded).toContainText("12 volunteers · 30.5 h");
+    await expect(archive.getByRole("article")).toHaveCount(4);
     for (const title of [
       "Best in the Profession 2026",
       "Amirsoy Paradiso — Open Air",
