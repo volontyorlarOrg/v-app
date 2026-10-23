@@ -16,6 +16,7 @@ import {
   notificationListSchema,
   opportunityDetailSchema,
   opportunityListSchema,
+  pastEventListSchema,
   profileSchema,
   progressSchema,
   publicProfileSchema,
@@ -824,5 +825,48 @@ describe("the volunteer's progress", () => {
     ).toThrow();
     expect(() => progressSchema.parse({ ...progress, verifiedHours: -1 })).toThrow();
     expect(() => progressSchema.parse({ ...progress, rank: 0 })).toThrow();
+  });
+});
+
+describe("past event schema", () => {
+  it("reads an approved organization event for the opportunities archive", () => {
+    const parsed = pastEventListSchema.parse({
+      items: [
+        {
+          id: "e1",
+          title: "Neighborhood reading day",
+          eventDate: "2026-09-20",
+          organization: { id: "o1", name: "Chilonzor Reading Corners", logoUrl: null },
+          volunteers: 12,
+          hours: 30.5,
+        },
+      ],
+      total: 1,
+    });
+    expect(parsed.items[0]?.organization).toEqual({
+      id: "o1",
+      name: "Chilonzor Reading Corners",
+      slug: "",
+      logoUrl: undefined,
+      verified: false,
+    });
+    expect(parsed.page).toBe(1);
+  });
+
+  it("refuses an event without its volunteer count rather than guessing it", () => {
+    expect(() =>
+      pastEventListSchema.parse({
+        items: [
+          {
+            id: "e1",
+            title: "Neighborhood reading day",
+            eventDate: "2026-09-20",
+            organization: { id: "o1", name: "Readers" },
+            hours: 3,
+          },
+        ],
+        total: 1,
+      }),
+    ).toThrow();
   });
 });

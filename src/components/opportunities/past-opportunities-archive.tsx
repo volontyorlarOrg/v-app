@@ -1,6 +1,16 @@
-import { Archive, ArrowUpRight, CalendarDays, MapPin } from "lucide-react";
+import {
+  Archive,
+  ArrowUpRight,
+  Building2,
+  CalendarDays,
+  MapPin,
+  Users,
+} from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 
+import { LoadErrorRows, type LoadErrorLabels } from "@/components/app/load-error";
+import type { Loaded } from "@/lib/api/load.server";
+import type { PastEventList } from "@/lib/api/schemas";
 import { PAST_OPPORTUNITIES } from "@/lib/opportunities/archive";
 
 function formatDate(format: ReturnType<typeof useFormatter>, value: string) {
@@ -11,7 +21,13 @@ function formatDate(format: ReturnType<typeof useFormatter>, value: string) {
   });
 }
 
-export function PastOpportunitiesArchive() {
+export function PastOpportunitiesArchive({
+  events,
+  errorLabels,
+}: {
+  events: Loaded<PastEventList>;
+  errorLabels: LoadErrorLabels;
+}) {
   const t = useTranslations("opportunities.archive");
   const format = useFormatter();
 
@@ -56,6 +72,57 @@ export function PastOpportunitiesArchive() {
           </a>
         </div>
       </header>
+
+      {events.status === "failed" ? (
+        <LoadErrorRows
+          failure={events.failure}
+          labels={errorLabels}
+          className="mt-5 rounded-xl border border-border bg-surface"
+        />
+      ) : events.data.items.length > 0 ? (
+        <ul
+          aria-label={t("recorded")}
+          className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        >
+          {events.data.items.map((event) => (
+            <li key={event.id} className="flex min-w-0">
+              <article className="panel-surface flex w-full flex-col rounded-xl border border-border bg-surface p-4 sm:p-5">
+                <span className="w-fit rounded-full bg-surface-sunk px-2.5 py-1 text-xs font-medium text-ink-muted">
+                  {t("pastEvent")}
+                </span>
+
+                <h3 className="mt-3 text-base leading-snug font-semibold text-balance [overflow-wrap:anywhere] text-ink">
+                  {event.title}
+                </h3>
+
+                <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
+                  <CalendarDays aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                  <time dateTime={event.eventDate}>
+                    {formatDate(format, event.eventDate)}
+                  </time>
+                </p>
+
+                <p className="mt-2 flex items-start gap-2 text-sm text-ink-muted">
+                  <Building2 aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                  <span className="[overflow-wrap:anywhere]">
+                    {event.organization.name}
+                  </span>
+                </p>
+
+                <p className="tabular mt-2 flex items-start gap-2 text-sm text-ink-muted">
+                  <Users aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                  <span>
+                    {t("took", {
+                      count: event.volunteers,
+                      hours: format.number(event.hours),
+                    })}
+                  </span>
+                </p>
+              </article>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       <ul className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {PAST_OPPORTUNITIES.map((item) => {

@@ -7,6 +7,7 @@ import {
   isMergeNotificationKind,
   levelNotification,
   mergeNotificationName,
+  pastEventNotification,
 } from "@/lib/notifications/types";
 
 describe("merge notifications", () => {
@@ -148,6 +149,50 @@ describe("level notifications", () => {
       levelNotification("attendance.resolved", {
         level: "volunteer",
         verifiedHours: 12,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("past event notifications", () => {
+  it("reads the event, its organization and the XP a volunteer was credited", () => {
+    expect(
+      pastEventNotification("past_event.credited", {
+        userId: "u1",
+        title: "Library clean-up",
+        organization: "Chilonzor Reading Corners",
+        xpAwarded: 40,
+      }),
+    ).toEqual({
+      event: "Library clean-up",
+      organization: "Chilonzor Reading Corners",
+      xp: 40,
+    });
+  });
+
+  it("treats missing or odd XP as none, so the sentence never shows a wrong figure", () => {
+    for (const xpAwarded of [undefined, 0, -5, 2.5, "40"]) {
+      expect(
+        pastEventNotification("past_event.credited", {
+          title: "Library clean-up",
+          organization: "Readers",
+          xpAwarded,
+        })?.xp,
+      ).toBe(0);
+    }
+  });
+
+  it("leaves the backend's own wording when the event or organization is missing", () => {
+    expect(
+      pastEventNotification("past_event.credited", { organization: "Readers" }),
+    ).toBeNull();
+    expect(
+      pastEventNotification("past_event.credited", { title: "Library clean-up" }),
+    ).toBeNull();
+    expect(
+      pastEventNotification("attendance.resolved", {
+        title: "Library clean-up",
+        organization: "Readers",
       }),
     ).toBeNull();
   });

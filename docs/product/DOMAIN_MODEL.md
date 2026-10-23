@@ -58,8 +58,14 @@ The opportunities listing defaults to newest publication first (`sort=newest`).
 Cards display the backend `publishedAt` date when available, including in Saved.
 Current and expired vacancies have separate headings and counts; a closed status
 or a deadline at or before the request time puts a vacancy in Expired. A full
-vacancy with a future deadline remains Current. The sourced past-events archive
-has its own divider and stays outside filtered and saved results.
+vacancy with a future deadline remains Current. The past-events archive has its
+own divider and stays outside filtered and saved results. It shows the
+organizations' past events an administrator approved (`GET /past-events`: name,
+date, organization, and how many volunteers and hours were approved), newest
+first, above the three sourced, illustrated events in
+`src/lib/opportunities/archive.ts`. A failed read shows `LoadErrorRows` in their
+place and leaves the sourced events standing. The volunteers' own share of an
+approved event is in their history as a `manual` entry.
 
 ## Application
 
