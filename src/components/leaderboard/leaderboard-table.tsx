@@ -97,7 +97,10 @@ export function LeaderboardTable({
                 )}
               </TableCell>
               <TableCell
-                className={cn(CELL, "tabular py-2.5 text-right text-sm text-ink")}
+                className={cn(
+                  CELL,
+                  "tabular py-2.5 text-right text-sm font-medium text-accent-ink",
+                )}
               >
                 {t("xpValue", { xp: format.number(entry.xp) })}
               </TableCell>

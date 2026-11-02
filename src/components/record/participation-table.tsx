@@ -185,7 +185,14 @@ function ParticipationRow({ entry, now }: { entry: ParticipationEntry; now: Date
               tone === "neutral" && "text-ink-muted",
             )}
           />
-          <span className={tone === "neutral" ? "text-ink-muted" : "text-ink"}>
+          <span
+            className={cn(
+              "font-medium",
+              tone === "achievement" && "text-accent-ink",
+              tone === "structure" && "text-primary",
+              tone === "neutral" && "text-ink-muted",
+            )}
+          >
             {t(`status.${status}`)}
           </span>
           {roleText ? <span className="text-ink-muted">{roleText}</span> : null}
@@ -199,7 +206,7 @@ function ParticipationRow({ entry, now }: { entry: ParticipationEntry; now: Date
         data-numeric=""
         className={cn(
           "participation-xp",
-          !pending && xp.startsWith("+") ? "text-ink" : "text-ink-muted",
+          !pending && xp.startsWith("+") ? "text-accent-ink" : "text-ink-muted",
         )}
       >
         {xp}
@@ -232,7 +239,7 @@ function EventThumb({ entry }: { entry: ParticipationEntry }) {
   return (
     <span
       aria-hidden="true"
-      className="participation-thumb inline-grid place-items-center bg-surface-sunk text-ink-muted"
+      className="participation-thumb inline-grid place-items-center bg-surface-soft text-primary"
     >
       <Icon className="size-4" />
     </span>

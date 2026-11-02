@@ -10,10 +10,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary: "bg-action text-knockout hover:bg-action-hover",
-        outline: "border border-border bg-transparent text-ink hover:bg-surface-sunk",
+        outline: "border border-border bg-surface text-ink hover:bg-surface-sunk",
         ghost: "text-primary hover:bg-surface-sunk",
         "danger-outline":
-          "border border-border bg-transparent text-danger-ink hover:border-danger/50 hover:bg-danger-muted",
+          "border border-border bg-surface text-danger-ink hover:border-danger/50 hover:bg-danger-muted",
         inverse: "bg-knockout text-action hover:bg-surface-sunk",
       },
       size: {

@@ -50,16 +50,16 @@ export function NextUp({
         return (
           <li
             key={id}
-            className="grid grid-cols-[2.5rem_1fr] gap-x-4 border-t border-border px-5 py-3 first:border-t-0"
+            className="grid grid-cols-[3rem_1fr] gap-x-3 border-t border-border px-5 py-3 first:border-t-0"
           >
-            <div className="text-center">
+            <div className="self-start rounded-md bg-surface-soft py-1 text-center">
               <time
                 dateTime={opportunity.startsAt}
-                className="figure block text-2xl text-ink"
+                className="figure block text-xl text-primary"
               >
                 {format.dateTime(starts, { day: "numeric" })}
               </time>
-              <span className="block text-xs text-ink-muted">
+              <span className="block text-xs text-primary">
                 {format.dateTime(starts, { month: "short" })}
               </span>
             </div>

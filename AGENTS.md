@@ -13,13 +13,13 @@ builds a participation record. Read this file before meaningful work, then use
 
 It follows the same codebase patterns as the marketing site in `../v-web`: the
 theme and route registry, catalog layout, documentation layout, and verification
-loop. **Its look is its own since 2026-11-02:** one cobalt blue on white, Inter, a
-small radius scale, described in [`DESIGN.md`](DESIGN.md). Do not copy tokens from
+loop. **Its look is its own since 2026-11-02:** one calm blue, white panels on a soft
+ground beside a pale blue sidebar, Inter, a moderate radius scale, described in [`DESIGN.md`](DESIGN.md). Do not copy tokens from
 `v-web` into this repository; the reason is in
 `.agent-memory/decisions/one-blue-on-white.md`.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
-plain white sidebar that carries everything on desktop — the lockup and the
+pale blue sidebar that carries everything on desktop — the lockup and the
 notification bell, five sections (dashboard, opportunities, my activity,
 leaderboard, tasks), and
 at the foot the identity card, which is itself the profile's link, above
@@ -213,7 +213,7 @@ set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
 CSS — the profile's rolling figures included (`RollingNumber` in
 `src/components/motion/`) — and `three` is isolated to one lazy object: the
 welcome flow's pass. The dashboard draws the volunteer's own pass — photo,
-name, level — in HTML and CSS, as a flat cobalt card hanging on its strap. The one
+name, level — in HTML and CSS, as a blue card hanging on its strap. The one
 shared-element transition, the profile photo travelling into the editor and
 back, is React's `<ViewTransition>` behind `SharedElement`: the App Router
 ships the React canary that exports it, `src/types/react-canary.d.ts` brings
@@ -315,18 +315,17 @@ docs/                           -> stable project documentation and the plan
   `/profile/edit`; a sidebar section with no phone tab names the tab to light
   in `tabSection`, as My activity (`/record`) lights the dashboard's. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.
-- **One blue, and it is a signal.** Blue marks what a volunteer can act on and
-  where they are: buttons, links, the selected state, focus, meters. Everything
-  else is neutral, and the volunteer's pass is the one large area of blue. **Orange
-  is the person's, and it is only ever a small mark**: the level, a verified result,
-  an acceptance, the XP star. It has no text token and never fills or tints
-  anything. The palette has one red, `danger`, the same values as the three portals,
+- **One calm blue, and solid fills are for actions.** Solid blue marks what a
+  volunteer can act on, and soft tints of it carry state and small icons. The
+  volunteer's pass is the one large area of blue. **Orange is the person's**: the
+  level, a verified result, an acceptance, XP, a saved opportunity. Icons use `accent`,
+  text uses `accent-ink`, and it never fills a button or a large surface. The palette has one red, `danger`, the same values as the three portals,
   and it marks an action that leaves or destroys — today only sign out
   (`danger-outline`). It is not an error colour: error states stay on the sunk
   surface in ink. Use semantic tokens, never a literal hex. Solid fills use
   `action`; text and marks use `primary`. The logo keeps the kit's own colours and
   never follows the interface blue.
-- **Corners and capitals.** The radius scale is 4 / 6 / 8 / 12, a button is never a
+- **Corners and capitals.** The radius scale is 6 / 10 / 14 / 18, a button is never a
   pill, and nothing is set in capitals or with spread letters. Use
   `min-h-(--control)` for a control's height, so a phone keeps its 44px target.
 - Every screen is private. The root layout sends `noindex`, every response

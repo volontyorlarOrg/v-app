@@ -83,7 +83,7 @@ function ProfileTaskRow({
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="text-sm font-medium text-ink">{t("profile.title")}</span>
-          <span className="figure text-sm text-ink">
+          <span className="figure text-sm text-accent-ink">
             {t("xp", { xp: format.number(reward.xp) })}
           </span>
         </p>

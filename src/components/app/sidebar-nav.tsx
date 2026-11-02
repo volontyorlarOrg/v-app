@@ -35,8 +35,8 @@ export function SidebarNav({
                 className={cn(
                   "flex min-h-(--control-sm) items-center gap-2.5 rounded-md px-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-surface-soft text-primary"
-                    : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
+                    ? "bg-sidebar-active text-primary"
+                    : "text-ink-muted hover:bg-sidebar-hover hover:text-ink",
                 )}
               >
                 <Icon aria-hidden="true" className="size-4.5 shrink-0" />

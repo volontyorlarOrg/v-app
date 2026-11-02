@@ -60,7 +60,7 @@ export function PastOpportunitiesArchive({
         <LoadErrorRows
           failure={events.failure}
           labels={errorLabels}
-          className="mt-4 rounded-lg border border-border"
+          className="mt-4 rounded-lg border border-border bg-surface shadow-panel"
         />
       ) : events.data.items.length > 0 ? (
         <ul
@@ -69,7 +69,7 @@ export function PastOpportunitiesArchive({
         >
           {events.data.items.map((event) => (
             <li key={event.id} className="flex min-w-0">
-              <article className="flex w-full flex-col rounded-lg border border-border p-4">
+              <article className="flex w-full flex-col rounded-lg border border-border bg-surface p-4 shadow-panel">
                 <span className="w-fit rounded-sm bg-surface-sunk px-1.5 py-0.5 text-xs font-medium text-ink-muted">
                   {t("pastEvent")}
                 </span>
@@ -116,7 +116,7 @@ export function PastOpportunitiesArchive({
 
           return (
             <li key={item.id} className="flex min-w-0">
-              <article className="flex w-full flex-col overflow-hidden rounded-lg border border-border">
+              <article className="flex w-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-panel">
                 <div
                   className="past-opportunity-art"
                   data-scene={item.scene}

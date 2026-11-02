@@ -17,7 +17,7 @@ export function ConnectTelegram({
   return (
     <section
       aria-labelledby="connect-telegram-title"
-      className="mt-4 flex flex-col gap-3 rounded-lg border border-border px-5 py-4 sm:flex-row sm:items-center"
+      className="mt-4 flex flex-col gap-3 rounded-lg border border-border bg-surface px-5 py-4 shadow-panel sm:flex-row sm:items-center"
     >
       <div className="min-w-0 flex-1">
         <h2 id="connect-telegram-title" className="text-sm font-semibold text-ink">

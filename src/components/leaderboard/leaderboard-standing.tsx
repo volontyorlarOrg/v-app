@@ -40,13 +40,13 @@ export function LeaderboardStanding({
     <section aria-labelledby="standing-title" className="">
       <Link
         href={href}
-        className="flex items-center gap-3 rounded-lg border border-border px-4 py-3 transition-colors hover:bg-surface-sunk sm:px-5"
+        className="flex items-center gap-3 rounded-lg border border-border px-4 py-3 shadow-panel transition-colors hover:bg-surface-sunk sm:px-5"
       >
         <span
           data-place={rank <= PODIUM_SIZE ? rank : undefined}
           className={cn(
             "figure shrink-0 text-xl",
-            rank <= PODIUM_SIZE ? "medal medal-ink" : "text-ink",
+            rank <= PODIUM_SIZE ? "medal medal-ink" : "text-accent-ink",
           )}
         >
           #{format.number(rank)}
@@ -71,7 +71,7 @@ export function LeaderboardStanding({
             ) : null}
           </p>
         </div>
-        <span className="figure shrink-0 text-sm text-ink">
+        <span className="figure shrink-0 text-sm text-accent-ink">
           {t("xpValue", { xp: format.number(xp) })}
         </span>
         <span className="sr-only">{t("standing.show")}</span>

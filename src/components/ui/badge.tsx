@@ -11,8 +11,8 @@ const badgeVariants = cva(
       variant: {
         default: "bg-action text-knockout",
         neutral: "bg-surface-sunk text-ink-muted",
-        structure: "bg-surface-sunk text-ink [&_svg]:text-primary",
-        achievement: "bg-surface-sunk text-ink [&_svg]:text-accent",
+        structure: "bg-surface-soft text-primary",
+        achievement: "bg-accent/10 text-accent-ink [&_svg]:text-accent",
         status: "border border-dashed border-input text-ink-muted",
       },
     },

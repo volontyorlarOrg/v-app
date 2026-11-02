@@ -29,7 +29,7 @@ export function LeaderboardPodium({
   return (
     <section
       aria-label={t("podium.label")}
-      className="overflow-hidden rounded-lg border border-border"
+      className="overflow-hidden rounded-lg border border-border bg-surface shadow-panel"
     >
       <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-10 sm:gap-4 sm:px-6">
         {entries.map((entry) => {
@@ -93,7 +93,10 @@ export function LeaderboardPodium({
                 </div>
               </div>
               <p
-                className={cn("figure mt-1 text-ink", first ? "text-xl" : "text-base")}
+                className={cn(
+                  "figure mt-1 text-accent-ink",
+                  first ? "text-xl" : "text-base",
+                )}
               >
                 {t("xpValue", { xp: format.number(entry.xp) })}
               </p>

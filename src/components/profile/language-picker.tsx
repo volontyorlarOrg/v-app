@@ -339,7 +339,7 @@ function LanguageOptionRow({
       <span
         aria-hidden="true"
         className={cn(
-          "grid size-[1.125rem] shrink-0 place-items-center rounded-sm border transition-colors duration-150",
+          "grid size-[1.125rem] shrink-0 place-items-center rounded-[0.25rem] border transition-colors duration-150",
           selected
             ? "border-action bg-action text-knockout"
             : "border-border-control bg-field",

@@ -56,8 +56,8 @@ export function LevelChip({
     <span
       data-size={size}
       className={cn(
-        "inline-flex w-fit items-center gap-1.5 font-medium text-ink",
-        size === "md" ? "text-sm" : "text-xs",
+        "inline-flex w-fit items-center gap-1.5 rounded-md bg-accent/10 font-medium text-accent-ink",
+        size === "md" ? "px-2.5 py-1 text-sm" : "px-2 py-0.5 text-xs",
         className,
       )}
     >
