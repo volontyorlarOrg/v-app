@@ -18,7 +18,7 @@ function fill(template: string, page: number): string {
 }
 
 const STEP_CLASS =
-  "inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg px-3 text-sm font-semibold transition-colors";
+  "inline-flex min-h-(--control-sm) min-w-(--control-sm) items-center justify-center gap-1 rounded-md px-2.5 text-sm font-medium transition-colors";
 
 function Step({
   page,
@@ -51,7 +51,7 @@ function Step({
       aria-label={label}
       className={cn(
         STEP_CLASS,
-        "text-primary-ink hover:bg-surface-soft focus-visible:bg-surface-soft",
+        "text-ink hover:bg-surface-sunk focus-visible:bg-surface-sunk",
       )}
     >
       {children}
@@ -91,9 +91,9 @@ export function Pagination({
                 aria-current={active ? "page" : undefined}
                 aria-label={fill(active ? labels.current : labels.page, page)}
                 className={cn(
-                  "tabular inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-semibold transition-colors",
+                  "tabular inline-flex min-h-(--control-sm) min-w-(--control-sm) items-center justify-center rounded-md px-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-surface-soft text-primary-ink ring-1 ring-border"
+                    ? "bg-surface-soft text-primary"
                     : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
                 )}
               >

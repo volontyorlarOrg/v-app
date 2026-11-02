@@ -78,7 +78,7 @@ export function ProfileSheet({
   return (
     <article
       aria-labelledby="profile-name"
-      className="profile-sheet panel-surface mx-auto w-full max-w-[46rem] overflow-clip rounded-xl border border-border bg-surface"
+      className="profile-sheet mx-auto w-full max-w-[46rem] overflow-clip rounded-lg border border-border bg-surface"
     >
       {completion ? (
         <div className="border-b border-border">
@@ -88,22 +88,20 @@ export function ProfileSheet({
             aria-label={completion.label}
             className="profile-completion-meter"
           />
-          <p className="px-5 py-3 text-sm leading-snug text-ink-muted sm:px-8">
-            <span className="tabular font-semibold text-primary-ink">
-              {completion.value}
-            </span>
+          <p className="px-5 py-2 text-xs text-ink-muted sm:px-6">
+            <span className="tabular font-medium text-ink">{completion.value}</span>
             <span aria-hidden="true"> · </span>
             {completion.missing}
           </p>
         </div>
       ) : null}
 
-      <header className="px-5 pt-6 sm:px-8 sm:pt-8">
+      <header className="px-5 pt-5 sm:px-6 sm:pt-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <SharedElement name={PROFILE_AVATAR_TRANSITION}>
-            <Avatar aria-hidden="true" className="profile-avatar size-24 sm:size-28">
+            <Avatar aria-hidden="true" className="size-16 sm:size-20">
               {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
-              <AvatarFallback className="bg-primary-muted font-serif text-4xl font-normal tracking-[-0.02em] text-primary-deep">
+              <AvatarFallback className="text-xl sm:text-2xl">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -114,7 +112,7 @@ export function ProfileSheet({
               prefetch
               className={buttonClass({
                 size: "sm",
-                className: "enter-rise [--enter-delay:140ms]",
+                className: "",
               })}
             >
               {labels.action}
@@ -125,14 +123,14 @@ export function ProfileSheet({
         <h1
           id="profile-name"
           data-long={longName || undefined}
-          className="profile-name enter-words mt-6 [--enter-delay:40ms]"
+          className="profile-name enter-words mt-4"
         >
           <SplitWords text={name} />
         </h1>
 
-        <p className="enter-rise mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 [--enter-delay:200ms]">
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
           {handle ? (
-            <span className="min-w-0 text-sm font-semibold [overflow-wrap:anywhere] text-ink">
+            <span className="min-w-0 text-sm [overflow-wrap:anywhere] text-ink-muted">
               @{handle}
             </span>
           ) : null}
@@ -142,7 +140,7 @@ export function ProfileSheet({
         {bio || socials.length > 0 ? (
           <div
             className={cn(
-              "enter-rise mt-5 grid gap-5 [--enter-delay:260ms]",
+              "mt-5 grid gap-5",
               bio &&
                 socials.length > 0 &&
                 "sm:grid-cols-[minmax(0,1fr)_minmax(10rem,0.62fr)] sm:gap-8",
@@ -158,11 +156,11 @@ export function ProfileSheet({
         ) : null}
 
         {figures.length > 0 ? (
-          <ul aria-label={labels.figures} className="profile-figures mt-5">
+          <ul aria-label={labels.figures} className="profile-figures mt-4">
             {figures.map((figure, index) => (
               <li
                 key={figure.id}
-                className="enter-rise"
+                className=""
                 style={{ "--enter-delay": `${320 + index * 80}ms` } as CSSProperties}
               >
                 {figure.content}
@@ -173,7 +171,7 @@ export function ProfileSheet({
       </header>
 
       {rows.length > 0 ? (
-        <dl className="profile-rows mt-7">
+        <dl className="profile-rows mt-6">
           {rows.map((row, index) => (
             <div
               key={row.id}
@@ -186,11 +184,11 @@ export function ProfileSheet({
           ))}
         </dl>
       ) : (
-        <div className="pb-6 sm:pb-8" />
+        <div className="pb-5 sm:pb-6" />
       )}
       {activity}
       {note ? (
-        <p className="border-t border-border px-5 py-4 text-sm leading-relaxed text-ink-muted sm:px-8">
+        <p className="border-t border-border px-5 py-3 text-sm text-ink-muted sm:px-6">
           {note}
         </p>
       ) : null}
@@ -215,10 +213,10 @@ export function ProfileLinkList({ links }: { links: readonly ProfileLink[] }) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer nofollow"
-            className="profile-link inline-flex max-w-full items-center gap-1.5 font-semibold text-primary-ink underline-offset-4 hover:underline"
+            className="profile-link inline-flex max-w-full items-center gap-1 text-primary underline-offset-4 hover:underline"
           >
             <span className="truncate">{link.label}</span>
-            <ArrowUpRight aria-hidden="true" className="size-4 shrink-0" />
+            <ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0" />
           </a>
         </li>
       ))}

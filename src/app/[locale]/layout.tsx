@@ -1,6 +1,6 @@
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Onest, Source_Serif_4 } from "next/font/google";
+import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -11,15 +11,10 @@ import { routing } from "@/i18n/routing";
 import { siteOrigin } from "@/lib/seo/origin";
 import "../globals.css";
 
-const onest = Onest({
+const inter = Inter({
   subsets: ["latin", "latin-ext", "cyrillic"],
-  variable: "--font-onest",
-  display: "swap",
-});
-
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  variable: "--font-source-serif",
+  axes: ["opsz"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -62,7 +57,7 @@ export default async function LocaleLayout({
       lang={locale}
       data-theme="light"
       suppressHydrationWarning
-      className={`${onest.variable} ${sourceSerif.variable} h-full`}
+      className={`${inter.variable} h-full`}
     >
       <head>
         <LanguageScript />

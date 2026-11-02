@@ -1,7 +1,6 @@
 import { useFormatter, useTranslations } from "next-intl";
 
 import { LoadErrorRows, type LoadErrorLabels } from "@/components/app/load-error";
-import { ICON_HEART } from "@/components/brand/logo-paths";
 import { VolunteerPass, type PassHolder } from "@/components/dashboard/volunteer-pass";
 import { LevelChip } from "@/components/levels/level-glyph";
 import { LevelsDialog, type LevelsDialogRow } from "@/components/levels/levels-dialog";
@@ -30,7 +29,7 @@ export function DashboardHero({
     <section aria-labelledby="dashboard-greeting" className="dashboard-hero">
       <h1
         id="dashboard-greeting"
-        className="dashboard-hero-greeting greeting-display enter-rise"
+        className="dashboard-hero-greeting text-3xl sm:text-4xl"
       >
         {greeting}
       </h1>
@@ -46,13 +45,6 @@ export function DashboardHero({
           />
         </div>
       ) : null}
-
-      <div aria-hidden="true" className="dashboard-hero-art">
-        <svg viewBox="326 615 354 225" className="dashboard-hero-heart">
-          <path d={ICON_HEART} fillRule="evenodd" />
-        </svg>
-        <span className="dashboard-hero-orbit" />
-      </div>
       <div aria-hidden="true" className="dashboard-pass">
         <VolunteerPass
           holder={{
@@ -98,28 +90,28 @@ function HeroLevel({
       <LevelChip
         level={progress.level}
         name={levelName(progress.level)}
-        className="dashboard-hero-level enter-rise [--enter-delay:80ms]"
+        className="dashboard-hero-level"
       />
 
-      <div className="dashboard-hero-next enter-rise [--enter-delay:140ms]">
+      <div className="dashboard-hero-next">
         {nextTitle && meter ? (
           <>
-            <p className="text-lg font-semibold text-ink sm:text-xl">{nextTitle}</p>
+            <p className="text-sm font-medium text-ink">{nextTitle}</p>
             <Progress
               value={meter.value}
               max={meter.max}
               valueText={summary}
               aria-label={meterLabel}
-              className="mt-3 h-2.5 sm:h-3"
+              className="mt-2"
             />
-            <p className="mt-3 text-ink-muted">{summary}</p>
+            <p className="mt-2 text-sm text-ink-muted">{summary}</p>
           </>
         ) : (
-          <p className="text-lg font-semibold text-accent-ink">{summary}</p>
+          <p className="text-sm font-medium text-ink">{summary}</p>
         )}
       </div>
 
-      <div className="dashboard-hero-action enter-rise [--enter-delay:200ms]">
+      <div className="dashboard-hero-action">
         <LevelsDialog
           rows={rows}
           next={next ? levels("next", { level: levelName(next.key) }) : null}

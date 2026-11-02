@@ -47,15 +47,15 @@ export function StepRail({
           <span
             data-state={item.state}
             className={cn(
-              "onboarding-rail-node inline-flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums",
-              item.state === "done" && "border-accent bg-accent text-knockout",
+              "onboarding-rail-node inline-flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-medium tabular-nums",
+              item.state === "done" &&
+                "border-transparent bg-surface-soft text-primary",
               item.state === "current" && "border-action bg-action text-knockout",
-              item.state === "upcoming" &&
-                "border-border-control bg-surface text-ink-muted",
+              item.state === "upcoming" && "border-border-control text-ink-muted",
             )}
           >
             {item.state === "done" ? (
-              <Check aria-hidden="true" className="size-4" strokeWidth={2.5} />
+              <Check aria-hidden="true" className="size-3.5" />
             ) : (
               item.number
             )}
@@ -64,8 +64,8 @@ export function StepRail({
             className={cn(
               "sr-only text-sm",
               !strip && "lg:not-sr-only lg:py-2.5",
-              item.state === "current" && "font-semibold text-ink",
-              item.state === "done" && "text-accent-ink",
+              item.state === "current" && "font-medium text-ink",
+              item.state === "done" && "text-ink",
               item.state === "upcoming" && "text-ink-muted",
             )}
           >
@@ -75,10 +75,7 @@ export function StepRail({
           {index < items.length - 1 ? (
             <span
               aria-hidden="true"
-              className={cn(
-                "h-px min-w-3 flex-1 bg-border-control/60",
-                !strip && "lg:hidden",
-              )}
+              className={cn("h-px min-w-3 flex-1 bg-border", !strip && "lg:hidden")}
             />
           ) : null}
         </li>
