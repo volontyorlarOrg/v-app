@@ -60,7 +60,7 @@ function HiddenFields({
 function Summary({ item }: { item: MergeRequestItem }) {
   return (
     <div className="min-w-0">
-      <p className="text-sm font-semibold text-ink">
+      <p className="text-sm font-medium text-ink">
         {item.counterparty ?? item.provider}
       </p>
       {item.counterparty ? (
@@ -83,14 +83,9 @@ function failureOf(
 
 function FreshAuth({ labels }: { labels: MergeRequestLabels }) {
   return (
-    <div
-      role="alert"
-      className="rounded-lg border border-border-control bg-surface-sunk p-4"
-    >
-      <p className="text-sm font-semibold text-ink">{labels.freshAuthTitle}</p>
-      <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-        {labels.freshAuthDescription}
-      </p>
+    <div role="alert" className="rounded-md bg-surface-sunk p-4">
+      <p className="text-sm font-medium text-ink">{labels.freshAuthTitle}</p>
+      <p className="mt-1 text-sm text-ink-muted">{labels.freshAuthDescription}</p>
       <form action={REAUTHENTICATE_PATH} method="post">
         <button
           type="submit"

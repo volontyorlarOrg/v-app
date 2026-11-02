@@ -37,11 +37,7 @@ export function ApplyForm({
         {...form.register("opportunityId")}
         defaultValue={opportunityId}
       />
-      <Button
-        type="submit"
-        disabled={pending}
-        className="w-full disabled:opacity-70"
-      >
+      <Button type="submit" disabled={pending} className="w-full disabled:opacity-70">
         {pending ? labels.applying : labels.apply}
       </Button>
       {result.status === "error" ? (
@@ -52,7 +48,7 @@ export function ApplyForm({
               {" "}
               <a
                 href={labels.profileLink.href}
-                className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                className="font-medium text-primary underline-offset-4 hover:underline"
               >
                 {labels.profileLink.label}
               </a>
@@ -60,7 +56,7 @@ export function ApplyForm({
           ) : null}
         </ActionStatus>
       ) : (
-        <p className="text-sm leading-relaxed text-ink-muted">{labels.hint}</p>
+        <p className="text-sm text-ink-muted">{labels.hint}</p>
       )}
     </form>
   );

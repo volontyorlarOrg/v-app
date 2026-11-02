@@ -12,7 +12,7 @@ function Card({ className, asChild = false, ...props }: SlotProps) {
     <Comp
       data-slot="card"
       className={cn(
-        "group/card panel-surface rounded-xl border border-border bg-card text-card-foreground",
+        "group/card rounded-lg border border-border bg-card text-card-foreground shadow-panel",
         className,
       )}
       {...props}
@@ -41,7 +41,7 @@ function CardTitle({ className, asChild = false, ...props }: SlotProps) {
   return (
     <Comp
       data-slot="card-title"
-      className={cn("font-sans text-base font-semibold text-foreground", className)}
+      className={cn("text-base font-semibold text-foreground", className)}
       {...props}
     />
   );

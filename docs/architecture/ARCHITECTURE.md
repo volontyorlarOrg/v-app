@@ -13,7 +13,7 @@ flowchart LR
   Visitor --> Proxy["src/proxy.ts: language from the cookie, guards"]
   Proxy --> Locale["/[locale] root layout"]
   Locale --> Root["/ → redirect to /login"]
-  Locale --> Auth["(auth) layout: lockup, language, theme, dot grid"]
+  Locale --> Auth["(auth) layout: lockup, language, theme"]
   Auth --> AuthPages["login · signup"]
   AuthPages -- Telegram handoff --> Handlers["api/auth/telegram/{start,callback}"]
   Handlers -- session cookie --> Panel
@@ -146,8 +146,8 @@ request.
 
 ## The panel shell
 
-`AppShell` lays out a sidebar and a column. The sidebar is a navy column from
-the large breakpoint, sticky and full height, and absent below it; there is no
+`AppShell` lays out a sidebar and a column. The sidebar is a pale blue column with a
+hairline edge from the large breakpoint, sticky and full height, and absent below it; there is no
 desktop top bar, because the sidebar carries the lockup and the notification
 bell, the sections, and at its foot the identity card and settings. Sign out
 is the red button in the account card at the top of `/settings`, the one place

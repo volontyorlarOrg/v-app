@@ -194,15 +194,15 @@ export function PassStage({
       pivot.add(pass);
       scene.add(pivot);
 
-      const lanyardMaterial = material("primary", 0.7);
-      const clipMaterial = material("primary-deep", 0.4);
+      const lanyardMaterial = material("action", 0.7);
+      const clipMaterial = material("border-control", 0.4);
       const cardMaterial = material("surface", 0.62);
       const rimMaterial = material("border-control", 0.85);
-      const bandMaterial = material("primary", 0.5);
+      const bandMaterial = material("action", 0.5);
       const knockoutMaterial = material("knockout", 0.6);
       const heartMaterial = material("logo-orange", 0.5);
-      const tileMaterial = material("primary-muted", 0.7);
-      const silhouetteMaterial = material("primary", 0.6);
+      const tileMaterial = material("surface-sunk", 0.7);
+      const silhouetteMaterial = material("action", 0.6);
 
       for (const side of [-1, 1] as const) {
         const curve = new THREE.CatmullRomCurve3([
@@ -243,7 +243,7 @@ export function PassStage({
         const context = shadowCanvas.getContext("2d");
         if (!context) return;
         const dark = document.documentElement.dataset.theme === "dark";
-        const channels = tokenColor("primary-deep").getStyle().slice(4, -1);
+        const channels = tokenColor("action").getStyle().slice(4, -1);
         const alpha = (value: number) => `rgba(${channels}, ${value})`;
         const half = shadowCanvas.width / 2;
         context.clearRect(0, 0, shadowCanvas.width, shadowCanvas.height);
@@ -338,7 +338,7 @@ export function PassStage({
       }
       {
         const { group, surface } = part("place", "print");
-        const pin = surface("primary", 0.5);
+        const pin = surface("action", 0.5);
         const muted = surface("ink-muted", 0.7);
         const cone = mesh(
           keep(new THREE.ConeGeometry(0.07, 0.16, 16)),
@@ -356,7 +356,7 @@ export function PassStage({
       }
       {
         const { group, surface } = part("languages", "pop");
-        const chip = surface("primary-muted", 0.7);
+        const chip = surface("surface-sunk", 0.7);
         const widths = [0.44, 0.36, 0.52] as const;
         let x = -0.94;
         for (const width of widths) {
@@ -374,7 +374,7 @@ export function PassStage({
       }
       {
         const { group, surface } = part("contact", "print");
-        const tone = surface("primary", 0.5);
+        const tone = surface("action", 0.5);
         const muted = surface("ink-muted", 0.7);
         group.add(
           mesh(

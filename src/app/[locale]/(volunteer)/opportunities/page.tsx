@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Archive, ArrowDownWideNarrow, CalendarClock } from "lucide-react";
+import { ArrowDownWideNarrow } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -194,7 +194,7 @@ function Opportunities({
         }
       />
 
-      <div className="enter-rise mt-6 [--enter-delay:90ms]">
+      <div className="mt-4">
         <OpportunityFilters
           action={navHref("opportunities")}
           labels={{
@@ -248,11 +248,11 @@ function Opportunities({
         <LoadErrorPanel
           failure={listing.failure}
           labels={errorLabels}
-          className="mx-0 mt-5 max-w-none"
+          className="mx-0 mt-4 max-w-none"
         />
       ) : (
         <>
-          <div className="enter-rise mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 [--enter-delay:160ms]">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <p role="status" className="text-sm text-ink-muted">
               {t("count", { count: listing.data.total })}
               {listing.data.total > listing.data.items.length
@@ -266,7 +266,7 @@ function Opportunities({
             {showArchive ? (
               <a
                 href="#past-opportunities-title"
-                className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+                className="inline-flex min-h-(--control-sm) items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 {t("archive.jumpTo")}
               </a>
@@ -296,49 +296,37 @@ function Opportunities({
               {(["current", "expired"] as const).map((group) => {
                 const items = groups[group];
                 if (group === "expired" && items.length === 0) return null;
-                const Icon = group === "current" ? CalendarClock : Archive;
 
                 return (
                   <section
                     key={group}
                     aria-labelledby={`${group}-opportunities-title`}
                     className={
-                      group === "current"
-                        ? "mt-5"
-                        : "mt-10 border-t-2 border-border-control pt-6"
+                      group === "current" ? "mt-5" : "mt-8 border-t border-border pt-6"
                     }
                   >
-                    <header className="mb-4 flex items-start gap-3">
-                      <span
-                        className={
-                          group === "current"
-                            ? "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-soft text-primary-ink"
-                            : "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface text-ink-muted"
-                        }
-                      >
-                        <Icon aria-hidden="true" className="size-5" />
-                      </span>
+                    <header className="mb-3">
                       <div>
                         <h2
                           id={`${group}-opportunities-title`}
-                          className="flex items-center gap-2.5 text-base font-semibold text-ink"
+                          className="flex items-center gap-2 text-base font-semibold text-ink"
                         >
                           {t(`sections.${group}.title`)}
                           <span
                             aria-hidden="true"
-                            className="tabular text-sm font-normal text-ink-muted"
+                            className="tabular text-sm font-normal tracking-normal text-ink-muted"
                           >
                             {items.length}
                           </span>
                         </h2>
-                        <p className="mt-1 text-sm text-ink-muted">
+                        <p className="text-sm text-ink-muted">
                           {t(`sections.${group}.description`)}
                         </p>
                       </div>
                     </header>
 
                     {items.length === 0 ? (
-                      <p className="rounded-xl border border-border bg-surface px-5 py-6 text-sm text-ink-muted">
+                      <p className="rounded-lg border border-border bg-surface px-5 py-6 text-sm text-ink-muted shadow-panel">
                         {t("sections.current.empty")}
                       </p>
                     ) : (

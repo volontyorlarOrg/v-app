@@ -88,15 +88,14 @@ backend in one language and are rendered as they arrive.
 
 ## Add a colour or token
 
-Tokens live in the `@theme` block of `src/app/globals.css` and nowhere else,
-and they are the marketing site's tokens. Change them there first, then copy;
-this repository does not fork the palette. A product-only token (like
-`--text-figure`) is added in the same commit as its dark value and its
-assertion in `src/app/design-tokens.test.ts`. Before reaching for a colour,
-check the role split in `../../DESIGN.md`: blue is the institution, orange is
-the person, and there is no third hue. The one red, `danger`, is for an action
-that leaves or destroys (sign out); it is not an error colour, which still
-waits on the plan's error-colour decision.
+Tokens live in the `@theme` block of `src/app/globals.css` and nowhere else. They
+are this app's own since 2026-11-02 and no longer follow the marketing site. A new
+token is added in the same commit as its dark value and its assertion in
+`src/app/design-tokens.test.ts`, and the first question is whether it is needed at
+all: the palette is deliberately small. Compute new values in OKLCH. Before reaching
+for a colour, check `../../DESIGN.md`: solid blue is for actions, soft blue for state, orange is for what the person did, in small areas, and there is no third hue. The
+one red, `danger`, is for an action that leaves or destroys (sign out); it is not an
+error colour.
 
 ## Add motion to a block
 
@@ -111,7 +110,7 @@ Server Components are the default. `"use client"` is justified by event
 handlers, client state, browser APIs, or an interactive primitive, with the
 boundary as low as possible. Client components receive translated copy from
 their server parents. Shared action styling comes from `Button` and
-`buttonClass`; solid actions use `action`, never `primary` or `primary-ink`.
+`buttonClass`; solid fills use `action`, and text and marks use `primary`.
 Status is a `StateChip` with an icon and a word; provisional material is a
 `StatusChip` with words.
 

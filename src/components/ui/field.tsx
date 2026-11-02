@@ -10,7 +10,7 @@ function FieldGroup({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="field-group"
-      className={cn("group/field-group flex w-full flex-col gap-5", className)}
+      className={cn("group/field-group flex w-full flex-col gap-4", className)}
       {...props}
     />
   );
@@ -26,7 +26,7 @@ function Field({
       role="group"
       data-slot="field"
       data-invalid={invalid || undefined}
-      className={cn("group/field flex w-full flex-col gap-2", className)}
+      className={cn("group/field flex w-full flex-col gap-1.5", className)}
       {...props}
     />
   );
@@ -46,7 +46,7 @@ function FieldDescription({ className, ...props }: ComponentProps<"p">) {
   return (
     <p
       data-slot="field-description"
-      className={cn("text-xs leading-5 text-muted-foreground", className)}
+      className={cn("text-xs text-muted-foreground", className)}
       {...props}
     />
   );
@@ -60,7 +60,7 @@ function FieldError({ className, children, ...props }: ComponentProps<"p">) {
       role="alert"
       data-slot="field-error"
       className={cn(
-        "flex items-start gap-2 text-sm font-medium text-foreground",
+        "flex items-start gap-1.5 text-sm font-medium text-foreground",
         className,
       )}
       {...props}

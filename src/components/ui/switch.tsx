@@ -27,11 +27,11 @@ function SwitchTrack() {
     <span
       aria-hidden="true"
       data-slot="switch-track"
-      className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition-colors group-data-[state=checked]/switch:border-action group-data-[state=checked]/switch:bg-action group-data-[state=unchecked]/switch:border-input group-data-[state=unchecked]/switch:bg-muted"
+      className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors group-focus-visible/switch:outline-2 group-focus-visible/switch:outline-offset-2 group-focus-visible/switch:outline-primary group-data-[state=checked]/switch:border-action group-data-[state=checked]/switch:bg-action group-data-[state=unchecked]/switch:border-input"
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
-        className="pointer-events-none block size-5 rounded-full bg-knockout ring-1 ring-input/40 transition-transform data-[state=checked]:translate-x-[1.375rem] data-[state=unchecked]:translate-x-0.5"
+        className="pointer-events-none block size-4 rounded-full transition-[translate,background-color] data-[state=checked]:translate-x-[1.0625rem] data-[state=checked]:bg-knockout data-[state=unchecked]:translate-x-px data-[state=unchecked]:bg-input"
       />
     </span>
   );
@@ -101,11 +101,14 @@ export function Switch({
         aria-describedby={description ? `${id}-description` : undefined}
       >
         <span className="min-w-0">
-          <span id={`${id}-label`} className="block text-sm font-semibold text-ink">
+          <span id={`${id}-label`} className="block text-sm font-medium text-ink">
             {label}
           </span>
           {description ? (
-            <span id={`${id}-description`} className="mt-0.5 block text-sm text-ink-muted">
+            <span
+              id={`${id}-description`}
+              className="mt-0.5 block text-sm text-ink-muted"
+            >
               {description}
             </span>
           ) : null}

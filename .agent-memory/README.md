@@ -12,9 +12,12 @@ folder. Never store secrets or unverified external claims.
 
 ## Current entries
 
+- `decisions/one-blue-on-white.md` — why the app left the marketing palette for one
+  calm blue on a soft ground, Inter and a moderate radius scale, and what that leaves out of
+  step with `v-web` and the portals
 - `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
-  `v-web`'s tokens, motion, catalogs and registry, and what happened to the
-  previous foundation
+  `v-web`'s tokens, motion, catalogs and registry (its look superseded by
+  `one-blue-on-white.md`), and what happened to the previous foundation
 - `decisions/sample-dashboard-is-labelled-and-fictional.md` — why the demo said
   it was a sample while it existed (historical; the sample is gone)
 - `decisions/every-screen-reads-the-backend.md` — why the sample and the
@@ -65,8 +68,8 @@ folder. Never store secrets or unverified external claims.
   the photo's view transition work
 - `discoveries/backend-has-a-schema-but-no-endpoints.md` — the endpoints
   `v-backend` serves and the error bodies they return
-- `discoveries/onest-covers-all-three-locales.md` — the typeface and the Uzbek
-  apostrophes
+- `discoveries/onest-covers-all-three-locales.md` — the Uzbek apostrophes, and what a
+  typeface must draw (the app now uses Inter)
 - `gotchas/calendar-days-are-timezone-dependent.md` — why deadlines count
   Tashkent days
 - `gotchas/generate-static-params-and-cookies.md` — why a route reading cookies

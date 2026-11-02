@@ -230,18 +230,13 @@ export function AvatarEditor({
   return (
     <section
       aria-labelledby="avatar-editor-title"
-      className="panel-surface enter-rise rounded-xl border border-border bg-surface p-5 sm:p-7"
+      className="rounded-lg border border-border bg-surface p-5 shadow-panel"
     >
       <div className="max-w-prose">
-        <h2
-          id="avatar-editor-title"
-          className="font-sans text-base font-semibold text-ink"
-        >
+        <h2 id="avatar-editor-title" className="text-base font-semibold text-ink">
           {labels.title}
         </h2>
-        <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-          {labels.description}
-        </p>
+        <p className="text-sm text-ink-muted">{labels.description}</p>
       </div>
 
       <input
@@ -253,7 +248,7 @@ export function AvatarEditor({
       />
 
       {sourceUrl ? (
-        <div className="mt-5 grid gap-5 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] sm:items-center">
+        <div className="mt-4 grid gap-4 sm:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] sm:items-center">
           <div
             ref={cropRef}
             role="application"
@@ -264,7 +259,7 @@ export function AvatarEditor({
             onPointerMove={pointerMove}
             onPointerUp={() => (dragRef.current = null)}
             onPointerCancel={() => (dragRef.current = null)}
-            className="focus-visible:ring-focus relative aspect-square w-full max-w-64 cursor-move touch-none overflow-hidden rounded-xl bg-surface-sunk ring-offset-2 outline-none focus-visible:ring-2"
+            className="relative aspect-square w-full max-w-64 cursor-move touch-none overflow-hidden rounded-lg bg-surface-sunk"
           >
             <Image
               src={sourceUrl}
@@ -280,7 +275,7 @@ export function AvatarEditor({
           </div>
 
           <div className="min-w-0">
-            <label className="text-sm font-semibold text-ink" htmlFor="avatar-zoom">
+            <label className="text-sm font-medium text-ink" htmlFor="avatar-zoom">
               {labels.zoom}
             </label>
             <input
@@ -295,13 +290,13 @@ export function AvatarEditor({
                 setZoom(next);
                 setPan((current) => clamp(current, next));
               }}
-              className="mt-3 w-full accent-action"
+              className="mt-2 w-full accent-action"
             />
             <p className="mt-2 flex items-start gap-2 text-sm text-ink-muted">
               <Move aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
               {labels.position}
             </p>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button type="button" disabled={pending || !size} onClick={upload}>
                 {pending ? labels.uploading : labels.upload}
               </Button>
@@ -317,16 +312,11 @@ export function AvatarEditor({
           </div>
         </div>
       ) : (
-        <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
           <SharedElement name={PROFILE_AVATAR_TRANSITION}>
-            <Avatar
-              aria-hidden="true"
-              className="size-24 shrink-0 outline-2 outline-offset-4 outline-accent"
-            >
+            <Avatar aria-hidden="true" className="size-16 shrink-0">
               {currentUrl ? <AvatarImage src={currentUrl} alt="" /> : null}
-              <AvatarFallback className="bg-primary-muted font-serif text-4xl font-normal tracking-[-0.02em] text-primary-deep">
-                {initials}
-              </AvatarFallback>
+              <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
           </SharedElement>
           <div className="flex flex-wrap gap-2">

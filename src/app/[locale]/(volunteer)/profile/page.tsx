@@ -257,7 +257,7 @@ function Profile({
                 <span className="text-ink-muted">{t("sheet.publicHidden")}</span>
                 <Link
                   href={`${navHref("settings")}#privacy`}
-                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                  className="font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {t("sheet.publicShow")}
                 </Link>
@@ -302,7 +302,7 @@ function Profile({
                 <Link
                   href={`${navHref("profileEdit")}#visibility`}
                   prefetch
-                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                  className="font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {chunks}
                 </Link>

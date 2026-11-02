@@ -19,6 +19,7 @@ Use this file to route project questions to the smallest relevant source.
 | **Volunteer levels and the progress dashboard** — contract, departures from the mocks | [`plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md`](plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md)                                 |
 | Full frontend audit and resolved information-architecture findings                    | [`reviews/FRONTEND_DIAGNOSIS.md`](reviews/FRONTEND_DIAGNOSIS.md)                                                       |
 | Applied UI system, localization behaviour, accessibility rules                        | [`ui/UI_SYSTEM.md`](ui/UI_SYSTEM.md)                                                                                   |
+| Why this blue, font, radius and spacing: what was tested and the sources              | [`ui/MINIMAL_BLUE_RESEARCH.md`](ui/MINIMAL_BLUE_RESEARCH.md)                                                           |
 | Security headers, CSP, secrets, trust boundaries                                      | [`security/SECURITY.md`](security/SECURITY.md)                                                                         |
 | Setup, commands, environment, CI, deployment                                          | [`operations/DEVELOPMENT_AND_DEPLOYMENT.md`](operations/DEVELOPMENT_AND_DEPLOYMENT.md)                                 |
 | Creating the Google OAuth client and wiring "Continue with Google"                    | [`operations/GOOGLE_SIGN_IN_SETUP.md`](operations/GOOGLE_SIGN_IN_SETUP.md)                                             |

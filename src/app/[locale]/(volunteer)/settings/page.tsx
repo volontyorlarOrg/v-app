@@ -271,10 +271,8 @@ function Settings({
 
         {waiting > 0 ? (
           <div id="requests" className="scroll-mt-20">
-            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 px-1">
-              <h2 className="font-sans text-base font-semibold text-ink">
-                {t("merge.title")}
-              </h2>
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-base font-medium text-ink">{t("merge.title")}</h2>
               <p className="text-sm text-ink-muted">
                 {t("merge.waitingCount", { count: waiting })}
               </p>
@@ -379,9 +377,7 @@ function Settings({
                 locale={locale}
                 googleConfigured={googleConfigured}
               />
-              <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-                {t("connections.handoff")}
-              </p>
+              <p className="mt-4 text-xs text-ink-muted">{t("connections.handoff")}</p>
             </Panel>
 
             <Panel

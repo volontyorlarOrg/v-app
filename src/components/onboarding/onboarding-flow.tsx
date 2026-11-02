@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowRight, BadgeCheck, CalendarCheck, CircleCheck, Send } from "lucide-react";
+import { BadgeCheck, CalendarCheck, CircleCheck, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
-import { SplitWords } from "@/components/motion/scene";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { PassStage } from "@/components/onboarding/pass-stage";
 import { ProfileStepForm } from "@/components/onboarding/profile-step-form";
@@ -125,37 +124,31 @@ export function OnboardingFlow({
     <a
       href={exitHref}
       onClick={skipForNow}
-      className="inline-flex min-h-8 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+      className="inline-flex min-h-8 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
     >
       {labels.skipForNow}
     </a>
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:items-start lg:gap-14 xl:gap-20">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] lg:items-start lg:gap-12 xl:gap-16">
       <div className="min-w-0">
-        <div className="hero-copy">
-          <h1 className="greeting-display enter-words [--enter-delay:120ms]">
-            <SplitWords text={title} />
-          </h1>
-          <p className="enter-rise mt-4 max-w-md text-lead text-pretty text-ink-muted [--enter-delay:360ms]">
-            {lead}
-          </p>
-        </div>
+        <h1 className="text-3xl text-balance">{title}</h1>
+        <p className="mt-2 max-w-md text-sm text-pretty text-ink-muted">{lead}</p>
         <div className="mt-6 xl:grid xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center xl:gap-8">
-          <PassStage parts={parts} className="enter-rise [--enter-delay:440ms]" />
+          <PassStage parts={parts} className="" />
           <StepRail
             items={railItems}
             label={labels.rail.label}
             stateLabels={labels.rail.states}
-            className="enter-rise mt-6 [--enter-delay:560ms] xl:mt-0"
+            className="mt-6 xl:mt-0"
           />
         </div>
       </div>
 
       <section
         aria-labelledby="onboarding-step-title"
-        className="enter-rise min-w-0 rounded-2xl border border-border bg-surface p-5 [--enter-delay:520ms] sm:p-7 xl:self-center"
+        className="min-w-0 rounded-lg border border-border bg-surface p-5 shadow-panel sm:p-6 xl:self-center"
       >
         <div key={step} className="onboarding-step" data-direction={direction}>
           {isFormStep(step) ? (
@@ -174,7 +167,7 @@ export function OnboardingFlow({
             id="onboarding-step-title"
             ref={headingRef}
             tabIndex={-1}
-            className="text-2xl leading-[1.18] tracking-[-0.02em] text-balance sm:text-3xl"
+            className="text-xl text-balance"
           >
             {step === "welcome"
               ? labels.welcome.title
@@ -236,7 +229,7 @@ export function OnboardingFlow({
 }
 
 function StepLead({ children }: { children: ReactNode }) {
-  return <p className="mt-2 text-pretty text-ink-muted">{children}</p>;
+  return <p className="mt-1 text-sm text-pretty text-ink-muted">{children}</p>;
 }
 
 function WelcomeBody({
@@ -251,10 +244,9 @@ function WelcomeBody({
   return (
     <>
       <StepLead>{labels.welcome.body}</StepLead>
-      <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border pt-5">
-        <Button type="button" size="sm" onClick={onStart} className="min-w-36">
+      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4">
+        <Button type="button" onClick={onStart}>
           {labels.start}
-          <ArrowRight aria-hidden="true" className="size-4" />
         </Button>
         {skipLink}
       </div>
@@ -284,53 +276,46 @@ function DoneBody({
   return (
     <>
       {complete ? (
-        <p className="mt-3 flex items-start gap-2 font-semibold text-accent-ink">
-          <CircleCheck aria-hidden="true" className="mt-1 size-4 shrink-0" />
+        <p className="mt-2 flex items-start gap-2 text-sm font-medium text-ink">
+          <CircleCheck
+            aria-hidden="true"
+            className="mt-0.5 size-4 shrink-0 text-accent"
+          />
           <span>{labels.done.complete}</span>
         </p>
       ) : (
-        <p className="mt-3 text-pretty text-ink">
+        <p className="mt-2 text-sm text-pretty text-ink">
           {fill(labels.done.incomplete, { percent, fields: missing.join(", ") })}{" "}
           <Link
             href={navHref("profileEdit")}
-            className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+            className="font-medium text-primary underline-offset-4 hover:underline"
           >
             {labels.done.finishOnProfile}
           </Link>
         </p>
       )}
 
-      <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
-        {labels.done.nextTitle}
-      </h3>
+      <h3 className="mt-6 text-sm font-medium text-ink">{labels.done.nextTitle}</h3>
       <ol className="mt-2 divide-y divide-border border-y border-border">
         {NEXT_STEPS.map(({ key, Icon, achievement }, index) => (
-          <li key={key} className="flex items-start gap-4 py-3.5">
+          <li key={key} className="flex items-start gap-3 py-3">
             <span
               className={cn(
-                "mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full",
-                achievement
-                  ? "bg-surface text-accent-ink ring-1 ring-accent/50"
-                  : "bg-surface-soft text-primary-ink",
+                "mt-0.5 shrink-0",
+                achievement ? "text-accent" : "text-ink-muted",
               )}
             >
               <Icon aria-hidden="true" className="size-4" />
               <span className="sr-only">{index + 1}</span>
             </span>
-            <p className="min-w-0 pt-1 text-sm leading-relaxed text-ink">
-              {labels.done.next[key]}
-            </p>
+            <p className="min-w-0 text-sm text-ink">{labels.done.next[key]}</p>
           </li>
         ))}
       </ol>
 
-      <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-3">
-        <a
-          href={ctaHref}
-          className={buttonClass({ size: "sm", className: "min-w-44" })}
-        >
+      <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-2">
+        <a href={ctaHref} className={buttonClass()}>
           {labels.done.cta}
-          <ArrowRight aria-hidden="true" className="size-4" />
         </a>
         <Link
           href={navHref("dashboard")}

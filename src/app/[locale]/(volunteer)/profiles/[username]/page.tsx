@@ -165,7 +165,7 @@ export default async function MemberProfilePage({
     <div>
       <Link
         href={navHref("leaderboard")}
-        className="enter-rise inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+        className="inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("visitor.back")}

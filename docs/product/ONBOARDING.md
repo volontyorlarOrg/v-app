@@ -19,13 +19,13 @@ fills them.
 
 ## Direction
 
-- **THESIS** — the threshold between the doorway and the room. The flow keeps
-  the sign-in pages' dot-grid ground and ends by handing the volunteer into
-  the panel. The category default it refuses is the centred wizard card with
+- **THESIS** — the threshold between the doorway and the room. The flow stands on the
+  same bare white page as sign-in and ends by handing the volunteer into the
+  panel. The category default it refuses is the centred wizard card with
   a progress bar on a blank page.
-- **OWN-WORLD** — the app's own tokens: serif greeting, sans controls, blue
-  for the institution (the lanyard, the band, the current step), orange only
-  for what the person did (a finished step, the seal at the end). The one new
+- **OWN-WORLD** — the app's own tokens: one typeface, blue for the lanyard, the
+  band and the current step, a soft blue tick for a finished step, and orange only
+  for the seal at the end. The one new
   object is the volunteer pass: a low-poly lanyard badge in Three.js that
   gains a part each time a step is saved.
 - **STORY** — "fill it in once; every application reuses it." A step saved is
