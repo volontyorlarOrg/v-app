@@ -22,7 +22,7 @@ export type AccountMenuLabels = {
 };
 
 const ITEM_CLASS =
-  "flex min-h-11 w-full items-center gap-2.5 rounded-sm px-2.5 text-sm text-ink transition-colors hover:bg-surface-sunk focus-visible:bg-surface-sunk";
+  "flex min-h-11 w-full items-center gap-2.5 rounded-md px-2.5 text-sm text-ink transition-colors hover:bg-surface-sunk focus-visible:bg-surface-sunk";
 
 export function AccountMenu({
   labels,
@@ -67,7 +67,7 @@ export function AccountMenu({
             href={profileHref}
             onClick={close}
             aria-label={`${labels.profile}: ${name}`}
-            className="flex items-center gap-3 rounded-sm px-2.5 py-2 transition-colors hover:bg-surface-sunk focus-visible:bg-surface-sunk"
+            className="flex items-center gap-3 rounded-md px-2.5 py-2 transition-colors hover:bg-surface-sunk focus-visible:bg-surface-sunk"
           >
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-ink">{name}</p>

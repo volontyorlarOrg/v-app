@@ -230,7 +230,7 @@ export function AvatarEditor({
   return (
     <section
       aria-labelledby="avatar-editor-title"
-      className="rounded-lg border border-border bg-surface p-5"
+      className="rounded-lg border border-border bg-surface p-5 shadow-panel"
     >
       <div className="max-w-prose">
         <h2 id="avatar-editor-title" className="text-base font-semibold text-ink">

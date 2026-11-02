@@ -45,7 +45,7 @@ export function AccountSummary({
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="scroll-mt-20 rounded-lg border border-border px-5 py-4"
+      className="scroll-mt-20 rounded-lg border border-border bg-surface px-5 py-4 shadow-panel"
     >
       <h2 id={`${id}-title`} className="sr-only">
         {labels.title}

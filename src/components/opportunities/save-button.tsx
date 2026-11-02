@@ -39,7 +39,7 @@ export function SaveButton({
           onClick={() => save.mutate(!save.optimistic)}
           className={cn(
             "inline-flex size-(--control-sm) items-center justify-center rounded-md bg-surface transition-colors hover:bg-surface-sunk disabled:opacity-50",
-            save.optimistic ? "text-primary" : "text-ink-muted hover:text-ink",
+            save.optimistic ? "text-accent" : "text-ink-muted hover:text-ink",
           )}
         >
           <Bookmark

@@ -146,7 +146,7 @@ request.
 
 ## The panel shell
 
-`AppShell` lays out a sidebar and a column. The sidebar is a white column with a
+`AppShell` lays out a sidebar and a column. The sidebar is a pale blue column with a
 hairline edge from the large breakpoint, sticky and full height, and absent below it; there is no
 desktop top bar, because the sidebar carries the lockup and the notification
 bell, the sections, and at its foot the identity card and settings. Sign out

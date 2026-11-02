@@ -23,7 +23,7 @@ fills them.
   same bare white page as sign-in and ends by handing the volunteer into the
   panel. The category default it refuses is the centred wizard card with
   a progress bar on a blank page.
-- **OWN-WORLD** — the app's own tokens: one typeface, cobalt for the lanyard, the
+- **OWN-WORLD** — the app's own tokens: one typeface, blue for the lanyard, the
   band and the current step, a soft blue tick for a finished step, and orange only
   for the seal at the end. The one new
   object is the volunteer pass: a low-poly lanyard badge in Three.js that

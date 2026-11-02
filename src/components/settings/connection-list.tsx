@@ -32,7 +32,7 @@ export function ConnectionList({
           key={state.provider}
           className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0"
         >
-          <span className="shrink-0 text-ink-muted">{MARKS[state.provider]}</span>
+          <span className="shrink-0 text-primary">{MARKS[state.provider]}</span>
           <div className="min-w-0 flex-1">
             <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-ink">
               {t(state.provider)}

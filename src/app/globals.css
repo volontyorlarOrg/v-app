@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --color-paper: #ffffff;
+  --color-paper: #f5f7fa;
   --color-surface: #ffffff;
-  --color-surface-sunk: #f6f7f9;
-  --color-surface-soft: #ebf2fe;
+  --color-surface-sunk: #f1f4f8;
+  --color-surface-soft: #e6f2fe;
   --color-surface-raised: #ffffff;
   --color-field: #ffffff;
 
-  --color-ink: #181b20;
-  --color-ink-muted: #5e636d;
+  --color-ink: #222b33;
+  --color-ink-muted: #566270;
 
-  --color-border: #e4e6ea;
-  --color-border-control: #878c96;
+  --color-border: #e2e7ed;
+  --color-border-control: #85909a;
 
   --color-knockout: #ffffff;
 
-  --color-primary: #1853c6;
-  --color-action: #1853c6;
-  --color-action-hover: #0a41ad;
+  --color-sidebar: #e9f1f9;
+  --color-sidebar-line: #d8e3ee;
+  --color-sidebar-hover: #dde8f3;
+  --color-sidebar-active: #ffffff;
+
+  --color-primary: #0f66ac;
+  --color-action: #0f66ac;
+  --color-action-hover: #005494;
 
   --color-accent: #e85d30;
+  --color-accent-ink: #b34917;
 
   --color-danger: #b3261e;
   --color-danger-ink: #8f1e18;
@@ -50,15 +56,16 @@
   --color-ring: var(--color-primary);
 
   --shadow-raised: var(--raised-shadow);
+  --shadow-panel: var(--panel-shadow);
 
   --ease-scene: cubic-bezier(0.22, 1, 0.36, 1);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
   --radius: var(--radius-md);
 
   --text-xs: 0.75rem;
@@ -82,7 +89,8 @@
 @layer base {
   :root {
     color-scheme: light;
-    --raised-shadow: 0 8px 24px -8px rgb(24 27 32 / 0.16);
+    --raised-shadow: 0 12px 32px -12px rgb(34 43 51 / 0.22);
+    --panel-shadow: 0 1px 2px rgb(34 43 51 / 0.04);
     --control: 2.75rem;
     --control-sm: 2.75rem;
     --page-top: 1.5rem;
@@ -104,22 +112,29 @@
   :root[data-theme="dark"] {
     color-scheme: dark;
 
-    --color-paper: #121314;
-    --color-surface: #121314;
-    --color-surface-sunk: #1d1e20;
-    --color-surface-soft: #1d2638;
-    --color-surface-raised: #1d1e20;
-    --color-field: #161719;
+    --color-paper: #0b1015;
+    --color-surface: #13191f;
+    --color-surface-sunk: #1d252d;
+    --color-surface-soft: #1c2d3f;
+    --color-surface-raised: #1d252d;
+    --color-field: #0f1318;
 
-    --color-ink: #e6e8eb;
-    --color-ink-muted: #a4a8af;
+    --color-ink: #e4e8ed;
+    --color-ink-muted: #a6afb9;
 
-    --color-border: #2a2b2e;
-    --color-border-control: #686c73;
+    --color-border: #272f37;
+    --color-border-control: #69737d;
 
-    --color-primary: #93b8fb;
-    --color-action: #2d63cd;
-    --color-action-hover: #386dd5;
+    --color-sidebar: #15222e;
+    --color-sidebar-line: #263340;
+    --color-sidebar-hover: #1d2b3b;
+    --color-sidebar-active: #233a51;
+
+    --color-primary: #83bdf8;
+    --color-action: #196cb3;
+    --color-action-hover: #2575bd;
+
+    --color-accent-ink: #f5a278;
 
     --color-danger: #ef7a70;
     --color-danger-ink: #f59a93;
@@ -133,7 +148,8 @@
     --color-bronze: #c9825a;
     --color-bronze-ink: #f0b48e;
 
-    --raised-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+    --raised-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+    --panel-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
   }
 
   html {
@@ -300,7 +316,7 @@
   }
 
   .opportunity-card-art {
-    background-color: var(--color-surface-sunk);
+    background-color: var(--color-surface-soft);
   }
 
   .dashboard-hero {
@@ -352,7 +368,7 @@
   }
 
   .volunteer-pass {
-    --pass-rest: 3deg;
+    --pass-rest: 4deg;
     position: relative;
     width: 13em;
     padding-top: 5em;
@@ -383,10 +399,10 @@
     position: absolute;
     top: 0;
     left: 50%;
-    width: 1.5em;
+    width: 1.75em;
     height: 5.5em;
     translate: -50% 0;
-    background: var(--color-action);
+    background: color-mix(in srgb, var(--color-action) 90%, var(--color-knockout));
   }
 
   .volunteer-pass-clip {
@@ -397,7 +413,7 @@
     width: 2.5em;
     height: 1em;
     translate: -50% 0;
-    border-radius: 0.25em;
+    border-radius: 0.375em;
     background: var(--color-border-control);
   }
 
@@ -406,9 +422,15 @@
     display: grid;
     justify-items: center;
     padding: 1.25em 1em 1.5em;
-    border-radius: 0.75em;
+    border-radius: 1.25em;
     color: var(--color-knockout);
-    background: var(--color-action);
+    background: linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--color-action) 86%, var(--color-knockout)),
+      var(--color-action) 55%,
+      color-mix(in srgb, var(--color-action) 82%, black)
+    );
+    box-shadow: var(--raised-shadow);
   }
 
   .volunteer-pass-brand {
@@ -727,6 +749,7 @@
     height: var(--step-height, 3rem);
     place-items: center;
     border-top: 2px solid var(--metal);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     background: var(--color-surface-sunk);
     color: var(--metal-ink);
     transition: height 500ms var(--ease-scene);
@@ -785,7 +808,7 @@
     height: 0.375rem;
     overflow: clip;
     border-radius: 9999px;
-    background-color: var(--color-surface-sunk);
+    background-color: var(--color-border);
   }
 
   .meter-fill {
@@ -939,7 +962,7 @@
     line-height: 1;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums lining-nums;
-    color: var(--color-ink);
+    color: var(--color-accent-ink);
   }
 
   .rolling-number-track {

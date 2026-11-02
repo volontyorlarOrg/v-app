@@ -33,31 +33,50 @@ alone; contrast and restraint carry the decision.
 
 ## The kinds of blue, measured
 
-Six candidates were rendered on the real dashboard beside the logo, in both
+The first pass chose cobalt. On screen it felt like too sudden a jump from the old
+design, so the choice moved to a calm blue halfway between the two (see below).
+
+Candidates were rendered on the real dashboard beside the logo, in both
 themes. Contrast is WCAG 2 against white.
 
-| Kind           | Hex       | OKLCH                 | On white   | Verdict                                                       |
-| -------------- | --------- | --------------------- | ---------- | ------------------------------------------------------------- |
-| Cerulean (old) | `#005E92` | 0.46 / 0.11 / 243     | 6.96:1     | Leans green; reads petrol at any size.                        |
-| Azure          | `#046DCE` | 0.54 / 0.17 / 254     | 5.14:1     | Closest to the logo, but electric across a large area.        |
-| True blue      | `#085DC7` | 0.50 / 0.18 / 258     | 6.18:1     | Good. A close second.                                         |
-| **Cobalt**     | `#1853C6` | **0.48 / 0.19 / 262** | **6.79:1** | **Chosen.** Rich in a small area, calm on the one large card. |
-| Ink            | `#2141A8` | 0.42 / 0.17 / 266     | 8.80:1     | Formal; starts to read indigo beside the logo.                |
-| Steel          | `#386695` | 0.50 / 0.09 / 251     | 6.00:1     | Dull, and an action looks disabled in it.                     |
+| Kind           | Hex       | OKLCH                 | On white   | Verdict                                                  |
+| -------------- | --------- | --------------------- | ---------- | -------------------------------------------------------- |
+| Cerulean (old) | `#005E92` | 0.46 / 0.11 / 243     | 6.96:1     | Leans green; reads petrol at any size.                   |
+| Azure          | `#046DCE` | 0.54 / 0.17 / 254     | 5.14:1     | Closest to the logo, but electric across a large area.   |
+| True blue      | `#085DC7` | 0.50 / 0.18 / 258     | 6.18:1     | Good. A close second.                                    |
+| **Calm blue**  | `#0F66AC` | **0.50 / 0.13 / 250** | **5.97:1** | **Chosen.** Left the green lean, kept the logo's family. |
+| Cobalt         | `#1853C6` | 0.48 / 0.19 / 262     | 6.79:1     | First pick; too sudden a jump from the old design.       |
+| Ink            | `#2141A8` | 0.42 / 0.17 / 266     | 8.80:1     | Formal; starts to read indigo beside the logo.           |
+| Steel          | `#386695` | 0.50 / 0.09 / 251     | 6.00:1     | Dull, and an action looks disabled in it.                |
 
 Reference points from other products, measured the same way: Apple `#0071E3`
 (4.70:1, hue 256), GitHub `#0969DA` (5.19:1, hue 258), Google `#0B57D0` (6.39:1,
 hue 261), IBM `#0F62FE` (5.00:1, hue 262), Tailwind `#1D4ED8` (6.70:1, hue 264).
-Cobalt sits in the same band, deeper than most, which is what lets one value
-pass AA as both a fill behind white text and as text on white, tinted and
-sunk surfaces. No graphics-versus-text split is needed in the light theme.
+The chosen blue is deep enough for one value to pass AA as both a fill behind white
+text and as text on white, tinted and sunk surfaces, so no graphics-versus-text split
+is needed in the light theme.
 
 The vests in the app's own past-event illustrations sample at about `#1850A0`,
-hue 258. Those images are labelled as AI-generated, so this is a pleasant
-coincidence rather than evidence.
+hue 258. Those images are labelled as AI-generated, so that is a pleasant coincidence
+rather than evidence.
 
-The logo keeps the kit's `#007FC2`. Its rules forbid recolouring it, and at hue
-243 against 262 it reads as the same family at logo size.
+The logo keeps the kit's `#007FC2`. Its rules forbid recolouring it, and at hue 243
+against 250 it reads as the same family.
+
+### Why the calm blue won
+
+Against the old screen, cobalt at hue 262 was 19° away and felt like a different
+product. The final `#0F66AC` sits at hue 250: it has left the green lean that made
+the old blue read as petrol, but stays in the logo's family (1.37:1 against
+`#007FC2`, where cobalt was 1.56:1). White on it is 5.97:1, and as text it clears AA
+on the sunk and soft surfaces at 5.41:1 and 5.26:1.
+
+The same review softened the rest. Panels went back to white on a pale `#F5F7FA`
+ground, `ink`, `ink-muted` and `border-control` returned to the previous design's
+values, and the dark theme kept a slight blue cast instead of neutral graphite. Soft icon
+tiles and orange text for what the person did came back, because removing them was itself
+part of the abrupt change. Of three sidebars rendered next to the old navy (white, pale
+blue, and a lighter dark blue), the user chose pale blue.
 
 ## The font, tested
 
@@ -85,11 +104,12 @@ was dropped rather than replaced: a second face adds nothing to a panel.
 
 ## Corners and spacing
 
-- **Nested corners are concentric:** the inner radius equals the outer radius
-  minus the gap. That is why the scale is 4 / 6 / 8 / 12: a control at 6px holds
-  a 4px item with 2px of padding, and a menu at 8px holds a 4px row with 4px.
-- **Small radii keep that arithmetic possible.** At the old 20 to 28px, nested
-  curves could not stay even and every panel read as soft.
+- **Nested corners are concentric:** the inner radius equals the outer radius minus
+  the gap. That is why the scale is 6 / 10 / 14 / 18: a menu at 14px holds a 10px row
+  with 4px of padding.
+- **The scale sits between the two extremes.** The old 20 to 28px with pill buttons
+  made nested curves uneven. A first pass at 4 / 6 / 8 / 12 fixed that but felt harsh
+  next to what people knew, so each step moved about halfway back.
 - **Spacing sits on a 4px grid,** the convention Material and most of the systems
   above build on, with 2px kept for tight internals.
 - **Target size is not density.** A control stays 44px on a touch screen and

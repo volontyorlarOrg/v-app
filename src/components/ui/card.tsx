@@ -12,7 +12,7 @@ function Card({ className, asChild = false, ...props }: SlotProps) {
     <Comp
       data-slot="card"
       className={cn(
-        "group/card rounded-lg border border-border bg-card text-card-foreground",
+        "group/card rounded-lg border border-border bg-card text-card-foreground shadow-panel",
         className,
       )}
       {...props}

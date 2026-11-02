@@ -148,7 +148,7 @@ export function OnboardingFlow({
 
       <section
         aria-labelledby="onboarding-step-title"
-        className="min-w-0 rounded-lg border border-border bg-surface p-5 sm:p-6 xl:self-center"
+        className="min-w-0 rounded-lg border border-border bg-surface p-5 shadow-panel sm:p-6 xl:self-center"
       >
         <div key={step} className="onboarding-step" data-direction={direction}>
           {isFormStep(step) ? (

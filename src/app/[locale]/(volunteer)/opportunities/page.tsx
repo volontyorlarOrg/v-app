@@ -326,7 +326,7 @@ function Opportunities({
                     </header>
 
                     {items.length === 0 ? (
-                      <p className="rounded-lg border border-border px-5 py-6 text-sm text-ink-muted">
+                      <p className="rounded-lg border border-border bg-surface px-5 py-6 text-sm text-ink-muted shadow-panel">
                         {t("sections.current.empty")}
                       </p>
                     ) : (

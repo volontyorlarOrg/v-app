@@ -27,7 +27,7 @@ export function PasswordInput({
       <input
         {...props}
         type={visible ? "text" : "password"}
-        className="min-h-(--control) w-full min-w-0 flex-1 bg-transparent px-3 text-base text-foreground caret-primary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
+        className="min-h-[calc(var(--control)-2px)] w-full min-w-0 flex-1 bg-transparent px-3 text-base text-foreground caret-primary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
       />
       <button
         type="button"

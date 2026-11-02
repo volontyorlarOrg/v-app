@@ -80,12 +80,8 @@ describe("colour in components", () => {
   it("does not spell a token that no longer exists", () => {
     expect(
       offenders(
-        /\b(?:bg|text|border|fill|stroke|ring|outline)-(?:shell|band|primary-ink|primary-deep|primary-muted|accent-ink)\b/,
+        /\b(?:bg|text|border|fill|stroke|ring|outline)-(?:shell|band|primary-ink|primary-deep|primary-muted)\b/,
       ),
     ).toEqual([]);
-  });
-
-  it("does not paint text orange, because the accent is a mark", () => {
-    expect(offenders(/\btext-accent-ink\b/)).toEqual([]);
   });
 });

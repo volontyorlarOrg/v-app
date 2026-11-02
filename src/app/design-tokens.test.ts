@@ -48,15 +48,15 @@ const AA_TEXT = 4.5;
 const AA_GRAPHIC = 3;
 
 const SURFACES = ["paper", "surface", "surface-sunk", "surface-soft", "surface-raised"];
-const TEXT_TOKENS = ["ink", "ink-muted", "primary"];
+const TEXT_TOKENS = ["ink", "ink-muted", "primary", "accent-ink"];
 const THEMES = [
   ["light", token],
   ["dark", darkToken],
 ] as const;
 
 describe("one blue", () => {
-  it("is cobalt in the light theme, the same value for text and for fills", () => {
-    expect(token("action")).toBe("#1853c6");
+  it("is one calm blue in the light theme, the same value for text and for fills", () => {
+    expect(token("action")).toBe("#0f66ac");
     expect(token("primary")).toBe(token("action"));
   });
 
@@ -75,16 +75,12 @@ describe("one blue", () => {
     expect(darkToken("logo-word")).toBe("#ffffff");
   });
 
-  it.each([
-    "shell",
-    "band",
-    "primary-ink",
-    "primary-deep",
-    "primary-muted",
-    "accent-ink",
-  ])("keeps the retired token %s out of the palette", (name) => {
-    expect(CSS).not.toMatch(new RegExp(`--color-${name}\\b`));
-  });
+  it.each(["shell", "band", "primary-ink", "primary-deep", "primary-muted"])(
+    "keeps the retired token %s out of the palette",
+    (name) => {
+      expect(CSS).not.toMatch(new RegExp(`--color-${name}\\b`));
+    },
+  );
 });
 
 describe.each(THEMES)("contrast in the %s theme", (_theme, read) => {
@@ -130,31 +126,57 @@ describe.each(THEMES)("contrast in the %s theme", (_theme, read) => {
   });
 });
 
+describe("the sidebar", () => {
+  it("is a pale blue field in the light theme, not white and not navy", () => {
+    const [r, g, b] = channels(token("sidebar"));
+    expect(b).toBeGreaterThan(g);
+    expect(g).toBeGreaterThan(r);
+    expect(relativeLuminance(token("sidebar"))).toBeGreaterThan(0.8);
+    expect(token("sidebar")).not.toBe(token("surface"));
+  });
+
+  it.each(THEMES)("keeps its text legible in the %s theme", (_theme, read) => {
+    for (const surface of ["sidebar", "sidebar-hover"]) {
+      for (const text of ["ink", "ink-muted"]) {
+        expect(
+          contrast(read(text), read(surface)),
+          `${text} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    }
+    expect(contrast(read("primary"), read("sidebar-active"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+  });
+});
+
 describe("neutrals, not a blue room", () => {
-  const MOST_CHROMA = 6;
+  const MOST_CHROMA = 16;
   const spread = (hex: string) => {
     const values = channels(hex);
     return Math.max(...values) - Math.min(...values);
   };
 
   it.each(["paper", "surface", "surface-sunk", "surface-raised", "border"])(
-    "%s carries almost no chroma in either theme",
+    "%s stays a quiet neutral in both themes",
     (name) => {
       expect(spread(token(name))).toBeLessThanOrEqual(MOST_CHROMA);
       expect(spread(darkToken(name))).toBeLessThanOrEqual(MOST_CHROMA);
     },
   );
 
-  it("paints the light workspace white", () => {
-    expect(token("paper")).toBe("#ffffff");
+  it("sets white panels on a soft ground in the light theme", () => {
     expect(token("surface")).toBe("#ffffff");
+    expect(token("paper")).not.toBe(token("surface"));
+    expect(contrast(token("paper"), token("surface"))).toBeLessThan(1.1);
   });
 
-  it("turns the dark floor graphite, with popovers a step above it", () => {
-    expect(relativeLuminance(darkToken("paper"))).toBeLessThan(0.01);
-    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(
-      relativeLuminance(darkToken("surface")),
-    );
+  it("raises panels off the dark floor, and popovers off the panels", () => {
+    const floor = relativeLuminance(darkToken("paper"));
+    const panel = relativeLuminance(darkToken("surface"));
+    expect(floor).toBeLessThan(0.01);
+    expect(panel).toBeGreaterThan(floor);
+    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(panel);
   });
 
   it("is switched by a data attribute, so the same tokens carry both themes", () => {
@@ -163,7 +185,7 @@ describe("neutrals, not a blue room", () => {
   });
 });
 
-describe("the surface furniture is gone", () => {
+describe("the surface furniture stays gone", () => {
   it.each([
     "workspace-backdrop",
     "shell-glow",
@@ -174,22 +196,28 @@ describe("the surface furniture is gone", () => {
     expect(CSS).not.toContain(name);
   });
 
-  it("draws no radial wash or gradient", () => {
-    expect(CSS).not.toMatch(/radial-gradient|linear-gradient/);
+  it("draws no radial wash", () => {
+    expect(CSS).not.toMatch(/radial-gradient/);
+  });
+
+  it("keeps its one gradient on the volunteer's pass", () => {
+    expect(CSS.match(/linear-gradient/g)).toHaveLength(1);
+    const pass = CSS.slice(CSS.indexOf(".volunteer-pass-card {"));
+    expect(pass.slice(0, pass.indexOf("}"))).toContain("linear-gradient");
   });
 });
 
 describe("corners", () => {
   it.each([
-    ["sm", "0.25rem"],
-    ["md", "0.375rem"],
-    ["lg", "0.5rem"],
-    ["xl", "0.75rem"],
+    ["sm", "0.375rem"],
+    ["md", "0.625rem"],
+    ["lg", "0.875rem"],
+    ["xl", "1.125rem"],
   ])("radius-%s is %s", (name, value) => {
     expect(CSS).toMatch(new RegExp(`--radius-${name}:\\s*${value};`));
   });
 
-  it("stops at twelve pixels", () => {
+  it("stops at eighteen pixels", () => {
     expect(CSS).not.toMatch(/--radius-[23]xl/);
   });
 });

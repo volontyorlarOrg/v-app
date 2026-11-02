@@ -42,7 +42,7 @@ reads the local `v-backend` and its separate development database. Run
 - The two sign-in surfaces: log in and create an account, each with Telegram,
   Google, and an email and password form. Google renders disabled with a note
   until its client id is set.
-- A product panel: a white sidebar on desktop carrying the lockup, the
+- A product panel: a pale blue sidebar on desktop carrying the lockup, the
   notification bell, the three sections and the identity card, with no top
   bar; a slim header and a four-tab bar on a phone.
 - The dashboard: greeting and level, three figures, the next commitment,

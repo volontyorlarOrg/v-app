@@ -46,7 +46,7 @@ export function Sidebar({
   const t = useTranslations("nav");
 
   return (
-    <div className="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r lg:border-border">
+    <div className="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r lg:border-sidebar-line lg:bg-sidebar">
       <aside className="sticky top-0 flex h-dvh flex-col">
         <div className="flex items-center gap-2 px-4 pt-4 pb-3">
           <Link
@@ -70,7 +70,7 @@ export function Sidebar({
           <SidebarNav items={navItems(primaryNavRoutes, t)} label={t("primaryLabel")} />
         </div>
 
-        <div className="border-t border-border px-3 py-3">
+        <div className="border-t border-sidebar-line px-3 py-3">
           <SidebarNav
             items={navItems(accountNavRoutes, t)}
             label={t("secondaryLabel")}

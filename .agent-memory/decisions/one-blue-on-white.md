@@ -1,6 +1,19 @@
-# One blue on white: the app leaves the marketing palette
+# One blue on a soft ground: the app leaves the marketing palette
 
 **Date:** 2026-11-02
+
+**Softened the same day.** The first version below (cobalt `#1853C6`, pure white,
+radius 4 / 6 / 8 / 12, flat pass) was on screen for an hour before the user said the
+edges and the colour were "a very aggressive transition from the previous one".
+The direction stayed and the distance shrank: blue `#0F66AC` at hue 250, between the
+old hue 243 and cobalt's 262; white panels on a soft `#F5F7FA` ground;
+the previous design's `ink`, `ink-muted` and `border-control` back; radius
+6 / 10 / 14 / 18; tinted chips and icon tiles; orange text for XP and results again (`accent-ink` is
+back); a pale blue sidebar, the user's own pick from three rendered options; a dark
+theme with a slight blue cast rather than
+neutral graphite; and a gentle gradient and shadow on the pass. **A redesign has to
+read as an evolution of what people already know; check the jump against the old
+screen, not only against the brief.**
 
 ## Decision
 

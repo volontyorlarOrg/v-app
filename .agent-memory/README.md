@@ -13,7 +13,7 @@ folder. Never store secrets or unverified external claims.
 ## Current entries
 
 - `decisions/one-blue-on-white.md` — why the app left the marketing palette for one
-  cobalt blue on white, Inter and a small radius scale, and what that leaves out of
+  calm blue on a soft ground, Inter and a moderate radius scale, and what that leaves out of
   step with `v-web` and the portals
 - `decisions/adopt-the-marketing-site-patterns.md` — why the app was rebuilt on
   `v-web`'s tokens, motion, catalogs and registry (its look superseded by

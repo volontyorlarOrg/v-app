@@ -16,10 +16,13 @@ export function SidebarIdentity({ user, label }: { user: ShellUser; label: strin
       aria-current={active ? "page" : undefined}
       className={cn(
         "flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors",
-        active ? "bg-surface-soft" : "hover:bg-surface-sunk",
+        active ? "bg-sidebar-active" : "hover:bg-sidebar-hover",
       )}
     >
-      <Avatar aria-hidden="true" className="size-8 shrink-0">
+      <Avatar
+        aria-hidden="true"
+        className="size-8 shrink-0 outline-2 outline-offset-1 outline-accent/60"
+      >
         {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
         <AvatarFallback>{user.initials}</AvatarFallback>
       </Avatar>

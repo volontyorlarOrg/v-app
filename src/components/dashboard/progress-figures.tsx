@@ -37,7 +37,7 @@ export function ProgressFigures({
     <section
       aria-label={t("label")}
       className={cn(
-        "overflow-hidden rounded-lg border border-border bg-surface",
+        "overflow-hidden rounded-lg border border-border bg-surface shadow-panel",
         className,
       )}
     >
@@ -49,29 +49,36 @@ export function ProgressFigures({
             <li key={figure.id} className="min-w-0">
               <Link
                 href={figure.href}
-                className="flex h-full items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-surface-sunk"
+                className="flex h-full items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-sunk"
               >
-                <span className="min-w-0">
-                  <span className="figure block text-3xl text-ink">{figure.value}</span>
-                  <span className="mt-1 flex items-center gap-1.5 text-sm text-ink-muted">
-                    <figure.Icon
-                      aria-hidden="true"
-                      className={cn(
-                        "size-3.5 shrink-0",
-                        figure.tone === "achievement" && "fill-accent text-accent",
-                      )}
-                    />
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "inline-grid size-10 shrink-0 place-items-center rounded-md",
+                    figure.tone === "achievement"
+                      ? "bg-accent/10 text-accent"
+                      : "bg-surface-soft text-primary",
+                  )}
+                >
+                  <figure.Icon
+                    className={cn(
+                      "size-5",
+                      figure.tone === "achievement" && "fill-accent",
+                    )}
+                  />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="figure block text-2xl text-ink">{figure.value}</span>
+                  <span className="block text-sm text-ink-muted">
                     {figure.label}
+                    {figure.note ? (
+                      <span className="block text-xs">{figure.note}</span>
+                    ) : null}
                   </span>
-                  {figure.note ? (
-                    <span className="mt-0.5 block text-xs text-ink-muted">
-                      {figure.note}
-                    </span>
-                  ) : null}
                 </span>
                 <ChevronRight
                   aria-hidden="true"
-                  className="size-4 shrink-0 text-ink-muted"
+                  className="size-4 shrink-0 text-primary"
                 />
               </Link>
             </li>

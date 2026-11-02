@@ -93,8 +93,7 @@ are this app's own since 2026-11-02 and no longer follow the marketing site. A n
 token is added in the same commit as its dark value and its assertion in
 `src/app/design-tokens.test.ts`, and the first question is whether it is needed at
 all: the palette is deliberately small. Compute new values in OKLCH. Before reaching
-for a colour, check `../../DESIGN.md`: blue only means "you can act here" or "you are
-here", orange is a small mark for what the person did, and there is no third hue. The
+for a colour, check `../../DESIGN.md`: solid blue is for actions, soft blue for state, orange is for what the person did, in small areas, and there is no third hue. The
 one red, `danger`, is for an action that leaves or destroys (sign out); it is not an
 error colour.
 

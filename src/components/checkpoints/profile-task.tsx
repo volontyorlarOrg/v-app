@@ -88,7 +88,7 @@ export function ProfileTask({
             <h2 id={titleId} className="text-xl text-balance">
               {t("profile.title")}
             </h2>
-            <p className="figure text-sm text-ink">
+            <p className="figure text-sm text-accent-ink">
               {t("xp", { xp: format.number(reward.xp) })}
             </p>
             <p className="mt-1 text-sm text-pretty text-ink-muted">

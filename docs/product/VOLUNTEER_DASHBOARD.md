@@ -50,10 +50,9 @@ which step is reached, current, next or ahead.
   for hours and XP; an accepted event still ahead is "Upcoming" and stays out
   of recent participation (it is in Next up). My activity carries the sentence
   that waiting results never count against the volunteer.
-- **A small orange mark means the person did it** — the level, a verified result,
-  the XP star — and a small blue one means something the institution is doing or
-  the next thing to do: awaiting verification, the next step. Numbers stay in ink.
-  There is no green.
+- **Orange means the person did it** — the level, a verified result, the XP earned —
+  and blue means something the institution is doing or the next thing to do: the meter,
+  awaiting verification, the next step. There is no green.
 - **A block with nothing in it is not drawn**, as before: Next up, the reward,
   recent participation and the prompts appear only while they say something.
 - **Deadlines are chips with words**; there is no red.

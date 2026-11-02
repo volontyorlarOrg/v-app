@@ -59,7 +59,7 @@ export function OpportunityCard({
       : t(`regions.${opportunity.region}`);
 
   return (
-    <article className="flex w-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-border-control">
+    <article className="flex w-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-panel transition-colors hover:border-border-control">
       <div className="relative aspect-[2/1] overflow-hidden border-b border-border bg-surface-sunk">
         {photo ? (
           <Image
@@ -73,13 +73,13 @@ export function OpportunityCard({
         ) : (
           <div
             aria-hidden="true"
-            className="opportunity-card-art flex size-full items-center justify-center text-ink-muted"
+            className="opportunity-card-art flex size-full items-center justify-center text-primary"
           >
             <KindIcon className="size-7 opacity-60" />
           </div>
         )}
 
-        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-sm bg-surface px-1.5 py-0.5 text-xs font-medium text-ink">
+        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-sm bg-surface px-1.5 py-0.5 text-xs font-medium text-primary">
           <KindIcon aria-hidden="true" className="size-3.5" />
           {t(`kinds.${opportunity.kind}`)}
         </span>
@@ -128,16 +128,16 @@ export function OpportunityCard({
         <ul className="mt-3 grid gap-1 text-sm text-ink-muted">
           <li className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span className="inline-flex items-center gap-1.5">
-              <CalendarDays aria-hidden="true" className="size-3.5" />
+              <CalendarDays aria-hidden="true" className="size-3.5 text-primary" />
               <time dateTime={opportunity.startsAt} className="tabular">
                 {format.dateTime(new Date(opportunity.startsAt), "day")}
               </time>
             </span>
             <span className="inline-flex items-center gap-1.5">
               {remote ? (
-                <Monitor aria-hidden="true" className="size-3.5" />
+                <Monitor aria-hidden="true" className="size-3.5 text-primary" />
               ) : (
-                <MapPin aria-hidden="true" className="size-3.5" />
+                <MapPin aria-hidden="true" className="size-3.5 text-primary" />
               )}
               {place}
             </span>
@@ -145,7 +145,7 @@ export function OpportunityCard({
           <li
             className={cn(
               "inline-flex items-center gap-1.5",
-              unavailable ? "text-ink-muted" : "text-ink",
+              unavailable ? "text-ink-muted" : "font-medium text-primary",
             )}
           >
             <Clock3 aria-hidden="true" className="size-3.5" />

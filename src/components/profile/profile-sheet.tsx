@@ -78,7 +78,7 @@ export function ProfileSheet({
   return (
     <article
       aria-labelledby="profile-name"
-      className="profile-sheet mx-auto w-full max-w-[46rem] overflow-clip rounded-lg border border-border bg-surface"
+      className="profile-sheet mx-auto w-full max-w-[46rem] overflow-clip rounded-lg border border-border bg-surface shadow-panel"
     >
       {completion ? (
         <div className="border-b border-border">
@@ -99,7 +99,10 @@ export function ProfileSheet({
       <header className="px-5 pt-5 sm:px-6 sm:pt-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <SharedElement name={PROFILE_AVATAR_TRANSITION}>
-            <Avatar aria-hidden="true" className="size-16 sm:size-20">
+            <Avatar
+              aria-hidden="true"
+              className="size-16 outline-2 outline-offset-2 outline-accent sm:size-20"
+            >
               {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
               <AvatarFallback className="text-xl sm:text-2xl">
                 {initials}
