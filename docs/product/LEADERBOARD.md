@@ -30,11 +30,9 @@ The page has four parts:
 3. **Standings** — one page of the board: place, public display name, public
    username and experience. The name is the primary identifier; the `@username`
    sits beneath it in the smaller metadata role.
-   The first three places and the volunteer's own row are in orange, the colour
-   that belongs to the person; every other experience figure is plain ink so
-   the orange keeps meaning something. The reader's own row is on the soft
-   surface with a blue edge, carries `aria-current` and the `#you` anchor, and
-   is marked with a chip.
+   Every experience figure is plain ink. The reader's own row is on the soft
+   surface, its place number in blue, carries `aria-current` and the `#you`
+   anchor, and is marked with a chip.
 4. **Pagination** — rendered from the response's own `page`, `pageSize` and
    `total`, never from a count of the rows on screen.
 

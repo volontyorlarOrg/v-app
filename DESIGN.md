@@ -1,453 +1,403 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, five sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
+description: A white sheet with hairlines, one typeface, and one cobalt blue that only ever means "you can act here" or "you are here" — plus the volunteer's pass, the single large field of blue in the product.
 colors:
-  paper: "#F5F8FB"
+  paper: "#FFFFFF"
   surface: "#FFFFFF"
-  surface-sunk: "#ECF1F5"
-  surface-soft: "#E7F1F9"
-  ink: "#222B33"
-  ink-muted: "#566270"
-  border: "#DBE3EA"
-  border-control: "#85909A"
-  primary: "#007FC2"
-  primary-ink: "#005E92"
-  primary-deep: "#004A73"
-  primary-muted: "#BFDCEF"
-  action: "#005E92"
-  action-hover: "#004A73"
-  band: "#005E92"
-  band-copy: "#BFDCEF"
-  accent: "#E85D30"
-  accent-ink: "#B34917"
-  knockout: "#FFFFFF"
-  shell: "#0B2340"
-  shell-raised: "#14345A"
-  shell-line: "#1E3F66"
-  shell-ink: "#F1F6FB"
-  shell-muted: "#9DB4CC"
-  shell-active: "#BFDCEF"
-  shell-active-ink: "#004A73"
+  surface-sunk: "#F6F7F9"
+  surface-soft: "#EBF2FE"
   surface-raised: "#FFFFFF"
   field: "#FFFFFF"
+  ink: "#181B20"
+  ink-muted: "#5E636D"
+  border: "#E4E6EA"
+  border-control: "#878C96"
+  knockout: "#FFFFFF"
+  primary: "#1853C6"
+  action: "#1853C6"
+  action-hover: "#0A41AD"
+  accent: "#E85D30"
+  danger: "#B3261E"
+  danger-ink: "#8F1E18"
+  danger-muted: "#F7E3E2"
   gold: "#D4A53A"
   gold-ink: "#7A5A0E"
   silver: "#B5BFCA"
   silver-ink: "#5B6774"
   bronze: "#C58256"
   bronze-ink: "#7D4A24"
+  logo-blue: "#007FC2"
+  logo-orange: "#E85D30"
+  logo-word: "#007FC2"
 typography:
   page:
-    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
-    fontSize: "1.875rem → 2.25rem"
-    fontWeight: 400
-    lineHeight: 1.15
-    letterSpacing: "-0.025em"
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.5rem → 1.75rem"
+    fontWeight: 600
+    lineHeight: "2rem → 2.25rem"
+    letterSpacing: "-0.02em"
+  greeting:
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.75rem → 2rem"
+    fontWeight: 600
+    lineHeight: "2.25rem → 2.5rem"
+    letterSpacing: "-0.02em"
   figure:
-    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
-    fontSize: "clamp(2.25rem, 4.5vw, 3.25rem)"
-    fontWeight: 400
-    lineHeight: 0.95
-    letterSpacing: "-0.035em"
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.75rem"
+    fontWeight: 500
+    lineHeight: "2.25rem"
+    letterSpacing: "-0.02em"
   panel-title:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "normal"
-  title:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.375rem"
-    fontWeight: 600
-    lineHeight: 1.32
-    letterSpacing: "-0.015em"
+    lineHeight: "1.5rem"
+    letterSpacing: "-0.01em"
   body:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.65
-    letterSpacing: "normal"
-  label:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "0.14em"
-  small:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: "1.25rem"
     letterSpacing: "normal"
-  lead:
-    fontFamily: "Onest, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(1.125rem, 1.5vw, 1.375rem)"
+  label:
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 500
+    lineHeight: "1.25rem"
+    letterSpacing: "normal"
+  small:
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.75rem"
     fontWeight: 400
-    lineHeight: 1.6
-    letterSpacing: "-0.008em"
-  profile-name:
-    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
-    fontSize: "clamp(2.25rem, 8cqi, 3.75rem)"
-    fontWeight: 400
-    lineHeight: 1.03
-    letterSpacing: "-0.03em"
-  profile-name-long:
-    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
-    fontSize: "clamp(1.75rem, 6cqi, 2.75rem)"
-    fontWeight: 400
-    lineHeight: 1.03
-    letterSpacing: "-0.03em"
-  figure-inline:
-    fontFamily: "Source Serif 4, ui-serif, Georgia, serif"
-    fontSize: "1.75rem"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "-0.02em"
+    lineHeight: "1.125rem"
+    letterSpacing: "normal"
 rounded:
-  sm: "6px"
-  md: "10px"
-  lg: "14px"
-  xl: "20px"
-  2xl: "28px"
+  sm: "4px"
+  md: "6px"
+  lg: "8px"
+  xl: "12px"
   full: "9999px"
 spacing:
-  sidebar: "16.5rem"
+  grid: "4px"
+  sidebar: "16rem"
   aside: "22rem"
   gutter-mobile: "16px"
-  gutter-wide: "32px"
+  gutter-wide: "40px"
   panel-gap: "24px"
-  workspace: "80rem"
+  workspace: "72rem"
 components:
   panel:
     backgroundColor: "{colors.surface}"
     borderColor: "{colors.border}"
-    rounded: "{rounded.xl}"
-    padding: "16px 20px"
-  figures-strip:
-    backgroundColor: "{colors.surface}"
-    borderColor: "{colors.border}"
-    rounded: "{rounded.xl}"
-    padding: "16px 24px"
-  level-chip:
-    backgroundColor: "color-mix(accent 10%, surface)"
-    borderColor: "{colors.accent}"
-    textColor: "{colors.accent-ink}"
     rounded: "{rounded.lg}"
-    padding: "6px 12px"
+    padding: "16px 20px"
   sidebar:
-    backgroundColor: "{colors.shell}"
-    textColor: "{colors.shell-ink}"
-    borderColor: "{colors.shell-line}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink-muted}"
+    borderColor: "{colors.border}"
     width: "{spacing.sidebar}"
   sidebar-active:
-    backgroundColor: "{colors.shell-active}"
-    textColor: "{colors.shell-active-ink}"
+    backgroundColor: "{colors.surface-soft}"
+    textColor: "{colors.primary}"
     rounded: "{rounded.md}"
-    height: "44px"
-  workspace:
-    backgroundColor: "{colors.surface-sunk}"
+    height: "36px, 44px on touch"
+  button-primary:
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.knockout}"
+    rounded: "{rounded.md}"
+    height: "40px, 44px on touch"
+  button-outline:
+    borderColor: "{colors.border}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    height: "36px, 44px on touch"
+  control:
+    backgroundColor: "{colors.field}"
+    borderColor: "{colors.border-control}"
+    rounded: "{rounded.md}"
+    height: "40px, 44px on touch"
   switch-on:
     backgroundColor: "{colors.action}"
     borderColor: "{colors.action}"
     rounded: "{rounded.full}"
-    size: "48px × 28px"
+    size: "36px × 20px"
   switch-off:
-    backgroundColor: "{colors.surface-sunk}"
+    backgroundColor: "transparent"
     borderColor: "{colors.border-control}"
     rounded: "{rounded.full}"
-    size: "48px × 28px"
-  button-primary:
+    size: "36px × 20px"
+  chip:
+    backgroundColor: "{colors.surface-sunk}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "2px 6px"
+  volunteer-pass:
     backgroundColor: "{colors.action}"
     textColor: "{colors.knockout}"
-    rounded: "{rounded.full}"
-    height: "52px"
-  control:
-    backgroundColor: "{colors.surface}"
-    borderColor: "{colors.border-control}"
-    rounded: "{rounded.lg}"
-    height: "48px"
-  state-chip:
-    backgroundColor: "{colors.surface-soft}"
-    textColor: "{colors.primary-ink}"
-    rounded: "{rounded.full}"
-    padding: "4px 10px"
+    rounded: "0.75em"
 ---
 
 # Design System: Volontyorlar App
 
 ## Overview
 
-**Creative North Star: "The same ink, a different room"**
+**Creative North Star: "One blue on white paper"**
 
-The marketing site is a civic notice pinned to a whiteboard. The application
-is the room where a volunteer does their own work, and it is laid out like one:
-a navy sidebar that names five sections — dashboard, opportunities, my
-activity, leaderboard, tasks — at the top and the account — who you are, which opens the
-profile, then settings — at the foot, and a flat workspace carrying panels of content, with
-no top bar between them. Every entry in the sidebar is a plain link: nothing
-in it expands, and the only tray is the notification bell beside the lockup.
-What used to hide inside the user card now has a place — the card itself is
-the link to the profile, settings is a link beneath it, the theme switch and
-the interface language are a panel on `/settings`. Anything that belongs to a
-section is a tab under that section's header. Tasks is a distinct primary
-section with its own sidebar link and phone tab. It shares every
-token, both typefaces, the two brand colours and their rules, the theme and the
-motion system with `../v-web/DESIGN.md`, and nothing else about its layout. The
-institution's blue is used as a field on the left, not only as an accent; the
-volunteer's own work stays orange on the right. A volunteer coming from the
-marketing site should recognise the ink; a volunteer coming from any other
-product should recognise a panel.
+The application is a white sheet. Neutrals and hairlines carry all of the
+structure, one typeface carries all of the text, and one cobalt blue carries all
+of the meaning. Blue is a signal, never a field: it marks what a volunteer can
+act on and where they are, and nothing else. A screen is mostly white, grey and
+near-black, so when something is blue it is worth looking at.
 
-Only the sign-in pages keep the marketing site's dot-grid ground: they are the
-doorway between the two. The welcome flow a new account meets on `/welcome`
-stands on the same ground as the threshold: a greeting, a lanyard pass that
-gains a part per saved step, and one step panel, ending by handing the
-volunteer into the room.
+The one exception is deliberate. The volunteer's pass on the dashboard is a
+solid cobalt card hanging on a strap from the top of the page: the only large
+area of blue in the product, belonging to the only thing here that is truly the
+volunteer's own. The whole budget for boldness is spent there, and everything
+around it stays quiet.
 
 **Key characteristics**
 
-- A 16.5rem navy sidebar (`shell`) with five sections at the top, the
-  identity card (the profile's link) above settings at the foot,
-  and no top bar on desktop; a 56px header and a five-tab bar (dashboard,
-  opportunities, leaderboard, tasks, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
-  `shell-active` in `shell-active-ink`, a pale pill by day and a deep blue one
-  after dark. The workspace is `surface-sunk` under two faint radial washes
-  (blue top-right, orange bottom-left), the panels are `surface`.
-- The dark theme is an elevation model, not an inversion: the floor
-  (`surface-sunk`) is the darkest navy, every panel (`surface`) sits a step
-  above it with a one-pixel highlight along its top edge, popovers
-  (`surface-raised`) a step above that, and fields (`field`) sink below the
-  panel they sit in. Every neutral is tinted toward navy rather than grey, the
-  washes are halved so orange never muddies to brown, and the accent text
-  values are lifted so both hues keep their AA ratios.
-- Underlined section tabs under a page header, with a count on each, where a
-  section has more than one listing; the applications page uses them. The
-  opportunities page has none: one toolbar row instead — search, the type
-  switcher, region, and a "Saved only" switch.
-- Photo-first opportunity cards: the vacancy photo across the top at 2:1 with
-  the type chip in its top-left corner and the bookmark in its top-right.
-- Washes of the two hues where a surface is the volunteer's own: the dashboard
-  hero, the leaderboard's standing card and the podium stage. A wash never carries text contrast; the tokens beneath do.
-- Panels, the figures strip and cards with a `border` edge and a 20px radius.
-  Content inside a panel is ruled rows, never nested boxes.
-- A serif page title at 30 to 36px (the dashboard's greeting larger), sans
-  panel titles at 16px, and serif figures.
-- Switches, segmented filters, selects and a search field that all clear 44px
-  and take the global focus ring.
-- Orange for what the person did: the level, an acceptance, a confirmed
-  attendance, the record's figures, a completed profile, a saved opportunity.
-- Chips that carry an icon and a word; a dashed chip for anything that is a
-  sample, a preview, or not connected yet.
+- A white 16rem sidebar with a hairline edge, five sections at the top, the
+  identity row (the profile's link) above settings at the foot, and no top bar
+  on desktop. On a phone a 56px header and a five-tab bar. Nothing in the sidebar
+  collapses.
+- A white workspace, up to 72rem wide. Panels are not raised off it: they are
+  white boxes with a hairline edge and an 8px radius, with no shadow.
+- No gradients, washes, glows, dot grids, blurs or panel shadows anywhere. The
+  stylesheet has no `radial-gradient` or `linear-gradient`, and a test holds it
+  to that.
+- Selected is one treatment everywhere: `surface-soft` with `primary` text. The
+  sidebar, the type switcher, segmented filters, pagination and language choices
+  all use it, so it only has to be learned once.
+- Chips share one quiet shape, `surface-sunk` at a 4px radius with an icon and a
+  word. Only the small icon's hue changes between a system state and something
+  the person did.
+- The dark theme is neutral graphite, not navy. Radix warns against saturated
+  greys for an app background, and the old navy room is what made the blue feel
+  everywhere at once.
+
+Why these values and not others is in
+[`docs/ui/MINIMAL_BLUE_RESEARCH.md`](docs/ui/MINIMAL_BLUE_RESEARCH.md).
+
+## Colour
+
+Everything below is computed in OKLCH and pinned by
+`src/app/design-tokens.test.ts`.
+
+| Token             | Light     | Dark      | Use                                                |
+| ----------------- | --------- | --------- | -------------------------------------------------- |
+| `paper`/`surface` | `#FFFFFF` | `#121314` | The page and panels: one sheet                     |
+| `surface-sunk`    | `#F6F7F9` | `#1D1E20` | Hover, meter track, chip, thumbnail ground         |
+| `surface-soft`    | `#EBF2FE` | `#1D2638` | Selected state only, and the viewer's own row      |
+| `surface-raised`  | `#FFFFFF` | `#1D1E20` | Popovers, menus, dialogs                           |
+| `field`           | `#FFFFFF` | `#161719` | Inside a text field                                |
+| `ink`             | `#181B20` | `#E6E8EB` | Text                                               |
+| `ink-muted`       | `#5E636D` | `#A4A8AF` | Secondary text and neutral icons                   |
+| `border`          | `#E4E6EA` | `#2A2B2E` | Hairlines, panel edges, secondary button edges     |
+| `border-control`  | `#878C96` | `#686C73` | A field's edge, 3:1 against the page               |
+| `primary`         | `#1853C6` | `#93B8FB` | Links, selected text, focus ring, small marks      |
+| `action`          | `#1853C6` | `#2D63CD` | Solid fills behind a white label, meters, the pass |
+| `action-hover`    | `#0A41AD` | `#386DD5` | The hover of a solid fill                          |
+| `accent`          | `#E85D30` | `#E85D30` | Small marks only: see below                        |
+
+In the light theme one value does every job: `#1853C6` passes AA both behind
+white text (6.79:1) and as text on white, sunk and soft surfaces. The dark theme
+has to split it, because saturated short-wavelength blue focuses poorly on a dark
+ground. Its text blue is lifted and calmed to `#93B8FB`; its fill stays dark
+enough to hold a white label at 5.56:1.
+
+**Blue appears on:** primary buttons, links, the selected state, the focus ring,
+meters, switches when on, the unread dot and count, the verified tick, the next
+step in the levels dialog, and the pass. **It does not appear on:** icons beside
+a fact, status words, deadlines, table headings, figures, or any background
+larger than a selected row, apart from the pass.
+
+**Orange is a mark, not a colour.** It belongs to the person, as it always has:
+the level, a verified result, an acceptance, the XP star, a finished level. But
+it now only ever draws a small icon or dot. It has no text token, never fills a
+button, and never tints a surface. The logo's heart is the only other orange on
+most screens, so the two read together.
+
+**The metals** (`gold`, `silver`, `bronze`) mark the top three on the leaderboard
+and nothing else: a 2px avatar ring, a 2px rule on a flat `surface-sunk` step,
+the crown, and the rank numeral in the metal's `*-ink`.
+
+**The one red**, `danger`, marks an action that leaves or destroys: the sign-out
+button. It never states an error. Errors stay on `surface-sunk` in `ink`, with an
+icon and a heavier weight.
+
+**The logo keeps the kit's own values.** `logo-blue`, `logo-orange` and
+`logo-word` follow `../v-web/docs/brand/BRAND_ASSETS.md` and never follow the
+interface blue. On the pass the logo is the kit's white wordmark or white glyph
+with the orange heart.
+
+## Type
+
+**Inter, and only Inter.** It is one of very few families that draws the Uzbek
+letter `ʻ` (U+02BB), spaces it properly, covers Cyrillic and has real tabular
+figures; the tests behind that are in the research note. It is loaded with its
+optical-size axis, so headings get the tighter display cut automatically.
+
+| Role        | Size                   | Weight | Tracking | Where                                  |
+| ----------- | ---------------------- | ------ | -------- | -------------------------------------- |
+| Greeting    | 28 → 32px              | 600    | −0.02em  | The dashboard's `h1`                   |
+| Page title  | 24 → 28px              | 600    | −0.02em  | `PageHeader`'s `h1`                    |
+| Panel title | 16px                   | 600    | −0.01em  | `h2`                                   |
+| Figure      | 24 to 28px (`.figure`) | 500    | −0.02em  | Hours, XP, rank, day of the month      |
+| Label       | 14px                   | 500    | normal   | Nav, buttons, row titles, field labels |
+| Body        | 14px                   | 400    | normal   | Almost everything else                 |
+| Small       | 12px                   | 400    | normal   | Chips, table headings, field help      |
+
+Three weights only: 400, 500 and 600. Nothing is bold. **Nothing is ever in
+capitals, and no letters are spread apart.** Capitals read badly in Uzbek and
+Russian, and a tracked eyebrow above every heading is decoration. Text fields use
+16px on a phone so iOS does not zoom, and 14px from the small breakpoint.
+
+Numbers that line up use `.tabular`; a figure uses `.figure`, which includes it.
+
+## Corners
+
+| Radius | Value | Use                                                       |
+| ------ | ----- | --------------------------------------------------------- |
+| `sm`   | 4px   | Chips, thumbnails' tags, a row inside a menu              |
+| `md`   | 6px   | Buttons, fields, nav items, selected states, icon buttons |
+| `lg`   | 8px   | Panels, cards, popovers, menus                            |
+| `xl`   | 12px  | Dialogs                                                   |
+| `full` | —     | Avatars, dots, count badges, switches, and nothing else   |
+
+The scale stops at 12px. A button is never a pill. Nested corners stay concentric:
+the inner radius is the outer radius minus the gap, so a 4px row sits 4px inside
+an 8px menu.
+
+## Spacing
+
+Everything sits on a 4px grid: 2 for tight internals, then 4, 8, 12, 16, 20, 24,
+32, 40.
+
+| Where                   | Value                                 |
+| ----------------------- | ------------------------------------- |
+| Page gutter             | 16px phone, 24px tablet, 40px desktop |
+| Page top (`--page-top`) | 24px phone, 40px desktop              |
+| Between panels          | 24px                                  |
+| Panel padding           | 16px vertical, 20px horizontal        |
+| Between rows in a panel | A hairline, 12px above and below      |
+| Between grid cards      | 16px                                  |
+| Label to field          | 6px                                   |
+| Field to field          | 16px                                  |
+
+**Control height is a variable, not a class.** `--control` and `--control-sm` are
+44px on a touch screen, and 40px and 36px under a fine pointer from the large
+breakpoint. A phone never loses its thumb-sized targets, and a desktop never
+pays for them. Use `min-h-(--control)`, not a fixed height.
 
 ## Layout
 
-| Region    | Desktop (≥ 64rem)                                                                                                                                                                                                                              | Phone                                                                                                             |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the five sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
-| Header    | Absent                                                                                                                                                                                                                                         | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings) |
-| Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                                                                      | 16px gutters, one column, the aside stacks after the main column                                                  |
-| Tab bar   | Absent                                                                                                                                                                                                                                         | Fixed, 56px, five destinations: dashboard, opportunities, leaderboard, tasks, profile                             |
+| Region    | Desktop (≥ 64rem)                                                                                                                    | Phone                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Sidebar   | Sticky, full height, white with a right hairline: lockup and bell, the five sections, then at the foot the identity row and settings | Absent                                                                             |
+| Header    | Absent                                                                                                                               | Sticky, white, bottom hairline: lockup, bell, avatar (account menu)                |
+| Workspace | White, up to 72rem wide, panels in a main column and a 22rem aside                                                                   | One column, the aside stacks after the main column                                 |
+| Tab bar   | Absent                                                                                                                               | Fixed, 56px, five destinations; the active one is `primary` with no pill behind it |
 
-The dashboard is the volunteer's progress: a hero that greets them by first
-name over the orange level chip, "Next: …", a wide meter inside the current
-step and "N verified hours to go", with "View levels" opening the levels
-dialog; the volunteer's pass hangs from the hero's top edge on its strap, the
-logo's heart and a faint blue ring behind it. Below it one panel of three
-linked figures — verified hours, XP, the overall XP rank — then whatever only
-appears while it has something to say (Next up, the profile reward), and
-"Recent participation": the four latest events that have ended, as a table of
-event, date, result, hours and XP whose rows open their application. On a
-phone the pass shrinks to the hero's corner without its wordmark, the figures
-stack, and the table becomes stacked rows. My activity (`/record`) is the same
-table with every event, the upcoming one included, under a page header. The opportunities page is a title with an outline "Applications"
-link and its count on the right, one toolbar row (search, the All /
-Volunteering / Competitions switcher, region, "Saved only"), and a three-column
-grid of photo cards; the applications page keeps the section tabs and its pill
-filter inside its panel. The leaderboard opens on the viewer's place as a single row that links to
-their own row in the board, the top three on a podium stage, and the ranked table from fourth place. The
-profile is the volunteer's own page: one read-only profile sheet, the same
-object the public page at `volontyorlar.uz/<username>` shows, with the
-volunteer's public profile details as more rows of it. Another volunteer's
-visible leaderboard identity opens that sheet inside the app at `/<username>`;
-editing is its own page, `/profile/edit`, a page header over the editor in titled sections
-with Save and Cancel, returning to the profile once saved. Settings opens on an
-account summary that carries the sign-out button, then any account-joining
-requests waiting, then its panels in two columns from the extra-large
-breakpoint — username, privacy and appearance beside the ways to sign in and
-the password — with no index of its own. Every other
-section opens with the same `PageHeader` and composes the
-same `Panel`, so the panel reads as one product rather than seven pages.
+**The dashboard** opens with no box at all: the greeting, the level as a small
+orange mark and a word, "Next: …", a thin meter, the hours to go, and "View
+levels". On the right the pass hangs from the very top of the workspace on its
+strap. Below it one panel of three linked figures, then whatever only appears
+while it has something to say (Next up, the profile reward), and "Recent
+participation" as a table of event, date, result, hours and XP. On a phone the
+pass shrinks to the corner and the figures stack.
 
-## Two faces in the product
+**The opportunities page** is a title with an outline "Applications" link, one
+toolbar row (search, the All / Volunteering / Competitions switcher, region,
+"Saved only"), and a three-column grid of photo cards. Each section is headed by
+plain text with no icon tile.
 
-`h1` takes the serif from the base layer at page-title size. Panel titles are
-`h2` and opt into `font-sans` at 16px semibold, because a panel title is a
-label, not a headline. The dashboard's figures are serif with
-`tabular-nums`, so a count reads as evidence. Nothing sets the serif bold; the
-typography test refuses it.
+**The leaderboard** is the viewer's place as a single row, three flat podium steps,
+and a ranked table from fourth place. Ranks are plain numerals, not discs.
 
-## Where the two hues appear
-
-**Blue** carries the sidebar's active section, the tab bar's active tab, panel
-actions, the primary and segmented buttons, the notification badge, switches
-when on, the meters, the "open" and "under review" chips, and the dots for
-things the institution did.
-
-**Orange** appears where a person did something, and nowhere else:
-
-| Surface                                                          | Treatment                          |
-| ---------------------------------------------------------------- | ---------------------------------- |
-| The level chip in the hero, on the pass and in the identity card | `level-chip` / `text-accent-ink`   |
-| The XP figure's star tile and the XP a verified row earned       | `bg-accent/12 text-accent`         |
-| Reached and current steps in the levels dialog                   | orange hexagon, "Reached" tick     |
-| Events and reliability on the profile                            | `text-accent-ink` at figure size   |
-| The "accepted" chip, the "attended" outcome, a "Verified" result | `border-accent/50 text-accent-ink` |
-| The decision node on an accepted application's timeline          | `bg-accent`                        |
-| A completed profile, and the preview "saved" status              | `text-accent-ink`                  |
-| Activity dots for a confirmation, an acceptance, a level         | `bg-accent`                        |
-
-**Gold, silver and bronze** appear in exactly one place: the top three on the
-leaderboard. Each place owns a metal (`gold`, `silver`, `bronze`) for its
-avatar ring, its podium step and the step's crown, and a metal ink
-(`*-ink`) for the numeral badge and the viewer's own rank when it is a podium
-one; the badge label is `medal-label`, white by day and the page ground after
-dark. The metals never label a system state or a person's action elsewhere,
-and the experience figures stay orange even on the podium.
-
-Nothing orange sits on blue and nothing blue sits on orange. The pass is the
-one blue field near an orange mark, and its level chip sits on its own
-`surface` pill, as the identity card's level does on the navy shell. The
-levels dialog keeps the next step blue (the goal the institution sets) and the
-steps already climbed orange. There is no green: a verified result and a
-reached level are the person's, so they are orange, and "Awaiting
-verification" is a system state, so it is blue with the clock. The palette has one
-red, `danger` (`danger`, `danger-ink`, `danger-muted`, the values the three
-portals use), for an action that leaves or destroys: the sign-out button in
-the settings account card is a `danger-outline` button. It never states an
-error and never sits beside an orange figure as a second accent; a validation
-colour is still a decision for the implementation plan.
+**The profile** is one read-only sheet, at most 46rem wide. **Settings** opens on
+the account summary with the sign-out button, then its panels in two columns from
+the extra-large breakpoint. **Sign-in** is a 24rem column on the bare white page,
+with no panel around it.
 
 ## Surfaces
 
-- **Panel** — `surface`, `border`, 20px radius, a header row with an `h2` and
-  an optional action link, then content. Lists inside use `padding="none"` and
-  rows separated by hairlines with their own 20px padding. The `id` a panel is
-  given is a real DOM id, so a panel can be an anchor target.
-- **Profile sheet** — the profile only, and the public page draws the same
-  sheet. One `surface` box at most 46rem wide, centred in the workspace, with
-  no cover, no stat band and no second panel: the avatar in its orange ring
-  with the one action beside it ("Complete profile" while fields are missing,
-  "Edit profile" once none are), the name as the `h1` at `profile-name` size,
-  the handle and the level pill, the bio as `lead` text, one line of inline
-  figures (serif `figure-inline` numerals in `accent-ink`, the words in
-  `ink-muted`), and then every detail the volunteer entered as a ruled row —
-  a `small` label in a 7rem column (10rem from a 34rem sheet) and its value at
-  body size. Empty details have no row; an empty bio, a record with nothing in
-  it, and a complete profile draw nothing at all. While the profile is
-  incomplete, the sheet's top edge is a 3px meter with one sentence beneath it:
-  the percentage and what is still missing. The public page row carries the
-  address, broken after the host on a narrow sheet, and a copy button whose
-  glyph turns into a tick.
-- **Podium** — the leaderboard's top three: each place is an avatar in its
-  metal ring, the handle, the experience figure, and a podium step in that
-  metal, the three steps at three heights so the silhouette reads before a
-  number does. Second stands left, first centre under the crown, third right.
-- **Failed read** — where a listing or a panel's rows would be: a soft disc
-  with a cloud-off (unreachable) or a warning (the server answered with an
-  error) glyph, a title, one sentence, the retry button and a live countdown
-  beneath it, and the request reference in small tabular type. The rest of the
-  page stays up around it.
-- **Figures strip** — one panel of three linked cells divided by hairlines:
-  a 48px icon tile, a serif figure, a label and an arrow; stacked on a phone.
-- **Levels dialog** — a 36rem raised surface over a `shell` scrim: the title,
-  one sentence, a row per step (hexagon glyph, name, "Starts at N h", and
-  Reached / Current level / "N h to go" / —) with the current row ringed in
-  blue, the next step's meter, and the note that organisation roles are
-  assigned separately.
-- **Card** — the opportunity card in a grid, photo first: the vacancy photo at
-  2:1 (or, without one, `surface-soft` with the dot grid and the type's glyph),
-  the type chip on a translucent `surface` pill in its top-left corner and the
-  bookmark in its top-right; then the title with the organiser beneath it and,
-  on the right, the application's status chip (or Closed / Full when nothing
-  can be applied for); a row with the start date and the place, a `primary-ink`
-  line with the deadline (muted once closed); and a full-width outline "View
-  details →" along the bottom edge, which reads Continue, Track status or
-  Attendance once an application exists. Hours and spots stay on the detail
-  page.
-- **Rows** — hairline-separated, the first flush to the panel edge; the same
-  row shape on the dashboard, in the applications list and in "closing soon".
-- **Participation table** — recent participation and My activity: a real
-  table from a 44rem container, stacked grid rows below it (event and XP,
-  result and hours, date), so neither the panel nor the page scrolls
-  sideways. A row with an application is one stretched link.
-
-The sign-in panel (`AuthPanel`, 28px radius on the dot grid) and the welcome
-flow's step panel, the same 28px surface holding one step at a time, are the
-two surfaces that are not a `Panel`.
+- **Panel** — `surface`, `border`, 8px radius, no shadow. A header row with an `h2`
+  and an optional text action, then content. Lists inside use `padding="none"` and
+  rows with their own 20px padding, separated by hairlines. Never nest a box in a
+  panel.
+- **Volunteer pass** — the solid `action` card with a 0.75em radius, a 1.5em strap
+  of the same blue, a neutral clip, a white photo disc, the name and the level. It
+  is flat, with no gradient or shadow, and rests at 3°. Sized in `em` so one font
+  size scales it per breakpoint. The wordmark appears only at full size, where it
+  clears the kit's 120px minimum; smaller passes use the white glyph.
+- **Opportunity card** — the photo at 2:1, or a flat `surface-sunk` ground with the
+  type's glyph; the type as a 4px chip and the bookmark as a white square over it;
+  title, organiser, date and place, the deadline in `ink`, and a plain `primary`
+  text link along the bottom edge.
+- **Podium** — avatar with a 2px metal ring, name, handle, XP; then a flat
+  `surface-sunk` step with a 2px metal rule and the rank in `*-ink`. Three heights,
+  so the silhouette reads before a number does.
+- **Levels dialog** — one bordered list split by hairlines rather than a stack of
+  boxes. The current row is `surface-sunk`. Reached steps are an orange hexagon
+  outline, the next step blue, the rest neutral.
+- **Failed read** — where a listing or a panel's rows would be: a neutral glyph with
+  no disc, a title, one sentence, the retry button with its countdown, and the
+  request reference. The rest of the page stays up around it.
+- **Participation table** — a real table from a 44rem container, stacked rows below
+  it, so neither the panel nor the page scrolls sideways.
 
 ## Controls
 
-| Control          | Shape                                                                                                                                                                                         |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Switch           | 48 × 28px track, `action` when on, `surface-sunk` with a `border-control` edge when off, a white knob; the button around it is 44px tall; `role="switch"` with `aria-checked`                 |
-| Segmented filter | Pills; the active one is `action` with a knockout label and a `band-copy` count                                                                                                               |
-| Type switcher    | The opportunities toolbar's All / Volunteering / Competitions: links in one 44px bordered `surface` box, the active one a filled `action` block with a knockout label                         |
-| Select           | The 48px control with a chevron; filters use a 44px variant                                                                                                                                   |
-| Search           | A 44px control on the opportunities page; it submits as a plain GET so the URL carries the query                                                                                              |
-| Save             | A pill toggle with `aria-pressed` on the detail page; on a card a 44px square over the photo, translucent `surface` off and a filled `accent` bookmark on — saving is the person's own choice |
-| Disabled action  | The real button, `disabled`, with a `PreviewNote` beside it saying what will make it work                                                                                                     |
+| Control        | Shape                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Primary button | `action` fill, white label, 6px radius, no arrow, no scale on press. One per view where possible                                      |
+| Outline button | `border` hairline, `ink` label; its hover is `surface-sunk`                                                                           |
+| Danger outline | `border` hairline, `danger-ink` label; its hover is `danger-muted`                                                                    |
+| Text link      | `primary`, weight 500, underlined on hover, no trailing arrow                                                                         |
+| Field          | `field` ground, `border-control` edge, 6px radius; a focused field draws a 2px `primary` outline with no offset                       |
+| Switch         | 36 × 20px. Off is an outlined track with a grey knob, on is an `action` track with a white knob. The button around it stays 44px tall |
+| Segmented      | Links at 6px radius; the active one is `surface-soft` with `primary` text                                                             |
+| Type switcher  | The same, with no box around the group                                                                                                |
+| Save           | A square white button over the card's photo: an outline bookmark in `ink-muted`, or a filled one in `primary` once saved              |
+| Focus          | A 2px `primary` outline at 2px offset, everywhere, in both themes. Nothing removes it                                                 |
+
+Icons are Lucide at a 1.75 stroke, set once in the base layer. They are neutral
+unless the icon itself is the signal.
 
 ## Motion
 
-The page header, the hero's greeting and level, and the figures use the
-`enter-*` keyframes because they are
-above the fold. Panels are always visible and never depend on JavaScript to
-enter the page. The welcome pass is the one authored loop: it
-pauses when offscreen or hidden, reads its colours from the tokens, and keeps a
-static composition under reduced motion or without WebGL. On the dashboard the
-volunteer's own pass — photo, name, role and level, drawn in HTML and CSS —
-hangs from the hero's top edge at a slight tilt and settles once on arrival
-with a short swing that reduced motion removes. The pass is
-the flow's one authored moment: a saved step prints a line on the badge and
-nudges it on its lanyard, the last screen stamps it with the orange seal, and
-each step panel slides in the direction the volunteer moved. Menus open and
-close without transition. No JavaScript and print see the full page.
+Almost none. Entry animations on page furniture were removed: pages simply appear.
+What is left is one authored moment and a few answers to the volunteer's own
+actions:
 
-The profile sheet has one entrance, played once on arrival and complete at
-rest: the avatar's orange ring settles outward, the name rises out of its mask
-word by word, the handle, bio and figures follow, and each ruled row draws its
-hairline in from the left a beat after the one above. The figures roll like an
-odometer: every digit is its real value in the flow of the text, with a strip
-of the ten digits laid over it that runs from 0 to that value and then gives
-way to it, so the number is correct before, during and after the roll, and
-nothing but CSS runs. Screen readers get the number once, from a visually
-hidden copy. "Edit profile" carries the photo into the editor, and "Back to
-profile" and Cancel carry it back: the two avatars share a `<ViewTransition>`
-name, so the circle glides between the sheet and the editor over 460ms instead
-of one disappearing and another appearing. The pair forms only when the new
-page commits in the same frame, which is why those links are prefetched, and
-only while the photo is on screen — React leaves out a shared element that has
-scrolled away, so Cancel at the foot of a long form cross-fades the page
-instead. Reduced motion and print drop all of it, including the view
-transition.
+- The pass settles once on the dashboard with a short swing, which reduced motion
+  removes.
+- The welcome flow's pass prints a line per saved step and takes the seal at the
+  end; each step panel slides in the direction the volunteer moved.
+- The profile sheet's name, figures and rows arrive once, and the photo travels
+  between the sheet and the editor through a `<ViewTransition>`.
+
+Hover is a colour change at 150ms and nothing moves. No JavaScript and print see the
+full page.
 
 ## Do's and don'ts
 
-- **Do** open every section with `PageHeader` and compose it from `Panel`s. The
-  profile is the one exception: the volunteer's own name is the `h1`, carried
-  by the profile sheet, because the page is a person rather than a section.
+- **Do** ask of any blue: can the volunteer act here, or are they here? If neither,
+  it is neutral.
 - **Do** carry a state with an icon and a word before a colour.
-- **Do** keep orange for a person's own action; a deadline is urgent, not an
-  achievement, and stays blue or neutral.
-- **Do** label anything that is sample, preview, or not connected, in words,
-  and disable an action that cannot happen yet.
+- **Do** keep orange to a small mark for something the person did.
+- **Do** open every section with `PageHeader` and compose it from `Panel`s. The
+  dashboard greeting and the profile's name are the two exceptions.
 - **Do** keep a filter in the URL, so a screen can be shared and reloaded.
-- **Don't** nest a box inside a panel; rows and hairlines carry structure.
-- **Don't** bring the dot grid into the workspace; it belongs to the doorway
-  and the welcome flow.
-- **Don't** put a literal hex value in a component, or reach for the danger
-  red for anything but an action that leaves or destroys.
+- **Don't** put a tile, disc or tint behind an icon. An icon stands on its own.
+- **Don't** add a gradient, wash, shadow on a panel, or blur.
+- **Don't** set anything in capitals, spread its letters, or use a second typeface.
+- **Don't** append an arrow to a link or button to make it look clickable.
+- **Don't** put a literal hex value in a component, or reach for `danger` for anything
+  but an action that leaves or destroys.
 - **Don't** add a hover-only affordance; the audience is on a phone.
-- **Don't** let a failed read blank a page: settle the read and draw the failed
-  panel in its place, with the retry inside it.
+- **Don't** let a failed read blank a page: settle the read and draw the failed panel
+  in its place.
 - **Don't** use a metal for anything but a podium place.

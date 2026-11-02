@@ -28,9 +28,9 @@ export function ApplicationRows({
       {applications.map((application) => (
         <li
           key={application.id}
-          className="border-t border-border px-5 py-4 first:border-t-0"
+          className="border-t border-border px-5 py-3 first:border-t-0"
         >
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
             <ApplicationStatusChip status={application.status} />
             {application.status === "draft" ? (
               <DeadlineText
@@ -51,20 +51,20 @@ export function ApplicationRows({
               </span>
             )}
           </div>
-          <h3 className="mt-2 text-base font-semibold text-balance">
+          <h3 className="mt-1.5 text-sm font-medium text-balance">
             <Link
               href={applicationHref(application.id)}
-              className="text-ink hover:text-primary-ink"
+              className="text-ink hover:text-primary"
             >
               {application.opportunity.title}
             </Link>
           </h3>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="text-sm text-ink-muted">
             {application.opportunity.organization.name}
             {" · "}
             <Link
               href={applicationHref(application.id)}
-              className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+              className="font-medium text-primary underline-offset-4 hover:underline"
             >
               {application.status === "draft"
                 ? t("continueDraft")

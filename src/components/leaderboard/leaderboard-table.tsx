@@ -17,7 +17,7 @@ import { initialsOf } from "@/lib/profile/initials";
 import { memberProfileHref } from "@/lib/profile/public-routing";
 import { cn } from "@/lib/utils";
 
-const CELL = "px-4 sm:px-5";
+const CELL = "px-5";
 
 export function LeaderboardTable({
   entries,
@@ -50,20 +50,15 @@ export function LeaderboardTable({
             : null;
           const identity = (
             <span className="flex items-center gap-3">
-              <Avatar
-                aria-hidden="true"
-                className={cn("size-9", isViewer && "ring-2 ring-accent/70")}
-              >
+              <Avatar aria-hidden="true" className="size-8">
                 {entry.avatarUrl ? <AvatarImage src={entry.avatarUrl} alt="" /> : null}
-                <AvatarFallback className="text-xs">
-                  {initialsOf(entry.displayName)}
-                </AvatarFallback>
+                <AvatarFallback>{initialsOf(entry.displayName)}</AvatarFallback>
               </Avatar>
               <span className="min-w-0">
-                <span className="block text-base leading-tight font-semibold break-words text-ink">
+                <span className="block text-sm font-medium break-words text-ink">
                   {entry.displayName}
                 </span>
-                <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
                   <span className="text-xs break-words text-ink-muted">
                     @{entry.username}
                   </span>
@@ -77,18 +72,13 @@ export function LeaderboardTable({
               key={entry.username}
               id={isViewer ? VIEWER_ANCHOR : undefined}
               aria-current={isViewer ? "true" : undefined}
-              className={cn(
-                isViewer &&
-                  "scroll-mt-24 bg-surface-soft shadow-[inset_3px_0_0_0_var(--color-action)]",
-              )}
+              className={cn(isViewer && "scroll-mt-24 bg-surface-soft")}
             >
               <TableCell className={cn(CELL, "py-2.5")}>
                 <span
                   className={cn(
-                    "tabular inline-grid size-8 place-items-center rounded-full text-sm font-semibold",
-                    isViewer
-                      ? "bg-action text-knockout"
-                      : "bg-surface-sunk text-ink-muted",
+                    "tabular text-sm",
+                    isViewer ? "font-medium text-primary" : "text-ink-muted",
                   )}
                 >
                   {format.number(entry.rank)}
@@ -98,7 +88,7 @@ export function LeaderboardTable({
                 {profileHref ? (
                   <Link
                     href={profileHref}
-                    className="block rounded-lg underline-offset-4 hover:underline"
+                    className="block rounded-md underline-offset-4 hover:underline"
                   >
                     {identity}
                   </Link>
@@ -107,10 +97,7 @@ export function LeaderboardTable({
                 )}
               </TableCell>
               <TableCell
-                className={cn(
-                  CELL,
-                  "tabular py-2.5 text-right font-semibold text-accent-ink",
-                )}
+                className={cn(CELL, "tabular py-2.5 text-right text-sm text-ink")}
               >
                 {t("xpValue", { xp: format.number(entry.xp) })}
               </TableCell>

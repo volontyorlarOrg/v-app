@@ -47,8 +47,7 @@ export default async function SignupPage({
   );
 }
 
-const legalLinkClass =
-  "font-semibold text-primary-ink hover:underline underline-offset-4";
+const legalLinkClass = "font-medium text-primary hover:underline underline-offset-4";
 
 function Signup({
   locale,
@@ -101,7 +100,7 @@ function Signup({
         </p>
       </AuthPanel>
 
-      <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">
+      <p className="mt-4 text-center text-sm text-ink-muted">
         {t("signup.haveAccount")}{" "}
         <Link href={loginHref} className={legalLinkClass}>
           {t("signup.logIn")}

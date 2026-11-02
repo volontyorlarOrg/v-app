@@ -14,14 +14,12 @@ counts their XP, and this build drops any key other than `profile`.
 `ProfileTask` (`src/components/checkpoints/profile-task.tsx`) uses the existing
 panel rules in three ruled parts:
 
-- a header with the volunteer's photo in the orange ring the sidebar and the
-  profile use (initials, then a person icon, when there is no photo), the serif
-  title "Complete your profile", the reward "+50 XP" in the orange figure style
-  and one sentence;
-- two meters side by side (stacked on a phone): the profile in blue ("Your
-  profile: 6 of 8 complete", a percentage, then "Still missing: …" or "Every
-  required detail is filled in.") and the reward places in orange ("700 of 1,000
-  rewards claimed", "Available while rewards remain.");
+- a header with the volunteer's photo (initials, then a person icon, when there is
+  no photo), the title "Complete your profile", the reward "+50 XP" and one sentence;
+- two meters side by side (stacked on a phone): the profile ("Your profile: 6 of 8
+  complete", a percentage, then "Still missing: …" or "Every required detail is
+  filled in.") and the reward places ("700 of 1,000 rewards claimed", "Available
+  while rewards remain.");
 - a footer: "Claim once while rewards remain." with "Claim 50 XP" when ready or
   "Complete profile" (to `/profile/edit`) while fields are missing or
   "Add profile photo" while a photo is missing; "You claimed 50 XP on …" once

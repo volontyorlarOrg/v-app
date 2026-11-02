@@ -24,25 +24,25 @@ export default async function AuthLayout({
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-knockout"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-action focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-knockout"
       >
         {t("skipToContent")}
       </a>
       <header className="container-page flex min-h-16 items-center justify-between gap-4">
         {site ? (
-          <a href={site} className="-m-1 rounded-lg p-1" aria-label={ORGANIZATION_NAME}>
+          <a href={site} className="-m-1 rounded-md p-1" aria-label={ORGANIZATION_NAME}>
             {lockup}
           </a>
         ) : (
           <Link
             href={navHref(ENTRY_ROUTE)}
-            className="-m-1 rounded-lg p-1"
+            className="-m-1 rounded-md p-1"
             aria-label={ORGANIZATION_NAME}
           >
             {lockup}
           </Link>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <LocaleSwitcher label={t("languageLabel")} />
           <ThemeToggle label={t("themeLabel")} />
         </div>
@@ -51,7 +51,7 @@ export default async function AuthLayout({
         id="main"
         className="container-page flex flex-1 flex-col justify-center py-6"
       >
-        <div className="mx-auto w-full max-w-md">{children}</div>
+        <div className="mx-auto w-full max-w-sm">{children}</div>
       </main>
     </>
   );

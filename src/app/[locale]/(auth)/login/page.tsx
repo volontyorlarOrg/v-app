@@ -96,11 +96,11 @@ function Login({
         <CredentialsSection mode="login" next={next} />
       </AuthPanel>
 
-      <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">
+      <p className="mt-4 text-center text-sm text-ink-muted">
         {t("login.noAccount")}{" "}
         <Link
           href={signupHref}
-          className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+          className="font-medium text-primary underline-offset-4 hover:underline"
         >
           {t("login.createAccount")}
         </Link>

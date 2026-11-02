@@ -18,25 +18,25 @@ export function PasswordInput({
     <div
       data-slot="password-input"
       className={cn(
-        "flex w-full items-stretch overflow-hidden rounded-lg border border-input bg-surface transition-colors",
-        "hover:border-primary-ink has-[input[aria-invalid]]:border-ink",
-        "has-[input:focus-visible]:outline has-[input:focus-visible]:outline-[3px] has-[input:focus-visible]:outline-offset-[3px] has-[input:focus-visible]:outline-primary-ink",
+        "flex w-full items-stretch overflow-hidden rounded-md border border-input bg-field transition-colors",
+        "hover:border-ink-muted has-[input[aria-invalid]]:border-ink",
+        "has-[input:focus-visible]:outline has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-0 has-[input:focus-visible]:outline-primary",
         className,
       )}
     >
       <input
         {...props}
         type={visible ? "text" : "password"}
-        className="min-h-12 w-full min-w-0 flex-1 bg-transparent px-4 text-base text-foreground caret-primary-ink placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+        className="min-h-(--control) w-full min-w-0 flex-1 bg-transparent px-3 text-base text-foreground caret-primary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
       />
       <button
         type="button"
         onClick={() => setVisible((current) => !current)}
         aria-pressed={visible}
         aria-label={visible ? conceal : reveal}
-        className="grid w-12 shrink-0 place-items-center text-ink-muted transition-colors hover:text-primary-ink"
+        className="grid w-10 shrink-0 place-items-center text-ink-muted transition-colors hover:text-ink"
       >
-        <Icon aria-hidden="true" className="size-5" />
+        <Icon aria-hidden="true" className="size-4" />
       </button>
     </div>
   );

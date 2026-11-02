@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -69,9 +68,6 @@ export function ClaimButton({
           : claim.isSuccess
             ? labels.claimed
             : labels.claim}
-        {claim.isPending || claim.isSuccess ? null : (
-          <ArrowRight aria-hidden="true" className="size-4" />
-        )}
       </Button>
       {!enabled ? <p className="text-sm text-ink-muted">{labels.unavailable}</p> : null}
       {claim.isError ? (

@@ -18,17 +18,17 @@ export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
   const { active, pending, choose } = useLocaleSwitch();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <ThemeToggle
         variant="setting"
         label={labels.darkTheme}
         description={labels.darkThemeHelp}
       />
 
-      <div className="border-t border-border pt-6">
-        <p className="text-sm font-semibold text-ink">{labels.language}</p>
+      <div className="border-t border-border pt-4">
+        <p className="text-sm font-medium text-ink">{labels.language}</p>
         <p className="mt-0.5 text-sm text-ink-muted">{labels.languageHelp}</p>
-        <ul className="mt-4 grid gap-2 sm:grid-cols-3">
+        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
           {locales.map((locale) => {
             const isActive = locale === active;
             return (
@@ -40,10 +40,10 @@ export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
                   disabled={pending}
                   onClick={() => choose(locale)}
                   className={cn(
-                    "flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors disabled:opacity-70",
+                    "flex min-h-(--control-sm) w-full items-center justify-between gap-2 rounded-md border px-3 text-sm font-medium transition-colors disabled:opacity-50",
                     isActive
-                      ? "border-action bg-action text-knockout"
-                      : "border-border text-ink hover:border-primary hover:text-primary-ink",
+                      ? "border-transparent bg-surface-soft text-primary"
+                      : "border-border text-ink hover:bg-surface-sunk",
                   )}
                 >
                   <span className="truncate">{localeNames[locale]}</span>
@@ -52,7 +52,7 @@ export function AppearanceSection({ labels }: { labels: AppearanceLabels }) {
                   ) : (
                     <span
                       aria-hidden="true"
-                      className="shrink-0 text-xs tracking-[0.08em] text-ink-muted uppercase"
+                      className="shrink-0 text-xs text-ink-muted"
                     >
                       {locale}
                     </span>

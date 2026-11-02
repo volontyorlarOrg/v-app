@@ -31,12 +31,12 @@ function Toaster(props: ToasterProps) {
           "--normal-text": "var(--color-popover-foreground)",
           "--normal-border": "var(--color-border)",
           "--border-radius": "var(--radius-lg)",
-          fontFamily: "var(--font-sans)",
+          fontFamily: "var(--)",
         } as CSSProperties
       }
       toastOptions={{
         classNames: {
-          toast: "font-sans text-sm font-semibold",
+          toast: " text-sm font-medium",
         },
       }}
       {...props}

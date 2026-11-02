@@ -90,10 +90,8 @@ export function PasswordForm({
       <input type="hidden" {...register("mode")} />
       {headed ? (
         <>
-          <h3 className="font-sans text-sm font-semibold text-ink">{labels.title}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-            {labels.description}
-          </p>
+          <h3 className="text-sm font-medium text-ink">{labels.title}</h3>
+          <p className="mt-1 text-sm text-ink-muted">{labels.description}</p>
         </>
       ) : null}
 

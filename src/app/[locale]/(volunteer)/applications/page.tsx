@@ -105,7 +105,7 @@ function Applications({
         current="applications"
         savedCount={savedCount}
         applicationCount={applications.status === "loaded" ? sorted.length : null}
-        className="enter-rise mt-6 [--enter-delay:90ms]"
+        className="mt-6"
       />
 
       <Panel id="applications" title={t("title")} padding="none" className="mt-5">

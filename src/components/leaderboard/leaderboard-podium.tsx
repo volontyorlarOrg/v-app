@@ -29,9 +29,9 @@ export function LeaderboardPodium({
   return (
     <section
       aria-label={t("podium.label")}
-      className="podium-stage enter-rise overflow-hidden rounded-xl border border-border [--enter-delay:180ms]"
+      className="overflow-hidden rounded-lg border border-border"
     >
-      <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-12 sm:gap-5 sm:px-8">
+      <ol className="grid grid-cols-3 items-end gap-2 px-3 pt-10 sm:gap-4 sm:px-6">
         {entries.map((entry) => {
           const first = entry.rank === 1;
           const profileHref = entry.profileVisible
@@ -48,42 +48,30 @@ export function LeaderboardPodium({
                 ORDER[entry.rank] ?? "order-3",
               )}
             >
-              <div className="relative mb-3">
+              <div className="relative mb-2">
                 {first ? (
                   <Crown
                     aria-hidden="true"
-                    className="absolute -top-9 left-1/2 size-7 -translate-x-1/2 fill-gold text-gold"
-                    strokeWidth={1.5}
+                    className="absolute -top-7 left-1/2 size-5 -translate-x-1/2 fill-gold text-gold"
                   />
                 ) : null}
                 <Avatar
                   aria-hidden="true"
                   className={cn(
-                    "medal-ring ring-4 ring-surface",
-                    first ? "size-20 sm:size-24" : "size-16 sm:size-20",
+                    "medal-ring",
+                    first ? "size-14 sm:size-16" : "size-12 sm:size-14",
                   )}
                 >
                   {entry.avatarUrl ? (
                     <AvatarImage src={entry.avatarUrl} alt="" />
                   ) : null}
-                  <AvatarFallback
-                    className={cn(
-                      "medal-disc medal-ink",
-                      first ? "text-xl sm:text-2xl" : "text-lg sm:text-xl",
-                    )}
-                  >
+                  <AvatarFallback className={cn("medal-disc medal-ink", "text-sm")}>
                     {initialsOf(entry.displayName)}
                   </AvatarFallback>
                 </Avatar>
-                <span
-                  aria-label={t("podium.place", { rank: entry.rank })}
-                  className="medal-badge tabular absolute -right-1 -bottom-1 inline-grid size-7 place-items-center rounded-full border-2 border-surface text-xs font-bold"
-                >
-                  {format.number(entry.rank)}
-                </span>
               </div>
               <div className="flex max-w-full flex-col items-center gap-0.5">
-                <p className="max-w-full truncate text-sm font-semibold text-ink sm:text-base">
+                <p className="max-w-full truncate text-sm font-medium text-ink">
                   {profileHref ? (
                     <Link
                       href={profileHref}
@@ -96,7 +84,7 @@ export function LeaderboardPodium({
                   )}
                 </p>
                 <div className="flex max-w-full items-center gap-1.5">
-                  <p className="max-w-full truncate text-xs text-ink-muted sm:text-sm">
+                  <p className="max-w-full truncate text-xs text-ink-muted">
                     @{entry.username}
                   </p>
                   {entry.isCurrentUser ? (
@@ -105,19 +93,15 @@ export function LeaderboardPodium({
                 </div>
               </div>
               <p
-                className={cn(
-                  "display-face tabular mt-1.5 text-accent-ink",
-                  first ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl",
-                )}
+                className={cn("figure mt-1 text-ink", first ? "text-xl" : "text-base")}
               >
                 {t("xpValue", { xp: format.number(entry.xp) })}
               </p>
-              <div
-                aria-hidden="true"
-                className="podium-step mt-4"
-                data-place={entry.rank}
-              >
-                <span className="display-face tabular text-3xl leading-none sm:text-4xl">
+              <div className="podium-step mt-3" data-place={entry.rank}>
+                <span
+                  aria-label={t("podium.place", { rank: entry.rank })}
+                  className="figure text-lg"
+                >
                   {format.number(entry.rank)}
                 </span>
               </div>

@@ -27,14 +27,14 @@ export default async function OnboardingLayout({
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-knockout"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-knockout"
       >
         {t("skipToContent")}
       </a>
       <header className="container-page flex min-h-16 items-center justify-between gap-4">
         <Link
           href={navHref(HOME_ROUTE)}
-          className="-m-1 rounded-lg p-1"
+          className="-m-1 rounded-md p-1"
           aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
         >
           <BrandLockup name={ORGANIZATION_NAME} />

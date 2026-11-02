@@ -45,24 +45,23 @@ export function AccountSummary({
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="standing-card enter-rise scroll-mt-20 rounded-xl border border-border px-5 py-5 sm:px-6"
+      className="scroll-mt-20 rounded-lg border border-border px-5 py-4"
     >
       <h2 id={`${id}-title`} className="sr-only">
         {labels.title}
       </h2>
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex min-w-0 items-center gap-4">
-          <Avatar aria-hidden="true" className="size-14 shrink-0 ring-2 ring-accent/70">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar aria-hidden="true" className="size-12 shrink-0">
             {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
-            <AvatarFallback className="text-base">{initials}</AvatarFallback>
+            <AvatarFallback className="text-sm">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-ink">{name}</p>
-            <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
-              <span className="font-semibold text-ink">@{username}</span>
+            <p className="truncate text-sm font-medium text-ink">{name}</p>
+            <p className="flex flex-wrap items-center gap-x-2 text-xs text-ink-muted">
+              <span>@{username}</span>
               {email ? (
                 <>
-                  <span aria-hidden="true">·</span>
                   <span className="truncate">{email}</span>
                 </>
               ) : null}
@@ -77,10 +76,8 @@ export function AccountSummary({
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between xl:shrink-0 xl:justify-end xl:gap-6">
           <div className="xl:text-right">
-            <p className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
-              {labels.signsInWith}
-            </p>
-            <ul className="mt-2 flex flex-wrap gap-1.5 xl:justify-end">
+            <p className="text-xs text-ink-muted">{labels.signsInWith}</p>
+            <ul className="mt-1 flex flex-wrap gap-1 xl:justify-end">
               {connected.length === 0 ? (
                 <li className="text-sm text-ink-muted">{labels.nothingConnected}</li>
               ) : (
