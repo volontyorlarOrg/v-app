@@ -5,18 +5,18 @@ import { Toggle as TogglePrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
 const toggleVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md border text-sm font-medium whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 rounded-full border text-sm font-semibold whitespace-nowrap transition-colors outline-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-transparent text-foreground hover:bg-muted aria-[current=page]:bg-surface-soft aria-[current=page]:text-primary data-[state=on]:bg-surface-soft data-[state=on]:text-primary",
+          "border-transparent bg-transparent text-foreground hover:bg-muted hover:text-primary-ink aria-[current=page]:bg-surface-soft aria-[current=page]:text-primary-ink data-[state=on]:bg-surface-soft data-[state=on]:text-primary-ink",
         outline:
-          "border-border text-ink-muted hover:bg-muted hover:text-ink aria-[current=page]:border-transparent aria-[current=page]:bg-surface-soft aria-[current=page]:text-primary data-[state=on]:border-transparent data-[state=on]:bg-surface-soft data-[state=on]:text-primary",
+          "border-input bg-surface text-foreground hover:border-primary-ink hover:text-primary-ink aria-[current=page]:border-action aria-[current=page]:bg-action aria-[current=page]:text-knockout data-[state=on]:border-action data-[state=on]:bg-action data-[state=on]:text-knockout",
       },
       size: {
-        default: "min-h-(--control-sm) px-3",
-        sm: "min-h-(--control-sm) px-2.5",
+        default: "min-h-10 px-4",
+        sm: "min-h-9 px-3",
       },
     },
     defaultVariants: {

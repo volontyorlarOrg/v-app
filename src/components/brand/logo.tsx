@@ -22,20 +22,6 @@ export function BrandIcon({ className }: { className?: string }) {
   );
 }
 
-export function BrandGlyph({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="175.73 278.41 644.4 555.32"
-      aria-hidden="true"
-      focusable="false"
-      className={cn("shrink-0", className)}
-    >
-      <path d={ICON_GLYPH} fillRule="evenodd" className="fill-knockout" />
-      <path d={ICON_HEART} fillRule="evenodd" className="fill-logo-orange" />
-    </svg>
-  );
-}
-
 export function BrandWordmark({ className }: { className?: string }) {
   return (
     <svg

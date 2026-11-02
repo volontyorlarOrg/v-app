@@ -30,7 +30,14 @@ export function Segmented({
         >
           {item.label}
           {item.count !== undefined ? (
-            <span className="tabular text-xs text-ink-muted">{item.count}</span>
+            <span
+              className={cn(
+                "tabular text-xs",
+                item.active ? "text-band-copy" : "text-ink-muted",
+              )}
+            >
+              {item.count}
+            </span>
           ) : null}
         </Link>
       ))}

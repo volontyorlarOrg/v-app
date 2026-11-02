@@ -153,9 +153,9 @@ function Leaderboard({
         title={t("title")}
         description={t("description")}
         actions={
-          <p className="inline-flex items-center gap-1.5 text-sm text-ink-muted">
-            <TrendingUp aria-hidden="true" className="size-4" />
-            <span className="tabular font-medium text-ink">
+          <p className="inline-flex min-h-11 items-center gap-2 text-sm text-ink-muted">
+            <TrendingUp aria-hidden="true" className="size-4 text-accent" />
+            <span className="tabular font-semibold text-accent-ink">
               {format.number(board.volunteerTotal)}
             </span>
             {t("count", { count: board.volunteerTotal })}
@@ -216,7 +216,7 @@ function Leaderboard({
           ) : null}
         </Panel>
 
-        <p className="text-xs text-ink-muted">
+        <p className="px-1 text-xs leading-relaxed text-ink-muted">
           {t("scoring", {
             hour: board.scoring.defaults?.xpPerHour ?? board.scoring.confirmedHourXp,
             winner: board.scoring.defaults?.xpWinner ?? board.scoring.attendedEventXp,

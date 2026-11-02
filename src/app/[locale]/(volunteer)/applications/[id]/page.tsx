@@ -219,7 +219,7 @@ function Application({
     <>
       <Link
         href={navHref("applications")}
-        className="inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+        className="enter-rise inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("detail.back")}
@@ -242,7 +242,7 @@ function Application({
                 when: format.dateTime(new Date(application.instructions.sentAt), "day"),
               })}
             >
-              <p className="whitespace-pre-line text-ink">
+              <p className="leading-relaxed whitespace-pre-line text-ink">
                 {application.instructions.message}
               </p>
               {application.instructions.groupLink ? (
@@ -296,10 +296,10 @@ function Application({
             <Panel id="answers" title={t("detail.answers")}>
               {application.essay ? (
                 <div className={application.answers.length > 0 ? "mb-6" : undefined}>
-                  <h3 className="text-sm font-medium text-ink">
+                  <h3 className="text-sm font-semibold text-ink">
                     {essayPrompt ?? t("detail.essay")}
                   </h3>
-                  <p className="mt-1.5 whitespace-pre-line text-ink-muted">
+                  <p className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
                     {application.essay}
                   </p>
                 </div>
@@ -312,12 +312,12 @@ function Application({
                       : undefined;
                     return (
                       <div key={answer.questionId ?? index}>
-                        <dt className="font-medium text-ink">
+                        <dt className="font-semibold text-ink">
                           {answer.prompt ??
                             question?.prompt ??
                             t("detail.question", { number: index + 1 })}
                         </dt>
-                        <dd className="mt-1.5 whitespace-pre-line text-ink-muted">
+                        <dd className="mt-1.5 leading-relaxed whitespace-pre-line text-ink-muted">
                           {answerText(answer.value, question)}
                         </dd>
                       </div>
@@ -330,13 +330,17 @@ function Application({
 
           {draft && !sendable ? (
             <Panel id="closed">
-              <p className="text-sm text-ink-muted">{t("detail.draftClosed")}</p>
+              <p className="text-sm leading-relaxed text-ink-muted">
+                {t("detail.draftClosed")}
+              </p>
             </Panel>
           ) : null}
 
           {application.reviewerNote ? (
             <Panel id="reviewer-note" title={t("detail.reviewerNote")}>
-              <p className="whitespace-pre-line text-ink">{application.reviewerNote}</p>
+              <p className="leading-relaxed whitespace-pre-line text-ink">
+                {application.reviewerNote}
+              </p>
             </Panel>
           ) : null}
 
@@ -346,39 +350,39 @@ function Application({
             <Panel id="attendance" title={t("attendance.title")}>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <dt className="text-xs font-medium text-ink-muted">
+                  <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                     {t("attendance.state")}
                   </dt>
-                  <dd className="mt-1 text-sm font-medium text-ink">
+                  <dd className="mt-1 text-sm font-semibold text-ink">
                     {t(`attendance.outcome.${application.attendance.outcome}`)}
                   </dd>
                 </div>
                 {confirmedHours === undefined ? null : (
                   <div>
-                    <dt className="text-xs font-medium text-ink-muted">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                       {t("attendance.hours")}
                     </dt>
-                    <dd className="tabular mt-1 text-sm font-medium text-ink">
+                    <dd className="tabular mt-1 text-sm font-semibold text-accent-ink">
                       {format.number(confirmedHours)}
                     </dd>
                   </div>
                 )}
                 {application.attendance.placement ? (
                   <div>
-                    <dt className="text-xs font-medium text-ink-muted">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                       {t("attendance.placement")}
                     </dt>
-                    <dd className="mt-1 text-sm font-medium text-ink">
+                    <dd className="mt-1 text-sm font-semibold text-ink">
                       {t(`attendance.placements.${application.attendance.placement}`)}
                     </dd>
                   </div>
                 ) : null}
                 {application.attendance.xpAwarded === undefined ? null : (
                   <div>
-                    <dt className="text-xs font-medium text-ink-muted">
+                    <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
                       {t("attendance.xp")}
                     </dt>
-                    <dd className="tabular mt-1 text-sm font-medium text-ink">
+                    <dd className="tabular mt-1 text-sm font-semibold text-accent-ink">
                       {application.attendance.xpAwarded > 0
                         ? `+${application.attendance.xpAwarded}`
                         : application.attendance.xpAwarded < 0
@@ -401,8 +405,10 @@ function Application({
             <dl className="grid gap-4 sm:grid-cols-2">
               {rows.map((item) => (
                 <div key={item.key}>
-                  <dt className="text-xs font-medium text-ink-muted">{item.label}</dt>
-                  <dd className="mt-1 text-sm font-medium text-ink">{item.value}</dd>
+                  <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+                    {item.label}
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-ink">{item.value}</dd>
                 </div>
               ))}
             </dl>

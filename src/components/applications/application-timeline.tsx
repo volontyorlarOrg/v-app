@@ -36,23 +36,24 @@ export function ApplicationTimeline({
             <span
               aria-hidden="true"
               className={cn(
-                "mt-px inline-grid size-4.5 shrink-0 place-items-center rounded-full",
+                "mt-0.5 inline-grid size-6 shrink-0 place-items-center rounded-full",
                 entry.state === "done" && (achievement ? "bg-accent" : "bg-action"),
-                entry.state === "current" && "border border-primary",
-                entry.state === "pending" && "border border-border-control",
+                entry.state === "current" && "border-2 border-primary bg-surface",
+                entry.state === "pending" && "border border-border-control bg-surface",
               )}
             >
               {entry.state === "done" ? (
-                <Check className="size-3 text-knockout" />
+                <Check className="size-3.5 text-knockout" />
               ) : entry.state === "current" ? (
-                <span className="size-1.5 rounded-full bg-primary" />
+                <span className="size-2 rounded-full bg-primary" />
               ) : null}
             </span>
             <div>
               <p
                 className={cn(
-                  "text-sm font-medium",
+                  "text-sm font-semibold",
                   entry.state === "pending" ? "text-ink-muted" : "text-ink",
+                  achievement && "text-accent-ink",
                 )}
               >
                 {label}

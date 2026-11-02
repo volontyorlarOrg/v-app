@@ -15,13 +15,13 @@ export function ProviderButtons({
   googleUnavailable: string;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <a
         href={telegramHref}
         rel="nofollow"
-        className={buttonClass({ variant: "outline", className: "w-full" })}
+        className={buttonClass({ size: "sm", className: "w-full" })}
       >
-        <TelegramMark className="size-4.5" />
+        <TelegramMark className="size-5" />
         {telegram}
       </a>
       {googleHref ? (
@@ -30,10 +30,11 @@ export function ProviderButtons({
           rel="nofollow"
           className={buttonClass({
             variant: "outline",
+            size: "sm",
             className: "w-full",
           })}
         >
-          <GoogleMark className="size-4.5" />
+          <GoogleMark className="size-5" />
           {google}
         </a>
       ) : (
@@ -44,13 +45,14 @@ export function ProviderButtons({
             aria-describedby="google-unavailable"
             className={buttonClass({
               variant: "outline",
+              size: "sm",
               className: "w-full",
             })}
           >
-            <GoogleMark className="size-4.5" />
+            <GoogleMark className="size-5" />
             {google}
           </button>
-          <p id="google-unavailable" className="text-xs text-ink-muted">
+          <p id="google-unavailable" className="text-xs leading-relaxed text-ink-muted">
             {googleUnavailable}
           </p>
         </>

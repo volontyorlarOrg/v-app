@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { BrandGlyph, BrandWordmark } from "@/components/brand/logo";
+import { BrandIcon, BrandWordmark } from "@/components/brand/logo";
 import { LEVEL_ICONS } from "@/components/levels/level-glyph";
 import type { Level } from "@/lib/record/levels";
 
@@ -21,7 +21,7 @@ export function VolunteerPass({ holder }: { holder: PassHolder }) {
       <span className="volunteer-pass-clip" />
       <div className="volunteer-pass-card">
         <div className="volunteer-pass-brand">
-          <BrandGlyph className="volunteer-pass-icon" />
+          <BrandIcon className="volunteer-pass-icon" />
           <BrandWordmark className="volunteer-pass-wordmark text-knockout" />
         </div>
         <div className="volunteer-pass-photo">
@@ -39,6 +39,7 @@ export function VolunteerPass({ holder }: { holder: PassHolder }) {
           )}
         </div>
         <p className="volunteer-pass-name">{holder.name}</p>
+        <p className="volunteer-pass-role">{holder.role}</p>
         {holder.level && LevelIcon ? (
           <p className="volunteer-pass-level">
             <LevelIcon />
