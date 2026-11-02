@@ -23,22 +23,27 @@ export function GettingStarted({ id, className }: { id?: string; className?: str
       description={t("description")}
       className={className}
     >
-      <ol className="grid gap-4 md:grid-cols-3">
+      <ol className="grid gap-5 md:grid-cols-3">
         {STEPS.map(({ key, Icon }) => (
-          <li key={key} className="flex gap-2.5">
-            <span aria-hidden="true" className="mt-0.5 shrink-0 text-ink-muted">
-              <Icon className="size-4" />
+          <li key={key} className="flex gap-3">
+            <span
+              aria-hidden="true"
+              className="inline-grid size-10 shrink-0 place-items-center rounded-full bg-primary-muted text-primary-deep"
+            >
+              <Icon className="size-4.5" />
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-ink">{t(`steps.${key}.title`)}</p>
-              <p className="text-sm text-ink-muted">{t(`steps.${key}.body`)}</p>
+              <p className="font-semibold text-ink">{t(`steps.${key}.title`)}</p>
+              <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                {t(`steps.${key}.body`)}
+              </p>
             </div>
           </li>
         ))}
       </ol>
       <Link
         href={navHref("opportunities")}
-        className={buttonClass({ className: "mt-4" })}
+        className={buttonClass({ className: "mt-6" })}
       >
         {t("cta")}
       </Link>

@@ -43,10 +43,10 @@ function ActivityList({ entries }: { entries: readonly ProfileActivityEntry[] })
         return (
           <li
             key={`${entry.source}-${entry.id}`}
-            className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 py-2.5"
+            className="flex flex-wrap items-baseline gap-x-5 gap-y-1 py-3"
           >
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium [overflow-wrap:anywhere] text-ink">
+              <p className="font-semibold [overflow-wrap:anywhere] text-ink">
                 {entry.title}
               </p>
               <p className="text-sm text-ink-muted">
@@ -85,22 +85,19 @@ export function ActivitySection({
     <section
       id="activity"
       aria-labelledby="profile-activity"
-      className="scroll-mt-20 border-t border-border px-5 py-5 sm:px-6"
+      className="scroll-mt-20 border-t border-border px-5 py-6 sm:px-8"
     >
-      <h2
-        id="profile-activity"
-        className="text-sm font-semibold tracking-normal text-ink"
-      >
+      <h2 id="profile-activity" className="text-section text-ink">
         {own ? t("mine") : t("title")}
       </h2>
       {entries.length === 0 ? (
-        <p className="mt-2 text-sm text-ink-muted">{t("empty")}</p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t("empty")}</p>
       ) : (
         <div className="mt-1">
           <ActivityList entries={lead} />
           {rest.length > 0 ? (
             <details className="group border-t border-border">
-              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-primary underline-offset-4 group-open:hidden hover:underline">
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-primary-ink underline-offset-4 group-open:hidden hover:underline">
                 {t("more", { count: entries.length })}
               </summary>
               <ActivityList entries={rest} />

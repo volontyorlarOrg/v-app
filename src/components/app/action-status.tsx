@@ -20,21 +20,14 @@ export function ActionStatus({
     <p
       role={tone === "error" ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-2 rounded-md bg-surface-sunk px-3 py-2 text-sm text-ink",
+        "flex items-start gap-3 rounded-lg px-4 py-3 text-sm leading-relaxed",
+        tone === "info" && "bg-surface-soft text-primary-ink",
+        tone === "done" && "bg-surface-soft text-accent-ink",
+        tone === "error" && "border border-border-control bg-surface-sunk text-ink",
         className,
       )}
     >
-      <Icon
-        aria-hidden="true"
-        className={cn(
-          "mt-0.5 size-4 shrink-0",
-          tone === "done"
-            ? "text-accent"
-            : tone === "info"
-              ? "text-primary"
-              : "text-ink",
-        )}
-      />
+      <Icon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
       <span className="min-w-0">{children}</span>
     </p>
   );

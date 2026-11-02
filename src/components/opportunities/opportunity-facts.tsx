@@ -149,8 +149,10 @@ export function OpportunityFacts({
         .filter((fact) => !omit.includes(fact.key))
         .map((fact) => (
           <div key={fact.key} className="grid gap-1 py-3 first:pt-0 last:pb-0">
-            <dt className="text-xs font-medium text-ink-muted">{fact.label}</dt>
-            <dd className="text-sm font-medium text-ink">{fact.value}</dd>
+            <dt className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+              {fact.label}
+            </dt>
+            <dd className="text-sm font-semibold text-ink">{fact.value}</dd>
           </div>
         ))}
     </dl>

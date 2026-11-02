@@ -36,7 +36,7 @@ export function PublicPageLink({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="min-w-0 font-medium text-primary underline-offset-4 hover:underline"
+        className="min-w-0 font-semibold text-primary-ink underline-offset-4 hover:underline"
       >
         {host}
         {path ? (
@@ -51,7 +51,7 @@ export function PublicPageLink({
         onClick={copy}
         data-copied={copied || undefined}
         aria-label={copied ? labels.copied : labels.copy}
-        className="copy-toggle relative -my-2 grid size-9 shrink-0 place-items-center rounded-md text-ink-muted transition-colors before:absolute before:-inset-1 hover:bg-surface-sunk hover:text-primary"
+        className="copy-toggle relative -my-2 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted transition-colors before:absolute before:-inset-1 hover:bg-surface-soft hover:text-primary-ink"
       >
         <Copy aria-hidden="true" className="copy-toggle-idle size-4" />
         <Check aria-hidden="true" className="copy-toggle-done size-4" />

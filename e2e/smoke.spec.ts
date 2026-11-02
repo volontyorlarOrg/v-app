@@ -1446,6 +1446,11 @@ test.describe("opportunities", () => {
     await expect(page).toHaveURL(/#past-opportunities-title$/);
 
     if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll(".enter-rise")].every(
+          (element) => getComputedStyle(element).opacity === "1",
+        ),
+      );
       await page.screenshot({
         path: testInfo.outputPath("past-opportunities-light.png"),
         fullPage: true,
@@ -1461,6 +1466,11 @@ test.describe("opportunities", () => {
     await gotoReady(page, "/opportunities");
 
     if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll(".enter-rise")].every(
+          (element) => getComputedStyle(element).opacity === "1",
+        ),
+      );
       await page.screenshot({
         path: testInfo.outputPath("past-opportunities-dark.png"),
         fullPage: true,

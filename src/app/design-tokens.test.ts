@@ -21,19 +21,11 @@ function darkToken(name: string): string {
   return tokenIn(DARK_CSS, name) ?? token(name);
 }
 
-function channels(hex: string): [number, number, number] {
-  return [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16)) as [
-    number,
-    number,
-    number,
-  ];
-}
-
 function relativeLuminance(hex: string): number {
-  const [r, g, b] = channels(hex).map((channel) => {
-    const value = channel / 255;
+  const [r = 0, g = 0, b = 0] = [1, 3, 5].map((offset) => {
+    const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
     return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  }) as [number, number, number];
+  });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
@@ -45,180 +37,107 @@ function contrast(a: string, b: string): number {
 }
 
 const AA_TEXT = 4.5;
-const AA_GRAPHIC = 3;
+const AA_LARGE = 3;
 
-const SURFACES = ["paper", "surface", "surface-sunk", "surface-soft", "surface-raised"];
-const TEXT_TOKENS = ["ink", "ink-muted", "primary", "accent-ink"];
-const THEMES = [
-  ["light", token],
-  ["dark", darkToken],
-] as const;
+const SURFACES = ["paper", "surface", "surface-sunk", "surface-soft"];
+const TEXT_TOKENS = ["ink", "ink-muted", "primary-ink", "accent-ink"];
+const GRAPHICS_TOKENS = ["primary", "accent"];
+const SOLID_FILLS = [
+  "action",
+  "action-hover",
+  "band",
+  "primary-deep",
+  "accent-ink",
+  "ink",
+];
+const HUE_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ["primary", "accent"],
+  ["primary", "accent-ink"],
+  ["primary-ink", "accent"],
+  ["primary-ink", "accent-ink"],
+  ["action", "accent"],
+];
+const LIGHT_HUE_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ...HUE_PAIRS,
+  ["primary-deep", "accent"],
+];
 
-describe("one blue", () => {
-  it("is one calm blue in the light theme, the same value for text and for fills", () => {
-    expect(token("action")).toBe("#0f66ac");
-    expect(token("primary")).toBe(token("action"));
+describe("brand values match the marketing site's design system", () => {
+  it.each([
+    ["primary", "#007fc2"],
+    ["primary-ink", "#005e92"],
+    ["accent", "#e85d30"],
+    ["accent-ink", "#b34917"],
+    ["ink", "#222b33"],
+    ["knockout", "#ffffff"],
+  ])("%s is %s", (name, value) => {
+    expect(token(name)).toBe(value);
   });
 
-  it("splits in the dark theme: a fill for white labels and a lifted, calmer text blue", () => {
-    expect(darkToken("primary")).not.toBe(darkToken("action"));
-    expect(relativeLuminance(darkToken("primary"))).toBeGreaterThan(
-      relativeLuminance(darkToken("action")),
-    );
+  it("fills actions and the band with the text-safe blue in the light theme", () => {
+    expect(token("action")).toBe(token("primary-ink"));
+    expect(token("band")).toBe(token("primary-ink"));
   });
-
-  it("leaves the logo kit's own colours alone", () => {
-    expect(token("logo-blue")).toBe("#007fc2");
-    expect(token("logo-orange")).toBe("#e85d30");
-    expect(token("logo-word")).toBe("#007fc2");
-    expect(darkToken("logo-blue")).toBe("#007fc2");
-    expect(darkToken("logo-word")).toBe("#ffffff");
-  });
-
-  it.each(["shell", "band", "primary-ink", "primary-deep", "primary-muted"])(
-    "keeps the retired token %s out of the palette",
-    (name) => {
-      expect(CSS).not.toMatch(new RegExp(`--color-${name}\\b`));
-    },
-  );
 });
 
-describe.each(THEMES)("contrast in the %s theme", (_theme, read) => {
-  it.each(TEXT_TOKENS)("%s meets AA on every surface", (foreground) => {
+describe("text tokens meet AA on every light surface", () => {
+  it.each(TEXT_TOKENS)("%s", (foreground) => {
     for (const surface of SURFACES) {
       expect(
-        contrast(read(foreground), read(surface)),
+        contrast(token(foreground), token(surface)),
         `${foreground} on ${surface}`,
       ).toBeGreaterThanOrEqual(AA_TEXT);
     }
   });
+});
 
-  it.each(["action", "action-hover"])("keeps a white label legible on %s", (fill) => {
-    expect(contrast(read("knockout"), read(fill))).toBeGreaterThanOrEqual(AA_TEXT);
-  });
-
-  it("gives a filled control a 3:1 boundary against the page", () => {
-    expect(contrast(read("action"), read("surface"))).toBeGreaterThanOrEqual(
-      AA_GRAPHIC,
-    );
-  });
-
-  it("gives a field's edge a 3:1 boundary", () => {
-    expect(contrast(read("border-control"), read("surface"))).toBeGreaterThanOrEqual(
-      AA_GRAPHIC,
-    );
-    expect(contrast(read("border-control"), read("field"))).toBeGreaterThanOrEqual(
-      AA_GRAPHIC,
-    );
-  });
-
-  it("keeps the hairline quieter than a field's edge", () => {
-    expect(contrast(read("border"), read("surface"))).toBeLessThan(
-      contrast(read("border-control"), read("surface")),
-    );
-    expect(contrast(read("border"), read("surface"))).toBeGreaterThan(1.2);
-  });
-
-  it("keeps the orange mark visible as a graphic", () => {
-    expect(contrast(read("accent"), read("surface"))).toBeGreaterThanOrEqual(
-      AA_GRAPHIC,
-    );
+describe("graphics tokens clear 3:1 but are not usable for body text", () => {
+  it.each(GRAPHICS_TOKENS)("%s", (foreground) => {
+    for (const surface of SURFACES) {
+      expect(
+        contrast(token(foreground), token(surface)),
+        `${foreground} on ${surface}`,
+      ).toBeGreaterThanOrEqual(AA_LARGE);
+    }
+    expect(contrast(token(foreground), token("paper"))).toBeLessThan(AA_TEXT);
   });
 });
 
-describe("the sidebar", () => {
-  it("is a pale blue field in the light theme, not white and not navy", () => {
-    const [r, g, b] = channels(token("sidebar"));
-    expect(b).toBeGreaterThan(g);
-    expect(g).toBeGreaterThan(r);
-    expect(relativeLuminance(token("sidebar"))).toBeGreaterThan(0.8);
-    expect(token("sidebar")).not.toBe(token("surface"));
-  });
-
-  it.each(THEMES)("keeps its text legible in the %s theme", (_theme, read) => {
-    for (const surface of ["sidebar", "sidebar-hover"]) {
-      for (const text of ["ink", "ink-muted"]) {
-        expect(
-          contrast(read(text), read(surface)),
-          `${text} on ${surface}`,
-        ).toBeGreaterThanOrEqual(AA_TEXT);
-      }
-    }
-    expect(contrast(read("primary"), read("sidebar-active"))).toBeGreaterThanOrEqual(
+describe("knockout labels on solid fills", () => {
+  it.each(SOLID_FILLS)("white on %s", (background) => {
+    expect(contrast(token("knockout"), token(background))).toBeGreaterThanOrEqual(
       AA_TEXT,
     );
   });
+
+  it("keeps secondary copy on the band legible", () => {
+    expect(contrast(token("band-copy"), token("band"))).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
+  it("keeps the inverse button legible at rest and on hover", () => {
+    expect(contrast(token("action"), token("knockout"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+    expect(
+      contrast(token("primary-deep"), token("primary-muted")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+  });
 });
 
-describe("neutrals, not a blue room", () => {
-  const MOST_CHROMA = 16;
-  const spread = (hex: string) => {
-    const values = channels(hex);
-    return Math.max(...values) - Math.min(...values);
-  };
-
-  it.each(["paper", "surface", "surface-sunk", "surface-raised", "border"])(
-    "%s stays a quiet neutral in both themes",
-    (name) => {
-      expect(spread(token(name))).toBeLessThanOrEqual(MOST_CHROMA);
-      expect(spread(darkToken(name))).toBeLessThanOrEqual(MOST_CHROMA);
+describe("the two hues must never be combined", () => {
+  it.each(LIGHT_HUE_PAIRS)(
+    "%s and %s are too close to sit on each other",
+    (blue, orange) => {
+      expect(contrast(token(blue), token(orange))).toBeLessThan(AA_LARGE);
     },
   );
-
-  it("sets white panels on a soft ground in the light theme", () => {
-    expect(token("surface")).toBe("#ffffff");
-    expect(token("paper")).not.toBe(token("surface"));
-    expect(contrast(token("paper"), token("surface"))).toBeLessThan(1.1);
-  });
-
-  it("raises panels off the dark floor, and popovers off the panels", () => {
-    const floor = relativeLuminance(darkToken("paper"));
-    const panel = relativeLuminance(darkToken("surface"));
-    expect(floor).toBeLessThan(0.01);
-    expect(panel).toBeGreaterThan(floor);
-    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(panel);
-  });
-
-  it("is switched by a data attribute, so the same tokens carry both themes", () => {
-    expect(DARK_START).toBeGreaterThan(0);
-    expect(DARK_CSS).toMatch(/color-scheme:\s*dark/);
-  });
 });
 
-describe("the surface furniture stays gone", () => {
-  it.each([
-    "workspace-backdrop",
-    "shell-glow",
-    "board-dot",
-    "board-wash",
-    "wash-primary",
-  ])("has no %s", (name) => {
-    expect(CSS).not.toContain(name);
-  });
-
-  it("draws no radial wash", () => {
-    expect(CSS).not.toMatch(/radial-gradient/);
-  });
-
-  it("keeps its one gradient on the volunteer's pass", () => {
-    expect(CSS.match(/linear-gradient/g)).toHaveLength(1);
-    const pass = CSS.slice(CSS.indexOf(".volunteer-pass-card {"));
-    expect(pass.slice(0, pass.indexOf("}"))).toContain("linear-gradient");
-  });
-});
-
-describe("corners", () => {
-  it.each([
-    ["sm", "0.375rem"],
-    ["md", "0.625rem"],
-    ["lg", "0.875rem"],
-    ["xl", "1.125rem"],
-  ])("radius-%s is %s", (name, value) => {
-    expect(CSS).toMatch(new RegExp(`--radius-${name}:\\s*${value};`));
-  });
-
-  it("stops at eighteen pixels", () => {
-    expect(CSS).not.toMatch(/--radius-[23]xl/);
+describe("structural tokens", () => {
+  it("gives interactive borders a visible 3:1 boundary", () => {
+    expect(contrast(token("border-control"), token("paper"))).toBeGreaterThanOrEqual(
+      AA_LARGE,
+    );
   });
 });
 
@@ -236,7 +155,7 @@ describe("the danger red", () => {
   });
 
   it("keeps its label legible at rest and on its own hover fill in both themes", () => {
-    for (const [, read] of THEMES) {
+    for (const read of [token, darkToken]) {
       for (const surface of [...SURFACES, "danger-muted"]) {
         expect(
           contrast(read("danger-ink"), read(surface)),
@@ -245,28 +164,166 @@ describe("the danger red", () => {
       }
     }
   });
+
+  it("gives its border a visible 3:1 boundary on a panel in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(contrast(read("danger"), read("surface"))).toBeGreaterThanOrEqual(
+        AA_LARGE,
+      );
+    }
+  });
+
+  it("is redder than the person's orange, so the two are not one hue", () => {
+    for (const read of [token, darkToken]) {
+      const green = (hex: string) => parseInt(hex.slice(3, 5), 16);
+      expect(green(read("danger-ink"))).toBeLessThan(green(read("accent-ink")));
+    }
+  });
 });
 
-describe("the podium metals", () => {
-  const METALS = ["gold", "silver", "bronze"] as const;
+describe("the shell", () => {
+  const SHELL_SURFACES = ["shell", "shell-raised"];
 
-  it.each(METALS)(
-    "%s ink meets AA on the page and on a step in both themes",
-    (metal) => {
-      for (const [, read] of THEMES) {
-        expect(contrast(read(`${metal}-ink`), read("surface"))).toBeGreaterThanOrEqual(
-          AA_TEXT,
-        );
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the light shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
         expect(
-          contrast(read(`${metal}-ink`), read("surface-sunk")),
+          contrast(token(foreground), token(surface)),
+          `${foreground} on ${surface}`,
         ).toBeGreaterThanOrEqual(AA_TEXT);
       }
     },
   );
 
+  it.each(["shell-ink", "shell-muted"])(
+    "%s meets AA on the dark shell",
+    (foreground) => {
+      for (const surface of SHELL_SURFACES) {
+        expect(
+          contrast(darkToken(foreground), darkToken(surface)),
+          `${foreground} on ${surface}`,
+        ).toBeGreaterThanOrEqual(AA_TEXT);
+      }
+    },
+  );
+
+  it("is the institution's blue as a field, never a neutral grey", () => {
+    for (const read of [token, darkToken]) {
+      const shell = read("shell");
+      const [r = 0, g = 0, b = 0] = [1, 3, 5].map((offset) =>
+        parseInt(shell.slice(offset, offset + 2), 16),
+      );
+      expect(b).toBeGreaterThan(r);
+      expect(b).toBeGreaterThan(g);
+      expect(relativeLuminance(shell)).toBeLessThan(0.03);
+    }
+  });
+
+  it("keeps the active section legible on its own fill in both themes", () => {
+    for (const read of [token, darkToken]) {
+      expect(
+        contrast(read("shell-active-ink"), read("shell-active")),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(contrast(read("shell-active"), read("shell"))).toBeGreaterThanOrEqual(1.5);
+    }
+  });
+});
+
+describe("the podium metals", () => {
+  const METALS = ["gold", "silver", "bronze"] as const;
+
+  it.each(METALS)("%s ink meets AA on the panel surface in both themes", (metal) => {
+    expect(contrast(token(`${metal}-ink`), token("surface"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+    expect(
+      contrast(darkToken(`${metal}-ink`), darkToken("surface")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
+  it.each(METALS)(
+    "a %s badge label meets AA on the metal ink in both themes",
+    (metal) => {
+      expect(
+        contrast(token("medal-label"), token(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+      expect(
+        contrast(darkToken("medal-label"), darkToken(`${metal}-ink`)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
   it("gives the three places three different hues in both themes", () => {
-    for (const [, read] of THEMES) {
+    for (const read of [token, darkToken]) {
       expect(new Set(METALS.map((metal) => read(metal))).size).toBe(3);
     }
+  });
+});
+
+describe("the dark theme", () => {
+  it("is switched by a data attribute, so the same tokens carry both themes", () => {
+    expect(DARK_START).toBeGreaterThan(0);
+    expect(DARK_CSS).toMatch(/color-scheme:\s*dark/);
+  });
+
+  it("turns the page ground near-black rather than blue", () => {
+    expect(relativeLuminance(darkToken("paper"))).toBeLessThan(0.01);
+    expect(relativeLuminance(darkToken("band"))).toBeLessThan(0.03);
+  });
+
+  it("raises panels above the workspace and sinks fields into panels", () => {
+    const workspace = relativeLuminance(darkToken("surface-sunk"));
+    const panel = relativeLuminance(darkToken("surface"));
+    expect(panel).toBeGreaterThan(workspace);
+    expect(relativeLuminance(darkToken("surface-raised"))).toBeGreaterThan(panel);
+    expect(relativeLuminance(darkToken("field"))).toBeLessThan(panel);
+    expect(contrast(darkToken("border"), darkToken("surface"))).toBeGreaterThan(1.2);
+  });
+
+  it.each(TEXT_TOKENS)("%s meets AA on every dark surface", (foreground) => {
+    for (const surface of SURFACES) {
+      expect(
+        contrast(darkToken(foreground), darkToken(surface)),
+        `${foreground} on ${surface}`,
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    }
+  });
+
+  it.each(GRAPHICS_TOKENS)("%s clears 3:1 on every dark surface", (foreground) => {
+    for (const surface of SURFACES) {
+      expect(
+        contrast(darkToken(foreground), darkToken(surface)),
+        `${foreground} on ${surface}`,
+      ).toBeGreaterThanOrEqual(AA_LARGE);
+    }
+  });
+
+  it.each(["action", "action-hover", "band"])(
+    "keeps white labels legible on %s",
+    (fill) => {
+      expect(contrast(darkToken("knockout"), darkToken(fill))).toBeGreaterThanOrEqual(
+        AA_TEXT,
+      );
+    },
+  );
+
+  it("keeps band copy, the inverse button and control borders legible", () => {
+    expect(contrast(darkToken("band-copy"), darkToken("band"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+    expect(contrast(darkToken("action"), darkToken("knockout"))).toBeGreaterThanOrEqual(
+      AA_TEXT,
+    );
+    expect(
+      contrast(darkToken("primary-deep"), darkToken("primary-muted")),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+    expect(
+      contrast(darkToken("border-control"), darkToken("paper")),
+    ).toBeGreaterThanOrEqual(AA_LARGE);
+  });
+
+  it.each(HUE_PAIRS)("keeps %s and %s too close to combine", (blue, orange) => {
+    expect(contrast(darkToken(blue), darkToken(orange))).toBeLessThan(AA_LARGE);
   });
 });

@@ -13,7 +13,7 @@ export function AuthStatus({
   return (
     <p
       role="status"
-      className="mt-4 flex items-start gap-2 rounded-md bg-surface-sunk px-3 py-2 text-sm text-ink"
+      className="enter-rise mt-4 flex items-start gap-3 rounded-lg bg-surface-soft px-4 py-3 text-sm leading-relaxed text-primary-ink [--enter-delay:650ms]"
     >
       <Icon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
       {children}

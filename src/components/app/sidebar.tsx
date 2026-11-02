@@ -46,17 +46,18 @@ export function Sidebar({
   const t = useTranslations("nav");
 
   return (
-    <div className="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r lg:border-sidebar-line lg:bg-sidebar">
-      <aside className="sticky top-0 flex h-dvh flex-col">
-        <div className="flex items-center gap-2 px-4 pt-4 pb-3">
+    <div className="hidden lg:block lg:w-[16.5rem] lg:shrink-0 lg:border-r lg:border-shell-line lg:bg-shell">
+      <aside className="sticky top-0 flex h-dvh flex-col text-shell-ink [&_:focus-visible]:outline-shell-ink">
+        <div className="shell-glow flex items-center gap-2 px-4 pt-5 pb-4">
           <Link
             href={navHref("dashboard")}
-            className="-m-1 inline-flex min-w-0 flex-1 rounded-md p-1"
+            className="-m-1 inline-flex min-w-0 flex-1 rounded-lg p-1"
             aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
           >
-            <BrandLockup name={ORGANIZATION_NAME} />
+            <BrandLockup name={ORGANIZATION_NAME} tone="inverse" />
           </Link>
           <NotificationsMenu
+            variant="shell"
             label={t("notifications.label")}
             title={t("notifications.title")}
             emptyLabel={t("notifications.empty")}
@@ -66,11 +67,11 @@ export function Sidebar({
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-2">
+        <div className="flex-1 overflow-y-auto px-3 pt-1 pb-3">
           <SidebarNav items={navItems(primaryNavRoutes, t)} label={t("primaryLabel")} />
         </div>
 
-        <div className="border-t border-sidebar-line px-3 py-3">
+        <div className="flex flex-col gap-0.5 border-t border-shell-line px-3 py-3">
           <SidebarNav
             items={navItems(accountNavRoutes, t)}
             label={t("secondaryLabel")}

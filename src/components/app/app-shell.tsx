@@ -29,16 +29,16 @@ export function AppShell({
     <div className="flex min-h-full flex-1 flex-col lg:flex-row">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-action focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-knockout"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-action focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-knockout"
       >
         {t("skipToContent")}
       </a>
       <Sidebar user={user} notifications={notifications} />
-      <div className="flex min-h-full min-w-0 flex-1 flex-col">
+      <div className="workspace-backdrop flex min-h-full min-w-0 flex-1 flex-col bg-surface-sunk">
         <MobileHeader user={user} notifications={notifications} />
         <main
           id="main"
-          className="mx-auto w-full max-w-[72rem] flex-1 px-4 pt-(--page-top) pb-24 sm:px-6 lg:px-10 lg:pb-12"
+          className="mx-auto w-full max-w-[80rem] flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-10 lg:py-9 lg:pb-12"
         >
           {children}
         </main>

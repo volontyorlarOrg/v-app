@@ -28,7 +28,7 @@ function DropdownMenuContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-32 overflow-x-hidden overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-raised outline-none",
+          "z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-32 overflow-x-hidden overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-[0_18px_40px_-32px_rgb(28_36_43/0.45)] outline-none",
           className,
         )}
         {...props}
@@ -49,7 +49,7 @@ function DropdownMenuItem({
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
       className={cn(
-        "relative flex min-h-(--control-sm) cursor-default items-center gap-2 rounded-md px-2.5 text-sm text-foreground outline-hidden transition-colors select-none focus:bg-muted data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex min-h-11 cursor-default items-center gap-3 rounded-md px-3 text-sm font-semibold text-foreground outline-hidden transition-colors select-none focus:bg-muted focus:text-primary-ink data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -64,7 +64,7 @@ function DropdownMenuLabel({
   return (
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
-      className={cn("px-2.5 py-1.5 text-sm font-medium text-foreground", className)}
+      className={cn("px-3 py-2 text-sm font-semibold text-foreground", className)}
       {...props}
     />
   );

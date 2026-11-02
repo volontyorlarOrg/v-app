@@ -29,7 +29,7 @@ export function LocaleSwitcher({
           aria-label={`${label}: ${localeNames[active]}`}
           aria-busy={pending}
           className={cn(
-            "group inline-flex h-(--control-sm) items-center gap-1 rounded-md px-2 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink",
+            "group inline-flex h-11 items-center gap-1 rounded-full border border-border bg-surface pr-2 pl-3 text-xs font-semibold tracking-[0.08em] text-ink uppercase transition-colors hover:border-border-control hover:text-primary-ink",
             className,
           )}
         >
@@ -51,17 +51,20 @@ export function LocaleSwitcher({
               aria-current={isActive ? "true" : undefined}
               onSelect={() => choose(locale)}
               className={cn(
-                "min-h-11 gap-3 text-sm font-medium",
+                "min-h-11 gap-3 text-sm font-semibold",
                 isActive
-                  ? "bg-surface-soft text-primary focus:bg-surface-soft"
-                  : "text-ink hover:bg-surface-sunk hover:text-primary",
+                  ? "bg-surface-soft text-primary-ink focus:bg-surface-soft"
+                  : "text-ink hover:bg-surface-sunk hover:text-primary-ink",
               )}
             >
               <span className="flex-1">{localeNames[locale]}</span>
               {isActive ? (
-                <Check aria-hidden="true" className="size-4 text-primary" />
+                <Check aria-hidden="true" className="size-4 text-primary-ink" />
               ) : (
-                <span aria-hidden="true" className="text-xs text-ink-muted">
+                <span
+                  aria-hidden="true"
+                  className="text-xs tracking-[0.08em] text-ink-muted uppercase"
+                >
                   {locale}
                 </span>
               )}

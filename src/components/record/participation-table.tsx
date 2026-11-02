@@ -157,15 +157,15 @@ function ParticipationRow({ entry, now }: { entry: ParticipationEntry; now: Date
             {href ? (
               <Link
                 href={href}
-                className="participation-link text-sm font-medium text-ink"
+                className="participation-link font-semibold text-ink"
                 aria-label={t("open", { title: entry.opportunityTitle })}
               >
                 {entry.opportunityTitle}
               </Link>
             ) : (
-              <p className="text-sm font-medium text-ink">{entry.opportunityTitle}</p>
+              <p className="font-semibold text-ink">{entry.opportunityTitle}</p>
             )}
-            <p className="text-xs text-ink-muted">{entry.organization}</p>
+            <p className="text-sm text-ink-muted">{entry.organization}</p>
           </div>
         </div>
       </td>
@@ -179,23 +179,30 @@ function ParticipationRow({ entry, now }: { entry: ParticipationEntry; now: Date
           <StatusIcon
             aria-hidden="true"
             className={cn(
-              "size-4 shrink-0",
-              tone === "achievement" && "text-accent",
-              tone === "structure" && "text-primary",
+              "size-5 shrink-0",
+              tone === "achievement" && "fill-accent text-surface",
+              tone === "structure" && "text-primary-ink",
               tone === "neutral" && "text-ink-muted",
             )}
           />
           <span
             className={cn(
-              "font-medium",
+              "font-semibold",
               tone === "achievement" && "text-accent-ink",
-              tone === "structure" && "text-primary",
+              tone === "structure" && "text-primary-ink",
               tone === "neutral" && "text-ink-muted",
             )}
           >
             {t(`status.${status}`)}
           </span>
-          {roleText ? <span className="text-ink-muted">{roleText}</span> : null}
+          {roleText ? (
+            <span className="text-ink-muted">
+              <span aria-hidden="true" className="mr-2">
+                ·
+              </span>
+              {roleText}
+            </span>
+          ) : null}
         </span>
       </td>
       <td role="cell" data-numeric="" className="participation-hours">
@@ -215,7 +222,7 @@ function ParticipationRow({ entry, now }: { entry: ParticipationEntry; now: Date
         ) : null}
       </td>
       <td role="cell" className="participation-chevron">
-        {href ? <ChevronRight aria-hidden="true" className="size-4" /> : null}
+        {href ? <ChevronRight aria-hidden="true" className="size-5" /> : null}
       </td>
     </tr>
   );
@@ -239,9 +246,9 @@ function EventThumb({ entry }: { entry: ParticipationEntry }) {
   return (
     <span
       aria-hidden="true"
-      className="participation-thumb inline-grid place-items-center bg-surface-soft text-primary"
+      className="participation-thumb inline-grid place-items-center bg-surface-soft text-primary-ink"
     >
-      <Icon className="size-4" />
+      <Icon className="size-5" />
     </span>
   );
 }

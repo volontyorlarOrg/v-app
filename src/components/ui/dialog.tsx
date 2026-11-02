@@ -25,7 +25,7 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className={cn("fixed inset-0 z-50 bg-black/40", className)}
+      className={cn("fixed inset-0 z-50 bg-shell/60 backdrop-blur-[2px]", className)}
       {...props}
     />
   );
@@ -43,7 +43,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-xl border border-border bg-popover p-6 text-popover-foreground shadow-raised outline-none",
+          "fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-xl border border-border bg-popover p-5 text-popover-foreground shadow-raised outline-none",
           className,
         )}
         {...props}
@@ -51,9 +51,9 @@ function DialogContent({
         {children}
         <DialogPrimitive.Close
           data-slot="dialog-close"
-          className="absolute top-3 right-3 inline-grid size-(--control-sm) place-items-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink"
+          className="absolute top-3 right-3 inline-grid size-11 place-items-center rounded-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink sm:top-4 sm:right-4"
         >
-          <X aria-hidden="true" className="size-4" />
+          <X aria-hidden="true" className="size-5" />
           <span className="sr-only">{closeLabel}</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
@@ -65,7 +65,7 @@ function DialogHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1 pr-10", className)}
+      className={cn("flex flex-col gap-1.5 pr-12", className)}
       {...props}
     />
   );
@@ -78,7 +78,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg font-semibold text-foreground", className)}
+      className={cn("font-sans text-xl font-semibold text-foreground", className)}
       {...props}
     />
   );
@@ -91,7 +91,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-sm leading-relaxed text-muted-foreground", className)}
       {...props}
     />
   );

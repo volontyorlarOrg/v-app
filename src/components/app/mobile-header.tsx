@@ -41,17 +41,17 @@ export function MobileHeader({
   const t = useTranslations("nav");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface lg:hidden">
-      <div className="flex min-h-14 items-center gap-2 pr-2.5 pl-4 sm:pl-6">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm lg:hidden">
+      <div className="flex min-h-14 items-center gap-2 px-4 sm:px-6">
         <Link
           href={navHref("dashboard")}
-          className="-m-1 rounded-md p-1"
+          className="-m-1 rounded-lg p-1"
           aria-label={`${ORGANIZATION_NAME} — ${t("dashboard")}`}
         >
           <BrandLockup name={ORGANIZATION_NAME} />
         </Link>
 
-        <div className="ml-auto flex items-center">
+        <div className="ml-auto flex items-center gap-2">
           <NotificationsMenu
             label={t("notifications.label")}
             title={t("notifications.title")}

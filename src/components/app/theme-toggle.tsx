@@ -48,15 +48,15 @@ export function ThemeToggle({
         <span className="flex min-w-0 items-center gap-3">
           <span
             aria-hidden="true"
-            className="inline-grid size-5 shrink-0 place-items-center text-ink-muted"
+            className="inline-grid size-5 shrink-0 place-items-center text-primary"
           >
-            <Sun className="theme-toggle-icon theme-toggle-sun size-4.5" />
-            <Moon className="theme-toggle-icon theme-toggle-moon size-4.5" />
+            <Sun className="theme-toggle-icon theme-toggle-sun size-5" />
+            <Moon className="theme-toggle-icon theme-toggle-moon size-5" />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-medium text-ink">{label}</span>
+            <span className="block text-sm font-semibold text-ink">{label}</span>
             {description ? (
-              <span className="block text-sm text-ink-muted">{description}</span>
+              <span className="mt-0.5 block text-sm text-ink-muted">{description}</span>
             ) : null}
           </span>
         </span>
@@ -71,7 +71,7 @@ export function ThemeToggle({
       onCheckedChange={(next) => applyTheme(next ? "dark" : "light")}
       aria-label={label}
       className={cn(
-        "theme-toggle inline-grid size-(--control-sm) shrink-0 place-items-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink",
+        "theme-toggle inline-grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface text-ink transition-colors hover:border-primary hover:text-primary-ink",
         className,
       )}
     >

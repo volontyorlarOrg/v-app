@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   BadgeCheck,
   CalendarDays,
   Clock3,
@@ -17,6 +18,7 @@ import {
 } from "@/components/dashboard/opportunity-status";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
 import { SaveButton } from "@/components/opportunities/save-button";
+import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { displayStatus } from "@/lib/opportunities/deadline";
@@ -59,8 +61,8 @@ export function OpportunityCard({
       : t(`regions.${opportunity.region}`);
 
   return (
-    <article className="flex w-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-panel transition-colors hover:border-border-control">
-      <div className="relative aspect-[2/1] overflow-hidden border-b border-border bg-surface-sunk">
+    <article className="panel-surface group/card flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors hover:border-primary/50">
+      <div className="relative aspect-[2/1] overflow-hidden bg-surface-soft">
         {photo ? (
           <Image
             unoptimized
@@ -75,11 +77,11 @@ export function OpportunityCard({
             aria-hidden="true"
             className="opportunity-card-art flex size-full items-center justify-center text-primary"
           >
-            <KindIcon className="size-7 opacity-60" />
+            <KindIcon className="size-10 opacity-70" strokeWidth={1.5} />
           </div>
         )}
 
-        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-sm bg-surface px-1.5 py-0.5 text-xs font-medium text-primary">
+        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-md border border-border bg-surface/90 px-2.5 py-1 text-xs font-semibold text-primary-ink backdrop-blur-sm">
           <KindIcon aria-hidden="true" className="size-3.5" />
           {t(`kinds.${opportunity.kind}`)}
         </span>
@@ -100,15 +102,15 @@ export function OpportunityCard({
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-balance">
+            <h3 className="text-base leading-snug font-semibold text-balance">
               <Link
                 href={opportunityHref(opportunity.slug)}
-                className="text-ink hover:text-primary"
+                className="text-ink hover:text-primary-ink"
               >
                 {opportunity.title}
               </Link>
             </h3>
-            <p className="flex flex-wrap items-center gap-x-1 text-sm text-ink-muted">
+            <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
               <span>{opportunity.organization.name}</span>
               {opportunity.organization.verified ? (
                 <BadgeCheck
@@ -125,50 +127,54 @@ export function OpportunityCard({
           ) : null}
         </div>
 
-        <ul className="mt-3 grid gap-1 text-sm text-ink-muted">
-          <li className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays aria-hidden="true" className="size-3.5 text-primary" />
+        <ul className="mt-4 grid gap-2 text-sm text-ink-muted">
+          <li className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays aria-hidden="true" className="size-4 text-primary" />
               <time dateTime={opportunity.startsAt} className="tabular">
                 {format.dateTime(new Date(opportunity.startsAt), "day")}
               </time>
             </span>
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-2">
               {remote ? (
-                <Monitor aria-hidden="true" className="size-3.5 text-primary" />
+                <Monitor aria-hidden="true" className="size-4 text-primary" />
               ) : (
-                <MapPin aria-hidden="true" className="size-3.5 text-primary" />
+                <MapPin aria-hidden="true" className="size-4 text-primary" />
               )}
               {place}
             </span>
           </li>
           <li
             className={cn(
-              "inline-flex items-center gap-1.5",
-              unavailable ? "text-ink-muted" : "font-medium text-primary",
+              "inline-flex items-center gap-2",
+              unavailable ? "text-ink-muted" : "font-medium text-primary-ink",
             )}
           >
-            <Clock3 aria-hidden="true" className="size-3.5" />
+            <Clock3 aria-hidden="true" className="size-4" />
             <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
           </li>
         </ul>
 
         {opportunity.publishedAt ? (
-          <p className="mt-2 text-xs text-ink-muted">
+          <p className="mt-3 text-xs text-ink-muted">
             {t("card.posted", {
               date: format.dateTime(new Date(opportunity.publishedAt), "day"),
             })}
           </p>
         ) : null}
 
-        <div className="mt-auto pt-2">
+        <div className="mt-auto pt-4">
           <Link
             href={
               application
                 ? applicationHref(application.id)
                 : opportunityHref(opportunity.slug)
             }
-            className="-mb-2 inline-flex min-h-(--control-sm) items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className={buttonClass({
+              variant: "outline",
+              size: "sm",
+              className: "w-full gap-2",
+            })}
           >
             {application
               ? application.status === "draft"
@@ -177,6 +183,7 @@ export function OpportunityCard({
                   ? applications("card.attendance")
                   : applications("card.track")
               : t("card.view")}
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         </div>
       </div>

@@ -34,7 +34,7 @@ export function LevelGlyph({
       <svg viewBox="0 0 48 52" className="level-glyph-shape absolute inset-0 size-full">
         <path d="M24 2.5 44.5 14.25v23.5L24 49.5 3.5 37.75v-23.5Z" />
       </svg>
-      <Icon className="level-glyph-icon relative size-[45%]" />
+      <Icon className="level-glyph-icon relative size-[45%]" strokeWidth={2.25} />
     </span>
   );
 }
@@ -56,8 +56,8 @@ export function LevelChip({
     <span
       data-size={size}
       className={cn(
-        "inline-flex w-fit items-center gap-1.5 rounded-md bg-accent/10 font-medium text-accent-ink",
-        size === "md" ? "px-2.5 py-1 text-sm" : "px-2 py-0.5 text-xs",
+        "level-chip inline-flex w-fit items-center gap-2 rounded-lg border border-accent/50 font-semibold text-accent-ink",
+        size === "md" ? "px-3 py-1.5 text-base" : "px-2.5 py-1 text-sm",
         className,
       )}
     >
@@ -65,7 +65,7 @@ export function LevelChip({
         aria-hidden="true"
         className={cn(
           "shrink-0 fill-accent text-accent",
-          size === "md" ? "size-4" : "size-3.5",
+          size === "md" ? "size-5" : "size-4",
         )}
       />
       {name}

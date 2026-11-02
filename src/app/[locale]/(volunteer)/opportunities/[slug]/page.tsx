@@ -107,7 +107,7 @@ function Opportunity({
     <>
       <Link
         href={navHref("opportunities")}
-        className="inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+        className="enter-rise inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("detail.back")}
@@ -144,14 +144,14 @@ function Opportunity({
           alt=""
           width={1600}
           height={900}
-          className="mt-6 aspect-video max-h-[32rem] w-full rounded-lg object-cover"
+          className="mt-6 aspect-video max-h-[32rem] w-full rounded-xl object-cover"
         />
       ) : null}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
           <Panel id="about" title={t("detail.description")}>
-            <p className="max-w-prose whitespace-pre-line text-ink">
+            <p className="max-w-prose leading-relaxed whitespace-pre-line text-ink">
               {opportunity.description}
             </p>
           </Panel>
@@ -163,7 +163,7 @@ function Opportunity({
                   <li key={`${index}-${requirement}`} className="flex gap-3 text-ink">
                     <span
                       aria-hidden="true"
-                      className="mt-2 size-1 shrink-0 rounded-full bg-ink-muted"
+                      className="mt-2.5 size-1.5 shrink-0 rounded-full bg-primary"
                     />
                     {requirement}
                   </li>
@@ -175,11 +175,11 @@ function Opportunity({
           {asksEssay ? (
             <Panel id="essay" title={t("detail.essayTitle")}>
               {opportunity.essayPrompt ? (
-                <p className="max-w-prose font-medium text-ink">
+                <p className="max-w-prose font-semibold text-ink">
                   {opportunity.essayPrompt}
                 </p>
               ) : null}
-              <p className="mt-1 max-w-prose text-sm text-ink-muted">
+              <p className="mt-1 max-w-prose text-sm leading-relaxed text-ink-muted">
                 {opportunity.essayPrompt
                   ? t("detail.essayPromptDescription")
                   : t("detail.essayDescription")}
@@ -198,11 +198,11 @@ function Opportunity({
               <ol className="flex flex-col gap-5">
                 {opportunity.questions.map((question, index) => (
                   <li key={question.id} className="grid grid-cols-[2rem_1fr] gap-x-3">
-                    <span className="tabular pt-0.5 text-xs font-medium text-primary">
+                    <span className="tabular pt-0.5 text-xs font-semibold tracking-[0.14em] text-primary-ink uppercase">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <p className="font-medium text-ink">{question.prompt}</p>
+                      <p className="font-semibold text-ink">{question.prompt}</p>
                       {question.helpText ? (
                         <p className="mt-1 text-sm text-ink-muted">
                           {question.helpText}
@@ -293,7 +293,7 @@ function Opportunity({
                 />
               ) : (
                 <div>
-                  <p className="text-sm text-ink-muted">
+                  <p className="text-sm leading-relaxed text-ink-muted">
                     {t("detail.profileRequired", {
                       fields: completion.missing
                         .map((field) => profileT(`completionFields.${field}`))

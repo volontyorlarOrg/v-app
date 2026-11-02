@@ -112,7 +112,7 @@ export function UsernameStepForm({
       {addressPrefix ? (
         <p className="mt-4 text-sm text-ink-muted">
           {text.address}{" "}
-          <span className="tabular font-medium break-all text-ink">
+          <span className="tabular font-semibold break-all text-ink">
             {addressPrefix}
             {preview || text.addressPlaceholder}
           </span>

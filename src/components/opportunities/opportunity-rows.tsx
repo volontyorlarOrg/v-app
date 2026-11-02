@@ -23,7 +23,9 @@ export function OpportunityRows({
   const format = useFormatter();
 
   if (opportunities.length === 0) {
-    return <p className="px-5 py-6 text-sm text-ink-muted">{emptyLabel}</p>;
+    return (
+      <p className="px-5 py-6 text-sm leading-relaxed text-ink-muted">{emptyLabel}</p>
+    );
   }
 
   return (
@@ -46,10 +48,10 @@ export function OpportunityRows({
               <OpportunityStatusChip opportunity={opportunity} now={now} />
               <DeadlineText deadline={opportunity.applicationDeadline} now={now} />
             </div>
-            <h3 className="mt-2 text-base font-medium text-balance">
+            <h3 className="mt-2 text-base font-semibold text-balance">
               <Link
                 href={opportunityHref(opportunity.slug)}
-                className="text-ink hover:text-primary"
+                className="text-ink hover:text-primary-ink"
               >
                 {opportunity.title}
               </Link>

@@ -1,5 +1,6 @@
-import { ChevronRight, Clock3, Star, Trophy, type LucideIcon } from "lucide-react";
+import { ArrowRight, Clock3, Star, Trophy, type LucideIcon } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
+import type { CSSProperties } from "react";
 
 import { LoadErrorRows, type LoadErrorLabels } from "@/components/app/load-error";
 import { Link } from "@/i18n/navigation";
@@ -37,7 +38,7 @@ export function ProgressFigures({
     <section
       aria-label={t("label")}
       className={cn(
-        "overflow-hidden rounded-lg border border-border bg-surface shadow-panel",
+        "panel-surface overflow-hidden rounded-xl border border-border bg-surface",
         className,
       )}
     >
@@ -45,40 +46,43 @@ export function ProgressFigures({
         <LoadErrorRows failure={progress.failure} labels={errorLabels} />
       ) : (
         <ul className="grid divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {figuresOf(progress.data).map((figure) => (
+          {figuresOf(progress.data).map((figure, index) => (
             <li key={figure.id} className="min-w-0">
               <Link
                 href={figure.href}
-                className="flex h-full items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-sunk"
+                className="group enter-rise flex h-full min-h-20 items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-sunk/60 sm:px-6 sm:py-5"
+                style={{ "--enter-delay": `${120 + index * 70}ms` } as CSSProperties}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "inline-grid size-10 shrink-0 place-items-center rounded-md",
+                    "inline-grid size-12 shrink-0 place-items-center rounded-lg",
                     figure.tone === "achievement"
-                      ? "bg-accent/10 text-accent"
-                      : "bg-surface-soft text-primary",
+                      ? "bg-accent/12 text-accent"
+                      : "bg-surface-soft text-primary-ink",
                   )}
                 >
                   <figure.Icon
                     className={cn(
-                      "size-5",
+                      "size-6",
                       figure.tone === "achievement" && "fill-accent",
                     )}
                   />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="figure block text-2xl text-ink">{figure.value}</span>
-                  <span className="block text-sm text-ink-muted">
+                  <span className="display-face tabular block text-[2rem] leading-none tracking-[-0.03em] text-ink sm:text-[2.25rem]">
+                    {figure.value}
+                  </span>
+                  <span className="mt-1.5 block text-sm leading-snug text-ink-muted">
                     {figure.label}
                     {figure.note ? (
                       <span className="block text-xs">{figure.note}</span>
                     ) : null}
                   </span>
                 </span>
-                <ChevronRight
+                <ArrowRight
                   aria-hidden="true"
-                  className="size-4 shrink-0 text-primary"
+                  className="size-5 shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5"
                 />
               </Link>
             </li>

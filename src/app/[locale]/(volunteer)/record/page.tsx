@@ -86,7 +86,7 @@ function Activity({
           <>
             <ParticipationTable entries={entries} now={now} label={t("title")} />
             {waiting ? (
-              <p className="border-t border-border px-5 py-3.5 text-sm text-ink-muted">
+              <p className="border-t border-border px-5 py-3.5 text-sm leading-relaxed text-ink-muted">
                 {t("participation.awaitingNote")}
               </p>
             ) : null}

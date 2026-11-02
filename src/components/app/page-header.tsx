@@ -16,14 +16,16 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between",
+        "enter-rise flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
         className,
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-2xl text-balance sm:text-3xl">{title}</h1>
+        <h1 className="text-3xl tracking-[-0.025em] text-balance sm:text-4xl">
+          {title}
+        </h1>
         {description ? (
-          <p className="mt-1 max-w-2xl text-sm text-pretty text-ink-muted">
+          <p className="mt-2 max-w-2xl leading-relaxed text-pretty text-ink-muted">
             {description}
           </p>
         ) : null}

@@ -37,47 +37,53 @@ export function LeaderboardStanding({
           : null;
 
   return (
-    <section aria-labelledby="standing-title" className="">
+    <section
+      aria-labelledby="standing-title"
+      className="enter-rise [--enter-delay:90ms]"
+    >
       <Link
         href={href}
-        className="flex items-center gap-3 rounded-lg border border-border px-4 py-3 shadow-panel transition-colors hover:bg-surface-sunk sm:px-5"
+        className="standing-card group flex items-center gap-3 rounded-xl border border-border px-4 py-3 transition-colors hover:border-primary sm:gap-4 sm:px-5"
       >
         <span
           data-place={rank <= PODIUM_SIZE ? rank : undefined}
           className={cn(
-            "figure shrink-0 text-xl",
+            "display-face tabular shrink-0 text-2xl leading-none sm:text-3xl",
             rank <= PODIUM_SIZE ? "medal medal-ink" : "text-accent-ink",
           )}
         >
           #{format.number(rank)}
         </span>
-        <Avatar aria-hidden="true" className="size-8 shrink-0">
+        <Avatar aria-hidden="true" className="size-10 shrink-0 ring-2 ring-accent/70">
           {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
-          <AvatarFallback>{initials}</AvatarFallback>
+          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
           <h2
             id="standing-title"
-            className="text-sm font-medium tracking-normal text-ink"
+            className="font-sans text-base leading-tight font-semibold text-ink"
           >
             {t("standing.rank")}
           </h2>
-          <p className="flex flex-col gap-x-2 text-xs text-ink-muted sm:flex-row sm:flex-wrap">
+          <p className="mt-1 flex flex-col gap-x-1.5 text-xs leading-snug text-ink-muted sm:flex-row sm:flex-wrap sm:text-sm">
             <span>{t("standing.of", { total })}</span>
             {distance ? (
               <>
-                <span>{distance}</span>
+                <span aria-hidden="true" className="hidden sm:inline">
+                  ·
+                </span>
+                <span className="font-semibold text-ink">{distance}</span>
               </>
             ) : null}
           </p>
         </div>
-        <span className="figure shrink-0 text-sm text-accent-ink">
+        <span className="tabular shrink-0 text-base font-semibold text-accent-ink sm:text-lg">
           {t("xpValue", { xp: format.number(xp) })}
         </span>
         <span className="sr-only">{t("standing.show")}</span>
         <ChevronRight
           aria-hidden="true"
-          className="hidden size-4 shrink-0 text-ink-muted sm:block"
+          className="hidden size-5 shrink-0 text-ink-muted transition-colors group-hover:text-primary-ink sm:block"
         />
       </Link>
     </section>

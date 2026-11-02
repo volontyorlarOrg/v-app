@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 export const inputClass =
-  "min-h-(--control) w-full min-w-0 rounded-md border border-input bg-field px-3 text-base text-foreground caret-primary transition-colors placeholder:text-muted-foreground hover:border-ink-muted focus-visible:outline-offset-0 aria-invalid:border-ink disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm";
+  "min-h-12 w-full min-w-0 rounded-lg border border-input bg-field px-4 text-base text-foreground caret-primary-ink transition-colors placeholder:text-muted-foreground hover:border-primary-ink aria-invalid:border-ink disabled:cursor-not-allowed disabled:opacity-60";
 
 function Input({ className, type, ...props }: ComponentProps<"input">) {
   return (

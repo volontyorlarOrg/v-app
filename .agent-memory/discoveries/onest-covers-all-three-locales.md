@@ -1,10 +1,5 @@
 # Onest covers Uzbek, Russian, and English in two subsets
 
-**Since 2026-11-02 the app uses Inter, not Onest** (see
-`decisions/one-blue-on-white.md`). The Uzbek rules below still hold, and any
-replacement face must draw U+02BB itself: of ten faces tested, only Inter, Onest,
-IBM Plex Sans and Commissioner do.
-
 The circle-and-arc logo specification said its wordmark needed "a licensed
 face with U+02BB support (Onest is verified)". The logo kit that replaced it
 draws the wordmark as outlines, so the wordmark no longer depends on a face;

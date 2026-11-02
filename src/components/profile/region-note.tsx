@@ -30,17 +30,17 @@ export function RegionNote({ labels }: { labels: RegionNoteLabels }) {
     <aside
       role="note"
       aria-label={labels.title}
-      className="rounded-md bg-surface-sunk px-3 py-2.5"
+      className="rounded-lg border border-primary/50 bg-surface-soft px-4 py-3.5"
     >
-      <p className="flex items-center gap-1.5 text-sm font-medium text-ink">
+      <p className="flex items-center gap-2 text-sm font-semibold text-primary-ink">
         <MapPinned aria-hidden="true" className="size-4 shrink-0" />
         {labels.title}
       </p>
-      <dl className="mt-2 grid gap-2 text-sm sm:grid-cols-2 sm:gap-4">
+      <dl className="mt-3 grid gap-3 text-sm leading-relaxed sm:grid-cols-2 sm:gap-5">
         {[labels.region, labels.hometownRegion].map((item) => (
           <div key={item.term}>
-            <dt className="font-medium text-ink">{item.term}</dt>
-            <dd className="text-ink-muted">{item.text}</dd>
+            <dt className="font-semibold text-ink">{item.term}</dt>
+            <dd className="mt-0.5 text-ink-muted">{item.text}</dd>
           </div>
         ))}
       </dl>

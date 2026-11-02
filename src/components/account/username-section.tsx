@@ -18,14 +18,18 @@ export function UsernameSection({
     <div>
       {headed ? (
         <>
-          <h3 className="text-sm font-medium text-ink">{labels.legend}</h3>
-          <p className="mt-1 text-sm text-ink-muted">{labels.description}</p>
+          <h3 className="font-sans text-sm font-semibold text-ink">{labels.legend}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+            {labels.description}
+          </p>
         </>
       ) : null}
 
       <div className={headed ? "mt-4" : undefined}>
-        <p className="text-xs font-medium text-ink-muted">{labels.current}</p>
-        <p className="tabular mt-1 text-lg font-medium break-words text-ink">
+        <p className="text-xs font-semibold tracking-[0.14em] text-ink-muted uppercase">
+          {labels.current}
+        </p>
+        <p className="tabular mt-1 text-lg font-semibold break-words text-ink">
           @{identity.username}
         </p>
       </div>
@@ -33,14 +37,16 @@ export function UsernameSection({
       {identity.editable ? (
         <>
           {identity.source === "generated" ? (
-            <p className="mt-2 text-sm text-ink-muted">{labels.generated}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              {labels.generated}
+            </p>
           ) : null}
           <div className="mt-4 border-t border-border pt-4">
             <UsernameForm identity={identity} labels={labels} />
           </div>
         </>
       ) : (
-        <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
+        <p className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-ink-muted">
           <Lock aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           <span>{labels.managed}</span>
         </p>

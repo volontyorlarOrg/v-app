@@ -50,32 +50,32 @@ export function NextUp({
         return (
           <li
             key={id}
-            className="grid grid-cols-[3rem_1fr] gap-x-3 border-t border-border px-5 py-3 first:border-t-0"
+            className="grid grid-cols-[3.5rem_1fr] gap-x-4 border-t border-border px-5 py-4 first:border-t-0"
           >
-            <div className="self-start rounded-md bg-surface-soft py-1 text-center">
+            <div className="rounded-lg bg-surface-soft py-2 text-center">
               <time
                 dateTime={opportunity.startsAt}
-                className="figure block text-xl text-primary"
+                className="display-face tabular block text-3xl leading-none text-primary-ink"
               >
                 {format.dateTime(starts, { day: "numeric" })}
               </time>
-              <span className="block text-xs text-primary">
+              <span className="mt-1 block text-xs font-semibold tracking-[0.1em] text-primary-ink uppercase">
                 {format.dateTime(starts, { month: "short" })}
               </span>
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-medium text-balance">
+              <h3 className="text-base font-semibold text-balance">
                 <Link
                   href={opportunityHref(opportunity.slug)}
-                  className="text-ink hover:text-primary"
+                  className="text-ink hover:text-primary-ink"
                 >
                   {opportunity.title}
                 </Link>
               </h3>
-              <p className="text-sm text-ink-muted">
+              <p className="mt-1 text-sm text-ink-muted">
                 {opportunity.organization.name} · {placeOf(opportunity, opportunities)}
               </p>
-              <p className="tabular text-sm text-ink-muted">
+              <p className="tabular mt-1 text-sm text-ink-muted">
                 {eventSchedule(opportunity, format, "weekday")}
               </p>
             </div>

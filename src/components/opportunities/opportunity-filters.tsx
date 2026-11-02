@@ -74,7 +74,7 @@ export function OpportunityFilters({
       action={action}
       onSubmit={onSubmit}
       aria-label={labels.legend}
-      className="flex flex-wrap items-center gap-2"
+      className="flex flex-wrap items-center gap-3"
     >
       {hiddenValues.map((hidden) => (
         <input
@@ -92,7 +92,7 @@ export function OpportunityFilters({
         </label>
         <Search
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted"
+          className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ink-muted"
         />
         <Input
           key={filters.q}
@@ -101,13 +101,13 @@ export function OpportunityFilters({
           type="search"
           defaultValue={filters.q}
           placeholder={labels.searchPlaceholder}
-          className="pl-9"
+          className="min-h-11 pl-11 text-sm"
         />
       </div>
 
       <nav
         aria-label={labels.kinds}
-        className="flex min-h-(--control) w-full gap-0.5 sm:w-auto"
+        className="flex min-h-11 w-full gap-1 rounded-lg border border-border bg-surface p-0.5 sm:w-auto"
       >
         {kinds.map((kind) => (
           <Link
@@ -116,9 +116,9 @@ export function OpportunityFilters({
             scroll={false}
             aria-current={kind.active ? "page" : undefined}
             className={cn(
-              "inline-flex flex-1 items-center justify-center rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors sm:flex-none",
+              "inline-flex min-h-10 flex-1 items-center justify-center rounded-md px-4 text-sm font-semibold whitespace-nowrap transition-colors sm:flex-none",
               kind.active
-                ? "bg-surface-soft text-primary"
+                ? "bg-action text-knockout"
                 : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
             )}
           >
@@ -133,7 +133,7 @@ export function OpportunityFilters({
         </label>
         <MapPin
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-ink-muted"
+          className="pointer-events-none absolute top-1/2 left-3.5 z-10 size-4 -translate-y-1/2 text-primary"
         />
         <NativeSelect
           id="filter-region"
@@ -144,7 +144,7 @@ export function OpportunityFilters({
               region: parseOpportunityFilters({ region: event.target.value }).region,
             })
           }
-          className="pl-9"
+          className="min-h-11 pl-10 text-sm"
         >
           <NativeSelectOption value="">{labels.regionAny}</NativeSelectOption>
           {regions.map((option) => (
@@ -155,7 +155,7 @@ export function OpportunityFilters({
         </NativeSelect>
       </div>
 
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-center gap-2.5">
         <SwitchControl
           id={savedId}
           checked={savedOnly}
@@ -165,7 +165,7 @@ export function OpportunityFilters({
         <label
           id={`${savedId}-label`}
           htmlFor={savedId}
-          className="text-sm whitespace-nowrap text-ink"
+          className="text-sm font-semibold whitespace-nowrap text-ink"
         >
           {labels.savedOnly}
         </label>

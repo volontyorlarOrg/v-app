@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Onest, Source_Serif_4 } from "next/font/google";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -11,10 +11,15 @@ import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
 import { siteOrigin } from "@/lib/seo/origin";
 import "./globals.css";
 
-const inter = Inter({
+const onest = Onest({
   subsets: ["latin", "latin-ext", "cyrillic"],
-  axes: ["opsz"],
-  variable: "--font-inter",
+  variable: "--font-onest",
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-source-serif",
   display: "swap",
 });
 
@@ -37,7 +42,7 @@ export default async function GlobalNotFound() {
       lang={defaultLocale}
       data-theme="light"
       suppressHydrationWarning
-      className={`${inter.variable} h-full`}
+      className={`${onest.variable} ${sourceSerif.variable} h-full`}
     >
       <head>
         <ThemeScript />
@@ -45,7 +50,9 @@ export default async function GlobalNotFound() {
       <body className="flex min-h-full flex-col">
         <main className="container-page flex flex-1 flex-col justify-center py-20">
           <BrandIcon className="size-12" />
-          <p className="mt-8 text-xs font-medium text-ink-muted">404</p>
+          <p className="mt-8 text-xs font-bold tracking-[0.14em] text-ink-muted uppercase">
+            404
+          </p>
           <ul className="mt-6 space-y-8">
             {messages.map(({ locale, t }, index) => {
               const Heading = index === 0 ? "h1" : "h2";
@@ -58,7 +65,7 @@ export default async function GlobalNotFound() {
                   <p className="mt-2 text-ink-muted">{t("description")}</p>
                   <a
                     href={navHref(HOME_ROUTE)}
-                    className="mt-3 inline-flex min-h-11 items-center font-medium text-primary underline underline-offset-4"
+                    className="mt-3 inline-flex min-h-11 items-center font-semibold text-primary-ink underline underline-offset-4"
                   >
                     {t("action")}
                     <span className="ml-2 text-sm font-normal text-ink-muted">

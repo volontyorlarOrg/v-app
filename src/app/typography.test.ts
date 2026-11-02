@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 
 const ROOT = process.cwd();
 const CSS = readFileSync(join(ROOT, "src/app/globals.css"), "utf8");
-const LAYOUT = readFileSync(join(ROOT, "src/app/[locale]/layout.tsx"), "utf8");
 
 function sourceFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((entry) => {
@@ -14,74 +13,54 @@ function sourceFiles(directory: string): string[] {
   });
 }
 
-function offenders(pattern: RegExp): string[] {
-  return sourceFiles(join(ROOT, "src")).flatMap((file) =>
-    pattern.test(readFileSync(file, "utf8")) ? [file.replace(`${ROOT}/`, "")] : [],
-  );
-}
-
 describe("typography", () => {
-  it("sets the whole interface in one family", () => {
-    expect(CSS).toMatch(/--font-sans:\s*var\(--font-inter\)/);
-    expect(CSS).not.toMatch(/--font-serif|--font-onest/);
-    expect(offenders(/Source_Serif_4|font-serif/)).toEqual([]);
+  it("declares a display serif alongside the interface sans", () => {
+    expect(CSS).toMatch(/--font-sans:\s*var\(--font-onest\)/);
+    expect(CSS).toMatch(/--font-serif:\s*var\(--font-source-serif\)/);
   });
 
-  it("loads Inter with its optical sizes and the scripts all three languages need", () => {
-    expect(LAYOUT).toMatch(/axes:\s*\["opsz"\]/);
-    expect(LAYOUT).toMatch(/subsets:\s*\["latin", "latin-ext", "cyrillic"\]/);
+  it("gives headings the serif at regular weight without a class", () => {
+    const base = CSS.slice(CSS.indexOf("h1,"), CSS.indexOf("::selection"));
+    expect(base).toContain(".display-face");
+    expect(base).toContain("--font-serif");
+    expect(base).toMatch(/font-weight:\s*400/);
   });
 
-  it("gives headings their weight from the base layer", () => {
-    const base = CSS.slice(CSS.indexOf("  h1 {"), CSS.indexOf(".lucide"));
-    expect(base).toMatch(/h1 \{\s*font-weight:\s*600/);
-    expect(base).toMatch(/h2 \{\s*font-weight:\s*600/);
-    expect(base).toMatch(/h3 \{\s*font-weight:\s*500/);
+  it("never sets the display faces bold, which would undo the register", () => {
+    const offenders: string[] = [];
+
+    for (const file of sourceFiles(join(ROOT, "src"))) {
+      const source = readFileSync(file, "utf8");
+      for (const [line] of source.matchAll(
+        /^.*(text-display|text-headline|text-figure|display-face|greeting-display).*$/gm,
+      )) {
+        if (/font-bold|font-extrabold|font-black/.test(line)) {
+          offenders.push(`${file.replace(`${ROOT}/`, "")}: ${line.trim()}`);
+        }
+      }
+    }
+
+    expect(offenders).toEqual([]);
   });
 
-  it("uses three weights and never bold", () => {
-    expect(offenders(/\bfont-(bold|extrabold|black|light|thin)\b/)).toEqual([]);
-    expect(CSS).not.toMatch(/font-weight:\s*(700|800|900)/);
-  });
-
-  it("writes no label in capitals, because Uzbek and Russian read badly that way", () => {
-    expect(offenders(/\buppercase\b/)).toEqual([]);
-    expect(CSS).not.toMatch(/text-transform:\s*uppercase/);
-  });
-
-  it("never spreads letters apart", () => {
-    expect(offenders(/tracking-\[0\.\d+em\]/)).toEqual([]);
-    expect(CSS).not.toMatch(/letter-spacing:\s*0\.\d+em/);
-  });
-
-  it("keeps a figure's digits aligned", () => {
-    const figure = CSS.slice(CSS.indexOf(".figure {"));
-    expect(figure.slice(0, figure.indexOf("}"))).toContain("tabular-nums");
+  it("keeps the display scale ahead of the body scale", () => {
+    const size = (token: string) => {
+      const match = CSS.match(new RegExp(`--text-${token}:\\s*clamp\\(([^,]+),`));
+      if (!match?.[1]) throw new Error(`no --text-${token} in globals.css`);
+      return Number.parseFloat(match[1]);
+    };
+    expect(size("display")).toBeGreaterThan(size("headline"));
+    expect(size("headline")).toBeGreaterThan(size("lead"));
+    expect(size("figure")).toBeGreaterThan(size("lead"));
   });
 
   it("uses no literal hex colour outside the token block", () => {
-    expect(offenders(/#[0-9a-fA-F]{6}\b/)).toEqual([]);
-  });
-});
-
-describe("corners in components", () => {
-  it("uses no radius above the scale", () => {
-    expect(offenders(/\brounded-(2xl|3xl|4xl)\b/)).toEqual([]);
-  });
-
-  it("does not build a button as a pill", () => {
-    const button = readFileSync(join(ROOT, "src/components/ui/button.tsx"), "utf8");
-    expect(button).not.toContain("rounded-full");
-    expect(button).toContain("rounded-md");
-  });
-});
-
-describe("colour in components", () => {
-  it("does not spell a token that no longer exists", () => {
-    expect(
-      offenders(
-        /\b(?:bg|text|border|fill|stroke|ring|outline)-(?:shell|band|primary-ink|primary-deep|primary-muted)\b/,
-      ),
-    ).toEqual([]);
+    const offenders: string[] = [];
+    for (const file of sourceFiles(join(ROOT, "src"))) {
+      const source = readFileSync(file, "utf8");
+      if (/#[0-9a-fA-F]{6}\b/.test(source))
+        offenders.push(file.replace(`${ROOT}/`, ""));
+    }
+    expect(offenders).toEqual([]);
   });
 });

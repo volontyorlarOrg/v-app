@@ -1,5 +1,6 @@
 "use client";
 
+import { IdCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 
@@ -75,13 +76,22 @@ export function OnboardingResume({
   return (
     <section
       aria-labelledby="onboarding-resume-title"
-      className="mt-4 flex flex-col gap-3 rounded-lg border border-border bg-surface px-5 py-4 shadow-panel sm:flex-row sm:items-center"
+      className="enter-rise mt-6 flex flex-col gap-4 rounded-xl border border-border bg-surface px-5 py-4 [--enter-delay:220ms] sm:flex-row sm:items-center"
     >
+      <span
+        aria-hidden="true"
+        className="hidden size-11 shrink-0 items-center justify-center rounded-full bg-surface-soft text-primary-ink sm:inline-flex"
+      >
+        <IdCard className="size-5" />
+      </span>
       <div className="min-w-0 flex-1">
-        <h2 id="onboarding-resume-title" className="text-sm font-semibold text-ink">
+        <h2
+          id="onboarding-resume-title"
+          className="font-sans text-base font-semibold text-ink"
+        >
           {labels.title}
         </h2>
-        <p className="text-sm text-ink-muted">
+        <p className="mt-0.5 text-sm text-ink-muted">
           {labels.bodyByDone[done] ?? labels.bodyByDone[0]}
         </p>
         <StepRail
