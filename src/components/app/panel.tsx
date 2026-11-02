@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
 import {
@@ -16,10 +15,9 @@ export function PanelAction({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex min-h-8 shrink-0 items-center gap-1 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+      className="inline-flex min-h-6 shrink-0 items-center text-sm font-medium text-primary underline-offset-4 hover:underline"
     >
       {label}
-      <ArrowRight aria-hidden="true" className="size-4" />
     </Link>
   );
 }

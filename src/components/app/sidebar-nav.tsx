@@ -21,9 +21,9 @@ export function SidebarNav({
   const pathname = usePathname();
 
   return (
-    <nav aria-label={label} className="flex flex-col gap-2">
+    <nav aria-label={label} className="flex flex-col gap-1">
       {lead}
-      <ul className="flex flex-col gap-1">
+      <ul className="flex flex-col gap-0.5">
         {items.map((item) => {
           const Icon = routeIcon(item.key);
           const active = isSectionActive(pathname, item.key);
@@ -33,22 +33,13 @@ export function SidebarNav({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors",
+                  "flex min-h-(--control-sm) items-center gap-2.5 rounded-md px-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-shell-active text-shell-active-ink"
-                    : "text-shell-muted hover:bg-shell-raised hover:text-shell-ink",
+                    ? "bg-sidebar-active text-primary"
+                    : "text-ink-muted hover:bg-sidebar-hover hover:text-ink",
                 )}
               >
-                <Icon
-                  aria-hidden="true"
-                  className={cn(
-                    "size-5 shrink-0 transition-colors",
-                    active
-                      ? "text-shell-active-ink"
-                      : "text-shell-muted group-hover:text-shell-ink",
-                  )}
-                  strokeWidth={active ? 2.25 : 2}
-                />
+                <Icon aria-hidden="true" className="size-4.5 shrink-0" />
                 {item.label}
               </Link>
             </li>

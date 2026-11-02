@@ -44,10 +44,7 @@ export function ProfileSocialLinks({
   if (links.length === 0) return null;
 
   return (
-    <ul
-      aria-label={label}
-      className="flex min-w-0 flex-wrap gap-x-4 gap-y-2 sm:flex-col sm:items-start"
-    >
+    <ul aria-label={label} className="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
       {links.map((link) => {
         const Icon = ICONS[link.platform];
         return (
@@ -57,9 +54,9 @@ export function ProfileSocialLinks({
               target="_blank"
               rel="noopener noreferrer nofollow"
               aria-label={`${platformLabels[link.platform]}: @${link.handle}`}
-              className="inline-flex min-h-9 max-w-full items-center gap-2 rounded-lg text-sm font-semibold text-primary-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-md text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <Icon aria-hidden="true" className="size-4 shrink-0" />
+              <Icon aria-hidden="true" className="size-3.5 shrink-0" />
               <span className="truncate">@{link.handle}</span>
             </a>
           </li>

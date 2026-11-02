@@ -145,8 +145,8 @@ function FormSection({
       className="grid scroll-mt-20 gap-4 border-t border-border pt-6 first:border-t-0 first:pt-0 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10"
     >
       <div>
-        <h3 className="font-sans text-sm font-semibold text-ink">{title}</h3>
-        <p className="mt-1 text-sm leading-relaxed text-ink-muted">{help}</p>
+        <h3 className="text-sm font-medium text-ink">{title}</h3>
+        <p className="mt-1 text-sm text-ink-muted">{help}</p>
       </div>
       <div className="min-w-0">{children}</div>
     </div>

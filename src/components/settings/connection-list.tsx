@@ -30,13 +30,11 @@ export function ConnectionList({
       {states.map((state) => (
         <li
           key={state.provider}
-          className="flex flex-wrap items-center gap-4 py-4 first:pt-0 last:pb-0"
+          className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0"
         >
-          <span className="inline-grid size-10 shrink-0 place-items-center rounded-full bg-surface-soft text-primary-ink">
-            {MARKS[state.provider]}
-          </span>
+          <span className="shrink-0 text-primary">{MARKS[state.provider]}</span>
           <div className="min-w-0 flex-1">
-            <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
+            <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-ink">
               {t(state.provider)}
               {state.verified ? (
                 <StateChip tone="structure" icon={<ShieldCheck aria-hidden="true" />}>
@@ -109,10 +107,7 @@ function ConnectAction({
         >
           {t("connectGoogle")}
         </button>
-        <span
-          id="google-connect-unavailable"
-          className="text-xs leading-relaxed text-ink-muted"
-        >
+        <span id="google-connect-unavailable" className="text-xs text-ink-muted">
           {t("googleUnavailable")}
         </span>
       </span>

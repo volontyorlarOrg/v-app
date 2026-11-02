@@ -279,7 +279,7 @@ export function AnswersForm({
               {" "}
               <a
                 href={labels.profileLink.href}
-                className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                className="font-medium text-primary underline-offset-4 hover:underline"
               >
                 {labels.profileLink.label}
               </a>

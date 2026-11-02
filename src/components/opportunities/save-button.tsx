@@ -38,21 +38,19 @@ export function SaveButton({
           disabled={save.isPending}
           onClick={() => save.mutate(!save.optimistic)}
           className={cn(
-            "inline-flex size-11 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors disabled:opacity-70",
-            save.optimistic
-              ? "border-accent bg-accent text-knockout"
-              : "border-border bg-surface/85 text-ink hover:bg-surface hover:text-primary-ink",
+            "inline-flex size-(--control-sm) items-center justify-center rounded-md bg-surface transition-colors hover:bg-surface-sunk disabled:opacity-50",
+            save.optimistic ? "text-accent" : "text-ink-muted hover:text-ink",
           )}
         >
           <Bookmark
             aria-hidden="true"
-            className={cn("size-5", save.optimistic && "fill-current")}
+            className={cn("size-4", save.optimistic && "fill-current")}
           />
         </button>
         {save.isError ? (
           <span
             role="alert"
-            className="mt-1.5 rounded-md bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-ink-muted shadow-raised"
+            className="mt-1 rounded-sm bg-surface px-1.5 py-0.5 text-xs whitespace-nowrap text-ink-muted shadow-raised"
           >
             {errorLabel}
           </span>
@@ -69,9 +67,9 @@ export function SaveButton({
         disabled={save.isPending}
         onClick={() => save.mutate(!save.optimistic)}
         className={cn(
-          "inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors disabled:opacity-70",
+          "inline-flex min-h-(--control-sm) items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors disabled:opacity-50",
           save.optimistic
-            ? "bg-surface-soft text-primary-ink"
+            ? "bg-surface-soft text-primary"
             : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
         )}
       >
@@ -82,7 +80,7 @@ export function SaveButton({
         {save.optimistic ? savedLabel : saveLabel}
       </button>
       {save.isError ? (
-        <span role="alert" className="px-4 text-xs text-ink-muted">
+        <span role="alert" className="px-2.5 text-xs text-ink-muted">
           {errorLabel}
         </span>
       ) : null}

@@ -11,14 +11,15 @@ a volunteer signs in, keeps a reusable profile, applies to opportunities, and
 builds a participation record. Read this file before meaningful work, then use
 [`docs/README.md`](docs/README.md) to load only the context the task needs.
 
-It follows the same codebase patterns and system design as the marketing site
-in `../v-web`: the same tokens, typefaces, theme and motion system, route
-registry, catalog layout, documentation layout, and verification loop. When the
-two disagree, check whether `v-web` moved first; the design system is sourced
-from there.
+It follows the same codebase patterns as the marketing site in `../v-web`: the
+theme and route registry, catalog layout, documentation layout, and verification
+loop. **Its look is its own since 2026-11-02:** one calm blue, white panels on a soft
+ground beside a pale blue sidebar, Inter, a moderate radius scale, described in [`DESIGN.md`](DESIGN.md). Do not copy tokens from
+`v-web` into this repository; the reason is in
+`.agent-memory/decisions/one-blue-on-white.md`.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
-navy sidebar that carries everything on desktop — the lockup and the
+pale blue sidebar that carries everything on desktop — the lockup and the
 notification bell, five sections (dashboard, opportunities, my activity,
 leaderboard, tasks), and
 at the foot the identity card, which is itself the profile's link, above
@@ -29,8 +30,8 @@ only tray. The theme switch and the
 interface language are a panel on `/settings`, not shell controls.
 Applications and saved items live inside the opportunities section, not
 sections of their own: saved items are the toolbar's "Saved only" switch, and
-applications are the outline link beside the page title. Only the sign-in pages keep the marketing site's
-whiteboard ground. See [`DESIGN.md`](DESIGN.md).
+applications are the outline link beside the page title. See
+[`DESIGN.md`](DESIGN.md).
 
 ## Product identity
 
@@ -193,8 +194,8 @@ authorisation.
 
 - Next.js 16 App Router, React 19, strict TypeScript with
   `noUncheckedIndexedAccess`, Node.js 22.13+
-- Tailwind CSS 4 with the semantic tokens copied from `v-web` in
-  `src/app/globals.css`
+- Tailwind CSS 4 with this app's semantic tokens in `src/app/globals.css`, and
+  Inter as the only typeface
 - `next-intl` for `uz` / `ru` / `en` routing and one catalog per locale
 - shadcn/ui components in `src/components/ui/`, built on `radix-ui`,
   `class-variance-authority`, `clsx`, `tailwind-merge` and Lucide icons; the
@@ -212,7 +213,7 @@ set switched by `data-theme` on `<html>` (`src/lib/theme.ts`), entry motion is
 CSS — the profile's rolling figures included (`RollingNumber` in
 `src/components/motion/`) — and `three` is isolated to one lazy object: the
 welcome flow's pass. The dashboard draws the volunteer's own pass — photo,
-name, level — in HTML and CSS, hanging on its strap. The one
+name, level — in HTML and CSS, as a blue card hanging on its strap. The one
 shared-element transition, the profile photo travelling into the editor and
 back, is React's `<ViewTransition>` behind `SharedElement`: the App Router
 ships the React canary that exports it, `src/types/react-canary.d.ts` brings
@@ -314,18 +315,19 @@ docs/                           -> stable project documentation and the plan
   `/profile/edit`; a sidebar section with no phone tab names the tab to light
   in `tabSection`, as My activity (`/record`) lights the dashboard's. Detail pages hang off a section through `opportunityHref`
   and `applicationHref`.
-- Two brand colours with a role each. **Blue is the institution**: navigation,
-  structure, chips for a system state, primary actions. **Orange is the
-  person**: the level reached, an accepted application, a confirmed attendance,
-  the record's figures, a completed profile, a saved opportunity. Blue and orange sit 1.25:1 apart
-  and must never be combined; the logo's orange heart is the one exception,
-  drawn by the kit as its own shape beside the blue. Each hue has a graphics
-  value and a text value. The palette has one red, `danger`, the same
-  values as the three portals, and it marks an action that leaves or destroys —
-  today only sign out (`danger-outline`). It is not an error colour: error
-  states stay on the soft surface and ink, and a validation red still needs a
-  decision before it is used (see the plan). Use semantic tokens, never a literal hex.
-  Solid fills use `action` and `band`, never `primary-ink`.
+- **One calm blue, and solid fills are for actions.** Solid blue marks what a
+  volunteer can act on, and soft tints of it carry state and small icons. The
+  volunteer's pass is the one large area of blue. **Orange is the person's**: the
+  level, a verified result, an acceptance, XP, a saved opportunity. Icons use `accent`,
+  text uses `accent-ink`, and it never fills a button or a large surface. The palette has one red, `danger`, the same values as the three portals,
+  and it marks an action that leaves or destroys — today only sign out
+  (`danger-outline`). It is not an error colour: error states stay on the sunk
+  surface in ink. Use semantic tokens, never a literal hex. Solid fills use
+  `action`; text and marks use `primary`. The logo keeps the kit's own colours and
+  never follows the interface blue.
+- **Corners and capitals.** The radius scale is 6 / 10 / 14 / 18, a button is never a
+  pill, and nothing is set in capitals or with spread letters. Use
+  `min-h-(--control)` for a control's height, so a phone keeps its 44px target.
 - Every screen is private. The root layout sends `noindex`, every response
   carries `X-Robots-Tag: noindex`, and `robots.txt` disallows all. Do not add
   an indexable route without the per-route policy in the plan.

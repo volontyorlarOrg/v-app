@@ -39,7 +39,7 @@ function Icon({
   className?: string;
 }) {
   const Glyph = reason === "unreachable" ? CloudOff : TriangleAlert;
-  return <Glyph aria-hidden="true" className={className} strokeWidth={1.75} />;
+  return <Glyph aria-hidden="true" className={className} />;
 }
 
 export function LoadErrorPanel({
@@ -58,16 +58,14 @@ export function LoadErrorPanel({
   return (
     <div role="alert" className={cn("mx-auto mt-6 w-full max-w-lg", className)}>
       <Panel className="text-center">
-        <span className="mx-auto inline-grid size-14 place-items-center rounded-full bg-surface-soft text-primary-ink">
-          <Icon reason={failure.reason} className="size-7" />
-        </span>
-        <p className="mt-4 text-lg font-semibold text-ink">
+        <Icon reason={failure.reason} className="mx-auto size-6 text-ink-muted" />
+        <p className="mt-3 text-base font-medium text-ink">
           {unreachable ? labels.title : labels.failedTitle}
         </p>
-        <p className="mx-auto mt-2 max-w-prose text-sm leading-relaxed text-ink-muted">
+        <p className="mx-auto mt-1 max-w-prose text-sm text-ink-muted">
           {unreachable ? labels.body : labels.failedBody}
         </p>
-        <div className="mt-5">
+        <div className="mt-4">
           {action ?? <RetryControls auto={failure.retryable} labels={labels} />}
         </div>
         {failure.reference ? (
@@ -94,13 +92,11 @@ export function LoadErrorRows({
   return (
     <div
       role="alert"
-      className={cn("flex flex-col items-center px-5 py-7 text-center", className)}
+      className={cn("flex flex-col items-center px-5 py-6 text-center", className)}
     >
-      <span className="inline-grid size-11 place-items-center rounded-full bg-surface-soft text-primary-ink">
-        <Icon reason={failure.reason} className="size-5" />
-      </span>
-      <p className="mt-3 font-semibold text-ink">{labels.section}</p>
-      <p className="mt-1 max-w-prose text-sm leading-relaxed text-ink-muted">
+      <Icon reason={failure.reason} className="size-5 text-ink-muted" />
+      <p className="mt-2 text-sm font-medium text-ink">{labels.section}</p>
+      <p className="mt-1 max-w-prose text-sm text-ink-muted">
         {unreachable ? labels.body : labels.failedBody}
       </p>
       <RetryControls auto={failure.retryable} labels={labels} className="mt-4" />

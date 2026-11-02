@@ -171,7 +171,7 @@ export function LanguagePicker({
             inputRef.current?.focus();
             setOpen(true);
           }}
-          className="relative flex min-h-12 w-full min-w-0 cursor-text scroll-mt-24 flex-wrap items-center gap-1.5 rounded-lg border border-input bg-field py-1.5 pr-10 pl-1.5 transition-colors hover:border-primary-ink has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-3 has-[input:focus-visible]:outline-primary-ink data-invalid:border-ink"
+          className="relative flex min-h-12 w-full min-w-0 cursor-text scroll-mt-24 flex-wrap items-center gap-1.5 rounded-md border border-input bg-field py-1.5 pr-10 pl-1.5 transition-colors hover:border-primary has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-3 has-[input:focus-visible]:outline-primary data-invalid:border-ink"
         >
           {selected.map((value) => {
             const label = labelOf.get(value) ?? value;
@@ -181,7 +181,7 @@ export function LanguagePicker({
                 type="button"
                 onClick={() => remove(value)}
                 aria-label={`${labels.remove}: ${label}`}
-                className="inline-flex min-h-8 max-w-full items-center gap-1 rounded-full bg-surface-soft py-1 pr-2 pl-3 text-sm font-medium text-primary-ink transition-colors hover:bg-primary-muted"
+                className="inline-flex min-h-7 max-w-full items-center gap-1 rounded-sm bg-surface-sunk py-0.5 pr-1.5 pl-2 text-sm text-ink transition-colors"
               >
                 <span className="truncate">{label}</span>
                 <X aria-hidden="true" className="size-3.5 shrink-0" />
@@ -215,7 +215,7 @@ export function LanguagePicker({
               }
             }}
             onKeyDown={onKeyDown}
-            className="min-h-9 min-w-16 flex-1 bg-transparent px-2.5 text-base text-foreground caret-primary-ink outline-none placeholder:text-muted-foreground"
+            className="min-h-9 min-w-16 flex-1 bg-transparent px-2.5 text-base text-foreground caret-primary outline-none placeholder:text-muted-foreground"
           />
           <ChevronDown
             aria-hidden="true"
@@ -243,7 +243,7 @@ export function LanguagePicker({
         className="w-(--radix-popover-trigger-width) overflow-hidden p-0"
       >
         {full ? (
-          <p className="border-b border-border px-4 py-2.5 text-xs leading-relaxed text-ink-muted">
+          <p className="border-b border-border px-4 py-2.5 text-xs text-ink-muted">
             {labels.limit}
           </p>
         ) : null}
@@ -264,7 +264,7 @@ export function LanguagePicker({
                 {group.label ? (
                   <div
                     id={`${id}-group-${group.key}`}
-                    className="px-2.5 pt-1.5 pb-1 text-xs font-semibold text-ink-muted"
+                    className="px-2.5 pt-1.5 pb-1 text-xs font-medium text-ink-muted"
                   >
                     {group.label}
                   </div>
@@ -334,18 +334,18 @@ function LanguageOptionRow({
       onClick={() => {
         if (!disabled) onPick(option.value);
       }}
-      className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2.5 text-sm text-ink select-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-active:bg-surface-soft"
+      className="flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2.5 text-sm text-ink select-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-active:bg-surface-soft"
     >
       <span
         aria-hidden="true"
         className={cn(
-          "grid size-[1.125rem] shrink-0 place-items-center rounded-sm border transition-colors duration-150",
+          "grid size-[1.125rem] shrink-0 place-items-center rounded-[0.25rem] border transition-colors duration-150",
           selected
             ? "border-action bg-action text-knockout"
             : "border-border-control bg-field",
         )}
       >
-        {selected ? <Check className="size-3" strokeWidth={3} /> : null}
+        {selected ? <Check className="size-3" /> : null}
       </span>
       <span className="min-w-0 flex-1 truncate">{option.label}</span>
     </li>
