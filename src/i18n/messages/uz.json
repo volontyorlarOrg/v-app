@@ -1229,5 +1229,31 @@
     "title": "Sahifa topilmadi",
     "description": "Bu sahifa mavjud emas yoki koʻchirilgan.",
     "action": "Bosh panelga oʻtish"
+  },
+  "reports": {
+    "trigger": "Muammo haqida xabar berish",
+    "title": "Muammo haqida xabar berish",
+    "help": "Bu sahifada nima ishlamaganini yozing. Jamoamiz xabaringizni koʻrib chiqadi.",
+    "description": "Qanday muammo yuz berdi?",
+    "placeholder": "Muammoni va qanday natija kutganingizni tasvirlang.",
+    "privacy": "Parollar, toʻlov maʼlumotlari va boshqa maxfiy maʼlumotlarni yozmang.",
+    "page": "Sahifa avtomatik biriktiriladi:",
+    "submit": "Xabar yuborish",
+    "pending": "Yuborilmoqda…",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "success": "Xabar yuborildi. Bizga maʼlum qilganingiz uchun rahmat.",
+    "fieldInvalid": "Muammoni 1–5 000 ta belgi bilan tasvirlang.",
+    "failure": "Xabar yuborilmadi. Matningiz saqlandi; qayta urinib koʻring.",
+    "errors": {
+      "rateLimitExceeded": "Oxirgi vaqtda bir nechta xabar yubordingiz. Bir soatdan keyin qayta urinib koʻring.",
+      "reportPageInvalid": "Sahifa manzilini biriktirib boʻlmadi. Shaklni yopib, qayta urinib koʻring.",
+      "reportDescriptionInvalid": "Tavsifdagi yashirin boshqaruv belgilarini olib tashlab, qayta urinib koʻring.",
+      "reportSubmissionConflict": "Bu xabar boshqa maʼlumotlar bilan yuborilgan. Shaklni yopib, yangi xabar oching.",
+      "validationFailed": "Muammo tavsifini tekshirib, qayta urinib koʻring.",
+      "forbidden": "Faqat hisobga kirgan koʻngillilar xabar yubora oladi.",
+      "network": "Serverga ulanib boʻlmadi. Matningiz saqlandi; qayta urinib koʻring.",
+      "timeout": "Yuborish juda uzoq davom etdi. Matningiz saqlandi; qayta urinib koʻring."
+    }
   }
 }
