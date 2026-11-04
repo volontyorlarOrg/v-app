@@ -21,7 +21,7 @@ export function deadlineState(
     return { kind: "later", days: Number.POSITIVE_INFINITY, date: deadline };
   }
 
-  if (now.getTime() > deadline.getTime()) return { kind: "passed" };
+  if (now.getTime() >= deadline.getTime()) return { kind: "passed" };
 
   const days = calendarDaysBetween(now, deadline);
 
@@ -43,10 +43,9 @@ export function displayStatus(
   opportunity: Pick<OpportunitySummary, "status" | "applicationDeadline">,
   now: Date = new Date(),
 ): DisplayStatus {
-  if (opportunity.status !== "open") return opportunity.status;
-
   const state = deadlineState(opportunity.applicationDeadline, now);
   if (state.kind === "passed") return "closed";
+  if (opportunity.status !== "open") return opportunity.status;
 
   return isClosingSoon(opportunity.applicationDeadline, now) ? "closingSoon" : "open";
 }

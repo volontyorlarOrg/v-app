@@ -92,7 +92,7 @@ export function decidedAt(
   }
 }
 
-const EDITABLE = new Set<ApplicationStatus>(["draft"]);
+const EDITABLE = new Set<ApplicationStatus>(["draft", "withdrawn"]);
 const WITHDRAWABLE = new Set<ApplicationStatus>([
   "submitted",
   "under_review",

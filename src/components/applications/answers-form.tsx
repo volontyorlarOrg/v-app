@@ -1,8 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useActionState, useId, useMemo, useRef, type FormEvent } from "react";
+import {
+  useActionState,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Button } from "@/components/ui/button";
@@ -77,8 +85,19 @@ export function AnswersForm({
     () => answersFormSchema(questions, essayRequired),
     [essayRequired, questions],
   );
-  const form = useForm({
-    resolver: zodResolver(schema),
+  const draftSchema = useMemo(
+    () => answersFormSchema(questions, essayRequired, false),
+    [essayRequired, questions],
+  );
+  const intentRef = useRef<"save" | "submit">("submit");
+  const [lastIntent, setLastIntent] = useState<"save" | "submit">("save");
+  const form = useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>({
+    resolver: (values, context, options) =>
+      zodResolver(intentRef.current === "save" ? draftSchema : schema)(
+        values,
+        context,
+        options,
+      ),
     defaultValues: answersFormValues(questions, answers, essay),
   });
   const [saveResult, save, saving] = useActionState(saveDraftAction, idleResult);
@@ -90,15 +109,17 @@ export function AnswersForm({
   const submitWith = useValidatedSubmit(form, formRef);
   const busy = saving || submitting;
   const hasDraftContent = essayRequired || questions.length > 0;
-  const latest = submitResult.status !== "idle" ? submitResult : saveResult;
+  const latest = lastIntent === "submit" ? submitResult : saveResult;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     const intent =
-      submitter instanceof HTMLButtonElement && submitter.value === "submit"
-        ? submit
-        : save;
-    return submitWith(intent)(event);
+      submitter instanceof HTMLButtonElement && submitter.value === "save"
+        ? "save"
+        : "submit";
+    intentRef.current = intent;
+    setLastIntent(intent);
+    return submitWith(intent === "save" ? save : submit)(event);
   }
 
   const { register, formState } = form;
@@ -257,7 +278,6 @@ export function AnswersForm({
         ) : null}
         <Button
           type="submit"
-          name="intent"
           value="submit"
           formAction={submit}
           disabled={busy}
@@ -267,7 +287,7 @@ export function AnswersForm({
         </Button>
       </div>
 
-      {saveResult.status === "ok" ? (
+      {lastIntent === "save" && saveResult.status === "ok" ? (
         <ActionStatus tone="done">{labels.savedDraft}</ActionStatus>
       ) : null}
 

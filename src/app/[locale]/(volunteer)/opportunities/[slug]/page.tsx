@@ -101,7 +101,10 @@ function Opportunity({
   const asksQuestions = opportunity.questions.length > 0;
   const asksEssay = opportunity.essayRequired;
   const needsApplicationForm = asksQuestions || asksEssay;
-  const sendable = application?.status === "draft" && !needsApplicationForm;
+  const reapplying = application?.status === "withdrawn";
+  const sendable =
+    (application?.status === "draft" && !needsApplicationForm) ||
+    (reapplying && applicable);
 
   return (
     <>
@@ -259,7 +262,7 @@ function Opportunity({
                 <ApplyForm
                   opportunityId={opportunity.id}
                   labels={{
-                    apply: t("detail.apply"),
+                    apply: reapplying ? t("detail.applyAgain") : t("detail.apply"),
                     applying: needsApplicationForm
                       ? t("detail.starting")
                       : t("detail.applying"),

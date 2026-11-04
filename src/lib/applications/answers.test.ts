@@ -68,6 +68,26 @@ const QUESTIONS: ApplicationQuestion[] = [
 describe("answersFormSchema", () => {
   const schema = answersFormSchema(QUESTIONS);
 
+  it("saves incomplete drafts while still checking lengths and available options", () => {
+    const draft = answersFormSchema(QUESTIONS, true, false);
+    expect(
+      draft.safeParse({ answer: { why: "", day: "", roles: [] }, essay: "" }).success,
+    ).toBe(true);
+    expect(
+      draft.safeParse({
+        answer: { why: "x".repeat(21), day: "", roles: [] },
+        essay: "",
+      }).success,
+    ).toBe(false);
+    expect(
+      draft.safeParse({ answer: { why: "", day: "sun", roles: [] }, essay: "" })
+        .success,
+    ).toBe(false);
+    expect(
+      schema.safeParse({ answer: { why: "", day: "", roles: [] }, essay: "" }).success,
+    ).toBe(false);
+  });
+
   it("names the form fields the way the server reads them", () => {
     expect(answerFieldName(QUESTIONS[0]!)).toBe("answer.why");
     expect(answerFieldName(QUESTIONS[2]!)).toBe("answer.roles[]");

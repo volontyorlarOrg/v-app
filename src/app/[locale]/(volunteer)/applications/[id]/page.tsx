@@ -51,18 +51,28 @@ export default async function ApplicationPage({
 
   const [opportunity, profile] = await Promise.all([
     getOpportunity(application.opportunity.slug),
-    application.profileSnapshot ? null : getProfile(),
+    isEditable(application.status) || !application.profileSnapshot
+      ? getProfile()
+      : null,
   ]);
 
-  const snapshot: ProfileSnapshot = application.profileSnapshot ?? {
+  const preparing =
+    application.status === "draft" ||
+    (application.status === "withdrawn" &&
+      opportunity !== null &&
+      canApply(opportunity, now));
+  const snapshot: ProfileSnapshot = (!preparing && application.profileSnapshot) || {
     fullName: profile?.fullName,
     bio: profile?.bio,
     region: profile?.region ?? undefined,
     hometownRegion: profile?.hometownRegion ?? undefined,
+    city: profile?.city,
     school: profile?.school,
+    gradeYear: profile?.gradeYear,
     languages: profile?.languages,
     phone: profile?.phone,
     telegram: profile?.telegram,
+    links: profile?.links,
   };
 
   return (
@@ -119,8 +129,9 @@ function Application({
   const questionById = new Map(
     (questions ?? []).map((question) => [question.id, question]),
   );
-  const draft = isEditable(application.status);
-  const sendable = draft && open && questions !== null && essayRequired !== null;
+  const draft = application.status === "draft";
+  const editable = isEditable(application.status) && (draft || open);
+  const sendable = editable && open && questions !== null && essayRequired !== null;
   const profileOnly =
     questions !== null && essayRequired === false && questions.length === 0;
   const confirmedHours = application.attendance?.confirmedHours;
@@ -275,7 +286,12 @@ function Application({
                 essay={application.essay ?? ""}
                 questions={fields}
                 answers={answers}
-                labels={answersLabels(t, navHref("profileEdit"))}
+                labels={{
+                  ...answersLabels(t, navHref("profileEdit")),
+                  ...(application.status === "withdrawn"
+                    ? { submit: t("detail.submitAgain") }
+                    : {}),
+                }}
               />
             </Panel>
           ) : sendable ? (
@@ -288,6 +304,9 @@ function Application({
                 answers={answers}
                 labels={{
                   ...answersLabels(t, navHref("profileEdit")),
+                  ...(application.status === "withdrawn"
+                    ? { submit: t("detail.submitAgain") }
+                    : {}),
                   ...(essayPrompt ? { essayLabel: essayPrompt } : {}),
                 }}
               />
@@ -336,7 +355,7 @@ function Application({
             </Panel>
           ) : null}
 
-          {application.reviewerNote ? (
+          {!editable && application.reviewerNote ? (
             <Panel id="reviewer-note" title={t("detail.reviewerNote")}>
               <p className="leading-relaxed whitespace-pre-line text-ink">
                 {application.reviewerNote}
@@ -399,7 +418,7 @@ function Application({
             id="snapshot"
             title={t("detail.fromProfile")}
             description={
-              draft ? t("detail.fromProfileDraft") : t("detail.fromProfileHelp")
+              editable ? t("detail.fromProfileDraft") : t("detail.fromProfileHelp")
             }
           >
             <dl className="grid gap-4 sm:grid-cols-2">
@@ -420,7 +439,7 @@ function Application({
             <OpportunityFacts
               opportunity={application.opportunity}
               now={now}
-              omit={draft ? [] : ["deadline", "capacity", "acceptance"]}
+              omit={editable ? [] : ["deadline", "capacity", "acceptance"]}
             />
             {questions === null ? null : (
               <Link

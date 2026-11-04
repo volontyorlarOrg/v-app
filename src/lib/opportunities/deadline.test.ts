@@ -58,6 +58,14 @@ describe("isClosingSoon", () => {
 });
 
 describe("displayStatus", () => {
+  it("closes full opportunities and stops accepting at the exact deadline", () => {
+    expect(displayStatus({ status: "full", applicationDeadline: at(-1) }, NOW)).toBe(
+      "closed",
+    );
+    expect(
+      canApply({ status: "open", applicationDeadline: NOW.toISOString() }, NOW),
+    ).toBe(false);
+  });
   it("closes an open opportunity whose deadline has passed", () => {
     expect(displayStatus({ status: "open", applicationDeadline: at(-2) }, NOW)).toBe(
       "closed",

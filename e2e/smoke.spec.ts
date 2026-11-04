@@ -1646,6 +1646,8 @@ test.describe("opportunities", () => {
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/\/applications\/app-remote-translation-support$/);
 
+    await page.getByRole("button", { name: "Save draft" }).click();
+    await expect(page.getByRole("status").last()).toContainText("Draft saved.");
     await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page.getByRole("alert").first()).toContainText(/required/i);
 
@@ -1657,6 +1659,18 @@ test.describe("opportunities", () => {
       0,
     );
     await expect(page.getByText("Uzbek and English")).toBeVisible();
+
+    await page.getByRole("button", { name: "Withdraw application" }).click();
+    await page.getByRole("button", { name: "Yes, withdraw" }).click();
+    await expect(
+      page.getByRole("button", { name: "Submit application again" }),
+    ).toBeVisible();
+    await expect(page.locator('select[name^="answer."]')).toHaveValue("uz-en");
+    await page.getByRole("button", { name: "Submit application again" }).click();
+    await expect(
+      page.getByRole("button", { name: "Withdraw application" }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/applications\/app-remote-translation-support$/);
   });
 
   test("applying to an opportunity that accepts automatically is accepted in one step", async ({
@@ -1705,6 +1719,17 @@ test.describe("opportunities", () => {
       page.getByRole("link", { name: "View your application" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
+
+    await gotoReady(page, "/applications/app-city-marathon-water-stations");
+    await page.getByRole("button", { name: "Withdraw application" }).click();
+    await page.getByRole("button", { name: "Yes, withdraw" }).click();
+    await expect(
+      page.getByRole("button", { name: "Submit application again" }),
+    ).toBeVisible();
+    await gotoReady(page, "/opportunities/city-marathon-water-stations");
+    await page.getByRole("button", { name: "Apply again" }).click();
+    await expect(page).toHaveURL(/\/applications\/app-city-marathon-water-stations$/);
+    await expect(page.getByText("Accepted", { exact: true }).first()).toBeVisible();
   });
 
   test("a closed opportunity cannot be applied to", async ({ page }) => {

@@ -79,23 +79,31 @@ function selectionsAnswer(question: ApplicationQuestion) {
 export function answersFormSchema(
   questions: readonly ApplicationQuestion[],
   essayRequired = false,
+  requireComplete = true,
 ) {
   return z.object({
     answer: z.object(
       Object.fromEntries(
-        questions.map((question) => [
-          question.id,
-          question.type === "multi_select"
-            ? selectionsAnswer(question)
-            : question.type === "single_select"
-              ? selectionAnswer(question)
-              : textAnswer(question),
-        ]),
+        questions.map((original) => {
+          const question = {
+            ...original,
+            required: requireComplete && original.required,
+          };
+          return [
+            question.id,
+            question.type === "multi_select"
+              ? selectionsAnswer(question)
+              : question.type === "single_select"
+                ? selectionAnswer(question)
+                : textAnswer(question),
+          ];
+        }),
       ),
     ),
-    essay: essayRequired
-      ? z.string().trim().min(1, "required").max(MAX_ESSAY_LENGTH, "tooLong")
-      : z.string().trim().max(MAX_ESSAY_LENGTH, "tooLong").optional(),
+    essay:
+      essayRequired && requireComplete
+        ? z.string().trim().min(1, "required").max(MAX_ESSAY_LENGTH, "tooLong")
+        : z.string().trim().max(MAX_ESSAY_LENGTH, "tooLong").optional(),
   });
 }
 
