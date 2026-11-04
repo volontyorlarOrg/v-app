@@ -553,7 +553,7 @@
       "fromProfileDraft": "What the organiser will see when you send your application.",
       "withdraw": "Withdraw application",
       "viewOpportunity": "View opportunity",
-      "withdrawConfirm": "Withdraw this application? This can't be undone.",
+      "withdrawConfirm": "Withdraw this application? You can apply again while the vacancy is open and places remain.",
       "withdrawYes": "Yes, withdraw",
       "withdrawing": "Withdrawing…",
       "cancel": "Cancel",
@@ -570,7 +570,8 @@
         "languages": "Languages",
         "skills": "Skills",
         "links": "Links"
-      }
+      },
+      "submitAgain": "Submit application again"
     },
     "attendance": {
       "title": "Attendance",
@@ -698,7 +699,8 @@
       "timesVary": "Times vary by day",
       "allDays": "{count, plural, =1 {Required on the day} other {All # days required}}",
       "someDays": "You can come on some of the days",
-      "essayPromptDescription": "You answer this in your own words before you submit your application."
+      "essayPromptDescription": "You answer this in your own words before you submit your application.",
+      "applyAgain": "Apply again"
     },
     "status": {
       "open": "Open",

@@ -52,8 +52,8 @@ function application(status: ApplicationStatus, startsAt: string): ApplicationSu
 }
 
 describe("application status predicates", () => {
-  it("only lets a draft be edited", () => {
-    expect(APPLICATION_STATUSES.filter(isEditable)).toEqual(["draft"]);
+  it("allows drafts and withdrawn applications to be prepared for submission", () => {
+    expect(APPLICATION_STATUSES.filter(isEditable)).toEqual(["draft", "withdrawn"]);
   });
 
   it("allows withdrawal while the organiser still holds the application", () => {

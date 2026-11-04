@@ -1736,12 +1736,23 @@ const server = createServer(async (request, response) => {
       (action === "draft" && method === "PATCH") ||
       (action === "submit" && method === "POST")
     ) {
-      if (item.status !== "draft")
+      if (!["draft", "withdrawn"].includes(item.status))
         return send(response, 409, { code: "applicationNotEditable" });
+      if (!applicable(opportunity))
+        return send(response, 409, { code: "opportunityUnavailable" });
       const answers = body.answers ?? {};
       const errors = validateAnswers(opportunity, answers, action === "submit");
       if (errors) return send(response, 400, { code: "invalidAnswers", errors });
       if (action === "submit" && refuseUnready(response, state)) return;
+      if (item.status === "withdrawn") {
+        item.status = "draft";
+        item.submittedAt = null;
+        item.reviewedAt = null;
+        item.withdrawnAt = null;
+        item.reviewerNote = null;
+        item.profileSnapshot = null;
+        item.attendance = null;
+      }
       item.answers = Object.entries(answers).map(([questionId, value]) => {
         const question = opportunity.questions.find(
           (candidate) => candidate.id === questionId,
@@ -1800,6 +1811,7 @@ const server = createServer(async (request, response) => {
         return send(response, 409, { code: "applicationCannotBeWithdrawn" });
       }
       item.status = "withdrawn";
+      item.attendance = null;
       item.withdrawnAt = new Date().toISOString();
       item.updatedAt = item.withdrawnAt;
       return send(response, 201, serializeApplication(state, item, true));

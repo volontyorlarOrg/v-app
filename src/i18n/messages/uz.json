@@ -553,7 +553,7 @@
       "fromProfileDraft": "Arizani yuborganingizda tashkilotchi koʻradigan maʼlumot.",
       "withdraw": "Arizani qaytarib olish",
       "viewOpportunity": "Imkoniyatni koʻrish",
-      "withdrawConfirm": "Arizani qaytarib olasizmi? Buni bekor qilib boʻlmaydi.",
+      "withdrawConfirm": "Arizani qaytarib olasizmi? Vakansiya ochiq va boʻsh joylar bor ekan, qayta ariza berishingiz mumkin.",
       "withdrawYes": "Ha, qaytarib olish",
       "withdrawing": "Qaytarib olinmoqda…",
       "cancel": "Bekor qilish",
@@ -570,7 +570,8 @@
         "languages": "Tillar",
         "skills": "Koʻnikmalar",
         "links": "Havolalar"
-      }
+      },
+      "submitAgain": "Arizani qayta yuborish"
     },
     "attendance": {
       "title": "Ishtirok",
@@ -698,7 +699,8 @@
       "timesVary": "Vaqt kunlarga qarab farq qiladi",
       "allDays": "{count, plural, =1 {Shu kuni qatnashish kerak} other {Barcha # kunda qatnashish majburiy}}",
       "someDays": "Kunlarning bir qismida kelishingiz mumkin",
-      "essayPromptDescription": "Arizani yuborishdan oldin bu savolga oʻz soʻzlaringiz bilan javob berasiz."
+      "essayPromptDescription": "Arizani yuborishdan oldin bu savolga oʻz soʻzlaringiz bilan javob berasiz.",
+      "applyAgain": "Qayta ariza berish"
     },
     "status": {
       "open": "Ochiq",

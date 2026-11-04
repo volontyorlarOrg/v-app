@@ -72,7 +72,7 @@ approved event is in their history as a `manual` entry.
 One volunteer's application to one opportunity, in one of `draft`,
 `submitted`, `under_review`, `accepted`, `rejected`, `withdrawn`, `closed` —
 the backend's `ApplicationStatus` enum. Three predicates replace scattered
-comparisons: `isEditable` (draft), `isWithdrawable` (submitted, under review,
+comparisons: `isEditable` (draft or withdrawn), `isWithdrawable` (submitted, under review,
 accepted), `isTerminal` (rejected, withdrawn, closed). An accepted application
 whose event is still ahead is an **upcoming commitment**, which is what the
 dashboard's first block shows. → `src/lib/applications/status.ts`
@@ -87,6 +87,16 @@ because the profile was incomplete, or an older application) is sent by the
 same Apply button. A draft belongs to the volunteer alone: the coordinator and
 administrator portals never list, count or open one.
 → `src/lib/opportunities/actions.ts`
+
+**Withdrawing permits a later application while places remain.** The vacancy
+offers Apply again, and the withdrawn application offers Submit application
+again while the opportunity is open and before its deadline. Both reuse the
+same application ID. Current questions, essay requirements, profile completion,
+capacity and acceptance mode apply again. Saving unfinished answers makes it a
+draft; submission refreshes its profile and answer snapshots and clears old
+decisions and instruction delivery. Other edits never rewrite a sent snapshot.
+Save draft allows incomplete required answers and essay; Submit requires them.
+Closed, rejected, accepted and pending applications cannot resubmit.
 
 **Each opportunity says how it accepts.** `acceptanceMode` is `manual` (the
 organiser reviews every application) or `automatic` (the backend accepts a

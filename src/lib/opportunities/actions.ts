@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 
 import { okResult, resultFromError, type ActionResult } from "@/lib/api/action-result";
 import { startApplication, submitApplication } from "@/lib/api/applications.server";
-import { isApiError } from "@/lib/api/errors";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { saveOpportunity, unsaveOpportunity } from "@/lib/api/saved.server";
 import { applicationHref } from "@/lib/routing/routes";
@@ -34,15 +33,6 @@ async function canSubmitFromProfile(slug: string): Promise<boolean> {
   );
 }
 
-async function send(applicationId: string): Promise<void> {
-  try {
-    await submitApplication(applicationId, {});
-  } catch (error) {
-    if (isApiError(error) && error.backendCode === "applicationNotEditable") return;
-    throw error;
-  }
-}
-
 export async function applyAction(
   _previous: ActionResult,
   formData: FormData,
@@ -54,10 +44,10 @@ export async function applyAction(
     const application = await startApplication(opportunityId);
     applicationId = application.id;
     if (
-      application.status === "draft" &&
+      (application.status === "draft" || application.status === "withdrawn") &&
       (await canSubmitFromProfile(application.opportunity.slug))
     ) {
-      await send(application.id);
+      await submitApplication(application.id, {});
     }
   } catch (error) {
     return resultFromError(error);

@@ -1302,7 +1302,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Replace the answers in an application draft */
+        /** Save a draft or prepare a withdrawn application again */
         patch: operations["ApplicationsController_saveDraft"];
         trace?: never;
     };
@@ -1315,7 +1315,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Validate and submit an application draft */
+        /** Submit a draft or resubmit a withdrawn application */
         post: operations["ApplicationsController_submit"];
         delete?: never;
         options?: never;
