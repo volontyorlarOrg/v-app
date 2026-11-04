@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 
 const PORT = Number(process.env.STUB_PORT ?? 3212);
 const APP_URL = process.env.E2E_APP_URL ?? "http://127.0.0.1:3211";
@@ -1271,6 +1272,23 @@ const server = createServer(async (request, response) => {
   if (path === "/auth/logout" && method === "POST") {
     sessions.delete(token);
     return send(response, 201, { loggedOut: true });
+  }
+  if (path === "/reports" && method === "POST") {
+    state.reports ??= new Map();
+    state.reportFailures ??= new Set();
+    if (
+      String(body.description).startsWith("__fail_once__") &&
+      !state.reportFailures.has(body.submissionId)
+    ) {
+      state.reportFailures.add(body.submissionId);
+      return send(response, 503, { code: "server" });
+    }
+    if (!state.reports.has(body.submissionId))
+      state.reports.set(body.submissionId, {
+        id: randomUUID(),
+        createdAt: new Date().toISOString(),
+      });
+    return send(response, 201, state.reports.get(body.submissionId));
   }
   if (path === "/auth/password/change" && method === "POST") {
     const currentEmail = state.account.email;

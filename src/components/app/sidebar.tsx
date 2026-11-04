@@ -7,6 +7,7 @@ import {
 import { SidebarIdentity } from "@/components/app/sidebar-identity";
 import { SidebarNav, type SidebarItem } from "@/components/app/sidebar-nav";
 import { BrandLockup } from "@/components/brand/logo";
+import { ReportProblemButton } from "@/components/reports/report-problem";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
 import { notificationLabels } from "@/lib/notifications/labels";
@@ -77,6 +78,7 @@ export function Sidebar({
             label={t("secondaryLabel")}
             lead={<SidebarIdentity user={user} label={t(IDENTITY_ROUTE)} />}
           />
+          <ReportProblemButton />
         </div>
       </aside>
     </div>

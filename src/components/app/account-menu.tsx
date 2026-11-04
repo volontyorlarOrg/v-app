@@ -1,9 +1,10 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { routeIcon } from "@/components/app/route-icons";
+import { ReportProblemButton } from "@/components/reports/report-problem";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -44,12 +45,14 @@ export function AccountMenu({
   items: readonly AccountMenuItem[];
 }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const close = () => setOpen(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
+          ref={triggerRef}
           type="button"
           aria-label={`${labels.menu}: ${name}`}
           className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface transition-colors hover:border-primary data-[state=open]:border-primary"
@@ -96,6 +99,13 @@ export function AccountMenu({
                 </li>
               );
             })}
+            <li>
+              <ReportProblemButton
+                variant="menu"
+                onClick={close}
+                returnFocusRef={triggerRef}
+              />
+            </li>
           </ul>
         </nav>
       </PopoverContent>

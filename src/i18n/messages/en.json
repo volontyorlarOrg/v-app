@@ -1229,5 +1229,31 @@
     "title": "Page not found",
     "description": "This page does not exist, or it has moved.",
     "action": "Go to the dashboard"
+  },
+  "reports": {
+    "trigger": "Report a problem",
+    "title": "Report a problem",
+    "help": "Tell us what went wrong on this page. The team will see your report.",
+    "description": "What went wrong?",
+    "placeholder": "Describe the problem and what you expected to happen.",
+    "privacy": "Please leave out passwords, payment details and other sensitive information.",
+    "page": "Page attached automatically:",
+    "submit": "Send report",
+    "pending": "Sending…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "success": "Report sent. Thank you for letting us know.",
+    "fieldInvalid": "Describe the problem in 1–5,000 characters.",
+    "failure": "Your report could not be sent. Your text is still here; please try again.",
+    "errors": {
+      "rateLimitExceeded": "You have sent several reports recently. Please try again in an hour.",
+      "reportPageInvalid": "This page address could not be attached. Close the form and try again.",
+      "reportDescriptionInvalid": "Remove hidden control characters from the description and try again.",
+      "reportSubmissionConflict": "This report was already sent with different details. Close the form and open a new report.",
+      "validationFailed": "Check the problem description and try again.",
+      "forbidden": "Only signed-in volunteers can send reports.",
+      "network": "The server could not be reached. Your text is still here; please try again.",
+      "timeout": "Sending took too long. Your text is still here; please try again."
+    }
   }
 }

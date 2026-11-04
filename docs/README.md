@@ -1,5 +1,7 @@
 # Volontyorlar App Documentation
 
+Volunteer reporting: [`product/REPORTS.md`](product/REPORTS.md).
+
 Use this file to route project questions to the smallest relevant source.
 
 | Task                                                                                  | Read                                                                                                                   |
