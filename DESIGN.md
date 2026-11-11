@@ -1,6 +1,6 @@
 ---
 name: Volontyorlar App
-description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, five sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
+description: The marketing site's tokens and type, applied to a product panel — a navy sidebar of flat links, four sections at the top and the account at the foot, panels raised off a flat workspace washed with the two hues, blue for the institution, orange for what the volunteer did, gold, silver and bronze for the top three alone, and a navy-tinted room after dark where every panel sits a step above the floor.
 colors:
   paper: "#F5F8FB"
   surface: "#FFFFFF"
@@ -181,8 +181,7 @@ components:
 
 The marketing site is a civic notice pinned to a whiteboard. The application
 is the room where a volunteer does their own work, and it is laid out like one:
-a navy sidebar that names five sections — dashboard, opportunities, my
-activity, leaderboard, tasks — at the top and the account — who you are, which opens the
+a navy sidebar that names four sections — dashboard, opportunities, leaderboard, tasks — at the top and the account — who you are, which opens the
 profile, then settings — at the foot, and a flat workspace carrying panels of content, with
 no top bar between them. Every entry in the sidebar is a plain link: nothing
 in it expands, and the only tray is the notification bell beside the lockup.
@@ -206,7 +205,7 @@ volunteer into the room.
 
 **Key characteristics**
 
-- A 16.5rem navy sidebar (`shell`) with five sections at the top, the
+- A 16.5rem navy sidebar (`shell`) with four sections at the top, the
   identity card (the profile's link) above settings at the foot,
   and no top bar on desktop; a 56px header and a five-tab bar (dashboard,
   opportunities, leaderboard, tasks, profile) on a phone. Nothing in the sidebar collapses. The active section sits on
@@ -243,7 +242,7 @@ volunteer into the room.
 
 | Region    | Desktop (≥ 64rem)                                                                                                                                                                                                                              | Phone                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the five sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
+| Sidebar   | Sticky, full height, `shell` navy: lockup and the notification bell, the four sections, then at the foot the identity card as the profile's link and settings — all plain links; sign out is the red button in the account card on `/settings` | Absent                                                                                                            |
 | Header    | Absent                                                                                                                                                                                                                                         | Sticky, `surface`, bottom hairline: lockup, bell, avatar (account menu: the name as the profile's link, settings) |
 | Workspace | `surface-sunk`, up to 80rem wide, 32px gutters, panels in a main column and a 22rem aside                                                                                                                                                      | 16px gutters, one column, the aside stacks after the main column                                                  |
 | Tab bar   | Absent                                                                                                                                                                                                                                         | Fixed, 56px, five destinations: dashboard, opportunities, leaderboard, tasks, profile                             |

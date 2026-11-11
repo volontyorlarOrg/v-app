@@ -163,8 +163,7 @@ registry: `primaryNavRoutes` for the stack under the lockup,
 `accountNavRoutes` for the stack at the foot (and for the phone's account
 menu, whose name block is the same profile link), `IDENTITY_ROUTE` for the
 identity card, `tabBarRoutes` for the thumbs, and `ROUTE_ICONS` for the glyphs. `/record` is
-**My activity**, the whole participation history, a primary sidebar section
-with no phone tab of its own: its `tabSection` keeps the dashboard tab lit
+**My activity**, the whole participation history, without a sidebar entry or phone tab of its own: its `tabSection` keeps the dashboard tab lit
 there, and the dashboard's "View all" and hours figure lead to it. The path is
 kept because `record` is already a reserved username in both this app and the
 backend, so no volunteer's `/<username>` can collide with it. Saved remains a

@@ -80,7 +80,6 @@ describe("app route registry", () => {
     ).toEqual([
       "dashboard",
       "opportunities",
-      "record",
       "leaderboard",
       "checkpoints",
       "settings",
@@ -100,11 +99,10 @@ describe("app route registry", () => {
     expect(guardFor("/leaderboard")).toBe("session");
   });
 
-  it("keeps the sidebar's primary group to five sections, My activity after opportunities", () => {
+  it("keeps the sidebar's primary group to four sections", () => {
     expect(primaryNavRoutes.map((route) => route.key)).toEqual([
       "dashboard",
       "opportunities",
-      "record",
       "leaderboard",
       "checkpoints",
     ]);
@@ -158,12 +156,13 @@ describe("app route registry", () => {
     expect(guardFor("/profiles/dilnoza_k")).toBe("session");
   });
 
-  it("gives the whole history, My activity, a sidebar section on the record URL but no phone tab", () => {
+  it("keeps My activity available on the record URL without a sidebar entry or phone tab", () => {
     const record = getRoute("record");
     expect(record.path).toBe("/record");
     expect(record.area).toBe("volunteer");
     expect(record.guard).toBe("session");
-    expect(record.navGroup).toBe("primary");
+    expect(record.navGroup).toBeNull();
+    expect(primaryNavRoutes).not.toContain(record);
     expect(record.inTabBar).toBe(false);
     expect(record.section).toBeNull();
     expect(tabBarRoutes).not.toContain(record);

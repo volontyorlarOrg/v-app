@@ -19,8 +19,7 @@ from there.
 
 It is not the marketing site's layout. The signed-in product is a **panel**: a
 navy sidebar that carries everything on desktop — the lockup and the
-notification bell, five sections (dashboard, opportunities, my activity,
-leaderboard, tasks), and
+notification bell, four sections (dashboard, opportunities, leaderboard, tasks), and
 at the foot the identity card, which is itself the profile's link, above
 settings — with no top bar; a slim header and a five-destination
 tab bar on a phone; and panels of content on a flat workspace. **Every

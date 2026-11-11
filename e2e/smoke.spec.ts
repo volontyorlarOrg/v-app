@@ -975,11 +975,8 @@ test.describe("the panel", () => {
     );
     await expect(page.getByRole("heading", { level: 1, name: "Tasks" })).toBeVisible();
 
-    if (mobile) {
-      await gotoReady(page, "/record");
-    } else {
-      await navigation.getByRole("link", { name: "My activity" }).click();
-    }
+    await expect(navigation.getByRole("link", { name: "My activity" })).toHaveCount(0);
+    await gotoReady(page, "/record");
     await expect(page).toHaveURL(/\/record$/);
     await expect(
       page.getByRole("heading", { level: 1, name: "My activity" }),
@@ -989,10 +986,6 @@ test.describe("the panel", () => {
         "aria-current",
         "page",
       );
-    } else {
-      await expect(
-        navigation.getByRole("link", { name: "My activity" }),
-      ).toHaveAttribute("aria-current", "page");
     }
 
     await navigation.getByRole("link", { name: "Leaderboard" }).click();
@@ -1196,7 +1189,7 @@ test.describe("the panel", () => {
     const sidebar = page.getByRole("complementary");
     await expect(
       page.getByRole("navigation", { name: "Main navigation" }).getByRole("link"),
-    ).toHaveCount(5);
+    ).toHaveCount(4);
     await expect(page.getByRole("banner")).toHaveCount(0);
     await expect(page.getByRole("button", { name: /Account menu/ })).toHaveCount(0);
 
