@@ -75,7 +75,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/record",
     area: "volunteer",
     guard: "session",
-    navGroup: "primary",
+    navGroup: null,
     inTabBar: false,
     section: null,
     tabSection: "dashboard",
