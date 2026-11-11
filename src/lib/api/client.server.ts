@@ -130,13 +130,18 @@ function nextFetch(
 ) {
   const { cache, revalidate, tags, accessToken } = init;
   return (request: Request) =>
-    fetch(request, {
-      cache: cache ?? (accessToken ? "no-store" : undefined),
-      next:
-        revalidate !== undefined || tags
-          ? { revalidate, tags: tags ? [...tags] : undefined }
-          : undefined,
-    });
+    fetch(
+      request,
+      accessToken || request.method !== "GET"
+        ? { cache: "no-store" }
+        : {
+            cache: cache ?? (revalidate === undefined ? "no-store" : undefined),
+            next:
+              revalidate !== undefined || tags
+                ? { revalidate, tags: tags ? [...tags] : undefined }
+                : undefined,
+          },
+    );
 }
 
 async function forwardedVisitor(): Promise<Record<string, string>> {
@@ -182,6 +187,7 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
     ...(await forwardedVisitor()),
   };
   const attempts = method === "GET" ? 2 : 1;
+  const combinedSignal = requestSignal(signal, timeoutMs);
   let data: unknown;
   let response: Response;
 
@@ -191,15 +197,17 @@ export async function api<TSchema extends z.ZodType | undefined = undefined>(
         params: { query: cleanQuery(query) },
         body,
         headers: outgoingHeaders,
-        signal: requestSignal(signal, timeoutMs),
+        signal: combinedSignal,
         parseAs: "text",
         fetch: nextFetch(init),
       }));
       break;
     } catch (cause) {
       const error = classifyApiError(cause);
-      if (attempt < attempts && isTransient(error) && !signal?.aborted) {
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      if (attempt < attempts && isTransient(error) && !combinedSignal.aborted) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, RETRY_DELAY_MS + Math.floor(Math.random() * 600)),
+        );
         continue;
       }
       logFailure(method, path, error);
