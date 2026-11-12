@@ -953,7 +953,8 @@
       "hours": "h",
       "notCounted": "History only",
       "empty": "Events you take part in will appear here.",
-      "more": "Show all {count}"
+      "more": "Show all {count}",
+      "profileCompleted": "Profile completed"
     },
     "visibility": {
       "title": "What others see",

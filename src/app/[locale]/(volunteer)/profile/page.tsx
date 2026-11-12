@@ -291,7 +291,11 @@ function Profile({
             <LoadErrorRows failure={history.failure} labels={errorLabels} />
           </div>
         ) : (
-          <ActivitySection own entries={activityOf(history.data)} />
+          <ActivitySection
+            own
+            entries={activityOf(history.data)}
+            rewards={history.data.rewards}
+          />
         )
       }
       note={

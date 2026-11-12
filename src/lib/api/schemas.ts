@@ -248,6 +248,15 @@ export const publicActivitySchema = z.object({
   countsTowardProgress: z.boolean().default(true),
 });
 
+export const rewardHistoryEntrySchema = z.object({
+  id: z.string().min(1),
+  key: z.string().min(1),
+  xpAwarded: z.number().int().positive(),
+  claimedAt: isoDate,
+});
+
+export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
+
 export const publicProfileSchema = z.object({
   displayName: z.string().min(1),
   username: usernameField,
@@ -285,6 +294,7 @@ export const publicProfileSchema = z.object({
     )
     .default([]),
   activity: z.array(publicActivitySchema).optional(),
+  rewards: z.array(rewardHistoryEntrySchema).default([]),
 });
 
 export const recordSchema = z.object({
@@ -337,6 +347,7 @@ export const participationEntrySchema = z.object({
 export const historySchema = z.object({
   items: z.array(participationEntrySchema),
   total: z.number().int(),
+  rewards: z.array(rewardHistoryEntrySchema).default([]),
 });
 
 export const notificationSchema = z

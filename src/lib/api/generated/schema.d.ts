@@ -3632,6 +3632,15 @@ export interface components {
             hours?: number;
             hoursVerified: boolean;
         };
+        CheckpointRewardHistoryDto: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            key: "profile";
+            xpAwarded: number;
+            /** Format: date-time */
+            claimedAt: string;
+        };
         ParticipationEntryDto: {
             /** Format: uuid */
             id: string;
@@ -3658,6 +3667,8 @@ export interface components {
             countsTowardProgress?: boolean;
         };
         ParticipationHistoryDto: {
+            /** @description Claimed rewards, separate from event participation and total. */
+            rewards: components["schemas"]["CheckpointRewardHistoryDto"][];
             items: components["schemas"]["ParticipationEntryDto"][];
             total: number;
         };
@@ -4429,6 +4440,8 @@ export interface components {
             pastEvents: components["schemas"]["PublicPastEventDto"][];
             /** @description Attended events and past events, newest first. Empty when hidden. */
             activity: components["schemas"]["PublicActivityDto"][];
+            /** @description Claimed rewards. Empty when activity is hidden. */
+            rewards: components["schemas"]["CheckpointRewardHistoryDto"][];
         };
         CreateBlogPostDto: {
             /** @enum {string} */

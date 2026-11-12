@@ -316,6 +316,22 @@ const CHECKPOINTS = [
   { key: "profile", group: "start", metric: "profileComplete", target: 1, xp: 50 },
 ];
 
+function rewardHistory(state) {
+  return CHECKPOINTS.flatMap((checkpoint) => {
+    const claimedAt = state.checkpointsClaimed?.get(checkpoint.key);
+    return claimedAt
+      ? [
+          {
+            id: `reward-${checkpoint.key}`,
+            key: checkpoint.key,
+            xpAwarded: checkpoint.xp,
+            claimedAt,
+          },
+        ]
+      : [];
+  });
+}
+
 const PROFILE_REWARD_LIMIT = 1000;
 
 const PROFILE_REQUIRED = [
@@ -1396,6 +1412,7 @@ const server = createServer(async (request, response) => {
           countsTowardProgress: item.countsTowardProgress,
         })),
       activity: shown("activity", activity, []),
+      rewards: shown("activity", isViewer ? rewardHistory(state) : [], []),
     });
   }
   if (path === "/me/username" && method === "PUT") {
@@ -1629,7 +1646,11 @@ const server = createServer(async (request, response) => {
   if (path === "/checkpoints" && method === "GET")
     return send(response, 200, checkpointList(state));
   if (path === "/record/history" && method === "GET")
-    return send(response, 200, { items: state.history, total: state.history.length });
+    return send(response, 200, {
+      items: state.history,
+      total: state.history.length,
+      rewards: rewardHistory(state),
+    });
   if (path === "/notifications" && method === "GET") {
     const items = currentNotifications(state);
     return send(response, 200, {
