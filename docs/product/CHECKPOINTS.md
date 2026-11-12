@@ -71,6 +71,16 @@ and English.
 The backend rules are in
 [`../../../v-backend/docs/architecture/CHECKPOINTS.md`](../../../v-backend/docs/architecture/CHECKPOINTS.md).
 
+## Profile history
+
+The own profile and other volunteers' profiles show "Profile completed" with
+the claimed XP and claim date in the activity timeline. `rewards` arrives from
+`GET /record/history` for the own profile and from the public-profile contract
+for visitors. It includes existing paid claims, once per merged account
+lineage. Unclaimed completions do not appear. Activity visibility covers
+rewards too. A reward contributes no event attendance or verified hours.
+Older API responses without `rewards` parse as an empty list during rollout.
+
 ## Verifying
 
 Unit tests cover the reward lookup, the places arithmetic, the field grouping

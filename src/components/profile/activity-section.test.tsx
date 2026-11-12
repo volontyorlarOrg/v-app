@@ -8,6 +8,7 @@ import {
 } from "@/components/profile/activity-section";
 import messages from "@/i18n/messages/en.json";
 import { formats } from "@/i18n/formats";
+import type { RewardHistoryEntry } from "@/lib/api/schemas";
 
 const attended: ProfileActivityEntry = {
   id: "a1",
@@ -48,7 +49,11 @@ const historyOnly: ProfileActivityEntry = {
   countsTowardProgress: false,
 };
 
-function renderSection(entries: ProfileActivityEntry[], own = false) {
+function renderSection(
+  entries: ProfileActivityEntry[],
+  own = false,
+  rewards: RewardHistoryEntry[] = [],
+) {
   return render(
     <NextIntlClientProvider
       locale="en"
@@ -56,12 +61,51 @@ function renderSection(entries: ProfileActivityEntry[], own = false) {
       formats={formats}
       timeZone="Asia/Tashkent"
     >
-      <ActivitySection entries={entries} own={own} />
+      <ActivitySection entries={entries} own={own} rewards={rewards} />
     </NextIntlClientProvider>,
   );
 }
 
 describe("ActivitySection", () => {
+  it("sorts claims and date-only events in Tashkent time and ignores unknown rewards", () => {
+    renderSection([{ ...attended, eventDate: "2026-09-10" }], true, [
+      {
+        id: "reward",
+        key: "profile",
+        xpAwarded: 50,
+        claimedAt: "2026-09-09T21:30:00.000Z",
+      },
+      {
+        id: "unknown",
+        key: "retired",
+        xpAwarded: 50,
+        claimedAt: "2026-09-11T12:00:00.000Z",
+      },
+    ]);
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent("Profile completed");
+    expect(items[1]).toHaveTextContent("City cleanup");
+  });
+  it.each([true, false])(
+    "shows a claimed profile reward on own=%s even without attended events",
+    (own) => {
+      renderSection([], own, [
+        {
+          id: "reward",
+          key: "profile",
+          xpAwarded: 50,
+          claimedAt: "2026-10-10T21:30:00.000Z",
+        },
+      ]);
+      const item = screen.getByRole("listitem");
+      expect(item).toHaveTextContent("Profile completed");
+      expect(item).toHaveTextContent("+50 XP");
+      expect(item).toHaveTextContent("Oct 11, 2026");
+      expect(item).not.toHaveTextContent(" h");
+      expect(item).not.toHaveTextContent("History only");
+    },
+  );
   it("names the section as the volunteer's own and lists each event with what it earned", () => {
     renderSection([attended, competition, historyOnly], true);
 

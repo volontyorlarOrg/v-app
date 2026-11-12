@@ -181,7 +181,7 @@ export default async function MemberProfilePage({
           socials={profileSocialLinks(profile)}
           figures={figures}
           rows={rows}
-          activity={<ActivitySection entries={activity} />}
+          activity={<ActivitySection entries={activity} rewards={profile.rewards} />}
           completion={null}
           labels={{
             figures: t("sheet.figures"),

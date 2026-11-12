@@ -221,6 +221,32 @@ describe("account schemas", () => {
 });
 
 describe("record and notification schemas", () => {
+  it("reads claimed rewards separately from event participation and defaults older responses to none", () => {
+    const reward = {
+      id: "reward",
+      key: "profile",
+      xpAwarded: 50,
+      claimedAt: "2026-10-10T21:30:00.000Z",
+    };
+    expect(
+      historySchema.parse({ items: [], total: 0, rewards: [reward] }).rewards,
+    ).toEqual([reward]);
+    expect(historySchema.parse({ items: [], total: 0 }).rewards).toEqual([]);
+    expect(
+      historySchema.safeParse({
+        items: [],
+        total: 0,
+        rewards: [{ ...reward, claimedAt: null }],
+      }).success,
+    ).toBe(false);
+    expect(
+      historySchema.safeParse({
+        items: [],
+        total: 0,
+        rewards: [{ ...reward, xpAwarded: 0 }],
+      }).success,
+    ).toBe(false);
+  });
   it("reads the record, the history and the saved list", () => {
     expect(
       recordSchema.parse({

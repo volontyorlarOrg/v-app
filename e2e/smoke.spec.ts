@@ -1116,6 +1116,33 @@ test.describe("the panel", () => {
       fullPage: true,
     });
 
+    for (const path of ["/profile", "/dilnoza_k"]) {
+      await gotoReady(page, path);
+      const reward = page
+        .getByRole("listitem")
+        .filter({ hasText: "Profile completed" });
+      await expect(reward).toHaveCount(1);
+      await expect(reward).toContainText("+50 XP");
+      await expect(reward.locator("time")).toHaveAttribute("dateTime", /T/);
+      for (const theme of ["light", "dark"] as const) {
+        await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
+        await page.reload();
+        await expect(reward).toBeVisible();
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+        await page.screenshot({
+          path: testInfo.outputPath(
+            `reward-${path === "/profile" ? "own" : "public"}-${theme}.png`,
+          ),
+          fullPage: true,
+          animations: "disabled",
+        });
+      }
+    }
+
     await gotoReady(page, "/dashboard");
     await expect(page.getByRole("region", { name: "Tasks" })).toHaveCount(0);
     await page

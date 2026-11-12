@@ -1,19 +1,12 @@
 import { useFormatter, useTranslations } from "next-intl";
 
-import type { Placement } from "@/lib/record/levels";
+import type { RewardHistoryEntry } from "@/lib/api/schemas";
+import {
+  profileActivityTimeline,
+  type ProfileActivityEntry,
+} from "@/lib/profile/activity";
 
-export type ProfileActivityEntry = {
-  id: string;
-  source: "attendance" | "manual";
-  kind: "volunteering" | "competition";
-  title: string;
-  organization: string;
-  eventDate: string;
-  hours: number | null;
-  placement: Placement | null;
-  xpAwarded: number;
-  countsTowardProgress: boolean;
-};
+export type { ProfileActivityEntry } from "@/lib/profile/activity";
 
 const LEAD = 6;
 
@@ -21,7 +14,11 @@ function eventDay(value: string): Date {
   return new Date(value.length > 10 ? value : `${value}T00:00:00Z`);
 }
 
-function ActivityList({ entries }: { entries: readonly ProfileActivityEntry[] }) {
+function ActivityList({
+  entries,
+}: {
+  entries: ReturnType<typeof profileActivityTimeline>;
+}) {
   const t = useTranslations("profile.activity");
   const record = useTranslations("record.history");
   const format = useFormatter();
@@ -29,6 +26,26 @@ function ActivityList({ entries }: { entries: readonly ProfileActivityEntry[] })
   return (
     <ul className="divide-y divide-border">
       {entries.map((entry) => {
+        if (entry.source === "checkpoint") {
+          return (
+            <li
+              key={`${entry.source}-${entry.id}`}
+              className="flex flex-wrap items-baseline gap-x-5 gap-y-1 py-3"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-ink">{t("profileCompleted")}</p>
+                <p className="text-sm text-ink-muted">
+                  <time dateTime={entry.claimedAt}>
+                    {format.dateTime(eventDay(entry.claimedAt), "dayYear")}
+                  </time>
+                </p>
+              </div>
+              <p className="tabular text-sm text-ink">
+                +{format.number(entry.xpAwarded)} XP
+              </p>
+            </li>
+          );
+        }
         const credited = entry.source === "attendance" || entry.countsTowardProgress;
         const facts = [
           entry.kind === "competition" && entry.placement
@@ -69,17 +86,20 @@ function ActivityList({ entries }: { entries: readonly ProfileActivityEntry[] })
 
 export function ActivitySection({
   entries,
+  rewards = [],
   own = false,
 }: {
   entries: readonly ProfileActivityEntry[];
+  rewards?: readonly RewardHistoryEntry[];
   own?: boolean;
 }) {
   const t = useTranslations("profile.activity");
+  const timeline = profileActivityTimeline(entries, rewards);
 
-  if (entries.length === 0 && !own) return null;
+  if (timeline.length === 0 && !own) return null;
 
-  const lead = entries.slice(0, LEAD);
-  const rest = entries.slice(LEAD);
+  const lead = timeline.slice(0, LEAD);
+  const rest = timeline.slice(LEAD);
 
   return (
     <section
@@ -90,7 +110,7 @@ export function ActivitySection({
       <h2 id="profile-activity" className="text-section text-ink">
         {own ? t("mine") : t("title")}
       </h2>
-      {entries.length === 0 ? (
+      {timeline.length === 0 ? (
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t("empty")}</p>
       ) : (
         <div className="mt-1">
@@ -98,7 +118,7 @@ export function ActivitySection({
           {rest.length > 0 ? (
             <details className="group border-t border-border">
               <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-primary-ink underline-offset-4 group-open:hidden hover:underline">
-                {t("more", { count: entries.length })}
+                {t("more", { count: timeline.length })}
               </summary>
               <ActivityList entries={rest} />
             </details>

@@ -953,7 +953,8 @@
       "hours": "soat",
       "notCounted": "Faqat tarix",
       "empty": "Qatnashgan tadbirlaringiz shu yerda koʻrinadi.",
-      "more": "Barchasini koʻrsatish: {count}"
+      "more": "Barchasini koʻrsatish: {count}",
+      "profileCompleted": "Profil toʻldirildi"
     },
     "visibility": {
       "title": "Boshqalarga koʻrinadigan qismlar",
