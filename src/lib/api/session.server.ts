@@ -7,6 +7,7 @@ import { api, type ApiRequest } from "@/lib/api/client.server";
 import { isApiError, isSessionOver } from "@/lib/api/errors";
 import { type SessionPayload } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
+import { LEGAL_CONSENT_REQUIRED } from "@/lib/legal/constants";
 
 export const SESSION_EXPIRED_PATH = "/api/auth/session/expired";
 
@@ -42,6 +43,9 @@ export async function authed<TSchema extends z.ZodType | undefined = undefined>(
       cache: "no-store",
     })) as AuthedResult<TSchema>;
   } catch (error) {
+    if (isApiError(error) && error.backendCode === LEGAL_CONSENT_REQUIRED) {
+      redirect("/consent");
+    }
     if (!isSessionOver(error)) throw error;
 
     return endSession();
@@ -49,5 +53,7 @@ export async function authed<TSchema extends z.ZodType | undefined = undefined>(
 }
 
 export function isMissing(error: unknown): boolean {
-  return isApiError(error) && (error.code === "notFound" || error.code === "validation");
+  return (
+    isApiError(error) && (error.code === "notFound" || error.code === "validation")
+  );
 }

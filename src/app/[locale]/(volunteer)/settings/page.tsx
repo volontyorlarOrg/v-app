@@ -22,7 +22,7 @@ import {
   PasswordForm,
   type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
-import { PublicProfileSection } from "@/components/settings/public-profile-section";
+import { PrivacySection } from "@/components/settings/privacy-section";
 import { buttonClass } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
 import {
@@ -45,6 +45,7 @@ import { requireSession } from "@/lib/api/session.server";
 import { isGoogleConfigured } from "@/lib/auth/config";
 import { initialsOf } from "@/lib/profile/initials";
 import type { Level } from "@/lib/record/levels";
+import { getLegalState } from "@/lib/legal/state.server";
 
 export const dynamic = "force-dynamic";
 
@@ -77,13 +78,14 @@ export default async function SettingsPage({
   setRequestLocale(locale);
 
   const { connect, password } = await searchParams;
-  const [session, me, requests, progress, format, t] = await Promise.all([
+  const [session, me, requests, progress, format, t, legal] = await Promise.all([
     requireSession(),
     getMe(),
     listMergeRequests(),
     settle(() => getProgress()),
     getFormatter({ locale }),
     getTranslations({ locale, namespace: "settings" }),
+    getLegalState(),
   ]);
 
   const now = new Date();
@@ -109,7 +111,8 @@ export default async function SettingsPage({
       level={progress.status === "loaded" ? progress.data.level : null}
       states={connectionStates(me)}
       username={usernameIdentity(me)}
-      publicProfileEnabled={me.publicProfileEnabled}
+      publicProfileEnabled={legal.publicProfile}
+      leaderboardEnabled={legal.leaderboard}
       email={me.email ?? null}
       hasPassword={me.authMethods.password}
       googleConfigured={isGoogleConfigured()}
@@ -135,6 +138,7 @@ function Settings({
   states,
   username,
   publicProfileEnabled,
+  leaderboardEnabled,
   email,
   hasPassword,
   googleConfigured,
@@ -150,6 +154,7 @@ function Settings({
   states: readonly ConnectionState[];
   username: UsernameIdentity;
   publicProfileEnabled: boolean;
+  leaderboardEnabled: boolean;
   email: string | null;
   hasPassword: boolean;
   googleConfigured: boolean;
@@ -338,14 +343,24 @@ function Settings({
               description={t("privacy.description")}
               className="scroll-mt-20"
             >
-              <PublicProfileSection
-                initialEnabled={publicProfileEnabled}
+              <PrivacySection
+                publicProfile={publicProfileEnabled}
+                leaderboard={leaderboardEnabled}
                 labels={{
-                  label: t("privacy.publicProfile"),
-                  description: t("privacy.publicProfileHelp"),
-                  visible: t("privacy.publicProfileVisible"),
-                  hidden: t("privacy.publicProfileHidden"),
+                  publicProfile: {
+                    label: t("privacy.publicProfile"),
+                    description: t("privacy.publicProfileHelp"),
+                    on: t("privacy.publicProfileVisible"),
+                    off: t("privacy.publicProfileHidden"),
+                  },
+                  leaderboard: {
+                    label: t("privacy.leaderboard"),
+                    description: t("privacy.leaderboardHelp"),
+                    on: t("privacy.leaderboardOn"),
+                    off: t("privacy.leaderboardOff"),
+                  },
                   error: t("preferences.saveError"),
+                  dataLink: t("privacy.dataLink"),
                 }}
               />
             </Panel>

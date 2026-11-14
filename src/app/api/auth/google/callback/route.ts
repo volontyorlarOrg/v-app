@@ -1,7 +1,9 @@
 import type { NextRequest, NextResponse } from "next/server";
 
 import { api } from "@/lib/api/client.server";
+import { isApiError } from "@/lib/api/errors";
 import { AUTH_REQUEST_TIMEOUT_MS, isAuthConfigured } from "@/lib/auth/config";
+import { ADMISSION_COOKIE, LEGAL_CONSENT_REQUIRED } from "@/lib/legal/constants";
 import {
   GOOGLE_STATE_COOKIE_NAME,
   googleStatusForError,
@@ -83,6 +85,11 @@ export async function POST(request: NextRequest) {
       timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
     });
   } catch (error) {
+    if (isApiError(error) && error.backendCode === LEGAL_CONSENT_REQUIRED) {
+      const response = relativeRedirect("/consent");
+      response.cookies.delete(ADMISSION_COOKIE);
+      return clearHandoff(response);
+    }
     const status = googleStatusForError(error);
     if (status === "unavailable") {
       console.error("[google-auth] callback redemption failed:", error);
@@ -99,6 +106,7 @@ export async function POST(request: NextRequest) {
   const response = relativeRedirect(
     session.isNewUser ? onboardingPath(returnTo) : (returnTo ?? navHref(HOME_ROUTE)),
   );
+  response.cookies.delete(ADMISSION_COOKIE);
   response.cookies.set(SESSION_COOKIE_NAME, cookieValue, sessionCookieOptions());
   if (session.isNewUser) response.cookies.set(onboardingStartCookie());
   return clearHandoff(response);

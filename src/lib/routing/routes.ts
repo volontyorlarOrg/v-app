@@ -1,6 +1,7 @@
 import { isLocale, type Locale } from "@/i18n/routing";
 
 export type RouteKey =
+  | "consent"
   | "login"
   | "signup"
   | "dashboard"
@@ -16,9 +17,9 @@ export type RouteKey =
   | "settings"
   | "welcome";
 
-export type RouteArea = "auth" | "volunteer" | "onboarding";
+export type RouteArea = "legal" | "auth" | "volunteer" | "onboarding";
 
-export type RouteGuard = "guest" | "session";
+export type RouteGuard = "guest" | "session" | "public";
 
 export type NavGroup = "primary" | "account";
 
@@ -34,6 +35,15 @@ export type AppRoute = {
 };
 
 export const appRoutes: readonly AppRoute[] = [
+  {
+    key: "consent",
+    path: "/consent",
+    area: "legal",
+    guard: "public",
+    navGroup: null,
+    inTabBar: false,
+    section: null,
+  },
   {
     key: "login",
     path: "/login",

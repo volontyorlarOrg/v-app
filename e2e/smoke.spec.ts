@@ -10,6 +10,15 @@ const LOCALES = ["uz", "ru", "en"] as const;
 // Wait for React and the form hooks before filling or clicking client controls.
 async function gotoReady(page: Page, url: string) {
   const response = await page.goto(url);
+  if (url.includes("/signup") && new URL(page.url()).pathname === "/consent") {
+    await page.locator('input[name="accepted"]').check();
+    await page
+      .locator("form")
+      .filter({ has: page.locator('input[name="accepted"]') })
+      .getByRole("button")
+      .click();
+    await page.waitForURL("**/signup**");
+  }
   if (/\/(login|signup|welcome|settings|profile\/edit)(?:[/?#]|$)/.test(page.url())) {
     await page.locator("html[data-app-hydrated='true']").waitFor();
     await page.waitForFunction(() =>
@@ -712,6 +721,8 @@ test.describe("sign-in", () => {
   }) => {
     await gotoReady(page, "/login");
     await page.getByRole("link", { name: "Create an account" }).click();
+    await expect(page).toHaveURL(/\/consent$/);
+    await gotoReady(page, "/signup");
     await expect(page).toHaveURL(/\/signup$/);
     await expect(
       page.getByRole("link", { name: "Continue with Telegram" }),

@@ -115,7 +115,8 @@
     },
     "menuLabel": "Menyu",
     "profileEdit": "Profilni tahrirlash",
-    "memberProfile": "Koʻngilli profili"
+    "memberProfile": "Koʻngilli profili",
+    "consent": "Maʼlumotlar va rozilik"
   },
   "auth": {
     "providers": {
@@ -492,7 +493,11 @@
       "place": "{rank}-oʻrin"
     },
     "xpValue": "{xp} XP",
-    "scoring": "Har bir imkoniyat oʻz XP sini belgilaydi. Odatda har bir tasdiqlangan volontyorlik soati uchun {hour} XP; tanlovlarda gʻolibga {winner} XP, faol ishtirokchiga {contributor} va ishtirok uchun {attendee}. Sababsiz kelmaslik {penalty} XP ga tushadi."
+    "scoring": "Har bir imkoniyat oʻz XP sini belgilaydi. Odatda har bir tasdiqlangan volontyorlik soati uchun {hour} XP; tanlovlarda gʻolibga {winner} XP, faol ishtirokchiga {contributor} va ishtirok uchun {attendee}. Sababsiz kelmaslik {penalty} XP ga tushadi.",
+    "join": {
+      "title": "Siz reytingda yoʻqsiz",
+      "body": "Oʻrningizni koʻrish uchun Sozlamalar → Maxfiylik boʻlimida «Meni reytingda koʻrsatish»ni yoqing."
+    }
   },
   "applications": {
     "metaTitle": "Arizalar",
@@ -549,8 +554,8 @@
       },
       "draftClosed": "Bu imkoniyat endi ariza qabul qilmaydi, shuning uchun qoralama yuborilmadi.",
       "fromProfile": "Profilingizdan",
-      "fromProfileHelp": "Ariza bergan paytingizdagi profil. Keyinroq profilga kiritilgan oʻzgarishlar unga taʼsir qilmaydi.",
-      "fromProfileDraft": "Arizani yuborganingizda tashkilotchi koʻradigan maʼlumot.",
+      "fromProfileHelp": "Ariza yuborilgan paytdagi profil. Keyingi tahrirlar ushbu nusxani oʻzgartirmaydi. Vakolatli tashkilotchilar hisob pochtasi mavjud boʻlsa uni ham koʻradi.",
+      "fromProfileDraft": "Yuborilganda tashkilotchi ushbu profil nusxasi, javoblar va esseni oladi. Vakolatli tashkilotchilar hisob pochtasi mavjud boʻlsa uni ham koʻradi. Ommaviy profil sozlamalari ushbu arizaga kirishni cheklamaydi.",
       "withdraw": "Arizani qaytarib olish",
       "viewOpportunity": "Imkoniyatni koʻrish",
       "withdrawConfirm": "Arizani qaytarib olasizmi? Vakansiya ochiq va boʻsh joylar bor ekan, qayta ariza berishingiz mumkin.",
@@ -1061,15 +1066,20 @@
     },
     "privacy": {
       "title": "Maxfiylik",
-      "description": "Tashkilotchilar va boshqa volontyorlar nimani koʻra oladi.",
+      "description": "Boshqalar nimani koʻradi. Ariza bergan tashkilotlaringiz arizangizni har doim koʻradi.",
       "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
       "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
       "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
       "levelPublicHelp": "Boshidan oʻchiq. Tarixingiz har holda maxfiy qoladi.",
       "publicProfile": "Ochiq profilimni koʻrsatish",
-      "publicProfileHelp": "Har kim volontyorlar.uz/sizning_nomingiz manzilini ochib, aloqa maʼlumotlari, taʼlim joyi, shahar, ijtimoiy tarmoqlar, portfolio va ishtirok natijalarini koʻrishi mumkin.",
+      "publicProfileHelp": "Har kim volontyorlar.uz/foydalanuvchi_nomingiz sahifasini ochib, profilingizni koʻra oladi, yashirgan maydonlaringizdan tashqari. Buni yoqish — profilingizni eʼlon qilishga roziligingiz.",
       "publicProfileVisible": "Ochiq profilingiz koʻrinib turibdi.",
-      "publicProfileHidden": "Ochiq profilingiz yashirildi. Uning manzili endi topilmadi javobini beradi."
+      "publicProfileHidden": "Ochiq profilingiz yashirildi. Uning manzili endi topilmadi javobini beradi.",
+      "leaderboard": "Meni reytingda koʻrsatish",
+      "leaderboardHelp": "Tizimga kirgan volontyorlar ismingiz, foydalanuvchi nomingiz, suratingiz, XP va oʻrningizni koʻradi.",
+      "leaderboardOn": "Siz reytingdasiz.",
+      "leaderboardOff": "Endi reytingda koʻrinmaysiz.",
+      "dataLink": "Maʼlumotlaringiz va soʻrovlar"
     },
     "appearance": {
       "title": "Koʻrinish",
@@ -1258,5 +1268,57 @@
       "network": "Serverga ulanib boʻlmadi. Matningiz saqlandi; qayta urinib koʻring.",
       "timeout": "Yuborish juda uzoq davom etdi. Matningiz saqlandi; qayta urinib koʻring."
     }
+  },
+  "legal": {
+    "title": "Boshlashdan oldin",
+    "manageTitle": "Maʼlumotlaringiz",
+    "intro": "Volontyorlar tashkilotlar siz bilan ishlay olishi uchun hisobingiz, profilingiz, arizalaringiz va volontyorlik tarixingizni saqlaydi. Qisqacha:",
+    "summary": {
+      "collect": "Oʻzingiz kiritgan va kirishda Telegram yoki Google beradigan maʼlumotlarni yigʻamiz: ism, aloqa, maktab, hudud, arizalar va soatlar.",
+      "access": "Ularni faqat siz, ariza bergan tashkilotlaringiz, koordinatorlarimiz va administratorlarimiz koʻradi. Quyidagi sozlamalarni yoqmasangiz, boshqa hech kim koʻrmaydi.",
+      "store": "Maʼlumotlar Singapurda saqlanadi — Oʻzbekiston uni shaxsga doir maʼlumotlarni yetarli himoya qiladigan davlat deb tan olgan.",
+      "choices": "Maʼlumotlaringizni sotmaymiz, reklama koʻrsatmaymiz va tashkilot arizangizni olganda sizga xabar beramiz.",
+      "rights": "Maʼlumotlaringizni koʻrish, tuzatish, oʻchirish yoki rozilikni qaytarib olish istalgan vaqtda Sozlamalar → Maxfiylik boʻlimida mumkin."
+    },
+    "privacyPolicy": "Maxfiylik siyosati",
+    "terms": "Foydalanish shartlari",
+    "form": {
+      "accept": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim va Volontyorlar shaxsga doir maʼlumotlarimni ularda tavsiflangandek qayta ishlashiga roziman.",
+      "optional": "Ixtiyoriy",
+      "leaderboard": "Meni reytingda koʻrsatish",
+      "leaderboardHelp": "Tizimga kirgan volontyorlar ismingiz, foydalanuvchi nomingiz, suratingiz, XP va oʻrningizni koʻradi.",
+      "publicProfile": "Profilimni ommaviy qilish",
+      "publicProfileHelp": "volontyorlar.uz/foydalanuvchi_nomingiz havolasiga ega har kim profilingizni koʻradi, yashirgan maydonlaringizdan tashqari.",
+      "submit": "Roziman, davom etish",
+      "pending": "Saqlanmoqda…",
+      "required": "Davom etish uchun birinchi belgini qoʻying.",
+      "error": "Roziligingiz saqlanmadi. Internetni tekshirib, qayta urinib koʻring."
+    },
+    "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar nimani koʻrishini Sozlamalar → Maxfiylik boʻlimida oʻzgartiring yoki quyida soʻrov yuboring.",
+    "requests": {
+      "title": "Maʼlumotlaringiz boʻyicha soʻrovlar",
+      "help": "Nusxa, tuzatish, avtomatik qarorni qayta koʻrib chiqish yoki oʻchirishni soʻrang. Javob shu yerda chiqadi: tuzatish 3 kun ichida, qolganlari 10 kun ichida. Maʼlumotlarni oʻchirish yoki rozilikni qaytarib olish ilovadan odatiy foydalanishni darhol toʻxtatadi.",
+      "kind": "Sizga nima kerak?",
+      "kinds": {
+        "access": "Maʼlumotlarim nusxasi",
+        "correction": "Maʼlumotlarimni tuzatish",
+        "review": "Avtomatik qarorni qayta koʻrib chiqish",
+        "erasure": "Hisobim va maʼlumotlarimni oʻchirish",
+        "withdrawal": "Roziligimni qaytarib olish"
+      },
+      "message": "Tafsilotlar (ixtiyoriy; hech qachon parol yozmang)",
+      "submit": "Soʻrov yuborish",
+      "pending": "Yuborilmoqda…",
+      "sent": "Soʻrov yuborildi. Javob quyida chiqadi.",
+      "error": "Soʻrov yuborilmadi. Qayta urinib koʻring.",
+      "status": {
+        "open": "Javob kutilmoqda",
+        "resolved": "Javob berildi",
+        "cancelled": "Bekor qilindi"
+      }
+    },
+    "back": "Sozlamalarga qaytish",
+    "signOut": "Chiqish",
+    "haveAccount": "Hisobingiz bormi? Kirish"
   }
 }

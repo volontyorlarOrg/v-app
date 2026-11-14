@@ -11,6 +11,7 @@ export const RESERVED_PROFILE_SEGMENTS = new Set([
   "admin",
   "applications",
   "checkpoints",
+  "consent",
   "contact",
   "dashboard",
   "leaderboard",

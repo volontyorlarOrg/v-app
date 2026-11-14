@@ -776,6 +776,8 @@ function newAccountState(email, fullName) {
 }
 
 const sessions = new Map();
+const legalAdmissions = new Map();
+const LEGAL_VERSION = "2026-11-14";
 const refreshTokens = new Map();
 const pendingStates = new Set();
 const googleChallenges = new Set();
@@ -1032,16 +1034,15 @@ const VOLUNTEERS_WITHOUT_HANDLE = 12;
 const GENERATED_USERNAME = /^user_[0-9a-f]{20}$/;
 
 function leaderboard(state, query) {
-  const rows = [
-    ...leaderboardRoster,
-    {
-      displayName: state.user.displayName,
-      username: state.account.username,
-      avatarUrl: state.account.avatarUrl,
-      profileVisible: state.preferences.publicProfileEnabled,
-      xp: VIEWER_XP,
-    },
-  ]
+  const viewerRow = {
+    displayName: state.user.displayName,
+    username: state.account.username,
+    avatarUrl: state.account.avatarUrl,
+    profileVisible: state.preferences.publicProfileEnabled,
+    xp: VIEWER_XP,
+  };
+  const joined = state.legal?.leaderboard !== false;
+  const rows = [...leaderboardRoster, ...(joined ? [viewerRow] : [])]
     .sort((a, b) => b.xp - a.xp || a.username.localeCompare(b.username))
     .map((row, index) => ({
       rank: index + 1,
@@ -1061,6 +1062,7 @@ function leaderboard(state, query) {
     volunteerTotal: rows.length + VOLUNTEERS_WITHOUT_HANDLE,
     viewer: (() => {
       const row = rows.find((candidate) => candidate.isCurrentUser);
+      if (!row) return { ...viewerRow, rank: null };
       return row
         ? {
             rank: row.rank,
@@ -1225,7 +1227,23 @@ const server = createServer(async (request, response) => {
     opened.account.authMethods.google = true;
     return send(response, 200, issueSession(opened));
   }
+  if (path === "/legal/admissions" && method === "POST") {
+    if (
+      body.version !== LEGAL_VERSION ||
+      body.accepted !== true ||
+      !["uz", "ru", "en"].includes(body.locale)
+    )
+      return send(response, 422, { code: "validationFailed" });
+    const token = randomUUID() + randomUUID();
+    legalAdmissions.set(token, body);
+    return send(response, 201, {
+      token,
+      expiresAt: new Date(Date.now() + 1800000).toISOString(),
+    });
+  }
   if (path === "/auth/password/signup" && method === "POST") {
+    if (!legalAdmissions.delete(body.admissionToken))
+      return send(response, 403, { code: "legalConsentRequired" });
     if (body.email === SEEDED_EMAIL)
       return send(response, 409, { code: "emailUnavailable" });
     if (String(body.password ?? "").length < 15)
@@ -1285,6 +1303,52 @@ const server = createServer(async (request, response) => {
     return send(response, 401, { code: "unauthenticated" });
   }
 
+  state.legal ??= { version: LEGAL_VERSION, accepted: true, leaderboard: true };
+  state.legalRequests ??= [];
+  const legalState = () => ({
+    ...state.legal,
+    leaderboard: state.legal.accepted && state.legal.leaderboard,
+    publicProfile: state.legal.accepted && state.preferences.publicProfileEnabled,
+  });
+  if (path === "/me/legal" && method === "GET") return send(response, 200, legalState());
+  if (path === "/me/legal/requests" && method === "GET")
+    return send(response, 200, { items: [...state.legalRequests].reverse() });
+  if (path === "/me/legal/accept" && method === "POST") {
+    if (body.version !== LEGAL_VERSION || body.accepted !== true)
+      return send(response, 422, { code: "validationFailed" });
+    state.legal.accepted = true;
+    state.legal.leaderboard = body.leaderboard === true;
+    state.preferences.publicProfileEnabled = body.publicProfile === true;
+    return send(response, 201, { id: state.user.id, status: "accepted" });
+  }
+  if (path === "/me/legal/choices" && method === "PUT") {
+    if (!state.legal.accepted)
+      return send(response, 403, { code: "legalConsentRequired" });
+    if (typeof body.leaderboard === "boolean") state.legal.leaderboard = body.leaderboard;
+    if (typeof body.publicProfile === "boolean")
+      state.preferences.publicProfileEnabled = body.publicProfile;
+    return send(response, 200, legalState());
+  }
+  if (path === "/me/legal/requests" && method === "POST") {
+    const item = {
+      id: randomUUID(),
+      kind: body.kind,
+      message: body.message,
+      status: "open",
+      resolution: null,
+      createdAt: new Date().toISOString(),
+      resolvedAt: null,
+    };
+    state.legalRequests.push(item);
+    if (["withdrawal", "erasure"].includes(body.kind)) {
+      state.legal.accepted = false;
+      state.legal.leaderboard = false;
+      state.preferences.publicProfileEnabled = false;
+    }
+    return send(response, 201, { id: item.id, status: item.status });
+  }
+  if (!state.legal.accepted && !path.startsWith("/me/legal") && path !== "/auth/logout")
+    return send(response, 403, { code: "legalConsentRequired" });
   if (path === "/auth/logout" && method === "POST") {
     sessions.delete(token);
     return send(response, 201, { loggedOut: true });

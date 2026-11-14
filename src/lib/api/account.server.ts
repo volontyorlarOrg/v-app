@@ -13,7 +13,6 @@ import {
   mergeRequestListSchema,
   mergeRequestSchema,
   mergeResolutionSchema,
-  publicProfilePreferenceSchema,
   usernameSummarySchema,
   type ConnectionOutcome,
   type MergeApproval,
@@ -104,14 +103,6 @@ export async function uploadAvatar(file: File) {
 
 export function removeAvatar() {
   return authed("/me/avatar", { method: "DELETE", schema: avatarResultSchema });
-}
-
-export function updatePublicProfilePreference(publicProfileEnabled: boolean) {
-  return authed("/me/preferences", {
-    method: "PUT",
-    body: { publicProfileEnabled },
-    schema: publicProfilePreferenceSchema,
-  });
 }
 
 export function updatePassword(input: {
