@@ -8,17 +8,18 @@ async function signInExisting(page: Page, baseURL: string) {
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 
-test("sign-up starts with one consent and leaves the optional choices unticked", async ({
-  page,
-}) => {
+test("sign-up starts with one consent box", async ({ page }) => {
   await page.goto("/en/signup");
   await expect(page).toHaveURL(/\/consent$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Before you start");
   const required = page.locator('input[name="accepted"]');
   await expect(required).not.toBeChecked();
-  await expect(page.locator('input[name="leaderboard"]')).not.toBeChecked();
-  await expect(page.locator('input[name="publicProfile"]')).not.toBeChecked();
-  await expect(page.locator('input[name="ageBand"], input[type="date"]')).toHaveCount(0);
+  await expect(
+    page.locator('input[name="leaderboard"], input[name="publicProfile"]'),
+  ).toHaveCount(0);
+  await expect(page.locator('input[name="ageBand"], input[type="date"]')).toHaveCount(
+    0,
+  );
 
   const submit = page.getByRole("button", { name: "Agree and continue" });
   await submit.click();
@@ -33,7 +34,9 @@ test("sign-up starts with one consent and leaves the optional choices unticked",
   ).toBe(true);
 });
 
-test("the consent step keeps the safe return path through sign-up", async ({ page }) => {
+test("the consent step keeps the safe return path through sign-up", async ({
+  page,
+}) => {
   const next = "/opportunities/book-drive";
   await page.goto(`/en/signup?next=${encodeURIComponent(next)}`);
   expect(new URL(page.url()).searchParams.get("next")).toBe(next);
@@ -76,8 +79,12 @@ test("withdrawing consent stops app use until the volunteer agrees again", async
     .getByLabel("What do you need?", { exact: true })
     .selectOption("withdrawal");
   await page.getByRole("button", { name: "Send request", exact: true }).click();
-  await expect(page.getByText("Request sent. Our answer will appear below.")).toBeVisible();
-  await expect(page.getByText("Withdraw my consent · Waiting for an answer")).toBeVisible();
+  await expect(
+    page.getByText("Request sent. Our answer will appear below."),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Withdraw my consent · Waiting for an answer"),
+  ).toBeVisible();
 
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/consent$/);
@@ -85,7 +92,6 @@ test("withdrawing consent stops app use until the volunteer agrees again", async
   await expect(page.getByLabel("What do you need?", { exact: true })).toBeVisible();
 
   await page.locator('input[name="accepted"]').check();
-  await page.locator('input[name="leaderboard"]').check();
   await page.getByRole("button", { name: "Agree and continue" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 });
@@ -97,12 +103,19 @@ test("the leaderboard and public profile are switched in Settings → Privacy", 
   await signInExisting(page, baseURL!);
   await page.goto("/settings");
   const privacy = page.locator("#privacy");
-  const leaderboard = privacy.getByRole("switch", { name: "Show me on the leaderboard" });
+  const leaderboard = privacy.getByRole("switch", {
+    name: "Show me on the leaderboard",
+  });
   await expect(leaderboard).toBeChecked();
   await leaderboard.click();
-  await expect(privacy.getByText("You are no longer on the leaderboard.")).toBeVisible();
+  await expect(
+    privacy.getByText("You are no longer on the leaderboard."),
+  ).toBeVisible();
 
   await page.goto("/settings");
-  await page.locator("#privacy").getByRole("link", { name: "Your data and requests" }).click();
+  await page
+    .locator("#privacy")
+    .getByRole("link", { name: "Your data and requests" })
+    .click();
   await expect(page).toHaveURL(/\/consent$/);
 });

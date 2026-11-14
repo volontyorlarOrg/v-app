@@ -1284,11 +1284,6 @@
     "terms": "Terms of Use",
     "form": {
       "accept": "I have read the Privacy Policy and Terms of Use and agree that Volontyorlar processes my personal data as described.",
-      "optional": "Optional",
-      "leaderboard": "Show me on the leaderboard",
-      "leaderboardHelp": "Signed-in volunteers see your name, username, photo, XP and rank.",
-      "publicProfile": "Make my profile public",
-      "publicProfileHelp": "Anyone with the link volontyorlar.uz/your_username sees your profile, except the fields you hide.",
       "submit": "Agree and continue",
       "pending": "Saving…",
       "required": "Tick the first box to continue.",

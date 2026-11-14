@@ -75,11 +75,6 @@ export default async function ConsentPage({
               next={returnTo}
               labels={{
                 accept: t("form.accept"),
-                optional: t("form.optional"),
-                leaderboard: t("form.leaderboard"),
-                leaderboardHelp: t("form.leaderboardHelp"),
-                publicProfile: t("form.publicProfile"),
-                publicProfileHelp: t("form.publicProfileHelp"),
                 submit: t("form.submit"),
                 pending: t("form.pending"),
                 required: t("form.required"),

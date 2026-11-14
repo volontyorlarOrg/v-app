@@ -40,8 +40,8 @@ export async function giveConsentAction(
     locale,
     version: LEGAL_VERSION,
     accepted: true,
-    leaderboard: form.get("leaderboard") === "on",
-    publicProfile: form.get("publicProfile") === "on",
+    leaderboard: false,
+    publicProfile: false,
   };
   const rawNext = form.get("next");
   const next = safeReturnPath(typeof rawNext === "string" ? rawNext : null);
