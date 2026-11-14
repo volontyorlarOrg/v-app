@@ -14,11 +14,6 @@ const idle: ActionResult = { status: "idle" };
 
 export type ConsentFormLabels = {
   accept: string;
-  leaderboard: string;
-  leaderboardHelp: string;
-  publicProfile: string;
-  publicProfileHelp: string;
-  optional: string;
   submit: string;
   pending: string;
   required: string;
@@ -67,21 +62,6 @@ export function ConsentForm({
       <input type="hidden" name="locale" value={locale} />
       {next ? <input type="hidden" name="next" value={next} /> : null}
       <Choice name="accepted" label={labels.accept} required />
-      <fieldset className="flex flex-col gap-3 border-t border-border pt-4">
-        <legend className="mb-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-          {labels.optional}
-        </legend>
-        <Choice
-          name="leaderboard"
-          label={labels.leaderboard}
-          help={labels.leaderboardHelp}
-        />
-        <Choice
-          name="publicProfile"
-          label={labels.publicProfile}
-          help={labels.publicProfileHelp}
-        />
-      </fieldset>
       {state.status === "error" ? (
         <ActionStatus tone="error">
           {state.code === "consentRequired" ? labels.required : labels.error}

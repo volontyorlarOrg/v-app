@@ -1284,11 +1284,6 @@
     "terms": "Foydalanish shartlari",
     "form": {
       "accept": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim va Volontyorlar shaxsga doir maʼlumotlarimni ularda tavsiflangandek qayta ishlashiga roziman.",
-      "optional": "Ixtiyoriy",
-      "leaderboard": "Meni reytingda koʻrsatish",
-      "leaderboardHelp": "Tizimga kirgan volontyorlar ismingiz, foydalanuvchi nomingiz, suratingiz, XP va oʻrningizni koʻradi.",
-      "publicProfile": "Profilimni ommaviy qilish",
-      "publicProfileHelp": "volontyorlar.uz/foydalanuvchi_nomingiz havolasiga ega har kim profilingizni koʻradi, yashirgan maydonlaringizdan tashqari.",
       "submit": "Roziman, davom etish",
       "pending": "Saqlanmoqda…",
       "required": "Davom etish uchun birinchi belgini qoʻying.",
