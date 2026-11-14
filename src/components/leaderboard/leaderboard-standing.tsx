@@ -89,3 +89,47 @@ export function LeaderboardStanding({
     </section>
   );
 }
+
+export function LeaderboardJoin({
+  initials,
+  avatarUrl,
+  href,
+}: {
+  initials: string;
+  avatarUrl?: string;
+  href: string;
+}) {
+  const t = useTranslations("leaderboard");
+
+  return (
+    <section
+      aria-labelledby="standing-title"
+      className="enter-rise [--enter-delay:90ms]"
+    >
+      <Link
+        href={href}
+        className="standing-card group flex items-center gap-3 rounded-xl border border-border px-4 py-3 transition-colors hover:border-primary sm:gap-4 sm:px-5"
+      >
+        <Avatar aria-hidden="true" className="size-10 shrink-0">
+          {avatarUrl ? <AvatarImage src={avatarUrl} alt="" /> : null}
+          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <h2
+            id="standing-title"
+            className="font-sans text-base leading-tight font-semibold text-ink"
+          >
+            {t("join.title")}
+          </h2>
+          <p className="mt-1 text-xs leading-snug text-ink-muted sm:text-sm">
+            {t("join.body")}
+          </p>
+        </div>
+        <ChevronRight
+          aria-hidden="true"
+          className="size-5 shrink-0 text-ink-muted transition-colors group-hover:text-primary-ink"
+        />
+      </Link>
+    </section>
+  );
+}

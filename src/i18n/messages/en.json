@@ -115,7 +115,8 @@
     },
     "menuLabel": "Menu",
     "profileEdit": "Edit profile",
-    "memberProfile": "Volunteer profile"
+    "memberProfile": "Volunteer profile",
+    "consent": "Data and consent"
   },
   "auth": {
     "providers": {
@@ -492,7 +493,11 @@
       "place": "Place {rank}"
     },
     "xpValue": "{xp} XP",
-    "scoring": "Each opportunity sets its own XP. Usually {hour} XP for every verified volunteer hour; in competitions {winner} XP for a winner, {contributor} for a contributor and {attendee} for taking part. An unexcused no-show costs {penalty} XP."
+    "scoring": "Each opportunity sets its own XP. Usually {hour} XP for every verified volunteer hour; in competitions {winner} XP for a winner, {contributor} for a contributor and {attendee} for taking part. An unexcused no-show costs {penalty} XP.",
+    "join": {
+      "title": "You are not on the leaderboard",
+      "body": "Turn on “Show me on the leaderboard” in Settings → Privacy to see your place."
+    }
   },
   "applications": {
     "metaTitle": "Applications",
@@ -549,8 +554,8 @@
       },
       "draftClosed": "This opportunity is no longer taking applications, so this draft wasn't sent.",
       "fromProfile": "From your profile",
-      "fromProfileHelp": "The profile you applied with. Later edits to your profile don't change it.",
-      "fromProfileDraft": "What the organiser will see when you send your application.",
+      "fromProfileHelp": "The profile you applied with. Later profile edits do not change this snapshot. Authorised organisers can also see your account email, if present.",
+      "fromProfileDraft": "When you send, the organiser receives this profile snapshot, your answers and essay. Authorised organisers can also see your account email, if present. Public-profile privacy settings do not limit this application.",
       "withdraw": "Withdraw application",
       "viewOpportunity": "View opportunity",
       "withdrawConfirm": "Withdraw this application? You can apply again while the vacancy is open and places remain.",
@@ -1061,15 +1066,20 @@
     },
     "privacy": {
       "title": "Privacy",
-      "description": "What organisers and other volunteers can see.",
+      "description": "What other people can see. Organisations you apply to always see your application.",
       "profileToOrganisers": "Share my profile with organisers I apply to",
       "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
       "levelPublic": "Show my level on the community list",
       "levelPublicHelp": "Off by default. Your record stays private either way.",
       "publicProfile": "Show my public profile",
-      "publicProfileHelp": "Lets anyone open volontyorlar.uz/your_username and see your contact details, education, location, social profiles, portfolio and participation totals.",
+      "publicProfileHelp": "Anyone can open volontyorlar.uz/your_username and see your profile, except the fields you hide. Turning this on is your consent to publish it.",
       "publicProfileVisible": "Your public profile is visible.",
-      "publicProfileHidden": "Your public profile is hidden. Its address now returns not found."
+      "publicProfileHidden": "Your public profile is hidden. Its address now returns not found.",
+      "leaderboard": "Show me on the leaderboard",
+      "leaderboardHelp": "Signed-in volunteers see your name, username, photo, XP and rank.",
+      "leaderboardOn": "You are on the leaderboard.",
+      "leaderboardOff": "You are no longer on the leaderboard.",
+      "dataLink": "Your data and requests"
     },
     "appearance": {
       "title": "Appearance",
@@ -1258,5 +1268,57 @@
       "network": "The server could not be reached. Your text is still here; please try again.",
       "timeout": "Sending took too long. Your text is still here; please try again."
     }
+  },
+  "legal": {
+    "title": "Before you start",
+    "manageTitle": "Your data",
+    "intro": "Volontyorlar keeps your account, profile, applications and volunteering record so organisations can work with you. In short:",
+    "summary": {
+      "collect": "We collect what you enter and what Telegram or Google share when you sign in: name, contacts, school, region, applications and hours.",
+      "access": "Only you, the organisations you apply to, our coordinators and administrators see it. Nobody else does unless you turn on the options below.",
+      "store": "It is stored in Singapore, which Uzbekistan recognises as adequately protecting personal data.",
+      "choices": "We never sell your data or show ads, and we tell you whenever an organisation receives your application.",
+      "rights": "You can see, correct or delete your data, or withdraw consent, at any time in Settings → Privacy."
+    },
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "form": {
+      "accept": "I have read the Privacy Policy and Terms of Use and agree that Volontyorlar processes my personal data as described.",
+      "optional": "Optional",
+      "leaderboard": "Show me on the leaderboard",
+      "leaderboardHelp": "Signed-in volunteers see your name, username, photo, XP and rank.",
+      "publicProfile": "Make my profile public",
+      "publicProfileHelp": "Anyone with the link volontyorlar.uz/your_username sees your profile, except the fields you hide.",
+      "submit": "Agree and continue",
+      "pending": "Saving…",
+      "required": "Tick the first box to continue.",
+      "error": "We could not save your consent. Check your connection and try again."
+    },
+    "accepted": "You have agreed to the current Privacy Policy. Change what others see in Settings → Privacy, or send a request below.",
+    "requests": {
+      "title": "Requests about your data",
+      "help": "Ask for a copy, a correction, a review of an automatic decision, or deletion. We answer here: corrections within 3 days, everything else within 10 days. Deleting your data or withdrawing consent stops normal use of the app at once.",
+      "kind": "What do you need?",
+      "kinds": {
+        "access": "A copy of my data",
+        "correction": "Correct my data",
+        "review": "Review an automatic decision",
+        "erasure": "Delete my account and data",
+        "withdrawal": "Withdraw my consent"
+      },
+      "message": "Details (optional; never include a password)",
+      "submit": "Send request",
+      "pending": "Sending…",
+      "sent": "Request sent. Our answer will appear below.",
+      "error": "We could not send the request. Try again.",
+      "status": {
+        "open": "Waiting for an answer",
+        "resolved": "Answered",
+        "cancelled": "Cancelled"
+      }
+    },
+    "back": "Back to settings",
+    "signOut": "Sign out",
+    "haveAccount": "Already have an account? Log in"
   }
 }

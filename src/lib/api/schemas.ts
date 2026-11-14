@@ -420,7 +420,7 @@ export const leaderboardEntrySchema = z
 
 const leaderboardViewerSchema = z
   .object({
-    rank: z.number().int().positive(),
+    rank: z.number().int().positive().nullable(),
     displayName: z.string().min(1),
     username: usernameField,
     avatarUrl: optional(z.url()),
@@ -493,7 +493,7 @@ export const meSchema = z
     usernameSource: z.enum(USERNAME_SOURCES),
     usernameEditable: z.boolean(),
     avatarUrl: optional(z.url()),
-    publicProfileEnabled: z.boolean().default(true),
+    publicProfileEnabled: z.boolean().default(false),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),
@@ -555,10 +555,6 @@ export const mergeApprovalSchema = z.object({
 export const mergeResolutionSchema = z.object({ request: mergeRequestSchema });
 
 export const avatarResultSchema = z.object({ avatarUrl: optional(z.url()) });
-
-export const publicProfilePreferenceSchema = z.object({
-  publicProfileEnabled: z.boolean(),
-});
 
 export const acknowledgementSchema = z.looseObject({});
 

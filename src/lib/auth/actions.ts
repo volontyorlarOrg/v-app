@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { ADMISSION_COOKIE, LEGAL_CONSENT_REQUIRED } from "@/lib/legal/constants";
+
 import {
   failedResult,
   resultFromError,
@@ -86,10 +88,20 @@ export async function createAccountAction(
     return failedResult("validationFailed", fieldErrorsOf(parsed.error));
   }
 
-  const result = await openSession("/auth/password/signup", parsed.data);
+  const store = await cookies();
+  const admissionToken = store.get(ADMISSION_COOKIE)?.value;
+  if (!admissionToken) redirect("/consent");
+  const result = await openSession("/auth/password/signup", {
+    ...parsed.data,
+    admissionToken,
+  });
+  if (result.status === "error" && result.code === LEGAL_CONSENT_REQUIRED) {
+    store.delete(ADMISSION_COOKIE);
+    redirect("/consent");
+  }
   if (result.status !== "ok") return result;
 
-  const store = await cookies();
+  store.delete(ADMISSION_COOKIE);
   store.set(onboardingStartCookie());
   redirect(onboardingPath(returnPathOf(formData)));
 }

@@ -17,7 +17,6 @@ import {
   removeAvatar,
   rejectMergeRequest,
   updatePassword,
-  updatePublicProfilePreference,
   updateUsername,
   uploadAvatar,
 } from "@/lib/api/account.server";
@@ -85,16 +84,6 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResu
 export async function removeAvatarAction(): Promise<ActionResult> {
   try {
     await removeAvatar();
-  } catch (error) {
-    return resultFromError(error);
-  }
-  revalidatePath("/", "layout");
-  return okResult;
-}
-
-export async function setPublicProfileAction(enabled: boolean): Promise<ActionResult> {
-  try {
-    await updatePublicProfilePreference(enabled);
   } catch (error) {
     return resultFromError(error);
   }

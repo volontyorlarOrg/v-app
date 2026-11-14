@@ -1,3 +1,4 @@
+import { ADMISSION_COOKIE } from "@/lib/legal/constants";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { defaultLocale, isLocale } from "@/i18n/routing";
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
   try {
     login = await api("/auth/telegram/authorize", {
       method: "POST",
-      body: { locale },
+      body: { locale, admissionToken: request.cookies.get(ADMISSION_COOKIE)?.value },
       schema: telegramAuthorizationSchema,
       cache: "no-store",
       timeoutMs: AUTH_REQUEST_TIMEOUT_MS,

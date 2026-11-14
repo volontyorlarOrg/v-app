@@ -30,6 +30,7 @@ import {
   historyHref,
   navHref,
 } from "@/lib/routing/routes";
+import { ensureLegalConsent } from "@/lib/legal/state.server";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -43,7 +44,7 @@ export default async function VolunteerLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const session = await requireSession();
+  const [session] = await Promise.all([requireSession(), ensureLegalConsent()]);
   const [record, common, settings, nav, format, checkpointsT] = await Promise.all([
     getTranslations({ locale, namespace: "record" }),
     getTranslations({ locale, namespace: "common" }),

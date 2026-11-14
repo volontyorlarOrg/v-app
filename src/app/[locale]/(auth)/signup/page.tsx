@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -15,6 +17,7 @@ import type { Locale } from "@/i18n/routing";
 import { isGoogleConfigured } from "@/lib/auth/config";
 import { safeReturnPath } from "@/lib/auth/session";
 import { navHref } from "@/lib/routing/routes";
+import { ADMISSION_COOKIE } from "@/lib/legal/constants";
 import { marketingHref } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +39,9 @@ export default async function SignupPage({
 
   const { next } = await searchParams;
   const returnTo = safeReturnPath(typeof next === "string" ? next : null);
+  if (!(await cookies()).get(ADMISSION_COOKIE)?.value) {
+    redirect(returnTo ? `/consent?next=${encodeURIComponent(returnTo)}` : "/consent");
+  }
 
   return (
     <Signup

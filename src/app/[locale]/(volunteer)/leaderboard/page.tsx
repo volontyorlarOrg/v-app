@@ -17,7 +17,10 @@ import {
   LeaderboardPodium,
   PODIUM_SIZE,
 } from "@/components/leaderboard/leaderboard-podium";
-import { LeaderboardStanding } from "@/components/leaderboard/leaderboard-standing";
+import {
+  LeaderboardJoin,
+  LeaderboardStanding,
+} from "@/components/leaderboard/leaderboard-standing";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import { getLeaderboard } from "@/lib/api/leaderboard.server";
 import { settle, type LoadFailure } from "@/lib/api/load.server";
@@ -91,9 +94,11 @@ export default async function LeaderboardRoute({
 }
 
 async function chaseFor(board: LeaderboardPage): Promise<Chase | null> {
-  const ahead = placeAhead(board.viewer.rank);
+  const { rank } = board.viewer;
+  if (rank === null) return null;
+  const ahead = placeAhead(rank);
   return chaseOf(
-    board.viewer,
+    { ...board.viewer, rank },
     entryAt(board.items, ahead) ?? (ahead ? await entryOnItsPage(board, ahead) : null),
   );
 }
@@ -164,18 +169,26 @@ function Leaderboard({
       />
 
       <div className="mt-6 flex flex-col gap-6">
-        <LeaderboardStanding
-          initials={initialsOf(viewer.displayName)}
-          avatarUrl={viewer.avatarUrl}
-          rank={viewer.rank}
-          xp={viewer.xp}
-          total={board.total}
-          chase={chase}
-          href={`${leaderboardPageHref(
-            navHref("leaderboard"),
-            pageOfRank(viewer.rank, board.pageSize),
-          )}#${VIEWER_ANCHOR}`}
-        />
+        {viewer.rank === null ? (
+          <LeaderboardJoin
+            initials={initialsOf(viewer.displayName)}
+            avatarUrl={viewer.avatarUrl}
+            href={`${navHref("settings")}#privacy`}
+          />
+        ) : (
+          <LeaderboardStanding
+            initials={initialsOf(viewer.displayName)}
+            avatarUrl={viewer.avatarUrl}
+            rank={viewer.rank}
+            xp={viewer.xp}
+            total={board.total}
+            chase={chase}
+            href={`${leaderboardPageHref(
+              navHref("leaderboard"),
+              pageOfRank(viewer.rank, board.pageSize),
+            )}#${VIEWER_ANCHOR}`}
+          />
+        )}
 
         {podium.length > 0 ? <LeaderboardPodium entries={podium} /> : null}
 
