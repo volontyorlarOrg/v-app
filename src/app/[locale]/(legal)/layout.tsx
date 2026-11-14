@@ -39,7 +39,7 @@ export default async function LegalLayout({
         id="main"
         className="container-page flex flex-1 flex-col justify-center py-6"
       >
-        <div className="mx-auto w-full max-w-md">{children}</div>
+        <div className="mx-auto w-full max-w-3xl">{children}</div>
       </main>
     </>
   );

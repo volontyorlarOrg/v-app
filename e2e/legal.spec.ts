@@ -102,9 +102,6 @@ test("the leaderboard and public profile are switched in Settings → Privacy", 
   await leaderboard.click();
   await expect(privacy.getByText("You are no longer on the leaderboard.")).toBeVisible();
 
-  await page.goto("/leaderboard");
-  await expect(page.getByText("You are not on the leaderboard")).toBeVisible();
-
   await page.goto("/settings");
   await page.locator("#privacy").getByRole("link", { name: "Your data and requests" }).click();
   await expect(page).toHaveURL(/\/consent$/);

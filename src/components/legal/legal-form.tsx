@@ -37,7 +37,7 @@ function Choice({
   required?: boolean;
 }) {
   return (
-    <label className="flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink">
+    <label className="flex min-h-11 items-start gap-3 text-base leading-relaxed text-ink">
       <input
         type="checkbox"
         name={name}

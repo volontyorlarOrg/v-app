@@ -1318,7 +1318,6 @@
       }
     },
     "back": "Back to settings",
-    "signOut": "Sign out",
-    "haveAccount": "Already have an account? Log in"
+    "signOut": "Sign out"
   }
 }

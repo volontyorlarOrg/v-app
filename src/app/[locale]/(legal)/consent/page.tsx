@@ -54,11 +54,11 @@ export default async function ConsentPage({
 
       <AuthPanel>
         {state?.accepted ? (
-          <p className="text-sm leading-relaxed text-ink">{t("accepted")}</p>
+          <p className="text-base leading-relaxed text-ink">{t("accepted")}</p>
         ) : (
           <>
-            <p className="text-sm leading-relaxed text-ink">{t("intro")}</p>
-            <ul className="mt-4 flex list-disc flex-col gap-2 ps-5 text-sm leading-relaxed text-ink-muted">
+            <p className="text-base leading-relaxed text-ink">{t("intro")}</p>
+            <ul className="mt-4 flex list-disc flex-col gap-2 ps-5 text-base leading-relaxed text-ink-muted">
               {SUMMARY.map((key) => (
                 <li key={key}>{t(`summary.${key}`)}</li>
               ))}
@@ -95,7 +95,7 @@ export default async function ConsentPage({
           <h2 className="font-sans text-base font-semibold text-ink">
             {t("requests.title")}
           </h2>
-          <p className="mt-1 mb-4 text-sm leading-relaxed text-ink-muted">
+          <p className="mt-1 mb-4 text-base leading-relaxed text-ink-muted">
             {t("requests.help")}
           </p>
           <DataRequestForm
@@ -147,11 +147,7 @@ export default async function ConsentPage({
             ) : null}
             <SignOutForm label={t("signOut")} />
           </>
-        ) : (
-          <Link href="/login" className="text-primary-ink underline underline-offset-4">
-            {t("haveAccount")}
-          </Link>
-        )}
+        ) : null}
       </div>
     </>
   );
