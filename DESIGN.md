@@ -259,10 +259,14 @@ event, date, result, hours and XP whose rows open their application. On a
 phone the pass shrinks to the hero's corner without its wordmark, the figures
 stack, and the table becomes stacked rows. My activity (`/record`) is the same
 table with every event, the upcoming one included, under a page header. The opportunities page is a title with an outline "Applications"
-link and its count on the right, one toolbar row (search, the All /
-Volunteering / Competitions switcher, region, "Saved only"), and a three-column
-grid of photo cards; the applications page keeps the section tabs and its pill
-filter inside its panel. The leaderboard opens on the viewer's place as a single row that links to
+link and its count on the right, a toolbar (search and a Filters button
+whose panel holds region, format, "Open for applications" and sort; then the
+All / Volunteering / Competitions switcher and "Saved only"; then the active
+filters as removable chips), and three-column grids of photo cards under two
+short labels, Current and Past, each shown only when it has a vacancy; the
+applications page keeps the section tabs and its pill filter and draws each
+application as the same card, with its status chip, the date it was applied or
+started, and the title opening the application. The leaderboard opens on the viewer's place as a single row that links to
 their own row in the board, the top three on a podium stage, and the ranked table from fourth place. The
 profile is the volunteer's own page: one read-only profile sheet, the same
 object the public page at `volontyorlar.uz/<username>` shows, with the

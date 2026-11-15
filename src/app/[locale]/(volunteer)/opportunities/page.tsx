@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { Archive, ArrowDownWideNarrow, CalendarClock } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -13,23 +12,17 @@ import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityFilters } from "@/components/opportunities/opportunity-filters";
-import { PastOpportunitiesArchive } from "@/components/opportunities/past-opportunities-archive";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { listApplications } from "@/lib/api/applications.server";
 import { dataOf, settle, type Loaded } from "@/lib/api/load.server";
 import { listOpportunities } from "@/lib/api/opportunities.server";
-import { listPastEvents } from "@/lib/api/past-events.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
-import type {
-  ApplicationList,
-  OpportunityList,
-  PastEventList,
-  SavedList,
-} from "@/lib/api/schemas";
+import type { ApplicationList, OpportunityList, SavedList } from "@/lib/api/schemas";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import {
   DEFAULT_FILTERS,
+  OPPORTUNITY_SORTS,
   activeFilterCount,
   filterOpportunities,
   parseOpportunityFilters,
@@ -44,11 +37,13 @@ import {
 } from "@/lib/opportunities/search-params";
 import { groupOpportunities } from "@/lib/opportunities/listing";
 import {
+  OPPORTUNITY_FORMATS,
   OPPORTUNITY_KINDS,
   REGIONS,
   type OpportunitySummary,
 } from "@/lib/opportunities/types";
 import { navHref } from "@/lib/routing/routes";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -78,14 +73,11 @@ export default async function OpportunitiesPage({
   const filters = parseOpportunityFilters(query);
   const view = opportunityViewParser.parseServerSide(query.view);
   const now = new Date();
-  const archiveShown =
-    view === "all" && activeFilterCount(filters) === 0 && filters.kind === null;
 
-  const [saved, applications, catalogue, pastEvents, common] = await Promise.all([
+  const [saved, applications, catalogue, common] = await Promise.all([
     settle(() => listSaved()),
     settle(() => listApplications()),
     view === "all" ? settle(() => listOpportunities(filters)) : Promise.resolve(null),
-    archiveShown ? settle(() => listPastEvents()) : Promise.resolve(null),
     getTranslations({ locale, namespace: "common" }),
   ]);
   const listing =
@@ -102,7 +94,6 @@ export default async function OpportunitiesPage({
       saved={savedList ? savedIds(savedList) : new Set()}
       applications={applicationsByOpportunity(dataOf(applications))}
       applicationCount={dataOf(applications)?.items.length ?? null}
-      pastEvents={pastEvents}
       now={now}
       errorLabels={loadErrorLabels(common)}
     />
@@ -156,7 +147,6 @@ function Opportunities({
   saved,
   applications,
   applicationCount,
-  pastEvents,
   now,
   errorLabels,
 }: {
@@ -166,14 +156,43 @@ function Opportunities({
   saved: ReadonlySet<string>;
   applications: ApplicationByOpportunity;
   applicationCount: number | null;
-  pastEvents: Loaded<PastEventList> | null;
   now: Date;
   errorLabels: LoadErrorLabels;
 }) {
   const t = useTranslations("opportunities");
 
-  const activeCount = activeFilterCount(filters);
-  const showArchive = pastEvents !== null;
+  const base = navHref("opportunities");
+  const state = { ...toFilterState(filters), view };
+  const without = (change: Partial<typeof state>) =>
+    serializeOpportunitySearch(base, { ...state, ...change });
+
+  const chips = [
+    ...(filters.region
+      ? [
+          {
+            key: "region",
+            label: t(`regions.${filters.region}`),
+            href: without({ region: null }),
+          },
+        ]
+      : []),
+    ...(filters.format
+      ? [
+          {
+            key: "format",
+            label: t(`format.${filters.format}`),
+            href: without({ format: null }),
+          },
+        ]
+      : []),
+    ...(filters.openOnly
+      ? [{ key: "open", label: t("filters.openOnly"), href: without({ open: false }) }]
+      : []),
+  ].map((chip) => ({
+    ...chip,
+    removeLabel: t("filters.remove", { filter: chip.label }),
+  }));
+
   const groups =
     listing.status === "loaded" ? groupOpportunities(listing.data.items, now) : null;
 
@@ -196,7 +215,7 @@ function Opportunities({
 
       <div className="enter-rise mt-6 [--enter-delay:90ms]">
         <OpportunityFilters
-          action={navHref("opportunities")}
+          action={base}
           labels={{
             legend: t("filters.legend"),
             search: t("filters.search"),
@@ -206,6 +225,12 @@ function Opportunities({
             regionAny: t("filters.regionAny"),
             savedOnly: t("filters.savedOnly"),
             clear: t("filters.clear"),
+            more: t("filters.more"),
+            format: t("filters.format"),
+            formatAny: t("filters.formatAny"),
+            openOnly: t("filters.openOnly"),
+            sort: t("filters.sort"),
+            done: t("filters.done"),
           }}
           kinds={[
             { key: "all", kind: null, label: t("kinds.all") },
@@ -217,30 +242,35 @@ function Opportunities({
           ].map((item) => ({
             key: item.key,
             label: item.label,
-            href: serializeOpportunitySearch(navHref("opportunities"), {
-              ...toFilterState(filters),
-              view,
-              kind: item.kind,
-            }),
+            href: without({ kind: item.kind }),
             active: filters.kind === item.kind,
           }))}
           regions={REGIONS.map((region) => ({
             value: region,
             label: t(`regions.${region}`),
           }))}
+          formats={OPPORTUNITY_FORMATS.map((format) => ({
+            value: format,
+            label: t(`format.${format}`),
+          }))}
+          sorts={OPPORTUNITY_SORTS.map((sort) => ({
+            value: sort,
+            label: t(`sorting.${sort}`),
+          }))}
           hiddenValues={[
+            ...(view === "saved" ? [{ name: "view", value: view }] : []),
             ...(filters.kind ? [{ name: "kind", value: filters.kind }] : []),
+            ...(filters.region ? [{ name: "region", value: filters.region }] : []),
             ...(filters.format ? [{ name: "format", value: filters.format }] : []),
             ...(filters.openOnly ? [{ name: "open", value: "1" }] : []),
             ...(filters.sort !== DEFAULT_FILTERS.sort
               ? [{ name: "sort", value: filters.sort }]
               : []),
           ]}
-          clearHref={serializeOpportunitySearch(navHref("opportunities"), {
-            view,
-            kind: filters.kind,
-          })}
-          activeCount={activeCount}
+          chips={chips}
+          clearHref={serializeOpportunitySearch(base, { view, kind: filters.kind })}
+          showClear={activeFilterCount(filters) > 0}
+          panelCount={chips.length}
         />
       </div>
 
@@ -252,35 +282,26 @@ function Opportunities({
         />
       ) : (
         <>
-          <div className="enter-rise mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 [--enter-delay:160ms]">
-            <p role="status" className="text-sm text-ink-muted">
-              {t("count", { count: listing.data.total })}
-              {listing.data.total > listing.data.items.length
-                ? ` · ${t("showingOf", { shown: listing.data.items.length, total: listing.data.total })}`
-                : null}
+          <p role="status" className="sr-only">
+            {t("count", { count: listing.data.total })}
+          </p>
+          {listing.data.total > listing.data.items.length ? (
+            <p className="mt-4 text-xs text-ink-muted">
+              {t("showingOf", {
+                shown: listing.data.items.length,
+                total: listing.data.total,
+              })}
             </p>
-            <p className="flex items-center gap-1.5 text-xs text-ink-muted">
-              <ArrowDownWideNarrow aria-hidden="true" className="size-3.5" />
-              {t(`sorting.${filters.sort}`)}
-            </p>
-            {showArchive ? (
-              <a
-                href="#past-opportunities-title"
-                className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-              >
-                {t("archive.jumpTo")}
-              </a>
-            ) : null}
-          </div>
+          ) : null}
 
           {listing.data.items.length === 0 ? (
-            <Panel className="mt-4" padding="none">
+            <Panel className="mt-6" padding="none">
               <EmptyState
                 title={t("empty.title")}
                 body={t("empty.body")}
                 action={
                   <Link
-                    href={serializeOpportunitySearch(navHref("opportunities"), {
+                    href={serializeOpportunitySearch(base, {
                       view,
                       kind: filters.kind,
                     })}
@@ -292,80 +313,62 @@ function Opportunities({
               />
             </Panel>
           ) : groups ? (
-            <>
-              {(["current", "expired"] as const).map((group) => {
-                const items = groups[group];
-                if (group === "expired" && items.length === 0) return null;
-                const Icon = group === "current" ? CalendarClock : Archive;
-
-                return (
-                  <section
-                    key={group}
-                    aria-labelledby={`${group}-opportunities-title`}
-                    className={
-                      group === "current"
-                        ? "mt-5"
-                        : "mt-10 border-t-2 border-border-control pt-6"
-                    }
-                  >
-                    <header className="mb-4 flex items-start gap-3">
-                      <span
-                        className={
-                          group === "current"
-                            ? "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-soft text-primary-ink"
-                            : "flex size-10 shrink-0 items-center justify-center rounded-md bg-surface text-ink-muted"
-                        }
-                      >
-                        <Icon aria-hidden="true" className="size-5" />
-                      </span>
-                      <div>
-                        <h2
-                          id={`${group}-opportunities-title`}
-                          className="flex items-center gap-2.5 text-base font-semibold text-ink"
-                        >
-                          {t(`sections.${group}.title`)}
-                          <span
-                            aria-hidden="true"
-                            className="tabular text-sm font-normal text-ink-muted"
-                          >
-                            {items.length}
-                          </span>
-                        </h2>
-                        <p className="mt-1 text-sm text-ink-muted">
-                          {t(`sections.${group}.description`)}
-                        </p>
-                      </div>
-                    </header>
-
-                    {items.length === 0 ? (
-                      <p className="rounded-xl border border-border bg-surface px-5 py-6 text-sm text-ink-muted">
-                        {t("sections.current.empty")}
-                      </p>
-                    ) : (
-                      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {items.map((opportunity) => (
-                          <li key={opportunity.id} className="flex min-w-0">
-                            <OpportunityCard
-                              opportunity={opportunity}
-                              saved={saved.has(opportunity.id)}
-                              application={applications.get(opportunity.id)}
-                              now={now}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+            <div className="enter-rise mt-6 grid gap-10 [--enter-delay:160ms]">
+              {(["current", "past"] as const).map((group) =>
+                groups[group].length > 0 ? (
+                  <section key={group} aria-labelledby={`${group}-opportunities-title`}>
+                    <SectionTitle
+                      id={`${group}-opportunities-title`}
+                      title={t(`sections.${group}.title`)}
+                      count={groups[group].length}
+                      muted={group === "past"}
+                    />
+                    <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {groups[group].map((opportunity) => (
+                        <li key={opportunity.id} className="flex min-w-0">
+                          <OpportunityCard
+                            opportunity={opportunity}
+                            saved={saved.has(opportunity.id)}
+                            application={applications.get(opportunity.id)}
+                            now={now}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </section>
-                );
-              })}
-            </>
+                ) : null,
+              )}
+            </div>
           ) : null}
         </>
       )}
-
-      {pastEvents ? (
-        <PastOpportunitiesArchive events={pastEvents} errorLabels={errorLabels} />
-      ) : null}
     </>
+  );
+}
+
+function SectionTitle({
+  id,
+  title,
+  count,
+  muted = false,
+}: {
+  id: string;
+  title: string;
+  count: number;
+  muted?: boolean;
+}) {
+  return (
+    <h2
+      id={id}
+      className={cn(
+        "mb-3 flex items-baseline gap-2 text-xs font-semibold tracking-[0.14em] uppercase",
+        muted ? "text-ink-muted" : "text-ink",
+      )}
+    >
+      {title}
+      <span aria-hidden="true" className="tabular font-normal text-ink-muted">
+        {count}
+      </span>
+    </h2>
   );
 }

@@ -3,16 +3,16 @@ import type { OpportunitySummary } from "./types";
 export function groupOpportunities<T extends OpportunitySummary>(
   items: readonly T[],
   now: Date,
-): { current: T[]; expired: T[] } {
+): { current: T[]; past: T[] } {
   const current: T[] = [];
-  const expired: T[] = [];
+  const past: T[] = [];
 
   for (const opportunity of items) {
-    const isExpired =
+    const isPast =
       opportunity.status === "closed" ||
       new Date(opportunity.applicationDeadline).getTime() <= now.getTime();
-    (isExpired ? expired : current).push(opportunity);
+    (isPast ? past : current).push(opportunity);
   }
 
-  return { current, expired };
+  return { current, past };
 }
