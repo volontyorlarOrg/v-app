@@ -38,12 +38,16 @@ export function OpportunityCard({
   now,
   application,
   showSave = true,
+  titleHref,
+  note,
 }: {
   opportunity: OpportunitySummary;
   saved: boolean;
   now: Date;
   application?: { id: string; status: ApplicationStatus } | undefined;
   showSave?: boolean;
+  titleHref?: string;
+  note?: string;
 }) {
   const t = useTranslations("opportunities");
   const applications = useTranslations("applications");
@@ -104,7 +108,7 @@ export function OpportunityCard({
           <div className="min-w-0">
             <h3 className="text-base leading-snug font-semibold text-balance">
               <Link
-                href={opportunityHref(opportunity.slug)}
+                href={titleHref ?? opportunityHref(opportunity.slug)}
                 className="text-ink hover:text-primary-ink"
               >
                 {opportunity.title}
@@ -155,7 +159,9 @@ export function OpportunityCard({
           </li>
         </ul>
 
-        {opportunity.publishedAt ? (
+        {note ? (
+          <p className="mt-3 text-xs text-ink-muted">{note}</p>
+        ) : opportunity.publishedAt ? (
           <p className="mt-3 text-xs text-ink-muted">
             {t("card.posted", {
               date: format.dateTime(new Date(opportunity.publishedAt), "day"),

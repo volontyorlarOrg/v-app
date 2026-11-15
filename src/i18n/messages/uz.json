@@ -645,7 +645,14 @@
       "region": "Hudud",
       "regionAny": "Barcha hududlar",
       "savedOnly": "Faqat saqlanganlar",
-      "clear": "Filtrlarni tozalash"
+      "clear": "Filtrlarni tozalash",
+      "more": "Filtrlar",
+      "format": "Format",
+      "formatAny": "Barchasi",
+      "openOnly": "Ariza qabul qilinmoqda",
+      "sort": "Saralash",
+      "done": "Tayyor",
+      "remove": "Olib tashlash: {filter}"
     },
     "card": {
       "view": "Batafsil",
@@ -757,48 +764,17 @@
       "volunteering": "Volontyorlik",
       "competition": "Tanlovlar"
     },
-    "archive": {
-      "title": "Avvalgi imkoniyatlar",
-      "description": "Volontyorlar jamoalari yordamida amalga oshgan avvalgi tadbirlardan ayrimlari.",
-      "illustrationsNote": "Rasmlar bu tadbirlarning fotosi emas, AI yordamida yaratilgan illyustratsiyalardir.",
-      "jumpTo": "Avvalgi imkoniyatlarni koʻrish",
-      "eventsOrganized": "tashkil etilgan tadbir",
-      "countSource": "50 dan ortiq tadbir haqidagi manbani ochish",
-      "pastEvent": "Tadbir oʻtgan",
-      "originalPost": "Asl eʼlon",
-      "sourceFor": "{title} haqidagi asl eʼlonni ochish",
-      "illustration": "Illyustratsiya",
-      "categories": {
-        "eventTeam": "Volontyorlar tadbiri"
-      },
-      "locations": {
-        "tashkent": "Toshkent, Paxtakor stadioni",
-        "amirsoy": "Amirsoy kurorti",
-        "andijan": "Andijon"
-      },
-      "items": {
-        "profession": "«Eng yaxshi kasb egasi — 2026» tanlovi",
-        "amirsoy": "Amirsoy Paradiso — Open Air",
-        "football": "Paxtakor stadionidagi xalqaro futbol uchrashuvi"
-      },
-      "closed": "Oʻtgan tadbirlar · Arizalar qabuli yopilgan",
-      "recorded": "Tashkilotlar qayd etgan oʻtgan tadbirlar",
-      "took": "{count, plural, one {# volontyor} other {# volontyor}} · {hours} soat"
-    },
     "sorting": {
-      "newest": "Eng yangi eʼlonlar avval",
-      "deadline": "Eng yaqin ariza muddati avval",
-      "start": "Eng yaqin tadbir avval"
+      "newest": "Eng yangi",
+      "deadline": "Ariza muddati",
+      "start": "Tadbir sanasi"
     },
     "sections": {
       "current": {
-        "title": "Joriy vakansiyalar",
-        "description": "Kelgusi imkoniyatlar. Qabul holatini har bir kartadan tekshiring.",
-        "empty": "Bu filtrlarga mos joriy vakansiyalar yoʻq."
+        "title": "Joriy"
       },
-      "expired": {
-        "title": "Muddati tugagan vakansiyalar",
-        "description": "Arizalar qabuli yopilgan. Tafsilotlarni hali ham koʻrishingiz mumkin."
+      "past": {
+        "title": "Oʻtgan"
       }
     }
   },

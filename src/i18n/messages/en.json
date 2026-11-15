@@ -645,7 +645,14 @@
       "region": "Region",
       "regionAny": "All regions",
       "savedOnly": "Saved only",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "more": "Filters",
+      "format": "Format",
+      "formatAny": "Any",
+      "openOnly": "Open for applications",
+      "sort": "Sort",
+      "done": "Done",
+      "remove": "Remove: {filter}"
     },
     "card": {
       "view": "View details",
@@ -757,48 +764,17 @@
       "volunteering": "Volunteering",
       "competition": "Competitions"
     },
-    "archive": {
-      "title": "Past opportunities",
-      "description": "A few past events made possible by volunteer teams.",
-      "illustrationsNote": "Images are AI-generated illustrations, not photos from these events.",
-      "jumpTo": "See past opportunities",
-      "eventsOrganized": "events organized",
-      "countSource": "Open the source for the 50+ events figure",
-      "pastEvent": "Past event",
-      "originalPost": "Original post",
-      "sourceFor": "Open the original post for {title}",
-      "illustration": "Illustration",
-      "categories": {
-        "eventTeam": "Volunteer event"
-      },
-      "locations": {
-        "tashkent": "Tashkent, Paxtakor Stadium",
-        "amirsoy": "Amirsoy Resort",
-        "andijan": "Andijan"
-      },
-      "items": {
-        "profession": "Best in the Profession 2026",
-        "amirsoy": "Amirsoy Paradiso — Open Air",
-        "football": "International football match at Paxtakor Stadium"
-      },
-      "closed": "Past events · Applications closed",
-      "recorded": "Past events organizations recorded",
-      "took": "{count, plural, one {# volunteer} other {# volunteers}} · {hours} h"
-    },
     "sorting": {
-      "newest": "Newest posts first",
-      "deadline": "Soonest deadline first",
-      "start": "Soonest event first"
+      "newest": "Newest",
+      "deadline": "Deadline",
+      "start": "Event date"
     },
     "sections": {
       "current": {
-        "title": "Current vacancies",
-        "description": "Upcoming opportunities. Check each card for availability.",
-        "empty": "No current vacancies match these filters."
+        "title": "Current"
       },
-      "expired": {
-        "title": "Expired vacancies",
-        "description": "Applications have closed. You can still view the details."
+      "past": {
+        "title": "Past"
       }
     }
   },
