@@ -56,16 +56,21 @@ coordinator revision temporarily hides the opportunity until renewed approval.
 
 The opportunities listing defaults to newest publication first (`sort=newest`).
 Cards display the backend `publishedAt` date when available, including in Saved.
-Current and expired vacancies have separate headings and counts; a closed status
-or a deadline at or before the request time puts a vacancy in Expired. A full
-vacancy with a future deadline remains Current. The past-events archive has its
-own divider and stays outside filtered and saved results. It shows the
-organizations' past events an administrator approved (`GET /past-events`: name,
-date, organization, and how many volunteers and hours were approved), newest
-first, above the three sourced, illustrated events in
-`src/lib/opportunities/archive.ts`. A failed read shows `LoadErrorRows` in their
-place and leaves the sourced events standing. The volunteers' own share of an
-approved event is in their history as a `manual` entry.
+The listing splits into Current and Past (`groupOpportunities` in
+`src/lib/opportunities/listing.ts`); a closed status or a deadline at or before
+the request time puts a vacancy in Past, and a full vacancy with a future
+deadline remains Current. Both groups render as the same cards under a short
+label and a count, with no description, and a group with no vacancies is not
+rendered at all.
+
+The toolbar is a search field and a Filters button, then the type tabs and the
+"Saved only" switch. The Filters button opens a panel with region, format, "Open
+for applications" and sort, each applied to the URL as it changes; its badge
+counts the active region, format and availability filters, which also appear
+under the toolbar as removable chips beside "Clear filters". Every value is a
+query parameter the backend's `GET /opportunities` already accepts, one value
+each. The listing no longer shows the past-events archive; the volunteers'
+own share of an approved event is in their history as a `manual` entry.
 
 ## Application
 

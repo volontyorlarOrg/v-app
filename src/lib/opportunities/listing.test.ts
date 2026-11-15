@@ -28,7 +28,7 @@ describe("groupOpportunities", () => {
       { ...base, id: "deadline-now", applicationDeadline: now.toISOString() },
       {
         ...base,
-        id: "full-expired",
+        id: "full-past",
         status: "full" as const,
         applicationDeadline: "2026-10-08T12:00:00Z",
       },
@@ -38,17 +38,17 @@ describe("groupOpportunities", () => {
       "new-current",
       "full-current",
     ]);
-    expect(groups.expired.map((item) => item.id)).toEqual([
+    expect(groups.past.map((item) => item.id)).toEqual([
       "closed",
       "deadline-now",
-      "full-expired",
+      "full-past",
     ]);
     expect(items.map((item) => item.id)).toEqual([
       "new-current",
       "closed",
       "full-current",
       "deadline-now",
-      "full-expired",
+      "full-past",
     ]);
   });
 });
