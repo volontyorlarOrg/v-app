@@ -1406,13 +1406,12 @@ test.describe("opportunities", () => {
     await signIn(page);
   });
 
-  test("separates current and expired vacancies and orders current posts newest first", async ({
+  test("separates current and past vacancies and drops an empty current group", async ({
     page,
   }) => {
     await gotoReady(page, "/opportunities");
-    const current = page.getByRole("region", { name: "Current vacancies" });
-    const expired = page.getByRole("region", { name: "Expired vacancies" });
-    await expect(page.getByText("Newest posts first", { exact: true })).toBeVisible();
+    const current = page.getByRole("region", { name: "Current", exact: true });
+    const past = page.getByRole("region", { name: "Past", exact: true });
     await expect(current.getByRole("heading", { level: 3 })).toHaveText([
       "City youth debate",
       "Winter book drive",
@@ -1421,102 +1420,27 @@ test.describe("opportunities", () => {
       "City marathon water stations",
     ]);
     await expect(current.getByText(/^Posted /)).toHaveCount(5);
-    await expect(expired.getByRole("heading", { level: 3 })).toHaveText([
+    await expect(past.getByRole("heading", { level: 3 })).toHaveText([
       "Read-aloud day",
     ]);
-    await expect(
-      expired.getByText("Applications have closed. You can still view the details."),
-    ).toBeVisible();
 
     await gotoReady(page, "/opportunities?view=saved");
     await expect(
       page
-        .getByRole("region", { name: "Current vacancies" })
+        .getByRole("region", { name: "Current", exact: true })
         .getByRole("heading", { level: 3 }),
     ).toHaveText(["Riverbank clean-up", "Remote translation support"]);
-    await expect(page.getByRole("region", { name: "Expired vacancies" })).toHaveCount(
+    await expect(page.getByRole("region", { name: "Past", exact: true })).toHaveCount(
       0,
     );
 
     await gotoReady(page, "/opportunities?q=read-aloud");
-    await expect(page.getByRole("region", { name: "Current vacancies" })).toContainText(
-      "No current vacancies match these filters.",
-    );
     await expect(
-      page.getByRole("region", { name: "Expired vacancies" }).getByRole("article"),
+      page.getByRole("region", { name: "Current", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Past", exact: true }).getByRole("article"),
     ).toHaveCount(1);
-  });
-
-  test("shows approved organization events and three illustrated past events only in the unfiltered listing", async ({
-    page,
-  }, testInfo) => {
-    await gotoReady(page, "/opportunities");
-    const archive = page.getByRole("region", { name: "Past opportunities" });
-
-    const recorded = archive.getByRole("list", {
-      name: "Past events organizations recorded",
-    });
-    await expect(recorded.getByRole("article")).toHaveCount(1);
-    await expect(
-      recorded.getByRole("heading", { level: 3, name: "Neighborhood reading day" }),
-    ).toBeVisible();
-    await expect(recorded).toContainText("Chilonzor Reading Corners");
-    await expect(recorded).toContainText("12 volunteers · 30.5 h");
-    await expect(archive.getByRole("article")).toHaveCount(4);
-    for (const title of [
-      "Best in the Profession 2026",
-      "Amirsoy Paradiso — Open Air",
-      "International football match at Paxtakor Stadium",
-    ]) {
-      await expect(
-        archive.getByRole("heading", { level: 3, name: title }),
-      ).toBeVisible();
-    }
-
-    await page.getByRole("link", { name: "See past opportunities" }).click();
-    await expect(page).toHaveURL(/#past-opportunities-title$/);
-
-    if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
-      await page.waitForFunction(() =>
-        [...document.querySelectorAll(".enter-rise")].every(
-          (element) => getComputedStyle(element).opacity === "1",
-        ),
-      );
-      await page.screenshot({
-        path: testInfo.outputPath("past-opportunities-light.png"),
-        fullPage: true,
-      });
-    }
-
-    await gotoReady(page, "/settings");
-    await page
-      .getByRole("region", { name: "Appearance" })
-      .getByRole("switch", { name: "Dark theme" })
-      .click();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    await gotoReady(page, "/opportunities");
-
-    if (["chromium-desktop", "chromium-mobile"].includes(testInfo.project.name)) {
-      await page.waitForFunction(() =>
-        [...document.querySelectorAll(".enter-rise")].every(
-          (element) => getComputedStyle(element).opacity === "1",
-        ),
-      );
-      await page.screenshot({
-        path: testInfo.outputPath("past-opportunities-dark.png"),
-        fullPage: true,
-      });
-    }
-
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoReady(page, "/opportunities");
-    await expect(page.locator("#past-opportunities-title")).toBeVisible();
-    expect(await page.locator("html").getAttribute("data-motion")).toBeNull();
-
-    await gotoReady(page, "/opportunities?kind=competition");
-    await expect(page.getByRole("region", { name: "Past opportunities" })).toHaveCount(
-      0,
-    );
   });
 
   test("competition type filters the catalogue and opens an individual application", async ({
@@ -1597,18 +1521,39 @@ test.describe("opportunities", () => {
     await expect(alert).toHaveCount(0);
   });
 
-  test("filtering by region puts the filter in the URL and asks the backend", async ({
+  test("the filters panel applies region, format and availability through the URL", async ({
     page,
   }) => {
     await gotoReady(page, "/opportunities");
+    await page.locator("html[data-app-hydrated='true']").waitFor();
     await expect.poll(() => page.getByRole("article").count()).toBeGreaterThan(3);
 
-    await page.getByLabel("Region").selectOption("samarkand");
+    await page.getByRole("button", { name: /^Filters/ }).click();
+    const panel = page.getByRole("dialog");
+    await panel.getByLabel("Region").selectOption("samarkand");
     await expect(page).toHaveURL(/region=samarkand/);
     await expect(page.getByRole("article")).toHaveCount(1);
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Filters/ })).toContainText("1");
+
+    await page.getByRole("link", { name: "Remove: Samarkand" }).click();
+    await expect(page).not.toHaveURL(/region=/);
+
+    await page.getByRole("button", { name: /^Filters/ }).click();
+    await panel.getByText("Remote", { exact: true }).click();
+    await expect(panel.getByRole("radio", { name: "Remote" })).toBeChecked();
+    await expect(page).toHaveURL(/format=remote/);
+    await panel.getByRole("switch", { name: "Open for applications" }).click();
+    await expect(page).toHaveURL(/open=1/);
+    await expect(page.getByRole("article")).toHaveCount(1);
+    await panel.getByText("Deadline", { exact: true }).click();
+    await expect(page).toHaveURL(/sort=deadline/);
+    await panel.getByRole("button", { name: "Done" }).click();
+    await expect(panel).toHaveCount(0);
 
     await page.getByRole("link", { name: "Clear filters" }).first().click();
-    await expect(page).not.toHaveURL(/region=/);
+    await expect(page).not.toHaveURL(/format=|open=|sort=/);
   });
 
   test("the search and the saved-only switch both round-trip through the URL", async ({
@@ -1786,6 +1731,23 @@ test.describe("opportunities", () => {
 test.describe("applications, record, profile and settings", () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page);
+  });
+
+  test("applications are vacancy cards carrying the application's status", async ({
+    page,
+  }) => {
+    await gotoReady(page, "/applications");
+    const list = page.getByRole("region", { name: "Your applications" });
+    await expect(list.getByRole("article").first()).toBeVisible();
+    const draft = list.getByRole("article").filter({
+      has: page.getByRole("link", { name: /book drive/i }),
+    });
+    await expect(draft.getByText("Draft", { exact: true })).toBeVisible();
+    await expect(draft.getByText(/^Started /)).toBeVisible();
+    await expect(draft.getByRole("link", { name: "Continue" })).toHaveAttribute(
+      "href",
+      /\/applications\/app-book-drive$/,
+    );
   });
 
   test("applications filter by group and a draft can be saved", async ({ page }) => {
