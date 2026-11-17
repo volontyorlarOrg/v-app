@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Link } from "@/i18n/navigation";
 import type { LegalChoice } from "@/lib/legal/constants";
 import { setLegalChoiceAction } from "@/lib/legal/actions";
+import { navHref } from "@/lib/routing/routes";
 
 type ChoiceLabels = { label: string; description: string; on: string; off: string };
 
@@ -81,7 +82,7 @@ export function PrivacySection({
         error={labels.error}
       />
       <Link
-        href="/consent"
+        href={navHref("dataRequests")}
         className="text-sm text-primary-ink underline underline-offset-4"
       >
         {labels.dataLink}

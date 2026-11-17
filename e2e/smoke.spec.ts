@@ -1884,6 +1884,7 @@ test.describe("applications, record, profile and settings", () => {
     ).toBeVisible();
     await expect(page.getByRole("list", { name: "Participation" })).toBeVisible();
     await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "My activity" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
@@ -2492,6 +2493,23 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard username", () => {
+  test("a profile without stored privacy choices starts with optional details hidden", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `privacy-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page
+      .getByLabel("Username", { exact: true })
+      .fill(`private_${info.project.name.replaceAll("-", "_")}`);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+    await gotoReady(page, "/profile/edit");
+    for (const name of ["Bio", "School", "Phone", "Activity"]) {
+      await expect(page.getByRole("switch", { name, exact: true })).not.toBeChecked();
+    }
+  });
   test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);
     await gotoReady(page, "/settings");

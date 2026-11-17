@@ -286,7 +286,7 @@ function Profile({
       avatarUrl={avatarUrl}
       handle={handle}
       level={level ? recordLabels(`level.${level}`) : null}
-      bio={values.bio.trim()}
+      bio={shown.bio.trim()}
       socials={socials}
       figures={figures}
       rows={rows}
