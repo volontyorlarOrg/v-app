@@ -1,4 +1,5 @@
 export const OPTIONAL_PROFILE_PARTS = [
+  "bio",
   "region",
   "hometownRegion",
   "city",
@@ -21,7 +22,6 @@ export const ALWAYS_SHOWN_PROFILE_PARTS = [
   "name",
   "username",
   "level",
-  "bio",
   "figures",
 ] as const;
 
@@ -51,6 +51,7 @@ export function hiddenPartsFromFormData(
 
 export function withoutHiddenParts<
   T extends {
+    bio: string;
     region: unknown;
     hometownRegion: unknown;
     city: string;
@@ -66,6 +67,7 @@ export function withoutHiddenParts<
 >(profile: T, hidden: ReadonlySet<OptionalProfilePart>): T {
   return {
     ...profile,
+    bio: hidden.has("bio") ? "" : profile.bio,
     region: hidden.has("region") ? null : profile.region,
     hometownRegion: hidden.has("hometownRegion") ? null : profile.hometownRegion,
     city: hidden.has("city") ? "" : profile.city,

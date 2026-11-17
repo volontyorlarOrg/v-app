@@ -31,7 +31,9 @@ describe("profile visibility", () => {
     for (const part of ALWAYS_SHOWN_PROFILE_PARTS) {
       expect(OPTIONAL_PROFILE_PARTS as readonly string[]).not.toContain(part);
     }
-    expect(hiddenProfileParts(["bio", "name", "phone"])).toEqual(new Set(["phone"]));
+    expect(hiddenProfileParts(["bio", "name", "phone"])).toEqual(
+      new Set(["bio", "phone"]),
+    );
   });
 
   it("reads a form with every switch on as nothing hidden", () => {
@@ -61,12 +63,15 @@ describe("profile visibility", () => {
     expect(hiddenPartsFromFormData(data)).toBeUndefined();
   });
 
-  it("blanks hidden parts and never the name or the bio", () => {
-    const shown = withoutHiddenParts(profile, new Set(["phone", "region", "links"]));
+  it("blanks hidden parts without hiding the name", () => {
+    const shown = withoutHiddenParts(
+      profile,
+      new Set(["bio", "phone", "region", "links"]),
+    );
 
     expect(shown).toMatchObject({
       fullName: "Dilnoza Karimova",
-      bio: "Hi",
+      bio: "",
       phone: "",
       region: null,
       links: [],

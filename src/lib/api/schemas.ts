@@ -257,7 +257,15 @@ export const rewardHistoryEntrySchema = z.object({
 
 export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
 
+export const verificationSchema = z.object({
+  verified: z.boolean(),
+  organization: z
+    .object({ id: z.string(), name: z.string(), logoUrl: z.string().nullable() })
+    .nullable(),
+});
+
 export const publicProfileSchema = z.object({
+  verification: verificationSchema.optional(),
   displayName: z.string().min(1),
   username: usernameField,
   avatarUrl: optional(z.url()),
@@ -413,6 +421,7 @@ export const leaderboardEntrySchema = z
     username: usernameField,
     avatarUrl: optional(z.url()),
     profileVisible: z.boolean(),
+    verification: verificationSchema.optional(),
     xp: z.number().int().nonnegative(),
     isCurrentUser: z.boolean(),
   })
@@ -425,6 +434,7 @@ const leaderboardViewerSchema = z
     username: usernameField,
     avatarUrl: optional(z.url()),
     profileVisible: z.boolean(),
+    verification: verificationSchema.optional(),
     xp: z.number().int().nonnegative(),
   })
   .strict();
@@ -494,6 +504,7 @@ export const meSchema = z
     usernameEditable: z.boolean(),
     avatarUrl: optional(z.url()),
     publicProfileEnabled: z.boolean().default(false),
+    verification: verificationSchema.optional(),
     roles: z.array(z.string()).default([]),
     createdAt: isoDate,
     email: optional(z.string()),
