@@ -89,7 +89,11 @@ export default async function ProfileEditPage({
   return (
     <ProfileEditor
       values={values}
-      hidden={[...hiddenProfileParts(profile?.hiddenFields)]}
+      hidden={
+        profile
+          ? [...hiddenProfileParts(profile.hiddenFields)]
+          : [...OPTIONAL_PROFILE_PARTS]
+      }
       locale={locale as Locale}
       avatarUrl={me.avatarUrl}
     />

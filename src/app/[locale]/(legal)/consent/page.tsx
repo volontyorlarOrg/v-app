@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
-import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { SignOutForm } from "@/components/auth/sign-out-form";
-import { ConsentForm, DataRequestForm } from "@/components/legal/legal-form";
+import { ConsentForm } from "@/components/legal/legal-form";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { authed } from "@/lib/api/session.server";
 import { safeReturnPath } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
-import { LEGAL_REQUEST_KINDS } from "@/lib/legal/constants";
-import { legalRequestsSchema } from "@/lib/legal/schemas";
 import { getLegalState } from "@/lib/legal/state.server";
+import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -36,17 +34,11 @@ export default async function ConsentPage({
   const { next } = await searchParams;
   const returnTo = safeReturnPath(typeof next === "string" ? next : null);
 
-  const [t, format, session] = await Promise.all([
+  const [t, session] = await Promise.all([
     getTranslations({ locale, namespace: "legal" }),
-    getFormatter({ locale }),
     getSession(),
   ]);
-  const [state, requests] = session
-    ? await Promise.all([
-        getLegalState(),
-        authed("/me/legal/requests", { schema: legalRequestsSchema }),
-      ])
-    : [null, null];
+  const state = session ? await getLegalState() : null;
 
   return (
     <>
@@ -85,56 +77,18 @@ export default async function ConsentPage({
         )}
       </AuthPanel>
 
-      {session && requests ? (
-        <AuthPanel>
-          <h2 className="font-sans text-base font-semibold text-ink">
-            {t("requests.title")}
-          </h2>
-          <p className="mt-1 mb-4 text-base leading-relaxed text-ink-muted">
-            {t("requests.help")}
-          </p>
-          <DataRequestForm
-            labels={{
-              kind: t("requests.kind"),
-              kinds: Object.fromEntries(
-                LEGAL_REQUEST_KINDS.map((kind) => [kind, t(`requests.kinds.${kind}`)]),
-              ) as Record<(typeof LEGAL_REQUEST_KINDS)[number], string>,
-              message: t("requests.message"),
-              submit: t("requests.submit"),
-              pending: t("requests.pending"),
-              sent: t("requests.sent"),
-              error: t("requests.error"),
-            }}
-          />
-          {requests.items.length > 0 ? (
-            <ul className="mt-5 flex flex-col gap-4 border-t border-border pt-4">
-              {requests.items.map((item) => (
-                <li key={item.id} className="text-sm">
-                  <p className="font-semibold text-ink">
-                    {t(`requests.kinds.${item.kind}`)} ·{" "}
-                    {t(`requests.status.${item.status}`)}
-                  </p>
-                  <p className="text-ink-muted">
-                    {format.dateTime(new Date(item.createdAt), { dateStyle: "medium" })}
-                  </p>
-                  {item.resolution ? (
-                    <p className="mt-1 whitespace-pre-line text-ink">
-                      {item.resolution}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </AuthPanel>
-      ) : null}
-
       <div className="mt-4 flex flex-wrap items-center justify-center gap-5 text-sm">
         {session ? (
           <>
+            <Link
+              href={navHref("dataRequests")}
+              className="text-primary-ink underline underline-offset-4"
+            >
+              {t("requests.title")}
+            </Link>
             {state?.accepted ? (
               <Link
-                href="/settings"
+                href={navHref("settings")}
                 className="text-primary-ink underline underline-offset-4"
               >
                 {t("back")}

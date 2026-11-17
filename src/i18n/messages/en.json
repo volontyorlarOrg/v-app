@@ -1266,7 +1266,7 @@
       "required": "Tick the first box to continue.",
       "error": "We could not save your consent. Check your connection and try again."
     },
-    "accepted": "You accepted the current Privacy Policy. Choose what others see in Edit profile, or send a request below.",
+    "accepted": "You accepted the current Privacy Policy. Choose what others see in Edit profile.",
     "requests": {
       "title": "Requests about your data",
       "help": "Ask for a copy, a correction, a review of an automatic decision, or deletion. We answer here: corrections within 3 days, everything else within 10 days. Deleting your data or withdrawing consent stops normal use of the app at once.",

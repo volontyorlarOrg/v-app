@@ -19,6 +19,7 @@ test("sign-up starts with one consent box", async ({ page }) => {
     ),
   ).toBeVisible();
   await expect(required).not.toBeChecked();
+  await expect(page.getByLabel("What do you need?", { exact: true })).toHaveCount(0);
   await expect(
     page.locator('input[name="leaderboard"], input[name="publicProfile"]'),
   ).toHaveCount(0);
@@ -78,8 +79,13 @@ test("withdrawing consent stops app use until the volunteer agrees again", async
   baseURL,
 }) => {
   await signInExisting(page, baseURL!);
-  await page.goto("/consent");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Your data");
+  await page.goto("/settings/privacy");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Requests about your data",
+  );
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+  ).toBe(true);
   await page
     .getByLabel("What do you need?", { exact: true })
     .selectOption("withdrawal");
@@ -94,7 +100,14 @@ test("withdrawing consent stops app use until the volunteer agrees again", async
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/consent$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Before you start");
+  await expect(page.getByLabel("What do you need?", { exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Requests about your data" }).click();
+  await expect(page).toHaveURL(/\/settings\/privacy$/);
   await expect(page.getByLabel("What do you need?", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Withdraw my consent · Waiting for an answer"),
+  ).toBeVisible();
+  await page.goto("/consent");
 
   await page.locator('input[name="accepted"]').check();
   await page.getByRole("button", { name: "Agree and continue" }).click();
@@ -125,5 +138,28 @@ test("the leaderboard choice remains in Settings → Privacy without a public-pr
     .locator("#privacy")
     .getByRole("link", { name: "Your data and requests" })
     .click();
-  await expect(page).toHaveURL(/\/consent$/);
+  await expect(page).toHaveURL(/\/settings\/privacy$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Requests about your data",
+  );
+});
+
+test("the consent page has no data-request form for a signed-in volunteer", async ({
+  page,
+  baseURL,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await signInExisting(page, baseURL!);
+  await page.goto("/consent");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByLabel("What do you need?", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Send request", exact: true }),
+  ).toHaveCount(0);
+});
+
+test("data requests require sign-in", async ({ page }) => {
+  await page.goto("/settings/privacy");
+  await expect(page).toHaveURL(/\/login\?next=%2Fsettings%2Fprivacy$/);
+  await expect(page.getByLabel("What do you need?", { exact: true })).toHaveCount(0);
 });

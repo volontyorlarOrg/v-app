@@ -2,6 +2,7 @@ import { isLocale, type Locale } from "@/i18n/routing";
 
 export type RouteKey =
   | "consent"
+  | "dataRequests"
   | "login"
   | "signup"
   | "dashboard"
@@ -35,6 +36,15 @@ export type AppRoute = {
 };
 
 export const appRoutes: readonly AppRoute[] = [
+  {
+    key: "dataRequests",
+    path: "/settings/privacy",
+    area: "legal",
+    guard: "session",
+    navGroup: null,
+    inTabBar: false,
+    section: "settings",
+  },
   {
     key: "consent",
     path: "/consent",

@@ -1266,7 +1266,7 @@
       "required": "Davom etish uchun birinchi belgini qoʻying.",
       "error": "Roziligingiz saqlanmadi. Internetni tekshirib, qayta urinib koʻring."
     },
-    "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar koʻradigan maʼlumotlarni Profilni tahrirlashda tanlang yoki quyida soʻrov yuboring.",
+    "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar koʻradigan maʼlumotlarni Profilni tahrirlashda tanlang.",
     "requests": {
       "title": "Maʼlumotlaringiz boʻyicha soʻrovlar",
       "help": "Nusxa, tuzatish, avtomatik qarorni qayta koʻrib chiqish yoki oʻchirishni soʻrang. Javob shu yerda chiqadi: tuzatish 3 kun ichida, qolganlari 10 kun ichida. Maʼlumotlarni oʻchirish yoki rozilikni qaytarib olish ilovadan odatiy foydalanishni darhol toʻxtatadi.",
