@@ -939,7 +939,7 @@
     },
     "visibility": {
       "title": "What others see",
-      "help": "Your photo, name, username, level, bio and participation figures are always on your profile. Everything else is your choice. Organisers still see your full profile on an application you send.",
+      "help": "Your photo, name, username, level and participation figures are always on your profile. You choose what else to show. Organisers still see your full profile on an application you send.",
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
       "parts": {
         "region": "Region",
@@ -954,7 +954,8 @@
         "linkedin": "LinkedIn",
         "links": "Portfolio links",
         "joined": "Joined date",
-        "activity": "Activity"
+        "activity": "Activity",
+        "bio": "Bio"
       }
     }
   },
@@ -1290,5 +1291,9 @@
     },
     "back": "Back to settings",
     "signOut": "Sign out"
+  },
+  "verification": {
+    "verified": "Verified",
+    "affiliation": "Affiliated with {name}"
   }
 }

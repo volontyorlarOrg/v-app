@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { VerificationMarks } from "@/components/profile/verification-marks";
 import type { LeaderboardEntry } from "@/lib/api/schemas";
 import { VIEWER_ANCHOR } from "@/lib/leaderboard/standing";
 import { initialsOf } from "@/lib/profile/initials";
@@ -93,7 +94,8 @@ export function LeaderboardPodium({
                     </Link>
                   ) : (
                     entry.displayName
-                  )}
+                  )}{" "}
+                  <VerificationMarks verification={entry.verification} />
                 </p>
                 <div className="flex max-w-full items-center gap-1.5">
                   <p className="max-w-full truncate text-xs text-ink-muted sm:text-sm">

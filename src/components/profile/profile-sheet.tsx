@@ -41,6 +41,7 @@ export type ProfileCompletionLine = {
 
 export function ProfileSheet({
   name,
+  marks,
   initials,
   avatarUrl,
   handle,
@@ -55,6 +56,7 @@ export function ProfileSheet({
   labels,
 }: {
   name: string;
+  marks?: ReactNode;
   initials: string;
   avatarUrl?: string;
   handle: string | null;
@@ -127,7 +129,7 @@ export function ProfileSheet({
           data-long={longName || undefined}
           className="profile-name enter-words mt-6 [--enter-delay:40ms]"
         >
-          <SplitWords text={name} />
+          <SplitWords text={name} /> {marks}
         </h1>
 
         <p className="enter-rise mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 [--enter-delay:200ms]">

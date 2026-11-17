@@ -939,7 +939,7 @@
     },
     "visibility": {
       "title": "Boshqalarga koʻrinadigan qismlar",
-      "help": "Rasm, ism, foydalanuvchi nomi, daraja, oʻzingiz haqingizdagi matn va ishtirok koʻrsatkichlari profilda doim koʻrinadi. Qolganini oʻzingiz tanlaysiz. Ariza yuborganingizda tashkilotchi profilingizni toʻliq koʻradi.",
+      "help": "Rasm, ism, foydalanuvchi nomi, daraja va ishtirok koʻrsatkichlari profilda doim koʻrinadi. Qolganini oʻzingiz tanlaysiz. Ariza yuborganingizda tashkilotchi profilingizni toʻliq koʻradi.",
       "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",
       "parts": {
         "region": "Hudud",
@@ -954,7 +954,8 @@
         "linkedin": "LinkedIn",
         "links": "Portfolio havolalari",
         "joined": "Qoʻshilgan sana",
-        "activity": "Faoliyat"
+        "activity": "Faoliyat",
+        "bio": "Oʻzingiz haqingizda"
       }
     }
   },
@@ -1290,5 +1291,9 @@
     },
     "back": "Sozlamalarga qaytish",
     "signOut": "Chiqish"
+  },
+  "verification": {
+    "verified": "Tasdiqlangan",
+    "affiliation": "{name} tashkilotiga aloqador"
   }
 }
