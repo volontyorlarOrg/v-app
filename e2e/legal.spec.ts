@@ -13,6 +13,11 @@ test("sign-up starts with one consent box", async ({ page }) => {
   await expect(page).toHaveURL(/\/consent$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Before you start");
   const required = page.locator('input[name="accepted"]');
+  await expect(
+    page.getByText(
+      /agree to the processing described and to my profile being visible to others/,
+    ),
+  ).toBeVisible();
   await expect(required).not.toBeChecked();
   await expect(
     page.locator('input[name="leaderboard"], input[name="publicProfile"]'),
@@ -96,13 +101,16 @@ test("withdrawing consent stops app use until the volunteer agrees again", async
   await expect(page).toHaveURL(/\/dashboard$/);
 });
 
-test("the leaderboard and public profile are switched in Settings → Privacy", async ({
+test("the leaderboard choice remains in Settings → Privacy without a public-profile switch", async ({
   page,
   baseURL,
 }) => {
   await signInExisting(page, baseURL!);
   await page.goto("/settings");
   const privacy = page.locator("#privacy");
+  await expect(
+    privacy.getByRole("switch", { name: "Show my public profile" }),
+  ).toHaveCount(0);
   const leaderboard = privacy.getByRole("switch", {
     name: "Show me on the leaderboard",
   });

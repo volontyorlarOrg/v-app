@@ -11,7 +11,6 @@ import { setLegalChoiceAction } from "@/lib/legal/actions";
 type ChoiceLabels = { label: string; description: string; on: string; off: string };
 
 export type PrivacyLabels = {
-  publicProfile: ChoiceLabels;
   leaderboard: ChoiceLabels;
   error: string;
   dataLink: string;
@@ -67,22 +66,14 @@ function ConsentSwitch({
 }
 
 export function PrivacySection({
-  publicProfile,
   leaderboard,
   labels,
 }: {
-  publicProfile: boolean;
   leaderboard: boolean;
   labels: PrivacyLabels;
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <ConsentSwitch
-        choice="publicProfile"
-        initialEnabled={publicProfile}
-        labels={labels.publicProfile}
-        error={labels.error}
-      />
       <ConsentSwitch
         choice="leaderboard"
         initialEnabled={leaderboard}

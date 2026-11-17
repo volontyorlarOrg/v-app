@@ -41,7 +41,7 @@ export async function giveConsentAction(
     version: LEGAL_VERSION,
     accepted: true,
     leaderboard: false,
-    publicProfile: false,
+    publicProfile: true,
   };
   const rawNext = form.get("next");
   const next = safeReturnPath(typeof rawNext === "string" ? rawNext : null);
