@@ -296,7 +296,7 @@
       },
       "contact": {
         "title": "Aloqa va ochiq havolalar",
-        "lead": "Tashkilotchilar bogʻlanishi uchun Telegram foydalanuvchi nomingizni kiriting. Telefon raqami ixtiyoriy. Ochiq profilingiz yoqilganida aloqa maʼlumotlari koʻrinadi."
+        "lead": "Tashkilotchilar bogʻlana olishi uchun Telegram nomingizni kiriting. Telefon ixtiyoriy. Aloqa maʼlumotlari profilda koʻrinishini oʻzingiz tanlaysiz."
       }
     },
     "rail": {
@@ -876,7 +876,7 @@
       "languagesRemove": "Olib tashlash",
       "languagesLimit": "Oʻnta tanlandi. Boshqasini qoʻshish uchun bittasini olib tashlang.",
       "phone": "Telefon raqami",
-      "phoneHelp": "Mamlakat kodi bilan, masalan +998 90 123 45 67. Ochiq profilingiz yoqilganida hammaga koʻrinadi.",
+      "phoneHelp": "Mamlakat kodi bilan, masalan +998 90 123 45 67. Profilda koʻrinishini oʻzingiz tanlaysiz.",
       "telegram": "Telegram foydalanuvchi nomi",
       "telegramHelp": "@ belgisisiz. Ochiq profilingizda koʻrinadi.",
       "instagram": "Instagram foydalanuvchi nomi",
@@ -1043,7 +1043,7 @@
     },
     "privacy": {
       "title": "Maxfiylik",
-      "description": "Boshqalar nimani koʻradi. Ariza bergan tashkilotlaringiz arizangizni har doim koʻradi.",
+      "description": "Profilingiz boshqalarga koʻrinadi. Ixtiyoriy maʼlumotlarni Profilni tahrirlashda tanlang. Ariza bergan tashkilotlaringiz arizangizni koʻra oladi.",
       "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
       "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
       "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
@@ -1252,7 +1252,7 @@
     "intro": "Volontyorlar tashkilotlar siz bilan ishlay olishi uchun hisobingiz, profilingiz, arizalaringiz va volontyorlik tarixingizni saqlaydi. Qisqacha:",
     "summary": {
       "collect": "Oʻzingiz kiritgan va kirishda Telegram yoki Google beradigan maʼlumotlarni yigʻamiz: ism, aloqa, maktab, hudud, arizalar va soatlar.",
-      "access": "Ularni faqat siz, ariza bergan tashkilotlaringiz, koordinatorlarimiz va administratorlarimiz koʻradi. Quyidagi sozlamalarni yoqmasangiz, boshqa hech kim koʻrmaydi.",
+      "access": "Foydalanuvchi nomini tanlaganingizdan keyin profilingizni har kim koʻra oladi. Ism, foydalanuvchi nomi, surat, daraja, XP va umumiy ishtirok koʻrsatkichlari koʻrinadi; boshqa maʼlumotlarni Profilni tahrirlashda tanlaysiz.",
       "store": "Maʼlumotlar Singapurda saqlanadi — Oʻzbekiston uni shaxsga doir maʼlumotlarni yetarli himoya qiladigan davlat deb tan olgan.",
       "choices": "Maʼlumotlaringizni sotmaymiz, reklama koʻrsatmaymiz va tashkilot arizangizni olganda sizga xabar beramiz.",
       "rights": "Maʼlumotlaringizni koʻrish, tuzatish, oʻchirish yoki rozilikni qaytarib olish istalgan vaqtda Sozlamalar → Maxfiylik boʻlimida mumkin."
@@ -1260,13 +1260,13 @@
     "privacyPolicy": "Maxfiylik siyosati",
     "terms": "Foydalanish shartlari",
     "form": {
-      "accept": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim va Volontyorlar shaxsga doir maʼlumotlarimni ularda tavsiflangandek qayta ishlashiga roziman.",
+      "accept": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim, ularda tavsiflangan qayta ishlashga va profilim boshqalarga koʻrinishiga roziman.",
       "submit": "Roziman, davom etish",
       "pending": "Saqlanmoqda…",
       "required": "Davom etish uchun birinchi belgini qoʻying.",
       "error": "Roziligingiz saqlanmadi. Internetni tekshirib, qayta urinib koʻring."
     },
-    "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar nimani koʻrishini Sozlamalar → Maxfiylik boʻlimida oʻzgartiring yoki quyida soʻrov yuboring.",
+    "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar koʻradigan maʼlumotlarni Profilni tahrirlashda tanlang yoki quyida soʻrov yuboring.",
     "requests": {
       "title": "Maʼlumotlaringiz boʻyicha soʻrovlar",
       "help": "Nusxa, tuzatish, avtomatik qarorni qayta koʻrib chiqish yoki oʻchirishni soʻrang. Javob shu yerda chiqadi: tuzatish 3 kun ichida, qolganlari 10 kun ichida. Maʼlumotlarni oʻchirish yoki rozilikni qaytarib olish ilovadan odatiy foydalanishni darhol toʻxtatadi.",

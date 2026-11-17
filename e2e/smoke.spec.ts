@@ -1868,8 +1868,12 @@ test.describe("applications, record, profile and settings", () => {
 
     await gotoReady(page, "/profile/edit");
     const school = page.getByRole("switch", { name: "School", exact: true });
+    await page
+      .getByRole("textbox", { name: "Bio", exact: true })
+      .fill("Private biography for this profile.");
     await expect(school).toBeChecked();
     await school.click();
+    await page.getByRole("switch", { name: "Bio", exact: true }).click();
     await page.getByRole("switch", { name: "Activity", exact: true }).click();
     await page.getByRole("switch", { name: "Instagram", exact: true }).click();
     await page.getByRole("button", { name: "Save profile" }).click();
@@ -1884,7 +1888,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
     await expect(
-      page.getByText("Not shown on your profile: School, Instagram, Activity."),
+      page.getByText("Not shown on your profile: Bio, School, Instagram, Activity."),
     ).toBeVisible();
 
     await gotoReady(page, "/profiles/dilnoza_k");
@@ -1892,6 +1896,7 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
     await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Activity" })).toHaveCount(0);
     await expect(
       page.getByRole("definition").filter({ hasText: "Tashkent City" }),
@@ -1934,19 +1939,21 @@ test.describe("applications, record, profile and settings", () => {
     );
   });
 
-  test("the public profile can be hidden from settings", async ({ page }) => {
+  test("profile visibility is required and its optional fields remain editable", async ({
+    page,
+  }) => {
     await signIn(page);
     await gotoReady(page, "/settings");
 
     const toggle = page.getByRole("switch", {
       name: "Show my public profile",
     });
-    await expect(toggle).toBeChecked();
-    await toggle.click();
-    await expect(toggle).not.toBeChecked();
-    await expect(page.getByRole("status")).toContainText(
-      "Your public profile is hidden.",
-    );
+    await expect(toggle).toHaveCount(0);
+    await expect(
+      page.getByText("Your profile is visible to others.", { exact: false }),
+    ).toBeVisible();
+    await gotoReady(page, "/profile/edit#visibility");
+    await expect(page.getByRole("switch", { name: "Bio", exact: true })).toBeVisible();
   });
 
   test("the profile form saves to the backend and completes the profile", async ({
