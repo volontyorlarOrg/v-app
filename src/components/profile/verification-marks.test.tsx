@@ -20,7 +20,28 @@ describe("VerificationMarks", () => {
         />
       </NextIntlClientProvider>,
     );
-    expect(screen.getByLabelText("Verified")).toBeInTheDocument();
-    expect(screen.getByLabelText("Affiliated with Example")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Verified" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Affiliated with Example" }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows an organization only beside the verification badge", () => {
+    const { container } = render(
+      <NextIntlClientProvider
+        locale="en"
+        messages={{
+          verification: { verified: "Verified", affiliation: "Affiliated with {name}" },
+        }}
+      >
+        <VerificationMarks
+          verification={{
+            verified: false,
+            organization: { id: "org", name: "Example", logoUrl: null },
+          }}
+        />
+      </NextIntlClientProvider>,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 });

@@ -240,7 +240,9 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await expect(page.getByLabel("Full name")).toHaveValue("Malika Karimova");
-    await page.getByLabel("Bio").fill("I read to younger pupils on Saturdays.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I read to younger pupils on Saturdays.");
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
@@ -302,7 +304,7 @@ test.describe("welcome flow", () => {
     ).toBeVisible();
     await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
-    await expect(page.getByLabel("Bio")).toHaveValue(
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveValue(
       "I read to younger pupils on Saturdays.",
     );
     await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
@@ -1034,7 +1036,9 @@ test.describe("the panel", () => {
     );
 
     await gotoReady(page, "/profile/edit");
-    await page.getByLabel("Bio").fill("I volunteer at community events.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I volunteer at community events.");
     await page.getByLabel("Phone number").fill("+998901234567");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/profile$/);
@@ -1454,7 +1458,9 @@ test.describe("opportunities", () => {
     await page.getByRole("link", { name: "City youth debate" }).click();
     await expect(page.getByText("Competitions", { exact: true }).first()).toBeVisible();
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I enjoy debating community questions.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I enjoy debating community questions.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
@@ -1616,7 +1622,9 @@ test.describe("opportunities", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I translate community information.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
     await gotoReady(page, "/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
@@ -1654,7 +1662,7 @@ test.describe("opportunities", () => {
   }) => {
     await gotoReady(page, "/opportunities/city-marathon-water-stations");
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I help at city events.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("I help at city events.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/profile$/);
@@ -1838,7 +1846,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("definition").filter({ hasText: "@dilnoza_k" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bio")).toHaveCount(0);
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveCount(0);
     await expect(page.getByText("Neighborhood reading day")).toBeVisible();
     const edit = page.getByRole("link", { name: "Complete profile" });
     await expect(edit).toHaveAttribute("href", "/profile/edit");
@@ -1966,7 +1974,7 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveAttribute("aria-valuenow", "88");
 
     await gotoReady(page, "/profile/edit");
-    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("Second-year student.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
@@ -1978,7 +1986,9 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveCount(0);
 
     await gotoReady(page, "/profile/edit");
-    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveValue(
+      "Second-year student.",
+    );
   });
 
   test("applying needs Telegram but allows an empty phone number", async ({ page }) => {
@@ -1991,7 +2001,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByText("Optional", { exact: true })).toHaveCount(4);
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
 
-    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("Second-year student.");
     await phone.fill("90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(phone).toHaveAttribute("aria-invalid", "true");

@@ -10,18 +10,16 @@ export function VerificationMarks({
   verification?: z.infer<typeof verificationSchema>;
 }) {
   const t = useTranslations("verification");
-  if (!verification || (!verification.verified && !verification.organization))
-    return null;
+  if (!verification?.verified) return null;
   const organization = verification.organization;
   return (
     <span className="inline-flex items-center gap-1 align-middle">
-      {verification.verified ? (
-        <span aria-label={t("verified")} title={t("verified")}>
-          <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout" />
-        </span>
-      ) : null}
+      <span role="img" aria-label={t("verified")} title={t("verified")}>
+        <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout" />
+      </span>
       {organization ? (
         <span
+          role="img"
           aria-label={t("affiliation", { name: organization.name })}
           title={organization.name}
         >

@@ -1252,7 +1252,7 @@
     "intro": "Volontyorlar keeps your account, profile, applications and volunteering record so organisations can work with you. In short:",
     "summary": {
       "collect": "We collect what you enter and what Telegram or Google share when you sign in: name, contacts, school, region, applications and hours.",
-      "access": "Anyone can see your profile after you choose a username. Your name, username, photo, level, XP and participation totals are shown; you choose which optional details to show in Edit profile.",
+      "access": "Every volunteer profile is public, including accounts created before 18 November 2026: anyone can see yours once you have chosen a username. Your name, username, photo, level, XP and participation totals are shown; you choose which optional details to show in Edit profile.",
       "store": "It is stored in Singapore, which Uzbekistan recognises as adequately protecting personal data.",
       "choices": "We never sell your data or show ads, and we tell you whenever an organisation receives your application.",
       "rights": "You can see, correct or delete your data, or withdraw consent, at any time in Settings → Privacy."
