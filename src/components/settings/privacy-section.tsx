@@ -7,11 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Link } from "@/i18n/navigation";
 import type { LegalChoice } from "@/lib/legal/constants";
 import { setLegalChoiceAction } from "@/lib/legal/actions";
+import { navHref } from "@/lib/routing/routes";
 
 type ChoiceLabels = { label: string; description: string; on: string; off: string };
 
 export type PrivacyLabels = {
-  publicProfile: ChoiceLabels;
   leaderboard: ChoiceLabels;
   error: string;
   dataLink: string;
@@ -67,22 +67,14 @@ function ConsentSwitch({
 }
 
 export function PrivacySection({
-  publicProfile,
   leaderboard,
   labels,
 }: {
-  publicProfile: boolean;
   leaderboard: boolean;
   labels: PrivacyLabels;
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <ConsentSwitch
-        choice="publicProfile"
-        initialEnabled={publicProfile}
-        labels={labels.publicProfile}
-        error={labels.error}
-      />
       <ConsentSwitch
         choice="leaderboard"
         initialEnabled={leaderboard}
@@ -90,7 +82,7 @@ export function PrivacySection({
         error={labels.error}
       />
       <Link
-        href="/consent"
+        href={navHref("dataRequests")}
         className="text-sm text-primary-ink underline underline-offset-4"
       >
         {labels.dataLink}

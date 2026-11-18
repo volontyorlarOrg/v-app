@@ -17,6 +17,7 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
+import { VerificationMarks } from "@/components/profile/verification-marks";
 import {
   ActivitySection,
   type ProfileActivityEntry,
@@ -97,6 +98,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       level={progress.status === "loaded" ? progress.data.level : null}
       handle={me.username}
       avatarUrl={me.avatarUrl}
+      verification={me.verification}
       publicPage={publicPage(me.username, me.publicProfileEnabled)}
       joinedAt={me.createdAt}
       history={history}
@@ -137,6 +139,7 @@ function Profile({
   level,
   handle,
   avatarUrl,
+  verification,
   publicPage,
   joinedAt,
   history,
@@ -148,6 +151,7 @@ function Profile({
   level: Level | null;
   handle: string | null;
   avatarUrl?: string;
+  verification?: import("@/lib/api/schemas").Me["verification"];
   publicPage: PublicPage;
   joinedAt: string;
   history: Loaded<History>;
@@ -277,11 +281,12 @@ function Profile({
   return (
     <ProfileSheet
       name={name}
+      marks={<VerificationMarks verification={verification} />}
       initials={initialsOf(name)}
       avatarUrl={avatarUrl}
       handle={handle}
       level={level ? recordLabels(`level.${level}`) : null}
-      bio={values.bio.trim()}
+      bio={shown.bio.trim()}
       socials={socials}
       figures={figures}
       rows={rows}

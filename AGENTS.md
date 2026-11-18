@@ -141,8 +141,8 @@ they joined) as plain ruled rows beside the public page address with its copy
 button, followed by **My activity**: the events they attended and their past
 events, each with its organisation, date, hours and XP.
 **The header is always shown; everything else is the volunteer's choice.**
-The photo, name, username, level, bio and figures cannot be hidden. The other
-twelve parts are one switch each in the "What others see" section of
+The photo, name, username, level and figures cannot be hidden. The fourteen
+optional parts, including bio, are one switch each in the "What others see" section of
 `/profile/edit`, saved with the form as `hiddenFields`; the vocabulary is
 `src/lib/profile/visibility.ts`. `/profile` shows exactly what others see,
 with one line at the foot naming what is hidden and linking back to the

@@ -240,7 +240,9 @@ test.describe("welcome flow", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await expect(page.getByLabel("Full name")).toHaveValue("Malika Karimova");
-    await page.getByLabel("Bio").fill("I read to younger pupils on Saturdays.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I read to younger pupils on Saturdays.");
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
@@ -302,7 +304,7 @@ test.describe("welcome flow", () => {
     ).toBeVisible();
     await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
-    await expect(page.getByLabel("Bio")).toHaveValue(
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveValue(
       "I read to younger pupils on Saturdays.",
     );
     await expect(page.getByRole("button", { name: "Remove: Uzbek" })).toBeVisible();
@@ -1034,7 +1036,9 @@ test.describe("the panel", () => {
     );
 
     await gotoReady(page, "/profile/edit");
-    await page.getByLabel("Bio").fill("I volunteer at community events.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I volunteer at community events.");
     await page.getByLabel("Phone number").fill("+998901234567");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/profile$/);
@@ -1454,7 +1458,9 @@ test.describe("opportunities", () => {
     await page.getByRole("link", { name: "City youth debate" }).click();
     await expect(page.getByText("Competitions", { exact: true }).first()).toBeVisible();
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I enjoy debating community questions.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I enjoy debating community questions.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
@@ -1616,7 +1622,9 @@ test.describe("opportunities", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Apply" })).toHaveCount(0);
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I translate community information.");
+    await page
+      .getByRole("textbox", { name: "Bio" })
+      .fill("I translate community information.");
     await page.getByRole("button", { name: "Save profile" }).click();
     await gotoReady(page, "/opportunities/remote-translation-support");
     await page.getByRole("button", { name: "Apply" }).click();
@@ -1654,7 +1662,7 @@ test.describe("opportunities", () => {
   }) => {
     await gotoReady(page, "/opportunities/city-marathon-water-stations");
     await page.getByRole("link", { name: "Complete profile" }).click();
-    await page.getByLabel("Bio").fill("I help at city events.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("I help at city events.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/profile$/);
@@ -1838,7 +1846,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("definition").filter({ hasText: "@dilnoza_k" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bio")).toHaveCount(0);
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveCount(0);
     await expect(page.getByText("Neighborhood reading day")).toBeVisible();
     const edit = page.getByRole("link", { name: "Complete profile" });
     await expect(edit).toHaveAttribute("href", "/profile/edit");
@@ -1868,8 +1876,12 @@ test.describe("applications, record, profile and settings", () => {
 
     await gotoReady(page, "/profile/edit");
     const school = page.getByRole("switch", { name: "School", exact: true });
+    await page
+      .getByRole("textbox", { name: "Bio", exact: true })
+      .fill("Private biography for this profile.");
     await expect(school).toBeChecked();
     await school.click();
+    await page.getByRole("switch", { name: "Bio", exact: true }).click();
     await page.getByRole("switch", { name: "Activity", exact: true }).click();
     await page.getByRole("switch", { name: "Instagram", exact: true }).click();
     await page.getByRole("button", { name: "Save profile" }).click();
@@ -1880,11 +1892,12 @@ test.describe("applications, record, profile and settings", () => {
     ).toBeVisible();
     await expect(page.getByRole("list", { name: "Participation" })).toBeVisible();
     await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "My activity" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
     await expect(
-      page.getByText("Not shown on your profile: School, Instagram, Activity."),
+      page.getByText("Not shown on your profile: Bio, School, Instagram, Activity."),
     ).toBeVisible();
 
     await gotoReady(page, "/profiles/dilnoza_k");
@@ -1892,6 +1905,7 @@ test.describe("applications, record, profile and settings", () => {
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
     await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
+    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Activity" })).toHaveCount(0);
     await expect(
       page.getByRole("definition").filter({ hasText: "Tashkent City" }),
@@ -1934,19 +1948,21 @@ test.describe("applications, record, profile and settings", () => {
     );
   });
 
-  test("the public profile can be hidden from settings", async ({ page }) => {
+  test("profile visibility is required and its optional fields remain editable", async ({
+    page,
+  }) => {
     await signIn(page);
     await gotoReady(page, "/settings");
 
     const toggle = page.getByRole("switch", {
       name: "Show my public profile",
     });
-    await expect(toggle).toBeChecked();
-    await toggle.click();
-    await expect(toggle).not.toBeChecked();
-    await expect(page.getByRole("status")).toContainText(
-      "Your public profile is hidden.",
-    );
+    await expect(toggle).toHaveCount(0);
+    await expect(
+      page.getByText("Your profile is visible to others.", { exact: false }),
+    ).toBeVisible();
+    await gotoReady(page, "/profile/edit#visibility");
+    await expect(page.getByRole("switch", { name: "Bio", exact: true })).toBeVisible();
   });
 
   test("the profile form saves to the backend and completes the profile", async ({
@@ -1958,7 +1974,7 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveAttribute("aria-valuenow", "88");
 
     await gotoReady(page, "/profile/edit");
-    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("Second-year student.");
     await page.getByLabel("Phone number").fill("+998 90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
 
@@ -1970,7 +1986,9 @@ test.describe("applications, record, profile and settings", () => {
     ).toHaveCount(0);
 
     await gotoReady(page, "/profile/edit");
-    await expect(page.getByLabel("Bio")).toHaveValue("Second-year student.");
+    await expect(page.getByRole("textbox", { name: "Bio" })).toHaveValue(
+      "Second-year student.",
+    );
   });
 
   test("applying needs Telegram but allows an empty phone number", async ({ page }) => {
@@ -1983,7 +2001,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(page.getByText("Optional", { exact: true })).toHaveCount(4);
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
 
-    await page.getByLabel("Bio").fill("Second-year student.");
+    await page.getByRole("textbox", { name: "Bio" }).fill("Second-year student.");
     await phone.fill("90 123 45 67");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(phone).toHaveAttribute("aria-invalid", "true");
@@ -2485,6 +2503,23 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard username", () => {
+  test("a profile without stored privacy choices starts with optional details hidden", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `privacy-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page
+      .getByLabel("Username", { exact: true })
+      .fill(`private_${info.project.name.replaceAll("-", "_")}`);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
+    await gotoReady(page, "/profile/edit");
+    for (const name of ["Bio", "School", "Phone", "Activity"]) {
+      await expect(page.getByRole("switch", { name, exact: true })).not.toBeChecked();
+    }
+  });
   test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);
     await gotoReady(page, "/settings");

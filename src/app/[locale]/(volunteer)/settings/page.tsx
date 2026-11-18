@@ -111,7 +111,6 @@ export default async function SettingsPage({
       level={progress.status === "loaded" ? progress.data.level : null}
       states={connectionStates(me)}
       username={usernameIdentity(me)}
-      publicProfileEnabled={legal.publicProfile}
       leaderboardEnabled={legal.leaderboard}
       email={me.email ?? null}
       hasPassword={me.authMethods.password}
@@ -137,7 +136,6 @@ function Settings({
   level,
   states,
   username,
-  publicProfileEnabled,
   leaderboardEnabled,
   email,
   hasPassword,
@@ -153,7 +151,6 @@ function Settings({
   level: Level | null;
   states: readonly ConnectionState[];
   username: UsernameIdentity;
-  publicProfileEnabled: boolean;
   leaderboardEnabled: boolean;
   email: string | null;
   hasPassword: boolean;
@@ -344,15 +341,8 @@ function Settings({
               className="scroll-mt-20"
             >
               <PrivacySection
-                publicProfile={publicProfileEnabled}
                 leaderboard={leaderboardEnabled}
                 labels={{
-                  publicProfile: {
-                    label: t("privacy.publicProfile"),
-                    description: t("privacy.publicProfileHelp"),
-                    on: t("privacy.publicProfileVisible"),
-                    off: t("privacy.publicProfileHidden"),
-                  },
                   leaderboard: {
                     label: t("privacy.leaderboard"),
                     description: t("privacy.leaderboardHelp"),

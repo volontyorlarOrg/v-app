@@ -13,6 +13,7 @@ import {
   type ProfileRow,
 } from "@/components/profile/profile-sheet";
 import { PublicPageLink } from "@/components/profile/public-page-link";
+import { VerificationMarks } from "@/components/profile/verification-marks";
 import {
   ActivitySection,
   type ProfileActivityEntry,
@@ -173,6 +174,7 @@ export default async function MemberProfilePage({
       <div className="mt-3">
         <ProfileSheet
           name={profile.displayName}
+          marks={<VerificationMarks verification={profile.verification} />}
           initials={initialsOf(profile.displayName)}
           avatarUrl={profile.avatarUrl}
           handle={profile.username}
