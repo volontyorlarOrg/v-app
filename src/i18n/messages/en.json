@@ -296,7 +296,7 @@
       },
       "contact": {
         "title": "Contact and public links",
-        "lead": "Add your Telegram username so organisers can reach you. A phone number is optional. Contact details appear on your public profile when it is on."
+        "lead": "Add your Telegram username so organisers can reach you. A phone number is optional. You choose whether contact details appear on your profile."
       }
     },
     "rail": {
@@ -876,7 +876,7 @@
       "languagesRemove": "Remove",
       "languagesLimit": "That is ten. Remove one to add another.",
       "phone": "Phone number",
-      "phoneHelp": "With the country code, for example +998 90 123 45 67. Visible to everyone when your public profile is on.",
+      "phoneHelp": "With the country code, for example +998 90 123 45 67. You choose whether it appears on your profile.",
       "telegram": "Telegram username",
       "telegramHelp": "Without the @. Visible on your public profile.",
       "instagram": "Instagram username",
@@ -939,7 +939,7 @@
     },
     "visibility": {
       "title": "What others see",
-      "help": "Your photo, name, username, level, bio and participation figures are always on your profile. Everything else is your choice. Organisers still see your full profile on an application you send.",
+      "help": "Your photo, name, username, level and participation figures are always on your profile. You choose what else to show. Organisers still see your full profile on an application you send.",
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
       "parts": {
         "region": "Region",
@@ -954,7 +954,8 @@
         "linkedin": "LinkedIn",
         "links": "Portfolio links",
         "joined": "Joined date",
-        "activity": "Activity"
+        "activity": "Activity",
+        "bio": "Bio"
       }
     }
   },
@@ -1042,7 +1043,7 @@
     },
     "privacy": {
       "title": "Privacy",
-      "description": "What other people can see. Organisations you apply to always see your application.",
+      "description": "Your profile is visible to others. Choose optional details in Edit profile. Organisations you apply to can see your application.",
       "profileToOrganisers": "Share my profile with organisers I apply to",
       "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
       "levelPublic": "Show my level on the community list",
@@ -1251,7 +1252,7 @@
     "intro": "Volontyorlar keeps your account, profile, applications and volunteering record so organisations can work with you. In short:",
     "summary": {
       "collect": "We collect what you enter and what Telegram or Google share when you sign in: name, contacts, school, region, applications and hours.",
-      "access": "Only you, the organisations you apply to, our coordinators and administrators see it. Nobody else does unless you turn on the options below.",
+      "access": "Every volunteer profile is public, including accounts created before 18 November 2026: anyone can see yours once you have chosen a username. Your name, username, photo, level, XP and participation totals are shown; you choose which optional details to show in Edit profile.",
       "store": "It is stored in Singapore, which Uzbekistan recognises as adequately protecting personal data.",
       "choices": "We never sell your data or show ads, and we tell you whenever an organisation receives your application.",
       "rights": "You can see, correct or delete your data, or withdraw consent, at any time in Settings → Privacy."
@@ -1259,13 +1260,13 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms of Use",
     "form": {
-      "accept": "I have read the Privacy Policy and Terms of Use and agree that Volontyorlar processes my personal data as described.",
+      "accept": "I have read the Privacy Policy and Terms of Use, and agree to the processing described and to my profile being visible to others.",
       "submit": "Agree and continue",
       "pending": "Saving…",
       "required": "Tick the first box to continue.",
       "error": "We could not save your consent. Check your connection and try again."
     },
-    "accepted": "You have agreed to the current Privacy Policy. Change what others see in Settings → Privacy, or send a request below.",
+    "accepted": "You accepted the current Privacy Policy. Choose what others see in Edit profile.",
     "requests": {
       "title": "Requests about your data",
       "help": "Ask for a copy, a correction, a review of an automatic decision, or deletion. We answer here: corrections within 3 days, everything else within 10 days. Deleting your data or withdrawing consent stops normal use of the app at once.",
@@ -1290,5 +1291,9 @@
     },
     "back": "Back to settings",
     "signOut": "Sign out"
+  },
+  "verification": {
+    "verified": "Verified",
+    "affiliation": "Affiliated with {name}"
   }
 }

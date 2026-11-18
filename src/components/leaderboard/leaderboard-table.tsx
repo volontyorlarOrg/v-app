@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { VerificationMarks } from "@/components/profile/verification-marks";
 import {
   Table,
   TableBody,
@@ -61,7 +62,8 @@ export function LeaderboardTable({
               </Avatar>
               <span className="min-w-0">
                 <span className="block text-base leading-tight font-semibold break-words text-ink">
-                  {entry.displayName}
+                  {entry.displayName}{" "}
+                  <VerificationMarks verification={entry.verification} />
                 </span>
                 <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="text-xs break-words text-ink-muted">

@@ -77,13 +77,7 @@ describe("app route registry", () => {
     }
     expect(
       appRoutes.filter((route) => route.navGroup !== null).map((route) => route.key),
-    ).toEqual([
-      "dashboard",
-      "opportunities",
-      "leaderboard",
-      "checkpoints",
-      "settings",
-    ]);
+    ).toEqual(["dashboard", "opportunities", "leaderboard", "checkpoints", "settings"]);
   });
 
   it("puts the leaderboard in the sidebar and the phone tab bar, never the account group", () => {
@@ -212,6 +206,17 @@ describe("app route registry", () => {
     expect(settings.navGroup).toBe("account");
     expect(settings.inTabBar).toBe(false);
     expect(navHref("settings")).toBe("/settings");
+  });
+
+  it("keeps data requests signed in and outside the layouts that require current consent", () => {
+    const route = getRoute("dataRequests");
+    expect(route.path).toBe("/settings/privacy");
+    expect(route.area).toBe("legal");
+    expect(route.guard).toBe("session");
+    expect(route.navGroup).toBeNull();
+    expect(route.inTabBar).toBe(false);
+    expect(guardFor(route.path)).toBe("session");
+    expect(sectionKeyFor(route.path)).toBe("settings");
   });
 
   it("labels every volunteer route in every catalog", () => {

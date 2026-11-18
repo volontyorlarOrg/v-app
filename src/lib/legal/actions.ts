@@ -16,6 +16,7 @@ import { authed } from "@/lib/api/session.server";
 import { isSecureCookieTransport } from "@/lib/auth/config";
 import { safeReturnPath } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
+import { navHref } from "@/lib/routing/routes";
 
 import {
   ADMISSION_COOKIE,
@@ -41,7 +42,7 @@ export async function giveConsentAction(
     version: LEGAL_VERSION,
     accepted: true,
     leaderboard: false,
-    publicProfile: false,
+    publicProfile: true,
   };
   const rawNext = form.get("next");
   const next = safeReturnPath(typeof rawNext === "string" ? rawNext : null);
@@ -123,6 +124,6 @@ export async function requestDataAction(
   } catch (error) {
     return resultFromError(error);
   }
-  revalidatePath("/consent");
+  revalidatePath(navHref("dataRequests"));
   return { status: "ok" };
 }

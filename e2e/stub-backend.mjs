@@ -777,7 +777,7 @@ function newAccountState(email, fullName) {
 
 const sessions = new Map();
 const legalAdmissions = new Map();
-const LEGAL_VERSION = "2026-11-14";
+const LEGAL_VERSION = "2026-11-18";
 const refreshTokens = new Map();
 const pendingStates = new Set();
 const googleChallenges = new Set();
@@ -1310,7 +1310,8 @@ const server = createServer(async (request, response) => {
     leaderboard: state.legal.accepted && state.legal.leaderboard,
     publicProfile: state.legal.accepted && state.preferences.publicProfileEnabled,
   });
-  if (path === "/me/legal" && method === "GET") return send(response, 200, legalState());
+  if (path === "/me/legal" && method === "GET")
+    return send(response, 200, legalState());
   if (path === "/me/legal/requests" && method === "GET")
     return send(response, 200, { items: [...state.legalRequests].reverse() });
   if (path === "/me/legal/accept" && method === "POST") {
@@ -1318,15 +1319,16 @@ const server = createServer(async (request, response) => {
       return send(response, 422, { code: "validationFailed" });
     state.legal.accepted = true;
     state.legal.leaderboard = body.leaderboard === true;
-    state.preferences.publicProfileEnabled = body.publicProfile === true;
+    state.preferences.publicProfileEnabled = true;
     return send(response, 201, { id: state.user.id, status: "accepted" });
   }
   if (path === "/me/legal/choices" && method === "PUT") {
     if (!state.legal.accepted)
       return send(response, 403, { code: "legalConsentRequired" });
-    if (typeof body.leaderboard === "boolean") state.legal.leaderboard = body.leaderboard;
-    if (typeof body.publicProfile === "boolean")
-      state.preferences.publicProfileEnabled = body.publicProfile;
+    if (typeof body.leaderboard === "boolean")
+      state.legal.leaderboard = body.leaderboard;
+    if (body.publicProfile === false)
+      return send(response, 403, { code: "publicationRequired" });
     return send(response, 200, legalState());
   }
   if (path === "/me/legal/requests" && method === "POST") {
@@ -1438,7 +1440,7 @@ const server = createServer(async (request, response) => {
       displayName: profile?.fullName ?? rosterEntry.displayName,
       username,
       avatarUrl: isViewer ? state.account.avatarUrl : rosterEntry.avatarUrl,
-      bio: profile?.bio ?? "Community volunteer and student.",
+      bio: shown("bio", profile?.bio ?? "Community volunteer and student.", ""),
       region: shown("region", profile?.region ?? "tashkent-city", null),
       city: shown("city", profile?.city ?? "Tashkent", ""),
       school: shown("school", profile?.school ?? "Academic lyceum No. 2", ""),
@@ -1629,7 +1631,9 @@ const server = createServer(async (request, response) => {
       });
     }
     const HIDEABLE = [
+      "bio",
       "region",
+      "hometownRegion",
       "city",
       "school",
       "gradeYear",

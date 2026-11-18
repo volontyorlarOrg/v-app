@@ -60,12 +60,17 @@ or partner claims.
 ## Personal data and consent
 
 Every volunteer gives one consent at `/consent` before using the app: one
-required box and two optional ones (leaderboard, public profile). A visitor
+required box covering processing and visibility of the profile. Optional profile
+details are chosen in Edit profile. A visitor
 without an account gets a 30-minute HttpOnly admission cookie that `/signup`
 requires and the Telegram, Google and password sign-ups pass to the backend;
 a signed-in volunteer without current consent is sent to `/consent` by the
 volunteer and onboarding layouts and by `authed()` on `legalConsentRequired`.
-Settings → Privacy holds both optional switches and links to `/consent`,
-where the volunteer sends data requests and reads the answers. The policy
+Settings → Privacy holds the leaderboard choice and links to `/settings/privacy`,
+where the volunteer sends data requests and reads the answers. The request page
+requires sign-in and remains accessible without current consent. `/consent`
+contains the policy summary, acceptance and a link to requests, with no request
+form or history. A failure to load request history does not block acceptance or
+sending a request. The policy
 text itself lives in `../v-web`; this app links to it. See
 [consent and data-request operations](../../v-backend/docs/operations/DATA_RIGHTS_AND_CONSENT.md).
