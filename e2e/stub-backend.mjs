@@ -1673,8 +1673,23 @@ const server = createServer(async (request, response) => {
     if (Object.keys(malformed).length > 0) {
       return send(response, 422, { code: "validationFailed", errors: malformed });
     }
+    const previousHidden = state.profile
+      ? (state.profile.hiddenFields ?? [])
+      : ["phone"];
+    if (
+      body.hiddenFields &&
+      !body.confirmContactPublication &&
+      ["phone", "telegram", "instagram", "linkedin", "links"].some(
+        (part) => previousHidden.includes(part) && !body.hiddenFields.includes(part),
+      )
+    ) {
+      return send(response, 400, {
+        code: "profileContactConfirmationRequired",
+        errors: { hiddenFields: ["profileContactConfirmationRequired"] },
+      });
+    }
     state.profile = {
-      ...(state.profile ?? {}),
+      ...(state.profile ?? { hiddenFields: ["phone"] }),
       ...body,
       fullName: body.fullName.trim(),
       phoneVerified: false,
