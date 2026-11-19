@@ -18,6 +18,7 @@ import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { initialsOf } from "@/lib/profile/initials";
 import {
   OPTIONAL_PROFILE_PARTS,
+  DEFAULT_HIDDEN_PROFILE_PARTS,
   hiddenProfileParts,
   type OptionalProfilePart,
 } from "@/lib/profile/visibility";
@@ -92,7 +93,7 @@ export default async function ProfileEditPage({
       hidden={
         profile
           ? [...hiddenProfileParts(profile.hiddenFields)]
-          : [...OPTIONAL_PROFILE_PARTS]
+          : [...DEFAULT_HIDDEN_PROFILE_PARTS]
       }
       locale={locale as Locale}
       avatarUrl={me.avatarUrl}
@@ -173,6 +174,9 @@ function ProfileEditor({
           labels: {
             title: t("visibility.title"),
             help: t("visibility.help"),
+            review: t("visibility.review"),
+            reviewHelp: t("visibility.reviewHelp"),
+            confirmContacts: t("visibility.confirmContacts"),
             parts: Object.fromEntries(
               OPTIONAL_PROFILE_PARTS.map((part) => [
                 part,

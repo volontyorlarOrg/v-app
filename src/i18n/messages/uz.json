@@ -940,6 +940,9 @@
     "visibility": {
       "title": "Boshqalarga koʻrinadigan qismlar",
       "help": "Rasm, ism, foydalanuvchi nomi, daraja va ishtirok koʻrsatkichlari profilda doim koʻrinadi. Qolganini oʻzingiz tanlaysiz. Ariza yuborganingizda tashkilotchi profilingizni toʻliq koʻradi.",
+      "review": "Tavsiya etilgan koʻrinishni tekshirish",
+      "reviewHelp": "Saqlangan tanlovlaringiz saqlamaguningizcha oʻzgarmaydi. Koʻproq maʼlumotni eʼlon qilishdan oldin quyidagi sozlamalarni tekshiring. Telefon uchun joriy tanlovingiz saqlanadi.",
+      "confirmContacts": "Tanlangan aloqa maʼlumotlari va havolalar ommaga koʻrsatilishini tasdiqlayman.",
       "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",
       "parts": {
         "region": "Hudud",

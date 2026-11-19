@@ -22,6 +22,7 @@ export type ProfileInput = {
   linkedin: string;
   links: string[];
   hiddenFields?: OptionalProfilePart[];
+  confirmContactPublication?: boolean;
 };
 
 const LIST_LIMITS = { languages: 10, links: 3 } as const;
@@ -165,6 +166,11 @@ export function profileInputFromFormData(formData: FormData): ProfileInput {
     instagram: text(formData, "instagram").replace(/^@+/, ""),
     linkedin: linkedinProfileUrl(text(formData, "linkedin")) ?? "",
     links: list(formData, "links"),
-    ...(hiddenFields ? { hiddenFields } : {}),
+    ...(hiddenFields
+      ? {
+          hiddenFields,
+          confirmContactPublication: formData.get("confirmContactPublication") === "on",
+        }
+      : {}),
   };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
@@ -34,6 +34,8 @@ import {
 import type { LanguageOption } from "@/lib/profile/languages";
 import {
   OPTIONAL_PROFILE_PARTS,
+  DEFAULT_HIDDEN_PROFILE_PARTS,
+  contactPublicationRequired,
   VISIBILITY_MARKER,
   visibilityFieldName,
   type OptionalProfilePart,
@@ -92,6 +94,9 @@ export type ProfileVisibility = {
     title: string;
     help: string;
     parts: Record<OptionalProfilePart, string>;
+    review?: string;
+    reviewHelp?: string;
+    confirmContacts?: string;
   };
 };
 
@@ -174,6 +179,13 @@ export function ProfileForm({
 }) {
   const id = useId();
   const router = useRouter();
+  const [hidden, setHidden] = useState<readonly OptionalProfilePart[]>(
+    visibility?.hidden ?? [],
+  );
+  const [contactsConfirmed, setContactsConfirmed] = useState(false);
+  const needsConfirmation = Boolean(
+    visibility && contactPublicationRequired(visibility.hidden, hidden),
+  );
   const { form, result, pending, formProps } = useActionForm({
     schema: profileFormSchema,
     defaultValues: profileFormValues(values),
@@ -422,6 +434,28 @@ export function ProfileForm({
               help={visibility.labels.help}
             >
               <input type="hidden" name={VISIBILITY_MARKER} value="1" />
+              {visibility.labels.review ? (
+                <div className="mb-4 flex flex-col items-start gap-2">
+                  <p className="text-sm leading-relaxed text-ink-muted">
+                    {visibility.labels.reviewHelp}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setHidden(
+                        hidden.includes("phone")
+                          ? [...DEFAULT_HIDDEN_PROFILE_PARTS]
+                          : [],
+                      );
+                      setContactsConfirmed(false);
+                    }}
+                  >
+                    {visibility.labels.review}
+                  </Button>
+                </div>
+              ) : null}
               <ul
                 aria-label={visibility.labels.title}
                 className="grid gap-x-10 sm:grid-cols-2"
@@ -431,17 +465,41 @@ export function ProfileForm({
                     <Switch
                       name={visibilityFieldName(part)}
                       label={visibility.labels.parts[part]}
-                      defaultChecked={!visibility.hidden.includes(part)}
+                      checked={!hidden.includes(part)}
+                      onCheckedChange={(shown) => {
+                        setHidden((current) =>
+                          shown
+                            ? current.filter((value) => value !== part)
+                            : [...current, part],
+                        );
+                        setContactsConfirmed(false);
+                      }}
                     />
                   </li>
                 ))}
               </ul>
+              {needsConfirmation ? (
+                <label className="mt-4 flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink">
+                  <input
+                    type="checkbox"
+                    name="confirmContactPublication"
+                    checked={contactsConfirmed}
+                    onChange={(event) => setContactsConfirmed(event.target.checked)}
+                    className="mt-1 size-4 shrink-0 accent-action"
+                  />
+                  {visibility.labels.confirmContacts}
+                </label>
+              ) : null}
             </FormSection>
           ) : null}
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-6">
-          <Button type="submit" disabled={pending} className="disabled:opacity-70">
+          <Button
+            type="submit"
+            disabled={pending || (needsConfirmation && !contactsConfirmed)}
+            className="disabled:opacity-70"
+          >
             {pending ? labels.saving : labels.save}
           </Button>
           {cancelHref && labels.cancel ? (
