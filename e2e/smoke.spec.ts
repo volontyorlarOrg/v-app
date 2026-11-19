@@ -2503,7 +2503,7 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard username", () => {
-  test("a profile without stored privacy choices starts with optional details hidden", async ({
+  test("a new profile shows optional details and requires confirmation to show phone", async ({
     page,
   }, info) => {
     await createAccount(page, `privacy-${info.project.name}@example.org`);
@@ -2516,9 +2516,20 @@ test.describe("the leaderboard username", () => {
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
     await gotoReady(page, "/profile/edit");
-    for (const name of ["Bio", "School", "Phone", "Activity"]) {
-      await expect(page.getByRole("switch", { name, exact: true })).not.toBeChecked();
+    for (const name of ["Bio", "School", "Activity", "Telegram", "Instagram"]) {
+      await expect(page.getByRole("switch", { name, exact: true })).toBeChecked();
     }
+    const phone = page.getByRole("switch", { name: "Phone", exact: true });
+    await expect(phone).not.toBeChecked();
+    await phone.click();
+    const save = page.getByRole("button", { name: "Save profile", exact: true });
+    await expect(save).toBeDisabled();
+    await page
+      .getByRole("checkbox", {
+        name: "I confirm that the selected contact details and links may be shown publicly.",
+      })
+      .check();
+    await expect(save).toBeEnabled();
   });
   test("a Telegram account can replace its imported username", async ({ page }) => {
     await signIn(page);

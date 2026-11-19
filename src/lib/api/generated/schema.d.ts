@@ -3524,6 +3524,8 @@ export interface components {
             links: string[];
             /** @description Optional parts kept off the profile others see. Omit to keep the stored choice. */
             hiddenFields?: ("bio" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "phone" | "telegram" | "instagram" | "linkedin" | "links" | "joined" | "activity")[];
+            /** @description Confirms publishing contact details that were previously hidden. */
+            confirmContactPublication?: boolean;
         };
         CreateOrganizationDto: {
             name: string;
@@ -4217,7 +4219,10 @@ export interface components {
         };
         UpdateVerificationDto: {
             verified: boolean;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description Kept only while the volunteer is verified; revoking verification clears it.
+             */
             organizationId: string | null;
         };
         SaveEssayDto: {

@@ -940,6 +940,9 @@
     "visibility": {
       "title": "What others see",
       "help": "Your photo, name, username, level and participation figures are always on your profile. You choose what else to show. Organisers still see your full profile on an application you send.",
+      "review": "Review recommended visibility",
+      "reviewHelp": "Your saved choices stay unchanged until you save. Review the switches below before publishing more details. Phone visibility keeps your current choice.",
+      "confirmContacts": "I confirm that the selected contact details and links may be shown publicly.",
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
       "parts": {
         "region": "Region",
