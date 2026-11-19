@@ -183,9 +183,6 @@ export function ProfileForm({
     visibility?.hidden ?? [],
   );
   const [contactsConfirmed, setContactsConfirmed] = useState(false);
-  const needsConfirmation = Boolean(
-    visibility && contactPublicationRequired(visibility.hidden, hidden),
-  );
   const { form, result, pending, formProps } = useActionForm({
     schema: profileFormSchema,
     defaultValues: profileFormValues(values),
@@ -195,6 +192,13 @@ export function ProfileForm({
       if (doneHref) router.push(doneHref);
     },
   });
+  const serverRequiresConfirmation =
+    result.status === "error" && result.code === "profileContactConfirmationRequired";
+  const needsConfirmation = Boolean(
+    visibility &&
+    (serverRequiresConfirmation ||
+      contactPublicationRequired(visibility.hidden, hidden)),
+  );
   const { register, formState, control: formControl } = form;
 
   const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
@@ -512,7 +516,11 @@ export function ProfileForm({
             </Link>
           ) : null}
           {result.status === "error" ? (
-            <ActionStatus tone="error">{labels.saveError}</ActionStatus>
+            <ActionStatus tone="error">
+              {serverRequiresConfirmation && visibility?.labels.confirmContacts
+                ? visibility.labels.confirmContacts
+                : labels.saveError}
+            </ActionStatus>
           ) : null}
         </div>
       </Panel>
