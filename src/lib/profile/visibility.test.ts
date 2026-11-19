@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   ALWAYS_SHOWN_PROFILE_PARTS,
+  DEFAULT_HIDDEN_PROFILE_PARTS,
+  contactPublicationRequired,
   OPTIONAL_PROFILE_PARTS,
   VISIBILITY_MARKER,
   hiddenPartsFromFormData,
@@ -89,5 +91,27 @@ describe("profile visibility", () => {
       region: null,
       hometownRegion: "bukhara",
     });
+  });
+  it("shows useful details by default and keeps phone private", () => {
+    const shown = withoutHiddenParts(profile, new Set(DEFAULT_HIDDEN_PROFILE_PARTS));
+    expect(shown).toMatchObject({
+      bio: "Hi",
+      region: "samarkand",
+      city: "Samarkand",
+      school: "School 12",
+      phone: "",
+      telegram: "dilnoza_k",
+      instagram: "dilnoza.codes",
+      linkedin: profile.linkedin,
+      links: profile.links,
+    });
+  });
+
+  it("requires confirmation only when previously hidden contacts become public", () => {
+    expect(contactPublicationRequired(["phone", "telegram"], ["phone"])).toBe(true);
+    expect(contactPublicationRequired(["phone", "links"], ["phone"])).toBe(true);
+    expect(contactPublicationRequired(["phone", "bio"], ["phone"])).toBe(false);
+    expect(contactPublicationRequired(["phone"], ["phone", "telegram"])).toBe(false);
+    expect(contactPublicationRequired([], [])).toBe(false);
   });
 });

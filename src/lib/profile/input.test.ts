@@ -163,4 +163,14 @@ describe("profileFormSchema", () => {
     expect(values.instagram).toBe("dilnoza.codes");
     expect(values.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
   });
+  it("sends contact publication confirmation only with an explicit visibility choice", () => {
+    const data = new FormData();
+    data.set("fullName", "Volunteer");
+    data.set("confirmContactPublication", "on");
+    expect(profileInputFromFormData(data).confirmContactPublication).toBeUndefined();
+    data.set("visibility", "1");
+    expect(profileInputFromFormData(data).confirmContactPublication).toBe(true);
+    data.delete("confirmContactPublication");
+    expect(profileInputFromFormData(data).confirmContactPublication).toBe(false);
+  });
 });

@@ -15,6 +15,25 @@ export const OPTIONAL_PROFILE_PARTS = [
   "activity",
 ] as const;
 
+export const DEFAULT_HIDDEN_PROFILE_PARTS = ["phone"] as const;
+
+export const CONTACT_PROFILE_PARTS = [
+  "phone",
+  "telegram",
+  "instagram",
+  "linkedin",
+  "links",
+] as const;
+
+export function contactPublicationRequired(
+  previousHidden: readonly string[],
+  nextHidden: readonly string[],
+) {
+  return CONTACT_PROFILE_PARTS.some(
+    (part) => previousHidden.includes(part) && !nextHidden.includes(part),
+  );
+}
+
 export type OptionalProfilePart = (typeof OPTIONAL_PROFILE_PARTS)[number];
 
 export const ALWAYS_SHOWN_PROFILE_PARTS = [

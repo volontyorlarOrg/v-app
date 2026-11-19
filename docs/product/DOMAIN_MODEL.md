@@ -161,3 +161,14 @@ plan proposes one. → `src/lib/activity/types.ts`
 
 **Not modelled.** `standoutReviews` is a backend-granted boolean that gates
 the `core` level; it is never computed on the frontend.
+
+## Public profile visibility defaults
+
+New profiles show supplied optional details with phone hidden by default.
+The editor preserves existing choices and offers a review action that stages
+recommended visibility without saving it; phone keeps its current choice.
+Showing previously hidden contact details requires a confirmation checkbox
+and Save profile. The API enforces confirmation. Existing profile rows are
+not backfilled, because saved defaults cannot reliably be separated from
+deliberate privacy choices. Both the in-app and marketing public profiles
+continue to render the backend-filtered public response.
