@@ -8,8 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 This repository is the authenticated **Volontyorlar** product application: where
 a volunteer signs in, keeps a reusable profile, applies to opportunities, and
-builds a participation record. Read this file before meaningful work, then use
-[`docs/README.md`](docs/README.md) to load only the context the task needs.
+builds a participation record. Read this file before meaningful work.
 
 It follows the same codebase patterns and system design as the marketing site
 in `../v-web`: the same tokens, typefaces, theme and motion system, route
@@ -29,7 +28,7 @@ interface language are a panel on `/settings`, not shell controls.
 Applications and saved items live inside the opportunities section, not
 sections of their own: saved items are the toolbar's "Saved only" switch, and
 applications are the outline link beside the page title. Only the sign-in pages keep the marketing site's
-whiteboard ground. See [`DESIGN.md`](DESIGN.md).
+whiteboard ground.
 
 ## Product identity
 
@@ -41,12 +40,10 @@ building regional operations toward all 14 regions.
 Do not call the product "Youth Volunteer Club", "YVC", "Youth Volunteering
 Community", or "Volontyor"; all four names are retired. The logo is the
 Volontyorlar web logo kit, drawn inline by `src/components/brand/logo.tsx` from
-the kit's own paths exactly as `../v-web` draws it; how it is installed and used
-is in `../v-web/docs/brand/BRAND_ASSETS.md`. The wordmark is outlined artwork,
+the kit's own paths exactly as `../v-web` draws it. The wordmark is outlined artwork,
 never set as text, and never narrower than the kit's 120px minimum.
 
-Verified facts live in the marketing repository (`../v-web/PRODUCT.md` and its
-`src/lib/content/org.ts`) and are summarised in [`PRODUCT.md`](PRODUCT.md).
+Verified facts live in the marketing repository's `src/lib/content/org.ts`.
 Nothing outside those sources may be presented as fact: no extra partners,
 statistics, testimonials, awards, offices, addresses, or integrations.
 
@@ -64,9 +61,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   `/api/auth/google/callback`, so no authorization code is exchanged, no Google
   client secret exists in either repository, and no third-party script is
   loaded; the button renders `disabled` with a note until
-  `VOLONTYORLAR_GOOGLE_CLIENT_ID` is set, and
-  [`docs/operations/GOOGLE_SIGN_IN_SETUP.md`](docs/operations/GOOGLE_SIGN_IN_SETUP.md)
-  is how it is set. **Email and password** are two Server Actions over
+  `VOLONTYORLAR_GOOGLE_CLIENT_ID` is set. **Email and password** are two Server Actions over
   `POST /auth/password/login` and `POST /auth/password/signup`; a new password
   is at least 8 characters and the backend also refuses one that is too easy
   to guess (`weakPassword`). The
@@ -74,8 +69,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   reset and no email verification — the backend has neither — so nothing on
   screen offers one and `/forgot-password` is a 404. A **new** account (the
   email sign-up, or Telegram and Google when the backend says `isNewUser`)
-  lands on `/welcome`, the four-step welcome flow described in
-  [`docs/product/ONBOARDING.md`](docs/product/ONBOARDING.md); its only state
+  lands on `/welcome`, the four-step welcome flow; its only state
   is a readable, app-only progress cookie, and every step saves through the
   existing profile action;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
@@ -120,14 +114,7 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   with a `source`: every username is renamed through
   `PUT /me/username` from `/settings` and from the welcome flow's first step,
   while a valid Telegram username is only the initial value and stops syncing
-  after the volunteer chooses a custom one. It is all
-  described in [`docs/product/LEADERBOARD.md`](docs/product/LEADERBOARD.md),
-  and what was known about the contract when it was written is in
-  `.agent-memory/decisions/leaderboard-contract-is-built-blind.md`;
-- the plan that got here, and the phase still open (hardening), is
-  [`docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md`](docs/plans/AUTH_AND_DASHBOARD_IMPLEMENTATION_PLAN.md);
-  the keys and the bot are set up from
-  [`../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md`](../v-backend/docs/operations/TELEGRAM_BOT_SETUP.md).
+  after the volunteer chooses a custom one.
 
 Do not invent a contract or claim a behaviour works because the code was
 written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
@@ -170,9 +157,7 @@ each a link; then the blocks that appear only when they have something to say
 (the welcome-flow resume, "Add Telegram", Next up, the profile reward), and the
 four most recent events that have ended. `/record` is **My activity**, the
 whole participation history, every outcome included. The level, its ladder and
-the figures are `GET /record/progress`, the backend's arithmetic shown, as
-described in
-[`docs/plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md`](docs/plans/VOLUNTEER_LEVELS_DASHBOARD_PLAN.md).
+the figures are `GET /record/progress`, the backend's arithmetic shown.
 The profile's activity is the attended part of that same history. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
 privacy}` are unused and are kept only because that decision is
@@ -235,8 +220,7 @@ save button, Sonner for the outcomes that used to be a status line, and
 read is still server-only and every write is still a Server Action; the
 libraries sit in front of that architecture, not instead of it. Still out, on
 purpose: `next-safe-action`, `next-themes`, `motion`, `date-fns`, and any auth
-SDK. The previous foundation is archived under
-`docs/reference/foundation-v1/legacy/` as reference material, not live code.
+SDK.
 
 For framework behaviour, read `node_modules/next/dist/docs/` before relying on
 older Next.js knowledge. Middleware is called Proxy in Next.js 16
@@ -273,8 +257,6 @@ src/lib/security/headers.ts     -> CSP and security headers
 src/lib/theme.ts                -> theme preference, the boot script, the motion flag
 src/components/{ui,brand,motion,app,auth,account,onboarding,dashboard,levels,checkpoints,opportunities,applications,record,leaderboard,profile,settings}/
 e2e/                            -> Playwright smoke suite
-docs/                           -> stable project documentation and the plan
-.agent-memory/                  -> durable decisions, discoveries, gotchas
 ```
 
 ## Critical rules
@@ -299,8 +281,7 @@ docs/                           -> stable project documentation and the plan
 "never"`): `localStorage`, mirrored to the app-only `volontyorlar_locale`
   cookie so the server can render it. A volunteer who changes it on
   `/settings` and goes back must stay in the language they chose, and nothing
-  the marketing site or a portal does may change it. The reason and the rules for old `/uz/…` links
-  are in `.agent-memory/decisions/the-language-is-a-cookie-not-a-path.md`.
+  the marketing site or a portal does may change it.
 - Add a section by registering it in `src/lib/routing/routes.ts`; the sidebar,
   the tab bar, the phone's account menu, the proxy's `guard` and the tests all
   read from it. `navGroup` says where in the sidebar a route lands —
@@ -358,12 +339,10 @@ docs/                           -> stable project documentation and the plan
   live and does nothing.
 - Preserve reduced-motion behaviour, keyboard access, visible focus states, one
   logical `h1` per page, and responsive behaviour.
-- Update `/docs` when stable environment or architecture behaviour changes.
 
 ## Code conventions
 
-- **Source files carry no comments.** Explanations go in `/docs` — see
-  [`docs/operations/EXTENDING.md`](docs/operations/EXTENDING.md). Names, types,
+- **Source files carry no comments.** Names, types,
   and test names carry intent inside the source. Compiler and linter directives
   are not comments and stay.
 - Server Components by default; `"use client"` only for event handlers, client
@@ -392,9 +371,6 @@ Add `npm run build` for build or deployment work, and `npm run test:e2e` when
 routing, navigation, or the information architecture changes. For UI work also
 inspect the affected routes at mobile and desktop widths, in both themes, and
 with reduced motion.
-
-To add anything — a section, copy, a locale, a token, a component, an external
-link — follow [`docs/operations/EXTENDING.md`](docs/operations/EXTENDING.md).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

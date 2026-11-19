@@ -54,10 +54,6 @@ reads the local `v-backend` and its separate development database. Run
 
 ## Where to read next
 
-| You want                              | Go to                                                                                              |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| What the product is                   | [`PRODUCT.md`](PRODUCT.md)                                                                         |
-| How to work in this repo              | [`AGENTS.md`](AGENTS.md)                                                                           |
-| The design system as applied          | [`DESIGN.md`](DESIGN.md)                                                                           |
-| Everything else                       | [`docs/README.md`](docs/README.md) — a context router                                              |
-| How all six repositories fit together | [`../v-backend/docs/architecture/SYSTEM_GUIDE.md`](../v-backend/docs/architecture/SYSTEM_GUIDE.md) |
+| You want                 | Go to                    |
+| ------------------------ | ------------------------ |
+| How to work in this repo | [`AGENTS.md`](AGENTS.md) |
