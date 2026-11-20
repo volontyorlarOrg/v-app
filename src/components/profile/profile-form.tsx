@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { ActionStatus } from "@/components/app/action-status";
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -32,14 +31,6 @@ import {
   type ProfileFormValues,
 } from "@/lib/profile/input";
 import type { LanguageOption } from "@/lib/profile/languages";
-import {
-  OPTIONAL_PROFILE_PARTS,
-  DEFAULT_HIDDEN_PROFILE_PARTS,
-  contactPublicationRequired,
-  VISIBILITY_MARKER,
-  visibilityFieldName,
-  type OptionalProfilePart,
-} from "@/lib/profile/visibility";
 
 export type ProfileSection = "about" | "education" | "location" | "contact" | "links";
 
@@ -86,18 +77,6 @@ export type ProfileFormLabels = {
   saveError: string;
   fieldInvalid: string;
   cancel?: string;
-};
-
-export type ProfileVisibility = {
-  hidden: readonly OptionalProfilePart[];
-  labels: {
-    title: string;
-    help: string;
-    parts: Record<OptionalProfilePart, string>;
-    review?: string;
-    reviewHelp?: string;
-    confirmContacts?: string;
-  };
 };
 
 function ProfileField({
@@ -163,7 +142,6 @@ export function ProfileForm({
   languageOptions,
   regions,
   labels,
-  visibility,
   headed = true,
   doneHref,
   cancelHref,
@@ -172,17 +150,12 @@ export function ProfileForm({
   languageOptions: readonly LanguageOption[];
   regions: readonly RegionOption[];
   labels: ProfileFormLabels;
-  visibility?: ProfileVisibility;
   headed?: boolean;
   doneHref?: string;
   cancelHref?: string;
 }) {
   const id = useId();
   const router = useRouter();
-  const [hidden, setHidden] = useState<readonly OptionalProfilePart[]>(
-    visibility?.hidden ?? [],
-  );
-  const [contactsConfirmed, setContactsConfirmed] = useState(false);
   const { form, result, pending, formProps } = useActionForm({
     schema: profileFormSchema,
     defaultValues: profileFormValues(values),
@@ -192,13 +165,6 @@ export function ProfileForm({
       if (doneHref) router.push(doneHref);
     },
   });
-  const serverRequiresConfirmation =
-    result.status === "error" && result.code === "profileContactConfirmationRequired";
-  const needsConfirmation = Boolean(
-    visibility &&
-    (serverRequiresConfirmation ||
-      contactPublicationRequired(visibility.hidden, hidden)),
-  );
   const { register, formState, control: formControl } = form;
 
   const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
@@ -430,80 +396,10 @@ export function ProfileForm({
               </ProfileField>
             </FieldGroup>
           </FormSection>
-
-          {visibility ? (
-            <FormSection
-              id="visibility"
-              title={visibility.labels.title}
-              help={visibility.labels.help}
-            >
-              <input type="hidden" name={VISIBILITY_MARKER} value="1" />
-              {visibility.labels.review ? (
-                <div className="mb-4 flex flex-col items-start gap-2">
-                  <p className="text-sm leading-relaxed text-ink-muted">
-                    {visibility.labels.reviewHelp}
-                  </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setHidden(
-                        hidden.includes("phone")
-                          ? [...DEFAULT_HIDDEN_PROFILE_PARTS]
-                          : [],
-                      );
-                      setContactsConfirmed(false);
-                    }}
-                  >
-                    {visibility.labels.review}
-                  </Button>
-                </div>
-              ) : null}
-              <ul
-                aria-label={visibility.labels.title}
-                className="grid gap-x-10 sm:grid-cols-2"
-              >
-                {OPTIONAL_PROFILE_PARTS.map((part) => (
-                  <li key={part} className="border-b border-border">
-                    <Switch
-                      name={visibilityFieldName(part)}
-                      label={visibility.labels.parts[part]}
-                      checked={!hidden.includes(part)}
-                      onCheckedChange={(shown) => {
-                        setHidden((current) =>
-                          shown
-                            ? current.filter((value) => value !== part)
-                            : [...current, part],
-                        );
-                        setContactsConfirmed(false);
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-              {needsConfirmation ? (
-                <label className="mt-4 flex min-h-11 items-start gap-3 text-sm leading-relaxed text-ink">
-                  <input
-                    type="checkbox"
-                    name="confirmContactPublication"
-                    checked={contactsConfirmed}
-                    onChange={(event) => setContactsConfirmed(event.target.checked)}
-                    className="mt-1 size-4 shrink-0 accent-action"
-                  />
-                  {visibility.labels.confirmContacts}
-                </label>
-              ) : null}
-            </FormSection>
-          ) : null}
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border pt-6">
-          <Button
-            type="submit"
-            disabled={pending || (needsConfirmation && !contactsConfirmed)}
-            className="disabled:opacity-70"
-          >
+          <Button type="submit" disabled={pending} className="disabled:opacity-70">
             {pending ? labels.saving : labels.save}
           </Button>
           {cancelHref && labels.cancel ? (
@@ -516,11 +412,7 @@ export function ProfileForm({
             </Link>
           ) : null}
           {result.status === "error" ? (
-            <ActionStatus tone="error">
-              {serverRequiresConfirmation && visibility?.labels.confirmContacts
-                ? visibility.labels.confirmContacts
-                : labels.saveError}
-            </ActionStatus>
+            <ActionStatus tone="error">{labels.saveError}</ActionStatus>
           ) : null}
         </div>
       </Panel>

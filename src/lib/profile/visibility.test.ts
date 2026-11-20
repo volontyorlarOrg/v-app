@@ -2,13 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
   ALWAYS_SHOWN_PROFILE_PARTS,
+  CONTACT_PROFILE_PARTS,
   DEFAULT_HIDDEN_PROFILE_PARTS,
-  contactPublicationRequired,
   OPTIONAL_PROFILE_PARTS,
-  VISIBILITY_MARKER,
-  hiddenPartsFromFormData,
+  REQUIRED_PROFILE_PARTS,
+  contactPublicationRequired,
   hiddenProfileParts,
-  visibilityFieldName,
   withoutHiddenParts,
 } from "@/lib/profile/visibility";
 
@@ -28,70 +27,109 @@ const profile = {
   links: ["https://a.example"],
 };
 
+const everyOldPart = [
+  "bio",
+  "region",
+  "hometownRegion",
+  "city",
+  "school",
+  "gradeYear",
+  "languages",
+  "phone",
+  "telegram",
+  "instagram",
+  "linkedin",
+  "links",
+  "joined",
+  "activity",
+];
+
 describe("profile visibility", () => {
-  it("keeps the header parts out of what a volunteer can hide", () => {
+  it("keeps the header and the required parts out of what a volunteer can hide", () => {
     for (const part of ALWAYS_SHOWN_PROFILE_PARTS) {
       expect(OPTIONAL_PROFILE_PARTS as readonly string[]).not.toContain(part);
     }
-    expect(hiddenProfileParts(["bio", "name", "phone"])).toEqual(
-      new Set(["bio", "phone"]),
-    );
+    expect(hiddenProfileParts(["bio", "name", "phone"])).toEqual(new Set(["phone"]));
   });
 
-  it("reads a form with every switch on as nothing hidden", () => {
-    const data = new FormData();
-    data.set(VISIBILITY_MARKER, "1");
-    for (const part of OPTIONAL_PROFILE_PARTS) data.set(visibilityFieldName(part), "1");
-
-    expect(hiddenPartsFromFormData(data)).toEqual([]);
-  });
-
-  it("hides exactly the parts whose switch is off", () => {
-    const data = new FormData();
-    data.set(VISIBILITY_MARKER, "1");
-    for (const part of OPTIONAL_PROFILE_PARTS) {
-      if (part !== "phone" && part !== "activity") {
-        data.set(visibilityFieldName(part), "1");
-      }
+  it("always shows the biography, location, study place, languages, portfolio links and joined date", () => {
+    expect(REQUIRED_PROFILE_PARTS).toEqual([
+      "bio",
+      "region",
+      "city",
+      "school",
+      "languages",
+      "links",
+      "joined",
+    ]);
+    expect(OPTIONAL_PROFILE_PARTS).toEqual([
+      "hometownRegion",
+      "gradeYear",
+      "phone",
+      "telegram",
+      "instagram",
+      "linkedin",
+      "activity",
+    ]);
+    for (const part of REQUIRED_PROFILE_PARTS) {
+      expect(ALWAYS_SHOWN_PROFILE_PARTS as readonly string[]).toContain(part);
     }
-
-    expect(hiddenPartsFromFormData(data)).toEqual(["phone", "activity"]);
   });
 
-  it("leaves the stored choice alone when a form carries no switches", () => {
-    const data = new FormData();
-    data.set("fullName", "Dilnoza");
+  it("ignores a stored choice to hide a required part", () => {
+    expect(
+      hiddenProfileParts(["region", "languages", "joined", "city", "gradeYear"]),
+    ).toEqual(new Set(["gradeYear"]));
+  });
 
-    expect(hiddenPartsFromFormData(data)).toBeUndefined();
+  it("treats a profile that hid every old part as hiding only the optional ones", () => {
+    const hidden = hiddenProfileParts(everyOldPart);
+
+    expect(hidden.size).toBe(OPTIONAL_PROFILE_PARTS.length);
+
+    expect(withoutHiddenParts(profile, hidden)).toMatchObject({
+      fullName: "Dilnoza Karimova",
+      bio: "Hi",
+      region: "samarkand",
+      city: "Samarkand",
+      school: "School 12",
+      languages: ["uz", "en"],
+      links: ["https://a.example"],
+      hometownRegion: null,
+      gradeYear: "",
+      phone: "",
+      telegram: "",
+      instagram: "",
+      linkedin: "",
+    });
+  });
+
+  it("keeps contact details optional", () => {
+    for (const part of CONTACT_PROFILE_PARTS) {
+      expect(OPTIONAL_PROFILE_PARTS as readonly string[]).toContain(part);
+    }
   });
 
   it("blanks hidden parts without hiding the name", () => {
-    const shown = withoutHiddenParts(
-      profile,
-      new Set(["bio", "phone", "region", "links"]),
-    );
+    const shown = withoutHiddenParts(profile, new Set(["phone", "gradeYear"]));
 
     expect(shown).toMatchObject({
       fullName: "Dilnoza Karimova",
-      bio: "",
       phone: "",
-      region: null,
-      links: [],
-      city: "Samarkand",
+      gradeYear: "",
+      bio: "Hi",
+      region: "samarkand",
       telegram: "dilnoza_k",
     });
   });
 
-  it("hides the hometown and the current region independently", () => {
+  it("hides the hometown without touching the current region", () => {
     expect(withoutHiddenParts(profile, new Set(["hometownRegion"]))).toMatchObject({
       region: "samarkand",
       hometownRegion: null,
     });
-    expect(withoutHiddenParts(profile, new Set(["region"]))).toMatchObject({
-      region: null,
-      hometownRegion: "bukhara",
-    });
   });
+
   it("shows useful details by default and keeps phone private", () => {
     const shown = withoutHiddenParts(profile, new Set(DEFAULT_HIDDEN_PROFILE_PARTS));
     expect(shown).toMatchObject({
@@ -99,6 +137,7 @@ describe("profile visibility", () => {
       region: "samarkand",
       city: "Samarkand",
       school: "School 12",
+      gradeYear: "10",
       phone: "",
       telegram: "dilnoza_k",
       instagram: "dilnoza.codes",
@@ -109,9 +148,13 @@ describe("profile visibility", () => {
 
   it("requires confirmation only when previously hidden contacts become public", () => {
     expect(contactPublicationRequired(["phone", "telegram"], ["phone"])).toBe(true);
-    expect(contactPublicationRequired(["phone", "links"], ["phone"])).toBe(true);
-    expect(contactPublicationRequired(["phone", "bio"], ["phone"])).toBe(false);
+    expect(contactPublicationRequired(["phone", "linkedin"], ["phone"])).toBe(true);
+    expect(contactPublicationRequired(["phone", "gradeYear"], ["phone"])).toBe(false);
     expect(contactPublicationRequired(["phone"], ["phone", "telegram"])).toBe(false);
     expect(contactPublicationRequired([], [])).toBe(false);
+  });
+
+  it("does not treat a legacy hidden portfolio link as a contact to confirm", () => {
+    expect(contactPublicationRequired(["phone", "links"], ["phone"])).toBe(false);
   });
 });

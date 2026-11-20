@@ -13,6 +13,37 @@ const ACCESS_TOKEN_TTL_SECONDS = Number(process.env.STUB_ACCESS_TTL ?? 259_200);
 const DAY = 86_400_000;
 const START = Date.now();
 
+const OPTIONAL_PROFILE_PARTS = [
+  "hometownRegion",
+  "gradeYear",
+  "phone",
+  "telegram",
+  "instagram",
+  "linkedin",
+  "activity",
+];
+const REQUIRED_PROFILE_PARTS = [
+  "bio",
+  "region",
+  "city",
+  "school",
+  "languages",
+  "links",
+  "joined",
+];
+const KNOWN_PROFILE_PARTS = [...OPTIONAL_PROFILE_PARTS, ...REQUIRED_PROFILE_PARTS];
+const CONTACT_PROFILE_PARTS = ["phone", "telegram", "instagram", "linkedin"];
+
+function normalizeHiddenParts(parts) {
+  return OPTIONAL_PROFILE_PARTS.filter((part) => parts.includes(part));
+}
+
+function contactPublicationRequired(previouslyHidden, nextHidden) {
+  return CONTACT_PROFILE_PARTS.some(
+    (part) => previouslyHidden.includes(part) && !nextHidden.includes(part),
+  );
+}
+
 function at(days, hour = 9) {
   const base = new Date(START);
   base.setUTCHours(hour - 5, 0, 0, 0);
@@ -1440,12 +1471,12 @@ const server = createServer(async (request, response) => {
       displayName: profile?.fullName ?? rosterEntry.displayName,
       username,
       avatarUrl: isViewer ? state.account.avatarUrl : rosterEntry.avatarUrl,
-      bio: shown("bio", profile?.bio ?? "Community volunteer and student.", ""),
-      region: shown("region", profile?.region ?? "tashkent-city", null),
-      city: shown("city", profile?.city ?? "Tashkent", ""),
-      school: shown("school", profile?.school ?? "Academic lyceum No. 2", ""),
+      bio: profile?.bio ?? "Community volunteer and student.",
+      region: profile?.region ?? "tashkent-city",
+      city: profile?.city ?? "Tashkent",
+      school: profile?.school ?? "Academic lyceum No. 2",
       gradeYear: shown("gradeYear", profile?.gradeYear ?? "2", ""),
-      languages: shown("languages", profile?.languages ?? ["uz", "ru", "en"], []),
+      languages: profile?.languages ?? ["uz", "ru", "en"],
       phone: shown("phone", profile?.phone || "+998 90 123 45 67", ""),
       telegram: shown("telegram", profile?.telegram ?? username, ""),
       instagram: shown("instagram", profile?.instagram ?? "volontyorlar.uz", ""),
@@ -1454,12 +1485,8 @@ const server = createServer(async (request, response) => {
         profile?.linkedin ?? "https://www.linkedin.com/in/volontyorlar-uz",
         "",
       ),
-      links: shown(
-        "links",
-        profile?.links ?? ["https://portfolio.example/volunteer"],
-        [],
-      ),
-      joinedAt: shown("joined", state.user.createdAt, null),
+      links: profile?.links ?? ["https://portfolio.example/volunteer"],
+      joinedAt: state.user.createdAt,
       level: isViewer ? progressOf(state).level : "volunteer",
       xp: isViewer ? VIEWER_XP : rosterEntry.xp,
       stats: {
@@ -1630,32 +1657,29 @@ const server = createServer(async (request, response) => {
         errors: { fullName: ["fullName must be longer than or equal to 2 characters"] },
       });
     }
-    const HIDEABLE = [
-      "bio",
-      "region",
-      "hometownRegion",
-      "city",
-      "school",
-      "gradeYear",
-      "languages",
-      "phone",
-      "telegram",
-      "instagram",
-      "linkedin",
-      "links",
-      "joined",
-      "activity",
-    ];
     if (
       body.hiddenFields !== undefined &&
       !(
         Array.isArray(body.hiddenFields) &&
-        body.hiddenFields.every((part) => HIDEABLE.includes(part))
+        body.hiddenFields.every((part) => KNOWN_PROFILE_PARTS.includes(part))
       )
     ) {
       return send(response, 422, {
         code: "validationFailed",
         errors: { hiddenFields: ["each value in hiddenFields must be a known part"] },
+      });
+    }
+    if (
+      body.hiddenFields !== undefined &&
+      !body.confirmContactPublication &&
+      contactPublicationRequired(
+        state.profile ? (state.profile.hiddenFields ?? []) : ["phone"],
+        body.hiddenFields,
+      )
+    ) {
+      return send(response, 400, {
+        code: "profileContactConfirmationRequired",
+        errors: { hiddenFields: ["profileContactConfirmationRequired"] },
       });
     }
     const malformed = {
@@ -1673,15 +1697,36 @@ const server = createServer(async (request, response) => {
     if (Object.keys(malformed).length > 0) {
       return send(response, 422, { code: "validationFailed", errors: malformed });
     }
-    const previousHidden = state.profile
-      ? (state.profile.hiddenFields ?? [])
-      : ["phone"];
+    const profileBody = { ...body };
+    delete profileBody.confirmContactPublication;
+    state.profile = {
+      ...(state.profile ?? { hiddenFields: ["phone"] }),
+      ...profileBody,
+      ...(body.hiddenFields === undefined
+        ? {}
+        : { hiddenFields: normalizeHiddenParts(body.hiddenFields) }),
+      fullName: body.fullName.trim(),
+      phoneVerified: false,
+      updatedAt: new Date().toISOString(),
+    };
+    state.user.displayName = state.profile.fullName;
+    return send(response, 200, state.profile);
+  }
+  if (path === "/profile/visibility" && method === "PUT") {
     if (
-      body.hiddenFields &&
+      !Array.isArray(body.hiddenFields) ||
+      !body.hiddenFields.every((part) => KNOWN_PROFILE_PARTS.includes(part))
+    ) {
+      return send(response, 422, {
+        code: "validationFailed",
+        errors: { hiddenFields: ["each value in hiddenFields must be a known part"] },
+      });
+    }
+    if (!state.profile) return send(response, 404, { code: "profileNotFound" });
+    const hiddenFields = normalizeHiddenParts(body.hiddenFields);
+    if (
       !body.confirmContactPublication &&
-      ["phone", "telegram", "instagram", "linkedin", "links"].some(
-        (part) => previousHidden.includes(part) && !body.hiddenFields.includes(part),
-      )
+      contactPublicationRequired(state.profile.hiddenFields ?? [], hiddenFields)
     ) {
       return send(response, 400, {
         code: "profileContactConfirmationRequired",
@@ -1689,13 +1734,10 @@ const server = createServer(async (request, response) => {
       });
     }
     state.profile = {
-      ...(state.profile ?? { hiddenFields: ["phone"] }),
-      ...body,
-      fullName: body.fullName.trim(),
-      phoneVerified: false,
+      ...state.profile,
+      hiddenFields,
       updatedAt: new Date().toISOString(),
     };
-    state.user.displayName = state.profile.fullName;
     return send(response, 200, state.profile);
   }
   if (path === "/record" && method === "GET") return send(response, 200, state.record);

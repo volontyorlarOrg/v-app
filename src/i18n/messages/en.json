@@ -926,7 +926,8 @@
     },
     "edit": {
       "back": "Back to profile",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "visibilityLink": "Choose what others see in Settings"
     },
     "activity": {
       "title": "Activity",
@@ -938,11 +939,6 @@
       "profileCompleted": "Profile completed"
     },
     "visibility": {
-      "title": "What others see",
-      "help": "Your photo, name, username, level and participation figures are always on your profile. You choose what else to show. Organisers still see your full profile on an application you send.",
-      "review": "Review recommended visibility",
-      "reviewHelp": "Your saved choices stay unchanged until you save. Review the switches below before publishing more details. Phone visibility keeps your current choice.",
-      "confirmContacts": "I confirm that the selected contact details and links may be shown publicly.",
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",
       "parts": {
         "region": "Region",
@@ -1046,7 +1042,7 @@
     },
     "privacy": {
       "title": "Privacy",
-      "description": "Your profile is visible to others. Choose optional details in Edit profile. Organisations you apply to can see your application.",
+      "description": "Your profile is visible to others. Choose optional details under What others see. Organisations you apply to can see your application.",
       "profileToOrganisers": "Share my profile with organisers I apply to",
       "profileToOrganisersHelp": "Required to apply. Organisers never see your contact details before you apply.",
       "levelPublic": "Show my level on the community list",
@@ -1215,6 +1211,28 @@
     },
     "password": {
       "label": "Password"
+    },
+    "visibility": {
+      "title": "What others see",
+      "description": "Anyone with your profile link can open your public profile. The details below are always on it, and you choose the rest. Organisers still see your full profile on an application you send.",
+      "alwaysTitle": "Always shown",
+      "optionalTitle": "You choose",
+      "always": {
+        "photo": "Photo",
+        "name": "Name",
+        "username": "Username",
+        "level": "Level",
+        "figures": "Participation figures"
+      },
+      "recommended": "Use recommended settings",
+      "recommendedHelp": "Shows everything except your phone number. Nothing changes until you save.",
+      "confirmContacts": "I confirm that the selected contact details and links may be shown publicly.",
+      "save": "Save choices",
+      "saving": "Saving…",
+      "saved": "Saved. Your public profile now follows your choices.",
+      "saveError": "Your choices were not saved. Try again.",
+      "needsProfile": "Create your profile first. Then you can choose what others see.",
+      "needsProfileAction": "Complete profile"
     }
   },
   "notFound": {

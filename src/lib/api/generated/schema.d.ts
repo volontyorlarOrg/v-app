@@ -683,6 +683,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/profile/visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Choose which optional profile details others can see */
+        put: operations["ProfilesController_updateVisibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/organizations": {
         parameters: {
             query?: never;
@@ -3522,8 +3539,14 @@ export interface components {
             linkedin: string;
             /** @default [] */
             links: string[];
-            /** @description Optional parts kept off the profile others see. Omit to keep the stored choice. */
-            hiddenFields?: ("bio" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "phone" | "telegram" | "instagram" | "linkedin" | "links" | "joined" | "activity")[];
+            /** @description Optional parts kept off the profile others see. Omit to keep the stored choice. Parts that are always public are accepted and ignored. */
+            hiddenFields?: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin" | "activity")[];
+            /** @description Confirms publishing contact details that were previously hidden. */
+            confirmContactPublication?: boolean;
+        };
+        UpdateProfileVisibilityDto: {
+            /** @description Optional parts kept off the profile others see. Parts that are always public are accepted and ignored. */
+            hiddenFields: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin" | "activity")[];
             /** @description Confirms publishing contact details that were previously hidden. */
             confirmContactPublication?: boolean;
         };
@@ -7884,6 +7907,91 @@ export interface operations {
             };
             /** @description Authenticated account cannot perform this operation */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ProfilesController_updateVisibility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileVisibilityDto"];
+            };
+        };
+        responses: {
+            /** @description The saved profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The profile has not been created */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

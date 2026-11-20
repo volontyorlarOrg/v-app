@@ -926,7 +926,8 @@
     },
     "edit": {
       "back": "Profilga qaytish",
-      "cancel": "Bekor qilish"
+      "cancel": "Bekor qilish",
+      "visibilityLink": "Boshqalarga nima koʻrinishini Sozlamalarda tanlang"
     },
     "activity": {
       "title": "Faoliyat",
@@ -938,11 +939,6 @@
       "profileCompleted": "Profil toʻldirildi"
     },
     "visibility": {
-      "title": "Boshqalarga koʻrinadigan qismlar",
-      "help": "Rasm, ism, foydalanuvchi nomi, daraja va ishtirok koʻrsatkichlari profilda doim koʻrinadi. Qolganini oʻzingiz tanlaysiz. Ariza yuborganingizda tashkilotchi profilingizni toʻliq koʻradi.",
-      "review": "Tavsiya etilgan koʻrinishni tekshirish",
-      "reviewHelp": "Saqlangan tanlovlaringiz saqlamaguningizcha oʻzgarmaydi. Koʻproq maʼlumotni eʼlon qilishdan oldin quyidagi sozlamalarni tekshiring. Telefon uchun joriy tanlovingiz saqlanadi.",
-      "confirmContacts": "Tanlangan aloqa maʼlumotlari va havolalar ommaga koʻrsatilishini tasdiqlayman.",
       "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",
       "parts": {
         "region": "Hudud",
@@ -1046,7 +1042,7 @@
     },
     "privacy": {
       "title": "Maxfiylik",
-      "description": "Profilingiz boshqalarga koʻrinadi. Ixtiyoriy maʼlumotlarni Profilni tahrirlashda tanlang. Ariza bergan tashkilotlaringiz arizangizni koʻra oladi.",
+      "description": "Profilingiz boshqalarga koʻrinadi. Ixtiyoriy maʼlumotlarni «Boshqalarga koʻrinadigan qismlar» boʻlimida tanlang. Ariza bergan tashkilotlaringiz arizangizni koʻra oladi.",
       "profileToOrganisers": "Profilimni ariza bergan tashkilotchilarga koʻrsatish",
       "profileToOrganisersHelp": "Ariza berish uchun zarur. Tashkilotchilar ariza berishdan oldin aloqa maʼlumotlaringizni koʻrmaydi.",
       "levelPublic": "Darajamni hamjamiyat roʻyxatida koʻrsatish",
@@ -1215,6 +1211,28 @@
     },
     "password": {
       "label": "Parol"
+    },
+    "visibility": {
+      "title": "Boshqalarga koʻrinadigan qismlar",
+      "description": "Profil havolangiz bor har kim ommaviy profilingizni ocha oladi. Quyidagi maʼlumotlar unda doim koʻrinadi, qolganini oʻzingiz tanlaysiz. Yuborgan arizangizda tashkilotchi profilingizni baribir toʻliq koʻradi.",
+      "alwaysTitle": "Doim koʻrinadi",
+      "optionalTitle": "Oʻzingiz tanlaysiz",
+      "always": {
+        "photo": "Rasm",
+        "name": "Ism",
+        "username": "Foydalanuvchi nomi",
+        "level": "Daraja",
+        "figures": "Ishtirok koʻrsatkichlari"
+      },
+      "recommended": "Tavsiya etilgan sozlamalar",
+      "recommendedHelp": "Telefon raqamingizdan tashqari hammasini koʻrsatadi. Saqlamaguningizcha hech narsa oʻzgarmaydi.",
+      "confirmContacts": "Tanlangan aloqa maʼlumotlari va havolalar ommaga koʻrsatilishini tasdiqlayman.",
+      "save": "Tanlovni saqlash",
+      "saving": "Saqlanmoqda…",
+      "saved": "Saqlandi. Ommaviy profilingiz endi tanlovingizga mos.",
+      "saveError": "Tanlovingiz saqlanmadi. Qayta urinib koʻring.",
+      "needsProfile": "Avval profilingizni yarating. Shundan keyin boshqalarga nima koʻrinishini tanlay olasiz.",
+      "needsProfileAction": "Profilni toʻldirish"
     }
   },
   "notFound": {

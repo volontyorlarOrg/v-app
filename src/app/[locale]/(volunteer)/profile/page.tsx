@@ -269,7 +269,7 @@ function Profile({
             ),
         }
       : null,
-    hidden.has("joined") || Number.isNaN(joinedOn.getTime())
+    Number.isNaN(joinedOn.getTime())
       ? null
       : {
           id: "joined",
@@ -309,7 +309,7 @@ function Profile({
               parts: hiddenLabels.join(", "),
               link: (chunks) => (
                 <Link
-                  href={`${navHref("profileEdit")}#visibility`}
+                  href={`${navHref("settings")}#visibility`}
                   prefetch
                   className="font-semibold text-primary-ink underline-offset-4 hover:underline"
                 >

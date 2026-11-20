@@ -122,19 +122,25 @@ written; a backend shape lives in `src/lib/api/schemas.ts` and nowhere else.
 **The profile is the volunteer's own page, not a settings screen.** `/profile`
 opens on `ProfileSheet` — one read-only sheet: the avatar, the name as the
 `h1`, the username and the level, the bio, one line of figures from the record,
-and then the details the volunteer chose to show (region, city, school, year,
-languages, phone, Telegram, Instagram, LinkedIn, portfolio links, the month
-they joined) as plain ruled rows beside the public page address with its copy
+and then the details: the region, city, school, languages, portfolio links and
+the month they joined, which are always shown, and the ones the volunteer chose
+to show (hometown, year, phone, Telegram, Instagram, LinkedIn) as plain ruled
+rows beside the public page address with its copy
 button, followed by **My activity**: the events they attended and their past
 events, each with its organisation, date, hours and XP.
-**The header is always shown; everything else is the volunteer's choice.**
-The photo, name, username, level and figures cannot be hidden. The fourteen
-optional parts, including bio, are one switch each in the "What others see" section of
-`/profile/edit`, saved with the form as `hiddenFields`; the vocabulary is
-`src/lib/profile/visibility.ts`. `/profile` shows exactly what others see,
-with one line at the foot naming what is hidden and linking back to the
-switches, and the backend, not this app, removes hidden parts from the public
-contract. An application still carries the whole profile.
+**The header and seven more details are always shown; the rest is the
+volunteer's choice.** The photo, name, username, level and figures cannot be
+hidden, and neither can the bio, region, city, school, languages, portfolio
+links and the joined date (`REQUIRED_PROFILE_PARTS`). The seven optional parts
+are one switch each in the "What others see" panel of `/settings`, saved on
+their own with `PUT /profile/visibility` as `hiddenFields`; the profile form
+carries no switches and links to the panel. The vocabulary is
+`src/lib/profile/visibility.ts`, mirroring the backend's
+`profile-visibility.ts`. `/profile` shows exactly what others see, with one
+line at the foot naming what is hidden and linking to the panel, and the
+backend, not this app, removes hidden parts from the public contract and
+ignores a stored choice to hide a required one. An application still carries
+the whole profile.
 There is no cover, no stat band and
 no second panel; completeness is a thin meter along the sheet's top edge with
 one sentence, and it disappears once nothing is missing. It is the same sheet

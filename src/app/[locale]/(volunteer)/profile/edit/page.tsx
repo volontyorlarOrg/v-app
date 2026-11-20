@@ -16,12 +16,6 @@ import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, type VolunteerProfile } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { initialsOf } from "@/lib/profile/initials";
-import {
-  OPTIONAL_PROFILE_PARTS,
-  DEFAULT_HIDDEN_PROFILE_PARTS,
-  hiddenProfileParts,
-  type OptionalProfilePart,
-} from "@/lib/profile/visibility";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -88,27 +82,16 @@ export default async function ProfileEditPage({
   };
 
   return (
-    <ProfileEditor
-      values={values}
-      hidden={
-        profile
-          ? [...hiddenProfileParts(profile.hiddenFields)]
-          : [...DEFAULT_HIDDEN_PROFILE_PARTS]
-      }
-      locale={locale as Locale}
-      avatarUrl={me.avatarUrl}
-    />
+    <ProfileEditor values={values} locale={locale as Locale} avatarUrl={me.avatarUrl} />
   );
 }
 
 function ProfileEditor({
   values,
-  hidden,
   locale,
   avatarUrl,
 }: {
   values: VolunteerProfile;
-  hidden: readonly OptionalProfilePart[];
   locale: Locale;
   avatarUrl?: string;
 }) {
@@ -131,6 +114,12 @@ function ProfileEditor({
           description={t("form.description")}
           className="mt-3"
         />
+        <Link
+          href={`${navHref("settings")}#visibility`}
+          className="mt-2 inline-flex min-h-9 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+        >
+          {t("edit.visibilityLink")}
+        </Link>
       </div>
 
       <AvatarEditor
@@ -169,22 +158,6 @@ function ProfileEditor({
           value: region,
           label: opportunities(`regions.${region}`),
         }))}
-        visibility={{
-          hidden,
-          labels: {
-            title: t("visibility.title"),
-            help: t("visibility.help"),
-            review: t("visibility.review"),
-            reviewHelp: t("visibility.reviewHelp"),
-            confirmContacts: t("visibility.confirmContacts"),
-            parts: Object.fromEntries(
-              OPTIONAL_PROFILE_PARTS.map((part) => [
-                part,
-                t(`visibility.parts.${part}`),
-              ]),
-            ) as Record<OptionalProfilePart, string>,
-          },
-        }}
         headed={false}
         doneHref={navHref("profile")}
         cancelHref={navHref("profile")}

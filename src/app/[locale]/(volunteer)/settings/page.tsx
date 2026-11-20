@@ -7,6 +7,11 @@ import {
   type UsernameLabels,
 } from "@/components/account/username-section";
 import { ActionStatus, type ActionTone } from "@/components/app/action-status";
+import {
+  LoadErrorRows,
+  loadErrorLabels,
+  type LoadErrorLabels,
+} from "@/components/app/load-error";
 import { PageHeader } from "@/components/app/page-header";
 import { Panel } from "@/components/app/panel";
 import { SignOutForm } from "@/components/auth/sign-out-form";
@@ -23,7 +28,12 @@ import {
   type PasswordFormLabels,
 } from "@/components/settings/password-connect-form";
 import { PrivacySection } from "@/components/settings/privacy-section";
+import {
+  VisibilitySection,
+  type VisibilityLabels,
+} from "@/components/settings/visibility-section";
 import { buttonClass } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import {
   connectionStates,
@@ -38,13 +48,21 @@ import {
   type UsernameIdentity,
 } from "@/lib/account/username";
 import { getMe, listMergeRequests } from "@/lib/api/account.server";
-import { settle } from "@/lib/api/load.server";
+import { settle, type LoadFailure } from "@/lib/api/load.server";
+import { getProfile } from "@/lib/api/profile.server";
 import { getProgress } from "@/lib/api/record.server";
 import type { MergeRequest } from "@/lib/api/schemas";
 import { requireSession } from "@/lib/api/session.server";
 import { isGoogleConfigured } from "@/lib/auth/config";
 import { initialsOf } from "@/lib/profile/initials";
+import {
+  OPTIONAL_PROFILE_PARTS,
+  REQUIRED_PROFILE_PARTS,
+  hiddenProfileParts,
+  type OptionalProfilePart,
+} from "@/lib/profile/visibility";
 import type { Level } from "@/lib/record/levels";
+import { navHref } from "@/lib/routing/routes";
 import { getLegalState } from "@/lib/legal/state.server";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +72,11 @@ const INFO_STATUSES: readonly ConnectStatus[] = ["approvalRequired", "alreadyPen
 const PASSWORD_STATUSES = ["set", "changed"] as const;
 
 type PasswordStatus = (typeof PASSWORD_STATUSES)[number];
+
+type VisibilityState =
+  | { status: "ready"; hidden: readonly OptionalProfilePart[] }
+  | { status: "missing" }
+  | { status: "failed"; failure: LoadFailure };
 
 function isPasswordStatus(value: unknown): value is PasswordStatus {
   return (
@@ -78,15 +101,28 @@ export default async function SettingsPage({
   setRequestLocale(locale);
 
   const { connect, password } = await searchParams;
-  const [session, me, requests, progress, format, t, legal] = await Promise.all([
-    requireSession(),
-    getMe(),
-    listMergeRequests(),
-    settle(() => getProgress()),
-    getFormatter({ locale }),
-    getTranslations({ locale, namespace: "settings" }),
-    getLegalState(),
-  ]);
+  const [session, me, requests, progress, profile, format, t, common, legal] =
+    await Promise.all([
+      requireSession(),
+      getMe(),
+      listMergeRequests(),
+      settle(() => getProgress()),
+      settle(() => getProfile()),
+      getFormatter({ locale }),
+      getTranslations({ locale, namespace: "settings" }),
+      getTranslations({ locale, namespace: "common" }),
+      getLegalState(),
+    ]);
+
+  const visibility: VisibilityState =
+    profile.status === "failed"
+      ? { status: "failed", failure: profile.failure }
+      : profile.data
+        ? {
+            status: "ready",
+            hidden: [...hiddenProfileParts(profile.data.hiddenFields)],
+          }
+        : { status: "missing" };
 
   const now = new Date();
   const toItem = (request: MergeRequest): MergeRequestItem => ({
@@ -112,6 +148,8 @@ export default async function SettingsPage({
       states={connectionStates(me)}
       username={usernameIdentity(me)}
       leaderboardEnabled={legal.leaderboard}
+      visibility={visibility}
+      errorLabels={loadErrorLabels(common)}
       email={me.email ?? null}
       hasPassword={me.authMethods.password}
       googleConfigured={isGoogleConfigured()}
@@ -137,6 +175,8 @@ function Settings({
   states,
   username,
   leaderboardEnabled,
+  visibility,
+  errorLabels,
   email,
   hasPassword,
   googleConfigured,
@@ -152,6 +192,8 @@ function Settings({
   states: readonly ConnectionState[];
   username: UsernameIdentity;
   leaderboardEnabled: boolean;
+  visibility: VisibilityState;
+  errorLabels: LoadErrorLabels;
   email: string | null;
   hasPassword: boolean;
   googleConfigured: boolean;
@@ -163,6 +205,7 @@ function Settings({
   const t = useTranslations("settings");
   const common = useTranslations("common");
   const record = useTranslations("record");
+  const profile = useTranslations("profile");
   const errors = Object.fromEntries(
     ACCOUNT_ERROR_KEYS.map((key) => [key, t(`errors.${key}`)]),
   );
@@ -225,6 +268,31 @@ function Settings({
     errors,
   };
 
+  const partLabel = (
+    part: OptionalProfilePart | (typeof REQUIRED_PROFILE_PARTS)[number],
+  ) => profile(`visibility.parts.${part}`);
+  const visibilityLabels: VisibilityLabels = {
+    alwaysTitle: t("visibility.alwaysTitle"),
+    optionalTitle: t("visibility.optionalTitle"),
+    always: [
+      ...(["photo", "name", "username", "level", "figures"] as const).map((id) => ({
+        id,
+        label: t(`visibility.always.${id}`),
+      })),
+      ...REQUIRED_PROFILE_PARTS.map((id) => ({ id, label: partLabel(id) })),
+    ],
+    parts: Object.fromEntries(
+      OPTIONAL_PROFILE_PARTS.map((part) => [part, partLabel(part)]),
+    ) as Record<OptionalProfilePart, string>,
+    recommended: t("visibility.recommended"),
+    recommendedHelp: t("visibility.recommendedHelp"),
+    confirmContacts: t("visibility.confirmContacts"),
+    save: t("visibility.save"),
+    saving: t("visibility.saving"),
+    saved: t("visibility.saved"),
+    saveError: t("visibility.saveError"),
+  };
+
   const waiting = incoming.length + outgoing.length;
 
   return (
@@ -270,6 +338,31 @@ function Settings({
             />
           }
         />
+
+        <Panel
+          id="visibility"
+          title={t("visibility.title")}
+          description={t("visibility.description")}
+          className="scroll-mt-20"
+        >
+          {visibility.status === "ready" ? (
+            <VisibilitySection hidden={visibility.hidden} labels={visibilityLabels} />
+          ) : visibility.status === "failed" ? (
+            <LoadErrorRows failure={visibility.failure} labels={errorLabels} />
+          ) : (
+            <div className="flex flex-col items-start gap-4">
+              <p className="text-sm leading-relaxed text-ink-muted">
+                {t("visibility.needsProfile")}
+              </p>
+              <Link
+                href={navHref("profileEdit")}
+                className={buttonClass({ variant: "outline", size: "sm" })}
+              >
+                {t("visibility.needsProfileAction")}
+              </Link>
+            </div>
+          )}
+        </Panel>
 
         {waiting > 0 ? (
           <div id="requests" className="scroll-mt-20">

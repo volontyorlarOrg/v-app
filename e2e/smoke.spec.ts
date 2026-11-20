@@ -298,7 +298,7 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("combobox", { name: "Hometown region" })).toHaveValue(
       "samarkand",
     );
-    await expect(page.getByRole("switch", { name: "Hometown region" })).toBeChecked();
+    await expect(page.getByRole("switch", { name: "Hometown region" })).toHaveCount(0);
     await expect(
       page.getByRole("note", { name: "Two regions, two different questions" }),
     ).toBeVisible();
@@ -314,6 +314,11 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("region", { name: "Your username" })).toContainText(
       "@malika_reads",
     );
+    await expect(
+      page
+        .getByRole("region", { name: "What others see" })
+        .getByRole("switch", { name: "Hometown region" }),
+    ).toBeChecked();
 
     await gotoReady(page, "/dashboard");
     await expect(page.getByRole("heading", { name: "Finish your pass" })).toHaveCount(
@@ -1873,39 +1878,55 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("definition").filter({ hasText: "Academic lyceum No. 2" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("term").filter({ hasText: "Year or grade" }),
+    ).toBeVisible();
 
     await gotoReady(page, "/profile/edit");
-    const school = page.getByRole("switch", { name: "School", exact: true });
     await page
       .getByRole("textbox", { name: "Bio", exact: true })
-      .fill("Private biography for this profile.");
-    await expect(school).toBeChecked();
-    await school.click();
-    await page.getByRole("switch", { name: "Bio", exact: true }).click();
-    await page.getByRole("switch", { name: "Activity", exact: true }).click();
-    await page.getByRole("switch", { name: "Instagram", exact: true }).click();
+      .fill("A biography everyone can read.");
     await page.getByRole("button", { name: "Save profile" }).click();
     await expect(page).toHaveURL(/\/profile$/);
+
+    await gotoReady(page, "/settings");
+    const visibility = page.getByRole("region", { name: "What others see" });
+    const grade = visibility.getByRole("switch", {
+      name: "Year or grade",
+      exact: true,
+    });
+    await expect(grade).toBeChecked();
+    await grade.click();
+    await visibility.getByRole("switch", { name: "Activity", exact: true }).click();
+    await visibility.getByRole("switch", { name: "Instagram", exact: true }).click();
+    await visibility.getByRole("button", { name: "Save choices" }).click();
+    await expect(
+      page.getByText("Saved. Your public profile now follows your choices."),
+    ).toBeVisible();
+    await gotoReady(page, "/profile");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
     await expect(page.getByRole("list", { name: "Participation" })).toBeVisible();
-    await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
-    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
+    await expect(page.getByText("A biography everyone can read.")).toBeVisible();
+    await expect(page.getByText("Academic lyceum No. 2")).toBeVisible();
+    await expect(
+      page.getByRole("term").filter({ hasText: "Year or grade" }),
+    ).toHaveCount(0);
     await expect(page.getByRole("region", { name: "My activity" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
     await expect(
-      page.getByText("Not shown on your profile: Bio, School, Instagram, Activity."),
+      page.getByText("Not shown on your profile: Year or grade, Instagram, Activity."),
     ).toBeVisible();
 
     await gotoReady(page, "/profiles/dilnoza_k");
     await expect(
       page.getByRole("heading", { level: 1, name: "Dilnoza Karimova" }),
     ).toBeVisible();
-    await expect(page.getByText("Academic lyceum No. 2")).toHaveCount(0);
-    await expect(page.getByText("Private biography for this profile.")).toHaveCount(0);
+    await expect(page.getByText("Academic lyceum No. 2")).toBeVisible();
+    await expect(page.getByText("A biography everyone can read.")).toBeVisible();
     await expect(page.getByRole("region", { name: "Activity" })).toHaveCount(0);
     await expect(
       page.getByRole("definition").filter({ hasText: "Tashkent City" }),
@@ -1913,12 +1934,13 @@ test.describe("applications, record, profile and settings", () => {
 
     await page.goto("/profile");
     await page.getByRole("link", { name: "Change" }).click();
-    await expect(page).toHaveURL(/\/profile\/edit#visibility$/);
+    await expect(page).toHaveURL(/\/settings#visibility$/);
+    const choices = page.getByRole("region", { name: "What others see" });
     await expect(
-      page.getByRole("switch", { name: "School", exact: true }),
+      choices.getByRole("switch", { name: "Year or grade", exact: true }),
     ).not.toBeChecked();
     await expect(
-      page.getByRole("switch", { name: "Phone", exact: true }),
+      choices.getByRole("switch", { name: "Phone", exact: true }),
     ).toBeChecked();
   });
 
@@ -1948,21 +1970,80 @@ test.describe("applications, record, profile and settings", () => {
     );
   });
 
-  test("profile visibility is required and its optional fields remain editable", async ({
+  test("settings keeps the required details on and lets the volunteer choose the rest", async ({
     page,
   }) => {
     await signIn(page);
     await gotoReady(page, "/settings");
 
-    const toggle = page.getByRole("switch", {
-      name: "Show my public profile",
-    });
-    await expect(toggle).toHaveCount(0);
+    await expect(
+      page.getByRole("switch", { name: "Show my public profile" }),
+    ).toHaveCount(0);
     await expect(
       page.getByText("Your profile is visible to others.", { exact: false }),
     ).toBeVisible();
-    await gotoReady(page, "/profile/edit#visibility");
-    await expect(page.getByRole("switch", { name: "Bio", exact: true })).toBeVisible();
+
+    const visibility = page.getByRole("region", { name: "What others see" });
+    const always = visibility.getByRole("region", { name: "Always shown" });
+    for (const name of [
+      "Photo",
+      "Name",
+      "Username",
+      "Level",
+      "Bio",
+      "Region",
+      "City",
+      "School",
+      "Languages",
+      "Portfolio links",
+      "Joined date",
+    ]) {
+      await expect(always).toContainText(name);
+      await expect(visibility.getByRole("switch", { name, exact: true })).toHaveCount(
+        0,
+      );
+    }
+    await expect(
+      visibility.getByRole("switch", { name: "Hometown region", exact: true }),
+    ).toBeVisible();
+    await expect(
+      visibility.getByRole("button", { name: "Save choices" }),
+    ).toBeDisabled();
+
+    await gotoReady(page, "/profile/edit");
+    await expect(page.getByRole("switch", { name: "Bio", exact: true })).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Choose what others see in Settings" }),
+    ).toHaveAttribute("href", "/settings#visibility");
+  });
+
+  test("a hidden contact detail is only published after it is confirmed", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await gotoReady(page, "/settings");
+    const visibility = page.getByRole("region", { name: "What others see" });
+    const telegram = visibility.getByRole("switch", { name: "Telegram", exact: true });
+    const save = visibility.getByRole("button", { name: "Save choices" });
+    const confirm = visibility.getByLabel(
+      "I confirm that the selected contact details and links may be shown publicly.",
+    );
+
+    await telegram.click();
+    await expect(confirm).toHaveCount(0);
+    await save.click();
+    await expect(
+      page.getByText("Saved. Your public profile now follows your choices."),
+    ).toBeVisible();
+
+    await telegram.click();
+    await expect(confirm).not.toBeChecked();
+    await expect(save).toBeDisabled();
+    await confirm.check();
+    await expect(save).toBeEnabled();
+    await save.click();
+    await expect(telegram).toBeChecked();
+    await expect(confirm).toHaveCount(0);
   });
 
   test("the profile form saves to the backend and completes the profile", async ({
@@ -2503,7 +2584,7 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard username", () => {
-  test("a new profile shows optional details and requires confirmation to show phone", async ({
+  test("a volunteer without a profile is asked to create one before choosing what others see", async ({
     page,
   }, info) => {
     await createAccount(page, `privacy-${info.project.name}@example.org`);
@@ -2515,19 +2596,44 @@ test.describe("the leaderboard username", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
+    await gotoReady(page, "/settings");
+    const visibility = page.getByRole("region", { name: "What others see" });
+    await expect(visibility).toContainText("Create your profile first.");
+    await expect(visibility.getByRole("switch")).toHaveCount(0);
+    await expect(
+      visibility.getByRole("link", { name: "Complete profile" }),
+    ).toHaveAttribute("href", "/profile/edit");
+  });
+  test("a new profile shows optional details and requires confirmation to show phone", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `shown-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page
+      .getByLabel("Username", { exact: true })
+      .fill(`shown_${info.project.name.replaceAll("-", "_")}`);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "About you" }),
+    ).toBeVisible();
     await gotoReady(page, "/profile/edit");
-    for (const name of ["Bio", "School", "Activity", "Telegram", "Instagram"]) {
-      await expect(page.getByRole("switch", { name, exact: true })).toBeChecked();
+    await page.getByRole("button", { name: "Save profile" }).click();
+    await expect(page).toHaveURL(/\/profile$/);
+
+    await gotoReady(page, "/settings");
+    const visibility = page.getByRole("region", { name: "What others see" });
+    for (const name of ["Hometown region", "Telegram", "Instagram", "Activity"]) {
+      await expect(visibility.getByRole("switch", { name, exact: true })).toBeChecked();
     }
-    const phone = page.getByRole("switch", { name: "Phone", exact: true });
+    const phone = visibility.getByRole("switch", { name: "Phone", exact: true });
     await expect(phone).not.toBeChecked();
     await phone.click();
-    const save = page.getByRole("button", { name: "Save profile", exact: true });
+    const save = visibility.getByRole("button", { name: "Save choices" });
     await expect(save).toBeDisabled();
-    await page
-      .getByRole("checkbox", {
-        name: "I confirm that the selected contact details and links may be shown publicly.",
-      })
+    await visibility
+      .getByLabel(
+        "I confirm that the selected contact details and links may be shown publicly.",
+      )
       .check();
     await expect(save).toBeEnabled();
   });

@@ -163,14 +163,16 @@ describe("profileFormSchema", () => {
     expect(values.instagram).toBe("dilnoza.codes");
     expect(values.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
   });
-  it("sends contact publication confirmation only with an explicit visibility choice", () => {
+  it("never carries a visibility choice, which Settings saves on its own", () => {
     const data = new FormData();
     data.set("fullName", "Volunteer");
-    data.set("confirmContactPublication", "on");
-    expect(profileInputFromFormData(data).confirmContactPublication).toBeUndefined();
     data.set("visibility", "1");
-    expect(profileInputFromFormData(data).confirmContactPublication).toBe(true);
-    data.delete("confirmContactPublication");
-    expect(profileInputFromFormData(data).confirmContactPublication).toBe(false);
+    data.set("show-bio", "on");
+    data.set("confirmContactPublication", "on");
+
+    const input = profileInputFromFormData(data);
+
+    expect(input).not.toHaveProperty("hiddenFields");
+    expect(input).not.toHaveProperty("confirmContactPublication");
   });
 });
