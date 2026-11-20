@@ -10,13 +10,29 @@ export function VerificationMarks({
   verification?: z.infer<typeof verificationSchema>;
 }) {
   const t = useTranslations("verification");
-  if (!verification?.verified) return null;
-  const organization = verification.organization;
+  const badgeUrl = verification?.badgeUrl ?? null;
+  if (!verification?.verified && !badgeUrl) return null;
+  const organization = verification?.verified ? verification.organization : null;
   return (
     <span className="inline-flex items-center gap-1 align-middle">
-      <span role="img" aria-label={t("verified")} title={t("verified")}>
-        <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout" />
-      </span>
+      {verification?.verified ? (
+        <span role="img" aria-label={t("verified")} title={t("verified")}>
+          <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout" />
+        </span>
+      ) : null}
+      {badgeUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- an administrator's upload, already resized by the backend
+        <img
+          src={badgeUrl}
+          alt={t("customBadge")}
+          title={t("customBadge")}
+          width={20}
+          height={20}
+          loading="lazy"
+          decoding="async"
+          className="size-5 shrink-0 object-contain"
+        />
+      ) : null}
       {organization ? (
         <span
           role="img"

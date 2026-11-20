@@ -262,6 +262,7 @@ export const verificationSchema = z.object({
   organization: z
     .object({ id: z.string(), name: z.string(), logoUrl: z.string().nullable() })
     .nullable(),
+  badgeUrl: z.string().nullable().default(null),
 });
 
 export const publicProfileSchema = z.object({

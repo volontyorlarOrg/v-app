@@ -1315,6 +1315,7 @@
   },
   "verification": {
     "verified": "Подтверждён",
-    "affiliation": "Связан с организацией {name}"
+    "affiliation": "Связан с организацией {name}",
+    "customBadge": "Особый значок"
   }
 }

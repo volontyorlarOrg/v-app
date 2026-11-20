@@ -1315,6 +1315,7 @@
   },
   "verification": {
     "verified": "Verified",
-    "affiliation": "Affiliated with {name}"
+    "affiliation": "Affiliated with {name}",
+    "customBadge": "Custom badge"
   }
 }

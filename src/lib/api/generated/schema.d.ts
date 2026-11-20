@@ -2042,6 +2042,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/verification/{id}/badge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload or replace a volunteer custom badge */
+        put: operations["AdminVerificationController_uploadBadge"];
+        post?: never;
+        /** Remove a volunteer custom badge */
+        delete: operations["AdminVerificationController_removeBadge"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/essays": {
         parameters: {
             query?: never;
@@ -4025,6 +4043,11 @@ export interface components {
         VerificationDto: {
             verified: boolean;
             organization: components["schemas"]["VerificationOrganizationDto"] | null;
+            /**
+             * Format: uri
+             * @description A custom badge image an administrator uploaded for this volunteer.
+             */
+            badgeUrl: string | null;
         };
         LeaderboardEntryDto: {
             verification: components["schemas"]["VerificationDto"];
@@ -4247,6 +4270,10 @@ export interface components {
              * @description Kept only while the volunteer is verified; revoking verification clears it.
              */
             organizationId: string | null;
+        };
+        VerificationBadgeDto: {
+            /** Format: uri */
+            badgeUrl: string | null;
         };
         SaveEssayDto: {
             title?: string;
@@ -14986,16 +15013,34 @@ export interface operations {
             };
         };
     };
-    EssaysController_list: {
+    AdminVerificationController_uploadBadge: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    badge: string;
+                };
+            };
+        };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationBadgeDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15038,31 +15083,24 @@ export interface operations {
             };
         };
     };
-    EssaysController_create: {
+    AdminVerificationController_removeBadge: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SaveEssayDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-            /** @description Malformed request body */
-            400: {
-                headers: {
-                    [name: string]: unknown;
+                content: {
+                    "application/json": components["schemas"]["VerificationBadgeDto"];
                 };
-                content?: never;
             };
             /** @description Missing or invalid credentials */
             401: {
