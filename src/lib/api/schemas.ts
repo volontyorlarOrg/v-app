@@ -259,9 +259,6 @@ export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
 
 export const verificationSchema = z.object({
   verified: z.boolean(),
-  organization: z
-    .object({ id: z.string(), name: z.string(), logoUrl: z.string().nullable() })
-    .nullable(),
   badgeUrl: z.string().nullable().default(null),
 });
 

@@ -2033,7 +2033,7 @@ export interface paths {
         };
         /** Read a volunteer verification assignment */
         get: operations["AdminVerificationController_get"];
-        /** Assign or revoke volunteer verification and affiliation */
+        /** Assign or revoke volunteer verification */
         put: operations["AdminVerificationController_update"];
         post?: never;
         delete?: never;
@@ -4034,15 +4034,8 @@ export interface components {
         ResolveVacancyAttendanceDto: {
             records: components["schemas"]["AttendanceResolutionDto"][];
         };
-        VerificationOrganizationDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            logoUrl: string | null;
-        };
         VerificationDto: {
             verified: boolean;
-            organization: components["schemas"]["VerificationOrganizationDto"] | null;
             /**
              * Format: uri
              * @description A custom badge image an administrator uploaded for this volunteer.
@@ -4265,11 +4258,6 @@ export interface components {
         };
         UpdateVerificationDto: {
             verified: boolean;
-            /**
-             * Format: uuid
-             * @description Kept only while the volunteer is verified; revoking verification clears it.
-             */
-            organizationId: string | null;
         };
         VerificationBadgeDto: {
             /** Format: uri */

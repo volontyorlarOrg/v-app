@@ -12,7 +12,7 @@ const messages = {
 };
 
 describe("VerificationMarks", () => {
-  it("names the badge and affiliation for assistive technology", () => {
+  it("names the verification badge for assistive technology", () => {
     render(
       <NextIntlClientProvider
         locale="en"
@@ -27,7 +27,6 @@ describe("VerificationMarks", () => {
         <VerificationMarks
           verification={{
             verified: true,
-            organization: { id: "org", name: "Example", logoUrl: null },
             badgeUrl: null,
           }}
         />
@@ -35,11 +34,11 @@ describe("VerificationMarks", () => {
     );
     expect(screen.getByRole("img", { name: "Verified" })).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "Affiliated with Example" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("img", { name: "Affiliated with Example" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("shows an organization only beside the verification badge", () => {
+  it("renders no marks for an unverified volunteer without an upload", () => {
     const { container } = render(
       <NextIntlClientProvider
         locale="en"
@@ -54,7 +53,6 @@ describe("VerificationMarks", () => {
         <VerificationMarks
           verification={{
             verified: false,
-            organization: { id: "org", name: "Example", logoUrl: null },
             badgeUrl: null,
           }}
         />
@@ -63,13 +61,12 @@ describe("VerificationMarks", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows an uploaded badge beside the verification mark and the organization", () => {
+  it("shows an uploaded badge beside the verification mark without an organization", () => {
     render(
       <NextIntlClientProvider locale="en" messages={messages}>
         <VerificationMarks
           verification={{
             verified: true,
-            organization: { id: "org", name: "Example", logoUrl: null },
             badgeUrl: "https://cdn.example/badges/user/badge.webp",
           }}
         />
@@ -81,8 +78,8 @@ describe("VerificationMarks", () => {
       "https://cdn.example/badges/user/badge.webp",
     );
     expect(
-      screen.getByRole("img", { name: "Affiliated with Example" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("img", { name: "Affiliated with Example" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows an uploaded badge on its own, without the verification mark", () => {
@@ -91,7 +88,6 @@ describe("VerificationMarks", () => {
         <VerificationMarks
           verification={{
             verified: false,
-            organization: { id: "org", name: "Example", logoUrl: null },
             badgeUrl: "https://cdn.example/badges/user/badge.webp",
           }}
         />

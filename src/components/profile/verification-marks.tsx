@@ -1,6 +1,5 @@
 import { BadgeCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { z } from "zod";
 import type { verificationSchema } from "@/lib/api/schemas";
 
@@ -12,7 +11,6 @@ export function VerificationMarks({
   const t = useTranslations("verification");
   const badgeUrl = verification?.badgeUrl ?? null;
   if (!verification?.verified && !badgeUrl) return null;
-  const organization = verification?.verified ? verification.organization : null;
   return (
     <span className="inline-flex items-center gap-1 align-middle">
       {verification?.verified ? (
@@ -32,22 +30,6 @@ export function VerificationMarks({
           decoding="async"
           className="size-5 shrink-0 object-contain"
         />
-      ) : null}
-      {organization ? (
-        <span
-          role="img"
-          aria-label={t("affiliation", { name: organization.name })}
-          title={organization.name}
-        >
-          <Avatar className="size-5 rounded-sm">
-            {organization.logoUrl ? (
-              <AvatarImage src={organization.logoUrl} alt="" />
-            ) : null}
-            <AvatarFallback className="rounded-sm text-[10px]">
-              {organization.name.slice(0, 1)}
-            </AvatarFallback>
-          </Avatar>
-        </span>
       ) : null}
     </span>
   );
