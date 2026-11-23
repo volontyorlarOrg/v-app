@@ -20,7 +20,6 @@ const OPTIONAL_PROFILE_PARTS = [
   "telegram",
   "instagram",
   "linkedin",
-  "activity",
 ];
 const REQUIRED_PROFILE_PARTS = [
   "bio",
@@ -30,6 +29,7 @@ const REQUIRED_PROFILE_PARTS = [
   "languages",
   "links",
   "joined",
+  "activity",
 ];
 const KNOWN_PROFILE_PARTS = [...OPTIONAL_PROFILE_PARTS, ...REQUIRED_PROFILE_PARTS];
 const CONTACT_PROFILE_PARTS = ["phone", "telegram", "instagram", "linkedin"];
@@ -1494,7 +1494,7 @@ const server = createServer(async (request, response) => {
         confirmedHours: isViewer ? (state.record.hours ?? 0) : 18,
       },
       pastEvents: activity
-        .filter((item) => item.source === "manual" && !hidden.has("activity"))
+        .filter((item) => item.source === "manual")
         .map((item) => ({
           id: item.id,
           title: item.title,
@@ -1504,8 +1504,8 @@ const server = createServer(async (request, response) => {
           xpAwarded: item.xpAwarded,
           countsTowardProgress: item.countsTowardProgress,
         })),
-      activity: shown("activity", activity, []),
-      rewards: shown("activity", isViewer ? rewardHistory(state) : [], []),
+      activity,
+      rewards: isViewer ? rewardHistory(state) : [],
     });
   }
   if (path === "/me/username" && method === "PUT") {

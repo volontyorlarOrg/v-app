@@ -61,6 +61,7 @@ describe("profile visibility", () => {
       "languages",
       "links",
       "joined",
+      "activity",
     ]);
     expect(OPTIONAL_PROFILE_PARTS).toEqual([
       "hometownRegion",
@@ -69,7 +70,6 @@ describe("profile visibility", () => {
       "telegram",
       "instagram",
       "linkedin",
-      "activity",
     ]);
     for (const part of REQUIRED_PROFILE_PARTS) {
       expect(ALWAYS_SHOWN_PROFILE_PARTS as readonly string[]).toContain(part);
@@ -78,7 +78,7 @@ describe("profile visibility", () => {
 
   it("ignores a stored choice to hide a required part", () => {
     expect(
-      hiddenProfileParts(["region", "languages", "joined", "city", "gradeYear"]),
+      hiddenProfileParts(["region", "languages", "joined", "city", "activity", "gradeYear"]),
     ).toEqual(new Set(["gradeYear"]));
   });
 

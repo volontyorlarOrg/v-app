@@ -6,6 +6,7 @@ export const REQUIRED_PROFILE_PARTS = [
   "languages",
   "links",
   "joined",
+  "activity",
 ] as const;
 
 export const OPTIONAL_PROFILE_PARTS = [
@@ -15,7 +16,6 @@ export const OPTIONAL_PROFILE_PARTS = [
   "telegram",
   "instagram",
   "linkedin",
-  "activity",
 ] as const;
 
 export const DEFAULT_HIDDEN_PROFILE_PARTS = ["phone"] as const;

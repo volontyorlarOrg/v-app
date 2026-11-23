@@ -128,10 +128,10 @@ to show (hometown, year, phone, Telegram, Instagram, LinkedIn) as plain ruled
 rows beside the public page address with its copy
 button, followed by **My activity**: the events they attended and their past
 events, each with its organisation, date, hours and XP.
-**The header and seven more details are always shown; the rest is the
+**The header, seven profile details and activity are always shown; the rest is the
 volunteer's choice.** The photo, name, username, level and figures cannot be
 hidden, and neither can the bio, region, city, school, languages, portfolio
-links and the joined date (`REQUIRED_PROFILE_PARTS`). The seven optional parts
+links, the joined date and activity (`REQUIRED_PROFILE_PARTS`). The six optional parts
 are one switch each in the "What others see" panel of `/settings`, saved on
 their own with `PUT /profile/visibility` as `hiddenFields`; the profile form
 carries no switches and links to the panel. The vocabulary is

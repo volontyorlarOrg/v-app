@@ -41,6 +41,7 @@ const labels: VisibilityLabels = {
     { id: "links", label: en.profile.visibility.parts.links },
     { id: "languages", label: en.profile.visibility.parts.languages },
     { id: "joined", label: en.profile.visibility.parts.joined },
+    { id: "activity", label: en.profile.visibility.parts.activity },
   ],
   parts: Object.fromEntries(
     OPTIONAL_PROFILE_PARTS.map((part) => [part, en.profile.visibility.parts[part]]),

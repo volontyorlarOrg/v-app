@@ -3558,13 +3558,13 @@ export interface components {
             /** @default [] */
             links: string[];
             /** @description Optional parts kept off the profile others see. Omit to keep the stored choice. Parts that are always public are accepted and ignored. */
-            hiddenFields?: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin" | "activity")[];
+            hiddenFields?: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin")[];
             /** @description Confirms publishing contact details that were previously hidden. */
             confirmContactPublication?: boolean;
         };
         UpdateProfileVisibilityDto: {
             /** @description Optional parts kept off the profile others see. Parts that are always public are accepted and ignored. */
-            hiddenFields: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin" | "activity")[];
+            hiddenFields: ("hometownRegion" | "gradeYear" | "phone" | "telegram" | "instagram" | "linkedin")[];
             /** @description Confirms publishing contact details that were previously hidden. */
             confirmContactPublication?: boolean;
         };
@@ -4832,9 +4832,9 @@ export interface components {
             xp: number;
             stats: components["schemas"]["PublicProfileStatsDto"];
             pastEvents: components["schemas"]["PublicPastEventDto"][];
-            /** @description Attended events and past events, newest first. Empty when hidden. */
+            /** @description Attended events and past events, newest first. */
             activity: components["schemas"]["PublicActivityDto"][];
-            /** @description Claimed rewards. Empty when activity is hidden. */
+            /** @description Claimed rewards. */
             rewards: components["schemas"]["CheckpointRewardHistoryDto"][];
         };
         CreateBlogPostDto: {

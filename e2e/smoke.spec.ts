@@ -1897,7 +1897,7 @@ test.describe("applications, record, profile and settings", () => {
     });
     await expect(grade).toBeChecked();
     await grade.click();
-    await visibility.getByRole("switch", { name: "Activity", exact: true }).click();
+    await expect(visibility.getByRole("switch", { name: "Activity", exact: true })).toHaveCount(0);
     await visibility.getByRole("switch", { name: "Instagram", exact: true }).click();
     await visibility.getByRole("button", { name: "Save choices" }).click();
     await expect(
@@ -1914,11 +1914,11 @@ test.describe("applications, record, profile and settings", () => {
     await expect(
       page.getByRole("term").filter({ hasText: "Year or grade" }),
     ).toHaveCount(0);
-    await expect(page.getByRole("region", { name: "My activity" })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "My activity" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Instagram/ })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /LinkedIn/ })).toBeVisible();
     await expect(
-      page.getByText("Not shown on your profile: Year or grade, Instagram, Activity."),
+      page.getByText("Not shown on your profile: Year or grade, Instagram."),
     ).toBeVisible();
 
     await gotoReady(page, "/profiles/dilnoza_k");
@@ -1927,7 +1927,7 @@ test.describe("applications, record, profile and settings", () => {
     ).toBeVisible();
     await expect(page.getByText("Academic lyceum No. 2")).toBeVisible();
     await expect(page.getByText("A biography everyone can read.")).toBeVisible();
-    await expect(page.getByRole("region", { name: "Activity" })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Activity" })).toBeVisible();
     await expect(
       page.getByRole("definition").filter({ hasText: "Tashkent City" }),
     ).toBeVisible();
@@ -2622,7 +2622,7 @@ test.describe("the leaderboard username", () => {
 
     await gotoReady(page, "/settings");
     const visibility = page.getByRole("region", { name: "What others see" });
-    for (const name of ["Hometown region", "Telegram", "Instagram", "Activity"]) {
+    for (const name of ["Hometown region", "Telegram", "Instagram"]) {
       await expect(visibility.getByRole("switch", { name, exact: true })).toBeChecked();
     }
     const phone = visibility.getByRole("switch", { name: "Phone", exact: true });

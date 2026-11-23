@@ -291,7 +291,7 @@ function Profile({
       figures={figures}
       rows={rows}
       activity={
-        hidden.has("activity") ? null : history.status === "failed" ? (
+        history.status === "failed" ? (
           <div className="border-t border-border px-5 py-5 sm:px-8">
             <LoadErrorRows failure={history.failure} labels={errorLabels} />
           </div>
