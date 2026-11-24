@@ -2,9 +2,11 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import type { OnboardingLabels } from "@/components/onboarding/labels";
+import {
+  ONBOARDING_FIELD_KEYS,
+  type OnboardingLabels,
+} from "@/components/onboarding/labels";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
-import { regionNoteLabels } from "@/components/profile/region-note";
 import type { Locale } from "@/i18n/routing";
 import { ACCOUNT_ERROR_KEYS } from "@/lib/account/types";
 import {
@@ -14,6 +16,8 @@ import {
   type UsernameIdentity,
 } from "@/lib/account/username";
 import { getMe } from "@/lib/api/account.server";
+import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import type { District, Institution } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
 import { safeReturnPath } from "@/lib/auth/session";
@@ -28,6 +32,7 @@ import {
   type VolunteerProfile,
 } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
+import { placeLabels } from "@/lib/profile/place-labels";
 import { marketingOrigin } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
@@ -48,12 +53,15 @@ export default async function WelcomePage({
   setRequestLocale(locale);
 
   const { next } = await searchParams;
-  const [session, profile, me, state] = await Promise.all([
+  const [session, profile, me, state, directories] = await Promise.all([
     requireSession(),
     getProfile(),
     getMe(),
     readOnboardingState(),
+    loadPlaceDirectories(),
   ]);
+  const districts = directories?.districts ?? [];
+  const universities = directories?.universities ?? [];
 
   const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
@@ -75,6 +83,8 @@ export default async function WelcomePage({
       initialStep={welcomeStep(state, username.source)}
       username={username}
       addressPrefix={origin ? `${new URL(origin).host}/` : null}
+      districts={districts}
+      universities={universities}
     />
   );
 }
@@ -87,6 +97,8 @@ function Welcome({
   initialStep,
   username,
   addressPrefix,
+  districts,
+  universities,
 }: {
   locale: Locale;
   values: VolunteerProfile;
@@ -95,6 +107,8 @@ function Welcome({
   initialStep: OnboardingStep;
   username: UsernameIdentity;
   addressPrefix: string | null;
+  districts: District[];
+  universities: Institution[];
 }) {
   const t = useTranslations("onboarding");
   const profile = useTranslations("profile");
@@ -102,35 +116,6 @@ function Welcome({
   const settings = useTranslations("settings");
 
   const firstName = values.fullName.trim().split(/\s+/)[0] ?? "";
-  const fieldKeys = [
-    "fullName",
-    "bio",
-    "bioHelp",
-    "school",
-    "gradeYear",
-    "region",
-    "hometownRegion",
-    "regionAny",
-    "city",
-    "languages",
-    "languagesHelp",
-    "languagesSearch",
-    "languagesEmpty",
-    "languagesCommon",
-    "languagesAll",
-    "languagesRemove",
-    "languagesLimit",
-    "phone",
-    "phoneHelp",
-    "telegram",
-    "telegramHelp",
-    "instagram",
-    "instagramHelp",
-    "linkedin",
-    "linkedinHelp",
-    "links",
-    "linksHelp",
-  ] as const;
 
   const labels: OnboardingLabels = {
     stepCount: t("stepCount", { step: "{step}", total: "{total}" }),
@@ -162,9 +147,10 @@ function Welcome({
       ) as OnboardingLabels["rail"]["items"],
     },
     fields: Object.fromEntries(
-      fieldKeys.map((key) => [key, profile(`fields.${key}`)]),
+      ONBOARDING_FIELD_KEYS.map((key) => [key, profile(`fields.${key}`)]),
     ) as OnboardingLabels["fields"],
-    regionNote: regionNoteLabels(profile),
+    place: placeLabels(profile),
+    placeRequired: profile("place.required"),
     optional: profile("optional"),
     usernameStep: {
       field: t("usernameStep.field"),
@@ -212,6 +198,9 @@ function Welcome({
         label: opportunities(`regions.${region}`),
       }))}
       languageOptions={languageDirectory.options(locale, values.languages)}
+      districts={districts}
+      universities={universities}
+      locale={locale}
       username={username}
       addressPrefix={addressPrefix}
       labels={labels}

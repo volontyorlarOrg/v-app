@@ -50,8 +50,8 @@ export const PROFILE_TASK_ITEMS = [
   { id: "username", fields: [] },
   { id: "telegram", fields: ["telegram"] },
   { id: "languages", fields: ["languages"] },
-  { id: "place", fields: ["region", "city"] },
-  { id: "school", fields: ["school", "gradeYear"] },
+  { id: "place", fields: ["region", "district"] },
+  { id: "school", fields: ["education", "gradeYear"] },
   { id: "bio", fields: ["bio"] },
 ] as const;
 

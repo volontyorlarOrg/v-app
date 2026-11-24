@@ -33,8 +33,9 @@ const COMPLETE: ProfileFields = {
   fullName: "Aziza Karimova",
   bio: "I like helping at school events.",
   region: "tashkent-city",
-  city: "Tashkent",
-  school: "School 110",
+  districtId: "1726294",
+  educationType: "school",
+  institutionId: "school-1726294-110",
   gradeYear: "10",
   languages: ["uz"],
   phone: "",
@@ -74,12 +75,12 @@ describe("the profile checklist", () => {
   it("covers every field the backend requires, grouped as the task shows them", () => {
     expect(PROFILE_TASK_ITEMS.flatMap((entry) => entry.fields).sort()).toEqual([
       "bio",
-      "city",
+      "district",
+      "education",
       "fullName",
       "gradeYear",
       "languages",
       "region",
-      "school",
       "telegram",
     ]);
   });
@@ -98,7 +99,7 @@ describe("the profile checklist", () => {
 
   it("needs both fields of a pair before the pair is done", () => {
     const checklist = profileTaskChecklist(
-      { ...COMPLETE, city: "", gradeYear: " " },
+      { ...COMPLETE, districtId: null, gradeYear: " " },
       true,
       true,
     );

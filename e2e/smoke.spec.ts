@@ -246,20 +246,32 @@ test.describe("welcome flow", () => {
     await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
-      page.getByRole("heading", { level: 2, name: "Where you study" }),
+      page.getByRole("heading", { level: 2, name: "Where you live and study" }),
     ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Skip this step" })).toHaveCount(0);
+    await expect(page.getByLabel("Hometown region")).toHaveCount(0);
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page.getByText("Choose one to continue.").first()).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Where you live and study" }),
+    ).toBeVisible();
+
+    await page.getByLabel("Region you live in").selectOption("tashkent-city");
+    await page.getByRole("button", { name: "District or city" }).click();
+    await page.getByRole("combobox", { name: "Search districts" }).fill("chil");
     await page
-      .getByLabel("School, college, or university")
-      .fill("Academic lyceum No. 1");
-    await page.getByLabel("Year or grade").fill("10");
-    const regionNote = page.getByRole("note", {
-      name: "Two regions, two different questions",
-    });
-    await expect(regionNote).toContainText("Where you live now.");
-    await expect(regionNote).toContainText("It is optional");
-    await page.getByLabel("Current region").selectOption("tashkent-city");
-    await page.getByLabel("Hometown region").selectOption("samarkand");
-    await page.getByLabel("City or district").fill("Chilonzor");
+      .getByRole("listbox")
+      .getByRole("option", { name: "Chilonzor District" })
+      .click();
+    await page.getByText("School", { exact: true }).click();
+    await page.getByRole("button", { name: "Your school" }).click();
+    await page.getByRole("combobox", { name: "Search by name or number" }).fill("212");
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "School No. 212" })
+      .click();
+    await page.getByLabel("Grade").fill("10");
     const languages = page.getByRole("combobox", { name: "Languages you speak" });
     await languages.fill("uzb");
     await languages.press("Enter");
@@ -287,21 +299,16 @@ test.describe("welcome flow", () => {
     await expect(page).toHaveURL(/\/opportunities$/);
 
     await gotoReady(page, "/profile/edit");
-    await expect(page.getByLabel("School, college, or university")).toHaveValue(
-      "Academic lyceum No. 1",
+    await expect(page.getByLabel("Region you live in")).toHaveValue("tashkent-city");
+    await expect(page.getByRole("button", { name: "District or city" })).toHaveText(
+      "Chilonzor District",
     );
-    await expect(page.getByRole("textbox", { name: "Year or grade" })).toHaveValue(
-      "10",
+    await expect(page.getByRole("radio", { name: "School" })).toBeChecked();
+    await expect(page.getByRole("button", { name: "Your school" })).toHaveText(
+      "School No. 212",
     );
-    await expect(page.getByLabel("City or district")).toHaveValue("Chilonzor");
-    await expect(page.getByLabel("Current region")).toHaveValue("tashkent-city");
-    await expect(page.getByRole("combobox", { name: "Hometown region" })).toHaveValue(
-      "samarkand",
-    );
-    await expect(page.getByRole("switch", { name: "Hometown region" })).toHaveCount(0);
-    await expect(
-      page.getByRole("note", { name: "Two regions, two different questions" }),
-    ).toBeVisible();
+    await expect(page.getByLabel("Grade")).toHaveValue("10");
+    await expect(page.getByLabel("Hometown region")).toHaveCount(0);
     await expect(page.getByLabel("Phone number")).toHaveValue("+998901234567");
     await expect(page.getByLabel("Telegram username")).toHaveValue("malika_k");
     await expect(page.getByRole("textbox", { name: "Bio" })).toHaveValue(
@@ -1721,6 +1728,94 @@ test.describe("opportunities", () => {
     await expect(page.getByText("Accepted", { exact: true }).first()).toBeVisible();
   });
 
+  test("a volunteer with only the old free-text place confirms it once, then the application continues", async ({
+    page,
+  }) => {
+    const state = await startedState(page);
+    await gotoReady(
+      page,
+      `/api/auth/telegram/callback?code=e2e-legacy-place&state=${encodeURIComponent(state)}`,
+    );
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await gotoReady(page, "/opportunities/city-marathon-water-stations");
+    await expect(page.getByRole("link", { name: "Complete profile" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Apply" }).click();
+
+    const dialog = page.getByRole("dialog", {
+      name: "Confirm where you live and study",
+    });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("You wrote before: “Chilonzor”")).toBeVisible();
+    await expect(dialog.getByLabel("Region you live in")).toHaveValue("tashkent-city");
+    await dialog.getByRole("button", { name: "Save and apply" }).click();
+    await expect(dialog.getByText("Choose one to continue.").first()).toBeVisible();
+    await expect(page).toHaveURL(/\/opportunities\/city-marathon-water-stations$/);
+
+    await dialog.getByRole("button", { name: "District or city" }).click();
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "Chilonzor District" })
+      .click();
+    await dialog.getByText("School", { exact: true }).click();
+    await expect(dialog.getByText("You wrote before: “45-maktab”")).toBeVisible();
+    await dialog.getByRole("button", { name: "Your school" }).click();
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "School No. 45" })
+      .click();
+    await dialog.getByRole("button", { name: "Save and apply" }).click();
+
+    await expect(page).toHaveURL(/\/applications\/app-city-marathon-water-stations$/);
+    await expect(page.getByText("Accepted", { exact: true }).first()).toBeVisible();
+
+    await gotoReady(page, "/profile");
+    const details = page.getByRole("main");
+    await expect(details.getByText("Chilonzor District")).toBeVisible();
+    await expect(details.getByText("School No. 45")).toBeVisible();
+
+    await gotoReady(page, "/opportunities/remote-translation-support");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page).toHaveURL(/\/applications\/app-remote-translation-support$/);
+  });
+
+  test("a volunteer with only the old free-text place confirms it when sending a saved draft", async ({
+    page,
+  }) => {
+    const state = await startedState(page);
+    await gotoReady(
+      page,
+      `/api/auth/telegram/callback?code=e2e-legacy-place&state=${encodeURIComponent(state)}`,
+    );
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await gotoReady(page, "/applications/app-book-drive");
+    await page.getByRole("button", { name: "Submit application" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("alert").first()).toContainText(/required/i);
+
+    await page
+      .getByRole("textbox", { name: /Why does this matter/ })
+      .fill("Because books open doors.");
+    await page.getByRole("button", { name: "Submit application" }).click();
+    const dialog = page.getByRole("dialog", {
+      name: "Confirm where you live and study",
+    });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "District or city" }).click();
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "Chilonzor District" })
+      .click();
+    await dialog.getByText("Gap year", { exact: true }).click();
+    await expect(dialog.getByLabel("Grade")).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Save and send" }).click();
+
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByText("Submitted", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit application" })).toHaveCount(
+      0,
+    );
+  });
+
   test("a closed opportunity cannot be applied to", async ({ page }) => {
     await gotoReady(page, "/opportunities/read-aloud-day");
     await expect(
@@ -1902,7 +1997,9 @@ test.describe("applications, record, profile and settings", () => {
     });
     await expect(grade).toBeChecked();
     await grade.click();
-    await expect(visibility.getByRole("switch", { name: "Activity", exact: true })).toHaveCount(0);
+    await expect(
+      visibility.getByRole("switch", { name: "Activity", exact: true }),
+    ).toHaveCount(0);
     await visibility.getByRole("switch", { name: "Instagram", exact: true }).click();
     await visibility.getByRole("button", { name: "Save choices" }).click();
     await expect(
@@ -2084,7 +2181,7 @@ test.describe("applications, record, profile and settings", () => {
     await expect(phone).toHaveValue("");
     await expect(page.getByText("Phone number", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Telegram username")).toHaveValue("dilnoza_k");
-    await expect(page.getByText("Optional", { exact: true })).toHaveCount(4);
+    await expect(page.getByText("Optional", { exact: true })).toHaveCount(3);
     await expect(page.getByLabel("Skills and interests")).toHaveCount(0);
 
     await page.getByRole("textbox", { name: "Bio" }).fill("Second-year student.");

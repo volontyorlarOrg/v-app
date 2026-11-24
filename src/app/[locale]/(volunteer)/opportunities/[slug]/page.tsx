@@ -15,12 +15,15 @@ import { OpportunityFacts } from "@/components/opportunities/opportunity-facts";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { PlaceCheckData } from "@/components/profile/place-check-dialog";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
+import { loadPlaceDirectories } from "@/lib/api/directories.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
 import type { ApplicationStatus } from "@/lib/applications/status";
 import { canApply } from "@/lib/opportunities/deadline";
+import { REGIONS } from "@/lib/opportunities/types";
 import type { OpportunityDetail } from "@/lib/opportunities/types";
 import { opportunityImageUrl } from "@/lib/opportunities/image";
 import {
@@ -28,6 +31,8 @@ import {
   profileCompletion,
   type ProfileCompletion,
 } from "@/lib/profile/completion";
+import { onlyPlaceMissing } from "@/lib/profile/place";
+import { placeCheckLabels } from "@/lib/profile/place-labels";
 import { applicationHref, navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +60,11 @@ export default async function OpportunityPage({
   if (!opportunity) notFound();
 
   const application = await getApplicationByOpportunity(opportunity.id);
+  const completion = profileCompletion(profile ?? EMPTY_PROFILE);
+  const directories =
+    profile && onlyPlaceMissing(completion.missing)
+      ? await loadPlaceDirectories()
+      : null;
 
   return (
     <Opportunity
@@ -69,7 +79,17 @@ export default async function OpportunityPage({
             }
           : null
       }
-      profileCompletion={profileCompletion(profile ?? EMPTY_PROFILE)}
+      profileCompletion={completion}
+      placeCheck={
+        profile && directories
+          ? {
+              profile,
+              districts: directories.districts,
+              universities: directories.universities,
+              locale,
+            }
+          : null
+      }
       now={now}
     />
   );
@@ -80,6 +100,7 @@ function Opportunity({
   saved,
   application,
   profileCompletion: completion,
+  placeCheck,
   now,
 }: {
   opportunity: OpportunityDetail;
@@ -90,6 +111,10 @@ function Opportunity({
     submittedAt?: string | undefined;
   } | null;
   profileCompletion: ProfileCompletion;
+  placeCheck: Pick<
+    PlaceCheckData,
+    "profile" | "districts" | "universities" | "locale"
+  > | null;
   now: Date;
 }) {
   const t = useTranslations("opportunities");
@@ -258,9 +283,21 @@ function Opportunity({
                 </Link>
               </div>
             ) : applicable ? (
-              completion.complete ? (
+              completion.complete || placeCheck ? (
                 <ApplyForm
                   opportunityId={opportunity.id}
+                  placeCheck={
+                    placeCheck
+                      ? {
+                          ...placeCheck,
+                          regions: REGIONS.map((region) => ({
+                            value: region,
+                            label: t(`regions.${region}`),
+                          })),
+                          labels: placeCheckLabels(profileT, "saveApply"),
+                        }
+                      : undefined
+                  }
                   labels={{
                     apply: reapplying ? t("detail.applyAgain") : t("detail.apply"),
                     applying: needsApplicationForm

@@ -1,11 +1,13 @@
 import type { Region } from "@/lib/opportunities/types";
+import type { EducationType, PlaceOption } from "@/lib/profile/place";
 
 export type ProfileFields = {
   fullName: string;
   bio: string;
   region: Region | null;
-  city: string;
-  school: string;
+  districtId: string | null;
+  educationType: EducationType | null;
+  institutionId: string | null;
   gradeYear: string;
   languages: string[];
   phone: string;
@@ -16,8 +18,8 @@ export const COMPLETION_FIELDS = [
   "fullName",
   "bio",
   "region",
-  "city",
-  "school",
+  "district",
+  "education",
   "gradeYear",
   "languages",
   "telegram",
@@ -33,12 +35,25 @@ function isFilled(profile: ProfileFields, field: CompletionField): boolean {
   switch (field) {
     case "fullName":
       return profile.fullName.trim().length >= 2;
+    case "bio":
+      return profile.bio.trim().length > 0;
     case "region":
       return profile.region !== null;
+    case "district":
+      return profile.districtId !== null;
+    case "education":
+      return (
+        profile.educationType === "gap_year" ||
+        (profile.educationType !== null && profile.institutionId !== null)
+      );
+    case "gradeYear":
+      return (
+        profile.educationType === "gap_year" || profile.gradeYear.trim().length > 0
+      );
     case "languages":
       return profile.languages.length > 0;
-    default:
-      return profile[field].trim().length > 0;
+    case "telegram":
+      return profile.telegram.trim().length > 0;
   }
 }
 
@@ -61,6 +76,10 @@ export function profileCompletion(profile: ProfileFields): ProfileCompletion {
 
 export type VolunteerProfile = ProfileFields & {
   hometownRegion: Region | null;
+  city: string;
+  school: string;
+  district: PlaceOption | null;
+  institution: PlaceOption | null;
   instagram: string;
   linkedin: string;
   links: string[];
@@ -71,6 +90,11 @@ export const EMPTY_PROFILE: VolunteerProfile = {
   bio: "",
   region: null,
   hometownRegion: null,
+  districtId: null,
+  district: null,
+  educationType: null,
+  institutionId: null,
+  institution: null,
   school: "",
   gradeYear: "",
   city: "",

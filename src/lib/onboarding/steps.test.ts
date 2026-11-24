@@ -60,18 +60,22 @@ describe("onboarding steps", () => {
 
   it("asks for every field that counts toward profile completeness", () => {
     const covered = new Set<string>(Object.values(PROFILE_STEP_FIELDS).flat());
+    const formField: Record<string, string> = {
+      district: "districtId",
+      education: "educationType",
+    };
     for (const field of COMPLETION_FIELDS) {
-      expect(covered.has(field), field).toBe(true);
+      expect(covered.has(formField[field] ?? field), field).toBe(true);
     }
   });
 
-  it("asks where the volunteer studies in one step, grade and city included", () => {
+  it("asks where the volunteer lives and studies in one step, from the directories", () => {
     expect(PROFILE_STEP_FIELDS.place).toEqual([
-      "school",
-      "gradeYear",
       "region",
-      "hometownRegion",
-      "city",
+      "districtId",
+      "educationType",
+      "institutionId",
+      "gradeYear",
       "languages",
     ]);
   });

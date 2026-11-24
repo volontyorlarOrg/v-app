@@ -9,8 +9,16 @@ import {
   resultFromError,
   type ActionResult,
 } from "@/lib/api/action-result";
-import { updateProfile, updateProfileVisibility } from "@/lib/api/profile.server";
-import { profileInputFromFormData } from "@/lib/profile/input";
+import {
+  updateProfile,
+  updateProfilePlace,
+  updateProfileVisibility,
+} from "@/lib/api/profile.server";
+import {
+  placeIssues,
+  placeSubmissionFromFormData,
+  profileInputFromFormData,
+} from "@/lib/profile/input";
 import {
   OPTIONAL_PROFILE_PARTS,
   type ProfileVisibilityInput,
@@ -34,6 +42,34 @@ export async function updateProfileAction(
   }
 
   revalidatePath("/", "layout");
+  return okResult;
+}
+
+export async function confirmPlaceAction(
+  _previous: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const input = placeSubmissionFromFormData(formData);
+  const issues = placeIssues({
+    region: input.region ?? "",
+    districtId: input.districtId ?? "",
+    educationType: input.educationType ?? "",
+    institutionId: input.institutionId ?? "",
+    gradeYear: input.gradeYear,
+  });
+  if (issues.length > 0) {
+    return failedResult(
+      "validationFailed",
+      Object.fromEntries(issues.map((issue) => [issue.path, [issue.message]])),
+    );
+  }
+
+  try {
+    await updateProfilePlace(input);
+  } catch (error) {
+    return resultFromError(error);
+  }
+
   return okResult;
 }
 

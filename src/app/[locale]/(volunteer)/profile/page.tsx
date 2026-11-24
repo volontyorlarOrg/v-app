@@ -52,6 +52,7 @@ import {
   type Level,
   type VolunteerRecord,
 } from "@/lib/record/levels";
+import { localName } from "@/lib/profile/place";
 import { navHref } from "@/lib/routing/routes";
 import { publicProfileHref } from "@/lib/seo/origin";
 
@@ -233,8 +234,25 @@ function Profile({
           value: opportunities(`regions.${shown.hometownRegion}`),
         }
       : null,
-    text("city", shown.city),
-    text("school", shown.school),
+    shown.district
+      ? {
+          id: "district",
+          label: t("sheet.rows.district"),
+          value: localName(shown.district.name, locale),
+        }
+      : text("city", shown.city),
+    shown.educationType
+      ? {
+          id: "education",
+          label: t("sheet.rows.education"),
+          value:
+            shown.educationType === "gap_year"
+              ? t("sheet.rows.gapYear")
+              : shown.institution
+                ? localName(shown.institution.name, locale)
+                : shown.school,
+        }
+      : text("school", shown.school),
     text("gradeYear", shown.gradeYear),
     text("languages", languages),
     text("phone", shown.phone),

@@ -12,6 +12,7 @@ import {
   USERNAME_SOURCES,
 } from "@/lib/account/username";
 import { APPLICATION_STATUSES } from "@/lib/applications/status";
+import { EDUCATION_TYPES, INSTITUTION_TYPES } from "@/lib/profile/place";
 import { issuedSessionSchema } from "@/lib/auth/session";
 import {
   ACCEPTANCE_MODES,
@@ -176,7 +177,10 @@ export const profileSnapshotSchema = z.object({
   region: optional(z.string()),
   hometownRegion: optional(z.string()),
   city: optional(z.string()),
+  districtId: optional(z.string().nullable()),
   school: optional(z.string()),
+  educationType: optional(z.enum(EDUCATION_TYPES).nullable()),
+  institutionId: optional(z.string().nullable()),
   gradeYear: optional(z.string()),
   languages: optional(z.array(z.string())),
   phone: optional(z.string()),
@@ -216,6 +220,39 @@ export const savedItemSchema = z.object({
   savedAt: z.string().optional(),
 });
 
+export const localizedNameSchema = z.object({
+  uz: z.string(),
+  ru: z.string(),
+  en: z.string(),
+});
+
+export const directoryEntrySchema = z.object({
+  id: z.string().min(1),
+  name: localizedNameSchema,
+});
+
+export const districtSchema = directoryEntrySchema.extend({
+  region: z.enum(REGIONS),
+  kind: z.enum(["district", "city"]),
+});
+
+export const districtListSchema = z.object({ items: z.array(districtSchema) });
+
+export const institutionSchema = directoryEntrySchema.extend({
+  type: z.enum(INSTITUTION_TYPES),
+  region: z.enum(REGIONS),
+  districtId: z.string().nullable().default(null),
+});
+
+export const institutionListSchema = z.object({
+  items: z.array(institutionSchema),
+});
+
+export type LocalizedName = z.infer<typeof localizedNameSchema>;
+export type DirectoryEntry = z.infer<typeof directoryEntrySchema>;
+export type District = z.infer<typeof districtSchema>;
+export type Institution = z.infer<typeof institutionSchema>;
+
 export const profileSchema = z.object({
   fullName: z.string().default(""),
   bio: z.string().default(""),
@@ -224,6 +261,11 @@ export const profileSchema = z.object({
   region: z.enum(REGIONS).nullable().default(null),
   hometownRegion: z.enum(REGIONS).nullable().default(null),
   city: z.string().default(""),
+  districtId: z.string().nullable().default(null),
+  educationType: z.enum(EDUCATION_TYPES).nullable().default(null),
+  institutionId: z.string().nullable().default(null),
+  district: directoryEntrySchema.nullable().default(null),
+  institution: directoryEntrySchema.nullable().default(null),
   languages: z.array(z.string()).default([]),
   phone: z.string().default(""),
   phoneVerified: z.boolean().default(false),
@@ -271,7 +313,10 @@ export const publicProfileSchema = z.object({
   region: z.enum(REGIONS).nullable().default(null),
   hometownRegion: z.enum(REGIONS).nullable().default(null),
   city: z.string().default(""),
+  district: directoryEntrySchema.nullable().default(null),
   school: z.string().default(""),
+  educationType: z.enum(EDUCATION_TYPES).nullable().default(null),
+  institution: directoryEntrySchema.nullable().default(null),
   gradeYear: z.string().default(""),
   languages: z.array(z.string()).default([]),
   phone: z.string().default(""),
