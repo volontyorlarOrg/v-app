@@ -7,6 +7,13 @@ import type { Metadata } from "next";
 import { Panel } from "@/components/app/panel";
 import { PageHeader } from "@/components/app/page-header";
 import { AnswersForm, type AnswerField } from "@/components/applications/answers-form";
+import type { PlaceCheckData } from "@/components/profile/place-check-dialog";
+import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf } from "@/lib/api/load.server";
+import { REGIONS } from "@/lib/opportunities/types";
+import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
+import { onlyPlaceMissing } from "@/lib/profile/place";
+import { placeCheckLabels } from "@/lib/profile/place-labels";
 import { ApplicationTimeline } from "@/components/applications/application-timeline";
 import { WithdrawForm } from "@/components/applications/withdraw-form";
 import { ApplicationStatusChip } from "@/components/dashboard/application-status";
@@ -56,6 +63,11 @@ export default async function ApplicationPage({
       : null,
   ]);
 
+  const directories =
+    profile && onlyPlaceMissing(profileCompletion(profile ?? EMPTY_PROFILE).missing)
+      ? dataOf(await loadPlaceDirectories())
+      : null;
+
   const preparing =
     application.status === "draft" ||
     (application.status === "withdrawn" &&
@@ -83,6 +95,16 @@ export default async function ApplicationPage({
       essayPrompt={opportunity?.essayPrompt}
       open={opportunity ? canApply(opportunity, now) : false}
       snapshot={snapshot}
+      placeCheck={
+        profile && directories
+          ? {
+              profile,
+              districts: directories.districts,
+              universities: directories.universities,
+              locale,
+            }
+          : null
+      }
       now={now}
     />
   );
@@ -110,6 +132,7 @@ function Application({
   essayPrompt,
   open,
   snapshot,
+  placeCheck,
   now,
 }: {
   application: ApplicationDetail;
@@ -118,6 +141,10 @@ function Application({
   essayPrompt?: string | undefined;
   open: boolean;
   snapshot: ProfileSnapshot;
+  placeCheck: Pick<
+    PlaceCheckData,
+    "profile" | "districts" | "universities" | "locale"
+  > | null;
   now: Date;
 }) {
   const t = useTranslations("applications");
@@ -135,6 +162,16 @@ function Application({
   const profileOnly =
     questions !== null && essayRequired === false && questions.length === 0;
   const confirmedHours = application.attendance?.confirmedHours;
+  const placeCheckData: PlaceCheckData | undefined = placeCheck
+    ? {
+        ...placeCheck,
+        regions: REGIONS.map((region) => ({
+          value: region,
+          label: opportunitiesT(`regions.${region}`),
+        })),
+        labels: placeCheckLabels(profileT, "saveSubmit"),
+      }
+    : undefined;
   const answers = Object.fromEntries(
     application.answers
       .filter((answer): answer is typeof answer & { questionId: string } =>
@@ -282,6 +319,7 @@ function Application({
             >
               <AnswersForm
                 applicationId={application.id}
+                placeCheck={placeCheckData}
                 essayRequired={false}
                 essay={application.essay ?? ""}
                 questions={fields}
@@ -298,6 +336,7 @@ function Application({
             <Panel id="answers" title={t("detail.answers")}>
               <AnswersForm
                 applicationId={application.id}
+                placeCheck={placeCheckData}
                 essayRequired={essayRequired ?? false}
                 essay={application.essay ?? ""}
                 questions={fields}

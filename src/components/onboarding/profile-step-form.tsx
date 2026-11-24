@@ -1,16 +1,19 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { StepActions, StepField } from "@/components/onboarding/step-controls";
 import { LanguagePicker } from "@/components/profile/language-picker";
-import { RegionNote } from "@/components/profile/region-note";
-import { RegionOptions, type RegionOption } from "@/components/profile/region-options";
+import {
+  PlaceFields,
+  usePlaceValue,
+  type PlaceFieldName,
+} from "@/components/profile/place-fields";
+import type { RegionOption } from "@/components/profile/region-options";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
 import { PROFILE_STEP_FIELDS, type ProfileStep } from "@/lib/onboarding/steps";
@@ -22,18 +25,20 @@ import {
   profileFormSchema,
   profileFormValues,
   profileInputFromFormData,
+  requiredPlaceFormSchema,
   type ProfileFormValues,
 } from "@/lib/profile/input";
 import type { LanguageOption } from "@/lib/profile/languages";
+import type { DistrictOption, InstitutionOption } from "@/lib/profile/place";
 
 const ALL_FIELDS = [
   "fullName",
   "bio",
-  "school",
-  "gradeYear",
   "region",
-  "hometownRegion",
-  "city",
+  "districtId",
+  "educationType",
+  "institutionId",
+  "gradeYear",
   "languages",
   "phone",
   "telegram",
@@ -47,6 +52,10 @@ export function ProfileStepForm({
   values,
   languageOptions,
   regions,
+  districts,
+  universities,
+  placeUnavailable,
+  locale,
   labels,
   onSaved,
   onSkip,
@@ -56,6 +65,10 @@ export function ProfileStepForm({
   values: VolunteerProfile;
   languageOptions: readonly LanguageOption[];
   regions: readonly RegionOption[];
+  districts: readonly DistrictOption[];
+  universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
+  locale: string;
   labels: OnboardingLabels;
   onSaved: (profile: VolunteerProfile) => void;
   onSkip: () => void;
@@ -64,20 +77,24 @@ export function ProfileStepForm({
   const id = useId();
   const defaults = profileFormValues(values);
   const { form, formRef, result, pending, formProps } = useActionForm({
-    schema: profileFormSchema,
+    schema: step === "place" ? requiredPlaceFormSchema : profileFormSchema,
     defaultValues: defaults,
     action: updateProfileAction,
     onSuccess: () => {
       const element = formRef.current;
-      if (element) onSaved(profileInputFromFormData(new FormData(element)));
+      if (element)
+        onSaved({ ...values, ...profileInputFromFormData(new FormData(element)) });
     },
   });
   const { register, formState, control: formControl } = form;
+  const place = usePlaceValue(form);
 
   const shown: readonly (keyof ProfileFormValues)[] = PROFILE_STEP_FIELDS[step];
   const hidden = ALL_FIELDS.filter((field) => !shown.includes(field));
   const canSkip =
-    step !== "about" || values.fullName.trim().length >= PROFILE_NAME_MIN_LENGTH;
+    step === "place"
+      ? false
+      : step !== "about" || values.fullName.trim().length >= PROFILE_NAME_MIN_LENGTH;
 
   const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
   const invalid = (name: keyof ProfileFormValues) =>
@@ -87,8 +104,17 @@ export function ProfileStepForm({
     invalid(name)
       ? name === "fullName"
         ? labels.nameNeeded
-        : labels.fieldInvalid
+        : formState.errors[name]?.message === "required"
+          ? name === "gradeYear"
+            ? labels.place.gradeRequired
+            : labels.placeRequired
+          : labels.fieldInvalid
       : undefined;
+  const placeErrors = Object.fromEntries(
+    (
+      ["region", "districtId", "educationType", "institutionId", "gradeYear"] as const
+    ).map((name) => [name, errorFor(name)]),
+  ) as Partial<Record<PlaceFieldName, string>>;
   const control = (name: keyof ProfileFormValues, help?: string) => ({
     id: fieldId(name),
     "aria-describedby": help ? `${fieldId(name)}-help` : undefined,
@@ -153,69 +179,20 @@ export function ProfileStepForm({
 
         {step === "place" ? (
           <>
-            <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              <StepField
-                id={fieldId("school")}
-                label={labels.fields.school}
-                error={errorFor("school")}
-              >
-                <Input
-                  {...control("school")}
-                  defaultValue={defaults.school}
-                  autoComplete="organization"
-                  maxLength={PROFILE_TEXT_LIMITS.school}
-                />
-              </StepField>
-              <StepField
-                id={fieldId("gradeYear")}
-                label={labels.fields.gradeYear}
-                error={errorFor("gradeYear")}
-              >
-                <Input
-                  {...control("gradeYear")}
-                  defaultValue={defaults.gradeYear}
-                  maxLength={PROFILE_TEXT_LIMITS.gradeYear}
-                />
-              </StepField>
-            </div>
-            <RegionNote labels={labels.regionNote} />
-            <div className="grid gap-5 sm:grid-cols-2">
-              <StepField id={fieldId("region")} label={labels.fields.region}>
-                <NativeSelect {...control("region")} defaultValue={defaults.region}>
-                  <RegionOptions
-                    placeholder={labels.fields.regionAny}
-                    regions={regions}
-                  />
-                </NativeSelect>
-              </StepField>
-              <StepField
-                id={fieldId("hometownRegion")}
-                label={labels.fields.hometownRegion}
-                optional={labels.optional}
-              >
-                <NativeSelect
-                  {...control("hometownRegion")}
-                  defaultValue={defaults.hometownRegion}
-                >
-                  <RegionOptions
-                    placeholder={labels.fields.regionAny}
-                    regions={regions}
-                  />
-                </NativeSelect>
-              </StepField>
-              <StepField
-                id={fieldId("city")}
-                label={labels.fields.city}
-                error={errorFor("city")}
-              >
-                <Input
-                  {...control("city")}
-                  defaultValue={defaults.city}
-                  autoComplete="address-level2"
-                  maxLength={PROFILE_TEXT_LIMITS.city}
-                />
-              </StepField>
-            </div>
+            <PlaceFields
+              idPrefix={id}
+              value={place.value}
+              onChange={place.onChange}
+              errors={placeErrors}
+              regions={regions}
+              districts={districts}
+              universities={universities}
+              initialInstitution={values.institution}
+              previous={{ city: values.city, school: values.school }}
+              locale={locale}
+              labels={labels.place}
+              unavailable={placeUnavailable}
+            />
             <StepField
               id={fieldId("languages")}
               label={labels.fields.languages}
@@ -328,6 +305,7 @@ export function ProfileStepForm({
 
       <StepActions
         pending={pending}
+        blocked={step === "place" && Boolean(placeUnavailable)}
         labels={labels}
         onSkip={canSkip ? onSkip : undefined}
         onBack={onBack}

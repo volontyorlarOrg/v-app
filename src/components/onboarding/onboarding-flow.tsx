@@ -33,6 +33,7 @@ import {
   type VolunteerProfile,
 } from "@/lib/profile/completion";
 import type { LanguageOption } from "@/lib/profile/languages";
+import type { DistrictOption, InstitutionOption } from "@/lib/profile/place";
 import { navHref } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,10 @@ export function OnboardingFlow({
   next,
   regions,
   languageOptions,
+  districts,
+  universities,
+  placeUnavailable,
+  locale,
   username,
   addressPrefix,
   labels,
@@ -68,6 +73,10 @@ export function OnboardingFlow({
   next: string | null;
   regions: readonly { value: string; label: string }[];
   languageOptions: readonly LanguageOption[];
+  districts: readonly DistrictOption[];
+  universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
+  locale: string;
   username: UsernameIdentity;
   addressPrefix: string | null;
   labels: OnboardingLabels;
@@ -121,15 +130,16 @@ export function OnboardingFlow({
       stepIndex(key) < stepIndex(step) ? "done" : key === step ? "current" : "upcoming",
   }));
 
-  const skipLink = usernameRequired ? null : (
-    <a
-      href={exitHref}
-      onClick={skipForNow}
-      className="inline-flex min-h-8 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
-    >
-      {labels.skipForNow}
-    </a>
-  );
+  const skipLink =
+    usernameRequired || step === "place" ? null : (
+      <a
+        href={exitHref}
+        onClick={skipForNow}
+        className="inline-flex min-h-8 items-center text-sm font-semibold text-primary-ink underline-offset-4 hover:underline"
+      >
+        {labels.skipForNow}
+      </a>
+    );
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:items-start lg:gap-14 xl:gap-20">
@@ -208,6 +218,10 @@ export function OnboardingFlow({
                 values={values}
                 languageOptions={languageOptions}
                 regions={regions}
+                districts={districts}
+                universities={universities}
+                placeUnavailable={placeUnavailable}
+                locale={locale}
                 labels={labels}
                 onSaved={(profile) => {
                   setValues(profile);

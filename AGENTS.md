@@ -158,6 +158,19 @@ account lives on `/settings`, sign-out as the red button in the account card
 that opens `/settings` — nowhere in the shell — and the theme and the interface
 language in the **Appearance** panel on `/settings` — the one place either is
 changed inside the app.
+**Where a volunteer lives and studies comes from the backend's directories.**
+`PlaceFields` (`src/components/profile/place-fields.tsx`) is the one picker:
+the region, then a searchable district or city, then School, University or Gap
+year and a searchable institution. Schools load per district through
+`/api/directories/schools`, and typing a number offers that district's
+numbered school. The picker is the welcome flow's place step, which cannot be
+skipped, the place section of `/profile/edit`, and `PlaceCheckDialog`. A
+volunteer whose only missing details are these (`onlyPlaceMissing`) is not
+sent to the profile: Apply, or sending a draft, opens the dialog, saves through
+`PUT /profile/place`, and then continues the same action. The profile shows the
+district and the institution in the reader's language, and the old free text
+until the volunteer has chosen. There is no hometown field any more; a stored
+hometown stays and still follows its visibility switch.
 **The dashboard is the volunteer's progress; the record is My activity.** The
 dashboard opens on the greeting, the level and the next step on the ladder of
 verified hours (the "Volunteer levels" dialog behind "View levels"), the pass,

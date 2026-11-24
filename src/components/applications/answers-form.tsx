@@ -13,6 +13,10 @@ import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
 import { ActionStatus } from "@/components/app/action-status";
+import {
+  PlaceCheckDialog,
+  type PlaceCheckData,
+} from "@/components/profile/place-check-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -72,8 +76,10 @@ export function AnswersForm({
   questions,
   answers,
   labels,
+  placeCheck,
 }: {
   applicationId: string;
+  placeCheck?: PlaceCheckData | undefined;
   essayRequired: boolean;
   essay: string;
   questions: readonly AnswerField[];
@@ -106,7 +112,10 @@ export function AnswersForm({
     idleResult,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
   const submitWith = useValidatedSubmit(form, formRef);
+  const [checking, setChecking] = useState(false);
+  const placeConfirmed = useRef(false);
   const busy = saving || submitting;
   const hasDraftContent = essayRequired || questions.length > 0;
   const latest = lastIntent === "submit" ? submitResult : saveResult;
@@ -119,194 +128,216 @@ export function AnswersForm({
         : "submit";
     intentRef.current = intent;
     setLastIntent(intent);
+    if (intent === "submit" && placeCheck && !placeConfirmed.current) {
+      event.preventDefault();
+      void form.trigger().then((valid) => {
+        if (valid) setChecking(true);
+      });
+      return;
+    }
     return submitWith(intent === "save" ? save : submit)(event);
   }
 
   const { register, formState } = form;
 
   return (
-    <form
-      ref={formRef}
-      action={save}
-      noValidate
-      onSubmit={onSubmit}
-      className="flex flex-col gap-6"
-    >
-      <input type="hidden" name="applicationId" value={applicationId} />
+    <>
+      <form
+        ref={formRef}
+        action={save}
+        noValidate
+        onSubmit={onSubmit}
+        className="flex flex-col gap-6"
+      >
+        <input type="hidden" name="applicationId" value={applicationId} />
 
-      {hasDraftContent ? (
-        <FieldGroup className="gap-6">
-          {essayRequired ? (
-            <Field invalid={Boolean(formState.errors.essay)}>
-              <FieldLabel htmlFor={`${id}-essay`}>{labels.essayLabel}</FieldLabel>
-              <Textarea
-                {...register("essay")}
-                id={`${id}-essay`}
-                required
-                maxLength={MAX_ESSAY_LENGTH}
-                rows={10}
-                aria-invalid={formState.errors.essay ? true : undefined}
-                aria-describedby={`${id}-essay-help`}
-              />
-              <FieldDescription id={`${id}-essay-help`}>
-                {labels.essayHelp}
-              </FieldDescription>
-              <FieldError>
-                {formState.errors.essay?.message === "required"
-                  ? labels.fieldRequired
-                  : formState.errors.essay
-                    ? labels.fieldInvalid
-                    : latest.status === "error" && latest.fields.essay
-                      ? isRequiredError(latest.fields.essay)
-                        ? labels.fieldRequired
-                        : labels.fieldInvalid
-                      : undefined}
-              </FieldError>
-            </Field>
-          ) : null}
-          {questions.map((question, index) => {
-            const name = answerFieldName(question);
-            const path = name.replace(/\[\]$/, "") as `answer.${string}`;
-            const current = answers[question.id];
-            const clientError = formState.errors.answer?.[question.id]?.message;
-            const serverErrors = serverFieldError(latest, question.id);
-            const error =
-              clientError !== undefined
-                ? clientError === "required"
-                  ? labels.fieldRequired
-                  : labels.fieldInvalid
-                : serverErrors
-                  ? isRequiredError(serverErrors)
+        {hasDraftContent ? (
+          <FieldGroup className="gap-6">
+            {essayRequired ? (
+              <Field invalid={Boolean(formState.errors.essay)}>
+                <FieldLabel htmlFor={`${id}-essay`}>{labels.essayLabel}</FieldLabel>
+                <Textarea
+                  {...register("essay")}
+                  id={`${id}-essay`}
+                  required
+                  maxLength={MAX_ESSAY_LENGTH}
+                  rows={10}
+                  aria-invalid={formState.errors.essay ? true : undefined}
+                  aria-describedby={`${id}-essay-help`}
+                />
+                <FieldDescription id={`${id}-essay-help`}>
+                  {labels.essayHelp}
+                </FieldDescription>
+                <FieldError>
+                  {formState.errors.essay?.message === "required"
+                    ? labels.fieldRequired
+                    : formState.errors.essay
+                      ? labels.fieldInvalid
+                      : latest.status === "error" && latest.fields.essay
+                        ? isRequiredError(latest.fields.essay)
+                          ? labels.fieldRequired
+                          : labels.fieldInvalid
+                        : undefined}
+                </FieldError>
+              </Field>
+            ) : null}
+            {questions.map((question, index) => {
+              const name = answerFieldName(question);
+              const path = name.replace(/\[\]$/, "") as `answer.${string}`;
+              const current = answers[question.id];
+              const clientError = formState.errors.answer?.[question.id]?.message;
+              const serverErrors = serverFieldError(latest, question.id);
+              const error =
+                clientError !== undefined
+                  ? clientError === "required"
                     ? labels.fieldRequired
                     : labels.fieldInvalid
-                  : undefined;
-            const controlId = `${id}-${question.id}`;
-            const helpId = `${controlId}-help`;
-            const label = `${String(index + 1).padStart(2, "0")} · ${question.prompt}`;
+                  : serverErrors
+                    ? isRequiredError(serverErrors)
+                      ? labels.fieldRequired
+                      : labels.fieldInvalid
+                    : undefined;
+              const controlId = `${id}-${question.id}`;
+              const helpId = `${controlId}-help`;
+              const label = `${String(index + 1).padStart(2, "0")} · ${question.prompt}`;
 
-            return (
-              <Field key={question.id} invalid={Boolean(error)}>
-                <FieldLabel
-                  id={`${controlId}-label`}
-                  htmlFor={question.type === "multi_select" ? undefined : controlId}
-                >
-                  {label}
-                </FieldLabel>
-                {question.type === "long_text" ? (
-                  <Textarea
-                    {...register(path)}
-                    id={controlId}
-                    aria-describedby={helpId}
-                    aria-invalid={error ? true : undefined}
-                    defaultValue={typeof current === "string" ? current : ""}
-                    maxLength={question.maxLength}
-                    required={question.required}
-                  />
-                ) : question.type === "short_text" ? (
-                  <Input
-                    {...register(path)}
-                    id={controlId}
-                    aria-describedby={helpId}
-                    aria-invalid={error ? true : undefined}
-                    defaultValue={typeof current === "string" ? current : ""}
-                    maxLength={question.maxLength}
-                    required={question.required}
-                  />
-                ) : question.type === "single_select" ? (
-                  <NativeSelect
-                    {...register(path)}
-                    id={controlId}
-                    aria-describedby={helpId}
-                    aria-invalid={error ? true : undefined}
-                    defaultValue={typeof current === "string" ? current : ""}
-                    required={question.required}
+              return (
+                <Field key={question.id} invalid={Boolean(error)}>
+                  <FieldLabel
+                    id={`${controlId}-label`}
+                    htmlFor={question.type === "multi_select" ? undefined : controlId}
                   >
-                    <NativeSelectOption value="">{labels.choose}</NativeSelectOption>
-                    {(question.options ?? []).map((option) => (
-                      <NativeSelectOption key={option.value} value={option.value}>
-                        {option.label}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                ) : (
-                  <ul
-                    id={controlId}
-                    role="group"
-                    aria-labelledby={`${controlId}-label`}
-                    aria-describedby={helpId}
-                    className="flex flex-col gap-2"
-                  >
-                    {(question.options ?? []).map((option) => (
-                      <li key={option.value}>
-                        <label className="flex min-h-11 items-center gap-3 text-sm text-ink">
-                          <input
-                            type="checkbox"
-                            {...register(path)}
-                            name={name}
-                            value={option.value}
-                            defaultChecked={
-                              Array.isArray(current) && current.includes(option.value)
-                            }
-                            className="size-5 accent-action"
-                          />
+                    {label}
+                  </FieldLabel>
+                  {question.type === "long_text" ? (
+                    <Textarea
+                      {...register(path)}
+                      id={controlId}
+                      aria-describedby={helpId}
+                      aria-invalid={error ? true : undefined}
+                      defaultValue={typeof current === "string" ? current : ""}
+                      maxLength={question.maxLength}
+                      required={question.required}
+                    />
+                  ) : question.type === "short_text" ? (
+                    <Input
+                      {...register(path)}
+                      id={controlId}
+                      aria-describedby={helpId}
+                      aria-invalid={error ? true : undefined}
+                      defaultValue={typeof current === "string" ? current : ""}
+                      maxLength={question.maxLength}
+                      required={question.required}
+                    />
+                  ) : question.type === "single_select" ? (
+                    <NativeSelect
+                      {...register(path)}
+                      id={controlId}
+                      aria-describedby={helpId}
+                      aria-invalid={error ? true : undefined}
+                      defaultValue={typeof current === "string" ? current : ""}
+                      required={question.required}
+                    >
+                      <NativeSelectOption value="">{labels.choose}</NativeSelectOption>
+                      {(question.options ?? []).map((option) => (
+                        <NativeSelectOption key={option.value} value={option.value}>
                           {option.label}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <FieldDescription id={helpId}>{question.help}</FieldDescription>
-                <FieldError>{error}</FieldError>
-              </Field>
-            );
-          })}
-        </FieldGroup>
-      ) : null}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
+                  ) : (
+                    <ul
+                      id={controlId}
+                      role="group"
+                      aria-labelledby={`${controlId}-label`}
+                      aria-describedby={helpId}
+                      className="flex flex-col gap-2"
+                    >
+                      {(question.options ?? []).map((option) => (
+                        <li key={option.value}>
+                          <label className="flex min-h-11 items-center gap-3 text-sm text-ink">
+                            <input
+                              type="checkbox"
+                              {...register(path)}
+                              name={name}
+                              value={option.value}
+                              defaultChecked={
+                                Array.isArray(current) && current.includes(option.value)
+                              }
+                              className="size-5 accent-action"
+                            />
+                            {option.label}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  <FieldDescription id={helpId}>{question.help}</FieldDescription>
+                  <FieldError>{error}</FieldError>
+                </Field>
+              );
+            })}
+          </FieldGroup>
+        ) : null}
 
-      <div className="flex flex-wrap items-center gap-3">
-        {hasDraftContent ? (
+        <div className="flex flex-wrap items-center gap-3">
+          {hasDraftContent ? (
+            <Button
+              type="submit"
+              name="intent"
+              value="save"
+              variant="outline"
+              disabled={busy}
+              className="disabled:opacity-70"
+            >
+              {saving ? labels.saving : labels.save}
+            </Button>
+          ) : null}
           <Button
+            ref={submitRef}
             type="submit"
-            name="intent"
-            value="save"
-            variant="outline"
+            value="submit"
+            formAction={submit}
             disabled={busy}
             className="disabled:opacity-70"
           >
-            {saving ? labels.saving : labels.save}
+            {submitting ? labels.submitting : labels.submit}
           </Button>
+        </div>
+
+        {lastIntent === "save" && saveResult.status === "ok" ? (
+          <ActionStatus tone="done">{labels.savedDraft}</ActionStatus>
         ) : null}
-        <Button
-          type="submit"
-          value="submit"
-          formAction={submit}
-          disabled={busy}
-          className="disabled:opacity-70"
-        >
-          {submitting ? labels.submitting : labels.submit}
-        </Button>
-      </div>
 
-      {lastIntent === "save" && saveResult.status === "ok" ? (
-        <ActionStatus tone="done">{labels.savedDraft}</ActionStatus>
+        {latest.status === "error" ? (
+          <ActionStatus tone="error">
+            {labels.errors[latest.code] ?? labels.fallback}
+            {latest.code === "profileRequired" ||
+            latest.code === "profileIncomplete" ? (
+              <>
+                {" "}
+                <a
+                  href={labels.profileLink.href}
+                  className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+                >
+                  {labels.profileLink.label}
+                </a>
+              </>
+            ) : null}
+          </ActionStatus>
+        ) : null}
+      </form>
+      {placeCheck ? (
+        <PlaceCheckDialog
+          open={checking}
+          onOpenChange={setChecking}
+          data={placeCheck}
+          onConfirmed={() => {
+            placeConfirmed.current = true;
+            formRef.current?.requestSubmit(submitRef.current);
+          }}
+        />
       ) : null}
-
-      {latest.status === "error" ? (
-        <ActionStatus tone="error">
-          {labels.errors[latest.code] ?? labels.fallback}
-          {latest.code === "profileRequired" || latest.code === "profileIncomplete" ? (
-            <>
-              {" "}
-              <a
-                href={labels.profileLink.href}
-                className="font-semibold text-primary-ink underline-offset-4 hover:underline"
-              >
-                {labels.profileLink.label}
-              </a>
-            </>
-          ) : null}
-        </ActionStatus>
-      ) : null}
-    </form>
+    </>
   );
 }

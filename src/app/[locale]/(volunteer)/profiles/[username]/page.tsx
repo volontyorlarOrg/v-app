@@ -26,6 +26,7 @@ import { initialsOf } from "@/lib/profile/initials";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { profileLinks } from "@/lib/profile/links";
 import { profileSocialLinks } from "@/lib/profile/social-links";
+import { localName } from "@/lib/profile/place";
 import { navHref } from "@/lib/routing/routes";
 import { publicProfileHref } from "@/lib/seo/origin";
 
@@ -128,8 +129,25 @@ export default async function MemberProfilePage({
           value: opportunities(`regions.${profile.hometownRegion}`),
         }
       : null,
-    text("city", profile.city),
-    text("school", profile.school),
+    profile.district
+      ? {
+          id: "district",
+          label: t("sheet.rows.district"),
+          value: localName(profile.district.name, localeValue),
+        }
+      : text("city", profile.city),
+    profile.educationType
+      ? {
+          id: "education",
+          label: t("sheet.rows.education"),
+          value:
+            profile.educationType === "gap_year"
+              ? t("sheet.rows.gapYear")
+              : profile.institution
+                ? localName(profile.institution.name, localeValue)
+                : profile.school,
+        }
+      : text("school", profile.school),
     text("gradeYear", profile.gradeYear),
     text("languages", languageDirectory.format(profile.languages, localeValue)),
     text("phone", profile.phone),

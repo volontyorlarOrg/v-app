@@ -291,7 +291,7 @@
         "lead": "Tashkilotchi birinchi oʻqiydigan narsa."
       },
       "place": {
-        "title": "Qayerda oʻqiysiz",
+        "title": "Yashash va oʻqish joyi",
         "lead": "Tashkilotchilar tadbirga yaqin volontyorlarni tanlaydi."
       },
       "contact": {
@@ -304,7 +304,7 @@
       "welcome": "Xush kelibsiz",
       "username": "Foydalanuvchi nomi",
       "about": "Siz haqingizda",
-      "place": "Qayerda oʻqiysiz",
+      "place": "Yashash va oʻqish joyi",
       "contact": "Aloqa",
       "done": "Tayyor"
     },
@@ -808,7 +808,10 @@
         "telegram": "Telegram",
         "links": "Portfolio",
         "publicPage": "Ochiq sahifa",
-        "joined": "Qoʻshilgan"
+        "joined": "Qoʻshilgan",
+        "district": "Tuman",
+        "education": "Taʼlim",
+        "gapYear": "Tanaffus yili"
       },
       "publicHidden": "Yashirin",
       "publicShow": "Sozlamalarda yoqish",
@@ -855,7 +858,8 @@
       "location": "Qayerdasiz",
       "contact": "Aloqa maʼlumotlari",
       "links": "Ochiq havolalar",
-      "about": "Siz haqingizda"
+      "about": "Siz haqingizda",
+      "place": "Yashash va oʻqish joyi"
     },
     "fields": {
       "fullName": "Toʻliq ism",
@@ -891,8 +895,8 @@
       "fullName": "Toʻliq ism",
       "bio": "Bio",
       "region": "Hudud",
-      "city": "Shahar",
-      "school": "Maktab",
+      "district": "Tuman",
+      "education": "Maktab yoki universitet",
       "gradeYear": "Sinf yoki kurs",
       "languages": "Tillar",
       "phone": "Telefon",
@@ -922,7 +926,8 @@
       "education": "Qayerda oʻqishingiz — tashkilotchi kim ariza berayotganini bilishi uchun.",
       "location": "Tashkilotchilar tadbirga yaqin koʻngillilarni tanlaydi.",
       "contact": "Ariza berish uchun Telegram foydalanuvchi nomi kerak. Telefon ixtiyoriy. Ular profilda koʻrinish-koʻrinmasligini pastda tanlaysiz.",
-      "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar."
+      "links": "Profil havolasini ochgan har kim koʻrishi mumkin boʻlgan ijtimoiy tarmoqlar va ishlar.",
+      "place": "Roʻyxatlardan tanlang: tashkilotchilar tadbirga yaqin koʻngillilarni shu orqali topadi."
     },
     "edit": {
       "back": "Profilga qaytish",
@@ -958,6 +963,52 @@
         "activity": "Faoliyat",
         "bio": "Oʻzingiz haqingizda"
       }
+    },
+    "place": {
+      "region": "Hozirgi hudud",
+      "regionPlaceholder": "Hududni tanlang",
+      "district": "Tuman yoki shahar",
+      "districtPlaceholder": "Tuman yoki shaharni tanlang",
+      "districtSearch": "Tumanlardan qidiring",
+      "districtEmpty": "Bu soʻrovga mos tuman topilmadi.",
+      "districtNeedsRegion": "Avval hududni tanlang.",
+      "education": "Hozir nima bilan bandsiz?",
+      "educationTypes": {
+        "school": "Maktab",
+        "university": "Universitet",
+        "gap_year": "Tanaffus yili"
+      },
+      "school": "Maktabingiz",
+      "university": "Universitetingiz",
+      "schoolPlaceholder": "Maktabingizni tanlang",
+      "universityPlaceholder": "Universitetingizni tanlang",
+      "institutionSearch": "Nomi yoki raqami boʻyicha qidiring",
+      "schoolEmpty": "Mos maktab topilmadi. Qoʻshish uchun raqamini yozing.",
+      "universityEmpty": "Bu soʻrovga mos universitet topilmadi.",
+      "schoolNumberHint": "Roʻyxatda yoʻqmi? Maktabingiz raqamini yozing.",
+      "schoolsLoading": "Maktablar yuklanmoqda…",
+      "schoolsFailed": "Maktablarni yuklab boʻlmadi. Roʻyxatni yopib, qayta urinib koʻring.",
+      "schoolNeedsDistrict": "Avval tumaningizni tanlang.",
+      "schoolDistrict": "Maktabingiz joylashgan tuman",
+      "otherDistrict": "Maktabim boshqa tumanda",
+      "ownDistrict": "Oʻz tumanimni tanlash",
+      "gradeSchool": "Sinf",
+      "gradeUniversity": "Kurs",
+      "gapYearNote": "Tanaffus yilida maktab yoki sinf kerak emas.",
+      "previous": "Avval yozganingiz: “{text}”",
+      "required": "Davom etish uchun bittasini tanlang.",
+      "gradeRequired": "Sinf yoki kursingizni yozing.",
+      "attribution": "Maktab va universitetlar roʻyxati: © OpenStreetMap ishtirokchilari, Wikidata"
+    },
+    "placeCheck": {
+      "title": "Qayerda yashashingiz va oʻqishingizni tasdiqlang",
+      "lead": "Endi tumanlar, maktablar va universitetlarning yagona roʻyxatidan foydalanamiz. Oʻzingiznikini bir marta tanlang, biz uni saqlaymiz, keyin arizangiz davom etadi.",
+      "saveApply": "Saqlash va ariza berish",
+      "saveSubmit": "Saqlash va yuborish",
+      "saving": "Saqlanmoqda…",
+      "cancel": "Hozir emas",
+      "error": "Saqlab boʻlmadi. Maydonlarni tekshirib, qayta urinib koʻring.",
+      "close": "Yopish"
     }
   },
   "languages": {

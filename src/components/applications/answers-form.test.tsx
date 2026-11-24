@@ -5,6 +5,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AnswersForm, type AnswersFormLabels } from "./answers-form";
 
 const actions = vi.hoisted(() => ({ save: vi.fn(), submit: vi.fn() }));
+vi.mock("@/lib/profile/actions", () => ({
+  confirmPlaceAction: vi.fn(),
+}));
+
 vi.mock("@/lib/applications/actions", () => ({
   saveDraftAction: actions.save,
   submitApplicationAction: actions.submit,

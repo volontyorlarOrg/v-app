@@ -3,19 +3,23 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import { LoadErrorRows, loadErrorLabels } from "@/components/app/load-error";
 import { PageHeader } from "@/components/app/page-header";
 import { ProfileForm } from "@/components/profile/profile-form";
-import { regionNoteLabels } from "@/components/profile/region-note";
 import { AvatarEditor } from "@/components/profile/avatar-editor";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
+import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf, type LoadFailure } from "@/lib/api/load.server";
+import type { District, Institution } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
 import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, type VolunteerProfile } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { initialsOf } from "@/lib/profile/initials";
+import { placeLabels } from "@/lib/profile/place-labels";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -24,12 +28,6 @@ const FIELD_KEYS = [
   "fullName",
   "bio",
   "bioHelp",
-  "school",
-  "gradeYear",
-  "region",
-  "hometownRegion",
-  "regionAny",
-  "city",
   "languages",
   "languagesHelp",
   "languagesSearch",
@@ -50,7 +48,7 @@ const FIELD_KEYS = [
   "linksHelp",
 ] as const;
 
-const SECTION_KEYS = ["about", "education", "location", "contact", "links"] as const;
+const SECTION_KEYS = ["about", "place", "contact", "links"] as const;
 
 export async function generateMetadata({
   params,
@@ -66,11 +64,13 @@ export default async function ProfileEditPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [session, profile, me] = await Promise.all([
+  const [session, profile, me, directories] = await Promise.all([
     requireSession(),
     getProfile(),
     getMe(),
+    loadPlaceDirectories(),
   ]);
+  const places = dataOf(directories);
 
   const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
@@ -82,7 +82,14 @@ export default async function ProfileEditPage({
   };
 
   return (
-    <ProfileEditor values={values} locale={locale as Locale} avatarUrl={me.avatarUrl} />
+    <ProfileEditor
+      values={values}
+      locale={locale as Locale}
+      avatarUrl={me.avatarUrl}
+      districts={places?.districts ?? []}
+      universities={places?.universities ?? []}
+      placeFailure={directories.status === "failed" ? directories.failure : null}
+    />
   );
 }
 
@@ -90,13 +97,20 @@ function ProfileEditor({
   values,
   locale,
   avatarUrl,
+  districts,
+  universities,
+  placeFailure,
 }: {
   values: VolunteerProfile;
   locale: Locale;
   avatarUrl?: string;
+  districts: District[];
+  universities: Institution[];
+  placeFailure: LoadFailure | null;
 }) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
+  const common = useTranslations("common");
 
   return (
     <div className="flex flex-col gap-6">
@@ -158,6 +172,14 @@ function ProfileEditor({
           value: region,
           label: opportunities(`regions.${region}`),
         }))}
+        districts={districts}
+        universities={universities}
+        placeUnavailable={
+          placeFailure ? (
+            <LoadErrorRows failure={placeFailure} labels={loadErrorLabels(common)} />
+          ) : null
+        }
+        locale={locale}
         headed={false}
         doneHref={navHref("profile")}
         cancelHref={navHref("profile")}
@@ -173,7 +195,8 @@ function ProfileEditor({
           fields: Object.fromEntries(
             FIELD_KEYS.map((key) => [key, t(`fields.${key}`)]),
           ) as Record<(typeof FIELD_KEYS)[number], string>,
-          regionNote: regionNoteLabels(t),
+          place: placeLabels(t),
+          placeRequired: t("place.required"),
           optional: t("optional"),
           save: t("save"),
           saving: t("saving"),

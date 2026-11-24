@@ -6,8 +6,13 @@ import { toast } from "sonner";
 import { ActionStatus } from "@/components/app/action-status";
 import { Panel } from "@/components/app/panel";
 import { LanguagePicker } from "@/components/profile/language-picker";
-import { RegionNote, type RegionNoteLabels } from "@/components/profile/region-note";
-import { RegionOptions, type RegionOption } from "@/components/profile/region-options";
+import {
+  PlaceFields,
+  usePlaceValue,
+  type PlaceFieldName,
+  type PlaceLabels,
+} from "@/components/profile/place-fields";
+import type { RegionOption } from "@/components/profile/region-options";
 import { Button, buttonClass } from "@/components/ui/button";
 import {
   Field,
@@ -17,7 +22,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionForm } from "@/hooks/use-action-form";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -31,8 +35,9 @@ import {
   type ProfileFormValues,
 } from "@/lib/profile/input";
 import type { LanguageOption } from "@/lib/profile/languages";
+import type { DistrictOption, InstitutionOption } from "@/lib/profile/place";
 
-export type ProfileSection = "about" | "education" | "location" | "contact" | "links";
+export type ProfileSection = "about" | "place" | "contact" | "links";
 
 export type ProfileFormLabels = {
   title: string;
@@ -43,12 +48,6 @@ export type ProfileFormLabels = {
     | "fullName"
     | "bio"
     | "bioHelp"
-    | "school"
-    | "gradeYear"
-    | "region"
-    | "hometownRegion"
-    | "regionAny"
-    | "city"
     | "languages"
     | "languagesHelp"
     | "languagesSearch"
@@ -69,7 +68,8 @@ export type ProfileFormLabels = {
     | "linksHelp",
     string
   >;
-  regionNote: RegionNoteLabels;
+  place: PlaceLabels;
+  placeRequired: string;
   optional: string;
   save: string;
   saving: string;
@@ -141,6 +141,10 @@ export function ProfileForm({
   values,
   languageOptions,
   regions,
+  districts,
+  universities,
+  placeUnavailable,
+  locale,
   labels,
   headed = true,
   doneHref,
@@ -149,6 +153,10 @@ export function ProfileForm({
   values: VolunteerProfile;
   languageOptions: readonly LanguageOption[];
   regions: readonly RegionOption[];
+  districts: readonly DistrictOption[];
+  universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
+  locale: string;
   labels: ProfileFormLabels;
   headed?: boolean;
   doneHref?: string;
@@ -166,13 +174,25 @@ export function ProfileForm({
     },
   });
   const { register, formState, control: formControl } = form;
+  const place = usePlaceValue(form);
 
   const fieldId = (name: keyof ProfileFormValues) => `${id}-${name}`;
   const invalid = (name: keyof ProfileFormValues) =>
     Boolean(formState.errors[name]) ||
     (result.status === "error" && Boolean(result.fields[name]));
   const errorFor = (name: keyof ProfileFormValues) =>
-    invalid(name) ? labels.fieldInvalid : undefined;
+    invalid(name)
+      ? formState.errors[name]?.message === "required"
+        ? name === "gradeYear"
+          ? labels.place.gradeRequired
+          : labels.placeRequired
+        : labels.fieldInvalid
+      : undefined;
+  const placeErrors = Object.fromEntries(
+    (
+      ["region", "districtId", "educationType", "institutionId", "gradeYear"] as const
+    ).map((name) => [name, errorFor(name)]),
+  ) as Partial<Record<PlaceFieldName, string>>;
   const control = (name: keyof ProfileFormValues, help?: string) => ({
     id: fieldId(name),
     "aria-describedby": help ? `${fieldId(name)}-help` : undefined,
@@ -242,77 +262,21 @@ export function ProfileForm({
             </FieldGroup>
           </FormSection>
 
-          <FormSection
-            title={labels.sections.education}
-            help={labels.sectionHelp.education}
-          >
-            <div className="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              <ProfileField
-                id={fieldId("school")}
-                label={labels.fields.school}
-                error={errorFor("school")}
-              >
-                <Input
-                  {...control("school")}
-                  defaultValue={values.school}
-                  maxLength={PROFILE_TEXT_LIMITS.school}
-                />
-              </ProfileField>
-              <ProfileField
-                id={fieldId("gradeYear")}
-                label={labels.fields.gradeYear}
-                error={errorFor("gradeYear")}
-              >
-                <Input
-                  {...control("gradeYear")}
-                  defaultValue={values.gradeYear}
-                  maxLength={PROFILE_TEXT_LIMITS.gradeYear}
-                />
-              </ProfileField>
-            </div>
-          </FormSection>
-
-          <FormSection
-            title={labels.sections.location}
-            help={labels.sectionHelp.location}
-          >
-            <RegionNote labels={labels.regionNote} />
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
-              <ProfileField id={fieldId("region")} label={labels.fields.region}>
-                <NativeSelect {...control("region")} defaultValue={values.region ?? ""}>
-                  <RegionOptions
-                    placeholder={labels.fields.regionAny}
-                    regions={regions}
-                  />
-                </NativeSelect>
-              </ProfileField>
-              <ProfileField
-                id={fieldId("hometownRegion")}
-                label={labels.fields.hometownRegion}
-                optional={labels.optional}
-              >
-                <NativeSelect
-                  {...control("hometownRegion")}
-                  defaultValue={values.hometownRegion ?? ""}
-                >
-                  <RegionOptions
-                    placeholder={labels.fields.regionAny}
-                    regions={regions}
-                  />
-                </NativeSelect>
-              </ProfileField>
-              <ProfileField
-                id={fieldId("city")}
-                label={labels.fields.city}
-                error={errorFor("city")}
-              >
-                <Input
-                  {...control("city")}
-                  defaultValue={values.city}
-                  maxLength={PROFILE_TEXT_LIMITS.city}
-                />
-              </ProfileField>
-            </div>
+          <FormSection title={labels.sections.place} help={labels.sectionHelp.place}>
+            <PlaceFields
+              idPrefix={id}
+              value={place.value}
+              onChange={place.onChange}
+              errors={placeErrors}
+              regions={regions}
+              districts={districts}
+              universities={universities}
+              initialInstitution={values.institution}
+              previous={{ city: values.city, school: values.school }}
+              locale={locale}
+              labels={labels.place}
+              unavailable={placeUnavailable}
+            />
           </FormSection>
 
           <FormSection

@@ -11,8 +11,9 @@ const EMPTY: ProfileFields = {
   fullName: "",
   bio: "",
   region: null,
-  city: "",
-  school: "",
+  districtId: null,
+  educationType: null,
+  institutionId: null,
   gradeYear: "",
   languages: [],
   phone: "",
@@ -23,8 +24,9 @@ const FULL: ProfileFields = {
   fullName: "Aziza Karimova",
   bio: "Second-year student, interested in literacy work.",
   region: "samarkand",
-  city: "Samarkand",
-  school: "School 14",
+  districtId: "1718401",
+  educationType: "school",
+  institutionId: "school-1718401-14",
   gradeYear: "11",
   languages: ["uz", "en"],
   phone: "+998 90 123 45 67",
@@ -48,8 +50,8 @@ describe("profileCompletion", () => {
       "fullName",
       "bio",
       "region",
-      "city",
-      "school",
+      "district",
+      "education",
       "gradeYear",
       "languages",
       "telegram",
@@ -57,8 +59,34 @@ describe("profileCompletion", () => {
   });
 
   it("ignores a one-letter name and blank text", () => {
-    const completion = profileCompletion({ ...FULL, fullName: "A", city: "  " });
-    expect(completion.missing).toEqual(["fullName", "city"]);
+    const completion = profileCompletion({ ...FULL, fullName: "A", bio: "  " });
+    expect(completion.missing).toEqual(["fullName", "bio"]);
+  });
+
+  it("asks a volunteer with only the old free text to choose district and education", () => {
+    expect(
+      profileCompletion({
+        ...FULL,
+        districtId: null,
+        educationType: null,
+        institutionId: null,
+      }).missing,
+    ).toEqual(["district", "education"]);
+  });
+
+  it("needs an institution for a school or university but nothing on a gap year", () => {
+    expect(
+      profileCompletion({ ...FULL, educationType: "university", institutionId: null })
+        .missing,
+    ).toEqual(["education"]);
+    expect(
+      profileCompletion({
+        ...FULL,
+        educationType: "gap_year",
+        institutionId: null,
+        gradeYear: "",
+      }).missing,
+    ).toEqual([]);
   });
 
   it("allows a missing phone number but requires a Telegram username", () => {

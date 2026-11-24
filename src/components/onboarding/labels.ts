@@ -1,7 +1,30 @@
 import type { FormStep } from "@/lib/onboarding/steps";
-import type { ProfileFormValues } from "@/lib/profile/input";
 import type { RailState } from "@/components/onboarding/step-rail";
-import type { RegionNoteLabels } from "@/components/profile/region-note";
+import type { PlaceLabels } from "@/components/profile/place-fields";
+
+export const ONBOARDING_FIELD_KEYS = [
+  "fullName",
+  "bio",
+  "bioHelp",
+  "languages",
+  "languagesHelp",
+  "languagesSearch",
+  "languagesEmpty",
+  "languagesCommon",
+  "languagesAll",
+  "languagesRemove",
+  "languagesLimit",
+  "phone",
+  "phoneHelp",
+  "telegram",
+  "telegramHelp",
+  "instagram",
+  "instagramHelp",
+  "linkedin",
+  "linkedinHelp",
+  "links",
+  "linksHelp",
+] as const;
 
 export type OnboardingLabels = {
   stepCount: string;
@@ -21,25 +44,9 @@ export type OnboardingLabels = {
     states: Record<RailState, string>;
     items: Record<FormStep, string>;
   };
-  fields: Record<
-    | keyof ProfileFormValues
-    | "bioHelp"
-    | "languagesHelp"
-    | "languagesSearch"
-    | "languagesEmpty"
-    | "languagesCommon"
-    | "languagesAll"
-    | "languagesRemove"
-    | "languagesLimit"
-    | "phoneHelp"
-    | "telegramHelp"
-    | "instagramHelp"
-    | "linkedinHelp"
-    | "linksHelp"
-    | "regionAny",
-    string
-  >;
-  regionNote: RegionNoteLabels;
+  fields: Record<(typeof ONBOARDING_FIELD_KEYS)[number], string>;
+  place: PlaceLabels;
+  placeRequired: string;
   optional: string;
   usernameStep: {
     field: string;

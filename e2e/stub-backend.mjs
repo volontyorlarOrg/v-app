@@ -34,6 +34,143 @@ const REQUIRED_PROFILE_PARTS = [
 const KNOWN_PROFILE_PARTS = [...OPTIONAL_PROFILE_PARTS, ...REQUIRED_PROFILE_PARTS];
 const CONTACT_PROFILE_PARTS = ["phone", "telegram", "instagram", "linkedin"];
 
+const DISTRICTS = [
+  {
+    id: "1726294",
+    region: "tashkent-city",
+    kind: "district",
+    name: {
+      uz: "Chilonzor tumani",
+      ru: "Чиланзарский район",
+      en: "Chilonzor District",
+    },
+  },
+  {
+    id: "1726266",
+    region: "tashkent-city",
+    kind: "district",
+    name: {
+      uz: "Yunusobod tumani",
+      ru: "Юнусабадский район",
+      en: "Yunusobod District",
+    },
+  },
+  {
+    id: "1718401",
+    region: "samarkand",
+    kind: "city",
+    name: { uz: "Samarqand shahri", ru: "г. Самарканд", en: "Samarqand City" },
+  },
+];
+const INSTITUTIONS = [
+  {
+    id: "school-1726294-45",
+    type: "school",
+    region: "tashkent-city",
+    districtId: "1726294",
+    name: { uz: "45-son maktab", ru: "Школа № 45", en: "School No. 45" },
+  },
+  {
+    id: "school-osm-w2",
+    type: "school",
+    region: "tashkent-city",
+    districtId: "1726294",
+    name: {
+      uz: "2-son akademik litsey",
+      ru: "Академический лицей № 2",
+      en: "Academic lyceum No. 2",
+    },
+  },
+  {
+    id: "university-q651133",
+    type: "university",
+    region: "tashkent-city",
+    districtId: "1726266",
+    name: {
+      uz: "Oʻzbekiston milliy universiteti",
+      ru: "Национальный университет Узбекистана",
+      en: "National University of Uzbekistan",
+    },
+  },
+];
+
+function numberedSchool(id) {
+  const match = /^school-(\d{7})-([1-9]\d{0,2})$/.exec(id);
+  if (!match || Number(match[2]) > 399) return null;
+  const district = DISTRICTS.find((item) => item.id === match[1]);
+  if (!district) return null;
+  const number = Number(match[2]);
+  return {
+    id,
+    type: "school",
+    region: district.region,
+    districtId: district.id,
+    name: {
+      uz: `${number}-son maktab`,
+      ru: `Школа № ${number}`,
+      en: `School No. ${number}`,
+    },
+  };
+}
+
+function entry(item) {
+  return item ? { id: item.id, name: item.name } : null;
+}
+
+function resolvePlace(body, current) {
+  const errors = {};
+  const patch = {};
+  if (body.districtId !== undefined) {
+    const district = DISTRICTS.find((item) => item.id === body.districtId);
+    if (!body.districtId) {
+      Object.assign(patch, { districtId: null, district: null });
+    } else if (!district) {
+      errors.districtId = ["unknownDistrict"];
+    } else {
+      Object.assign(patch, {
+        districtId: district.id,
+        district: entry(district),
+        region: district.region,
+        city: district.name.uz,
+      });
+    }
+  }
+  if (body.educationType === "gap_year") {
+    Object.assign(patch, {
+      educationType: "gap_year",
+      institutionId: null,
+      institution: null,
+      school: "",
+      gradeYear: "",
+    });
+  } else if (body.educationType === null) {
+    Object.assign(patch, {
+      educationType: null,
+      institutionId: null,
+      institution: null,
+    });
+  } else if (body.institutionId) {
+    const institution =
+      INSTITUTIONS.find((item) => item.id === body.institutionId) ??
+      numberedSchool(body.institutionId);
+    if (!institution) errors.institutionId = ["unknownInstitution"];
+    else if (body.educationType && institution.type !== body.educationType)
+      errors.institutionId = ["institutionTypeMismatch"];
+    else
+      Object.assign(patch, {
+        educationType: institution.type,
+        institutionId: institution.id,
+        institution: entry(institution),
+        school: institution.name.uz,
+      });
+  } else if (body.educationType) {
+    Object.assign(patch, { educationType: body.educationType });
+    if (current?.educationType !== body.educationType)
+      Object.assign(patch, { institutionId: null, institution: null });
+  }
+  return { errors, patch };
+}
+
 function normalizeHiddenParts(parts) {
   return OPTIONAL_PROFILE_PARTS.filter((part) => parts.includes(part));
 }
@@ -311,8 +448,8 @@ const REQUIRED_PROFILE_FIELDS = [
   "fullName",
   "bio",
   "region",
-  "city",
-  "school",
+  "district",
+  "education",
   "gradeYear",
   "languages",
   "telegram",
@@ -324,6 +461,16 @@ function missingForApplying(state) {
     if (!profile) return false;
     if (field === "fullName") return profile.fullName.trim().length >= 2;
     if (field === "region") return Boolean(profile.region);
+    if (field === "district") return Boolean(profile.districtId);
+    if (field === "education")
+      return (
+        profile.educationType === "gap_year" ||
+        (Boolean(profile.educationType) && Boolean(profile.institutionId))
+      );
+    if (field === "gradeYear")
+      return (
+        profile.educationType === "gap_year" || profile.gradeYear.trim().length > 0
+      );
     if (field === "languages") return profile.languages.length > 0;
     return profile[field].trim().length > 0;
   };
@@ -365,15 +512,7 @@ function rewardHistory(state) {
 
 const PROFILE_REWARD_LIMIT = 1000;
 
-const PROFILE_REQUIRED = [
-  "fullName",
-  "bio",
-  "region",
-  "city",
-  "school",
-  "gradeYear",
-  "telegram",
-];
+const PROFILE_REQUIRED = ["fullName", "bio", "region", "districtId", "telegram"];
 
 function checkpointFacts(state) {
   const profile = state.profile;
@@ -382,6 +521,9 @@ function checkpointFacts(state) {
     state.account.usernameSource !== "generated" &&
     profile !== null &&
     PROFILE_REQUIRED.every((field) => String(profile[field] ?? "").trim().length > 0) &&
+    (profile.educationType === "gap_year" ||
+      (Boolean(profile.institutionId) &&
+        String(profile.gradeYear ?? "").trim().length > 0)) &&
     (profile.languages ?? []).length > 0;
   return { profileComplete: complete ? 1 : 0 };
 }
@@ -532,6 +674,11 @@ function freshState() {
       gradeYear: "2",
       region: "tashkent-city",
       city: "Tashkent",
+      districtId: "1726294",
+      district: entry(DISTRICTS[0]),
+      educationType: "school",
+      institutionId: "school-osm-w2",
+      institution: entry(INSTITUTIONS[1]),
       languages: ["uz", "ru", "en"],
       skills: ["translation", "reading aloud"],
       phone: "",
@@ -1211,9 +1358,12 @@ const server = createServer(async (request, response) => {
       return send(response, 401, { code: "invalidLoginState" });
     if (body.code === "no-phone") return send(response, 403, { code: "phoneRequired" });
     if (
-      !["e2e-code", "e2e-profile-exhausted", "e2e-session-ends-on-write"].includes(
-        body.code,
-      )
+      ![
+        "e2e-code",
+        "e2e-profile-exhausted",
+        "e2e-session-ends-on-write",
+        "e2e-legacy-place",
+      ].includes(body.code)
     )
       return send(response, 401, { code: "invalidAuthorizationCode" });
     const opened = freshState();
@@ -1223,6 +1373,18 @@ const server = createServer(async (request, response) => {
       opened.account.avatarUrl = `http://127.0.0.1:${PORT}/avatar.webp`;
     }
     if (body.code === "e2e-session-ends-on-write") opened.endsOnWrite = true;
+    if (body.code === "e2e-legacy-place") {
+      Object.assign(opened.profile, {
+        bio: "I help at city events.",
+        city: "Chilonzor",
+        school: "45-maktab",
+        districtId: null,
+        district: null,
+        educationType: null,
+        institutionId: null,
+        institution: null,
+      });
+    }
     opened.account.authMethods.telegram = true;
     opened.account.telegramIdentity = { username: "dilnoza_k", linkedAt: at(-40) };
     opened.account.usernameSource = "telegram";
@@ -1326,6 +1488,23 @@ const server = createServer(async (request, response) => {
       : send(response, 404, { code: "opportunityNotFound" });
   }
 
+  if (path === "/directories/districts" && method === "GET") {
+    return send(response, 200, { items: DISTRICTS });
+  }
+  if (path === "/directories/institutions" && method === "GET") {
+    const type = url.searchParams.get("type");
+    const districtId = url.searchParams.get("districtId");
+    if (type === "school" && !districtId && !url.searchParams.get("region"))
+      return send(response, 422, {
+        code: "validationFailed",
+        errors: { districtId: ["districtOrRegionRequired"] },
+      });
+    return send(response, 200, {
+      items: INSTITUTIONS.filter(
+        (item) => item.type === type && (!districtId || item.districtId === districtId),
+      ),
+    });
+  }
   const token = (request.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
   const state = sessions.get(token);
   if (!state) return send(response, 401, { code: "unauthenticated" });
@@ -1474,7 +1653,10 @@ const server = createServer(async (request, response) => {
       bio: profile?.bio ?? "Community volunteer and student.",
       region: profile?.region ?? "tashkent-city",
       city: profile?.city ?? "Tashkent",
+      district: profile ? (profile.district ?? null) : entry(DISTRICTS[0]),
       school: profile?.school ?? "Academic lyceum No. 2",
+      educationType: profile ? (profile.educationType ?? null) : "school",
+      institution: profile ? (profile.institution ?? null) : entry(INSTITUTIONS[1]),
       gradeYear: shown("gradeYear", profile?.gradeYear ?? "2", ""),
       languages: profile?.languages ?? ["uz", "ru", "en"],
       phone: shown("phone", profile?.phone || "+998 90 123 45 67", ""),
@@ -1645,6 +1827,19 @@ const server = createServer(async (request, response) => {
     state.account.avatarUrl = null;
     return send(response, 200, { avatarUrl: null });
   }
+  if (path === "/profile/place" && method === "PUT") {
+    if (!state.profile) return send(response, 404, { code: "profileNotFound" });
+    const { errors, patch } = resolvePlace(body, state.profile);
+    if (Object.keys(errors).length > 0)
+      return send(response, 422, { code: "validationFailed", errors });
+    state.profile = {
+      ...state.profile,
+      ...patch,
+      gradeYear: patch.gradeYear ?? body.gradeYear ?? state.profile.gradeYear,
+      updatedAt: new Date().toISOString(),
+    };
+    return send(response, 200, state.profile);
+  }
   if (path === "/profile" && method === "GET") {
     return state.profile
       ? send(response, 200, state.profile)
@@ -1697,11 +1892,17 @@ const server = createServer(async (request, response) => {
     if (Object.keys(malformed).length > 0) {
       return send(response, 422, { code: "validationFailed", errors: malformed });
     }
+    const place = resolvePlace(body, state.profile);
+    if (Object.keys(place.errors).length > 0)
+      return send(response, 422, { code: "validationFailed", errors: place.errors });
     const profileBody = { ...body };
     delete profileBody.confirmContactPublication;
+    for (const key of ["districtId", "educationType", "institutionId"])
+      delete profileBody[key];
     state.profile = {
       ...(state.profile ?? { hiddenFields: ["phone"] }),
       ...profileBody,
+      ...place.patch,
       ...(body.hiddenFields === undefined
         ? {}
         : { hiddenFields: normalizeHiddenParts(body.hiddenFields) }),

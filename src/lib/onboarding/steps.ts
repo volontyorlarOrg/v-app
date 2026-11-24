@@ -21,7 +21,14 @@ export const FORM_STEP_COUNT = FORM_STEPS.length;
 
 export const PROFILE_STEP_FIELDS = {
   about: ["fullName", "bio"],
-  place: ["school", "gradeYear", "region", "hometownRegion", "city", "languages"],
+  place: [
+    "region",
+    "districtId",
+    "educationType",
+    "institutionId",
+    "gradeYear",
+    "languages",
+  ],
   contact: ["phone", "telegram", "instagram", "linkedin", "links"],
 } as const satisfies Record<ProfileStep, readonly (keyof ProfileFormValues)[]>;
 
@@ -85,7 +92,7 @@ export const PASS_PART_KEYS = [
 export function passParts(profile: VolunteerProfile, step: OnboardingStep): PassParts {
   return {
     name: profile.fullName.trim().length >= 2,
-    place: profile.school.trim().length > 0 || profile.region !== null,
+    place: profile.districtId !== null || profile.region !== null,
     languages: profile.languages.length > 0,
     contact: profile.phone.trim().length > 0 || profile.telegram.trim().length > 0,
     sealed: step === "done",

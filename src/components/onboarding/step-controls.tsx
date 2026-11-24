@@ -37,11 +37,13 @@ export function StepField({
 
 export function StepActions({
   pending,
+  blocked = false,
   labels,
   onSkip,
   onBack,
 }: {
   pending: boolean;
+  blocked?: boolean;
   labels: Pick<OnboardingLabels, "continue" | "saving" | "skipStep" | "back">;
   onSkip?: () => void;
   onBack?: () => void;
@@ -51,7 +53,7 @@ export function StepActions({
       <Button
         type="submit"
         size="sm"
-        disabled={pending}
+        disabled={pending || blocked}
         className="w-full sm:w-auto sm:min-w-36"
       >
         {pending ? labels.saving : labels.continue}

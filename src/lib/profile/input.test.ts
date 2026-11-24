@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   normalizePhone,
+  placeInputFromFormData,
   profileFormSchema,
   profileFormValues,
   profileInputFromFormData,
+  requiredPlaceFormSchema,
 } from "@/lib/profile/input";
 
 function form(entries: Record<string, string>): FormData {
@@ -25,6 +27,9 @@ describe("profileInputFromFormData", () => {
         linkedin: "linkedin.com/in/dilnoza-k",
         region: "samarkand",
         hometownRegion: "bukhara",
+        districtId: "1718401",
+        educationType: "school",
+        institutionId: "school-1718401-14",
         links:
           "https://a.example, https://b.example, https://c.example, https://d.example",
       }),
@@ -36,7 +41,12 @@ describe("profileInputFromFormData", () => {
     expect(input.instagram).toBe("dilnoza.codes");
     expect(input.linkedin).toBe("https://www.linkedin.com/in/dilnoza-k");
     expect(input.region).toBe("samarkand");
-    expect(input.hometownRegion).toBe("bukhara");
+    expect(input).not.toHaveProperty("hometownRegion");
+    expect(input).not.toHaveProperty("city");
+    expect(input).not.toHaveProperty("school");
+    expect(input.districtId).toBe("1718401");
+    expect(input.educationType).toBe("school");
+    expect(input.institutionId).toBe("school-1718401-14");
     expect(input.links).toHaveLength(3);
   });
 
@@ -54,7 +64,9 @@ describe("profileInputFromFormData", () => {
   it("turns an unknown or empty region into null and missing fields into empty values", () => {
     const input = profileInputFromFormData(form({ fullName: "D", region: "atlantis" }));
     expect(input.region).toBeNull();
-    expect(input.hometownRegion).toBeNull();
+    expect(input.districtId).toBeNull();
+    expect(input.educationType).toBeNull();
+    expect(input.institutionId).toBeNull();
     expect(input.bio).toBe("");
     expect(input.languages).toEqual([]);
   });
@@ -74,11 +86,11 @@ describe("profileFormSchema", () => {
   const valid = {
     fullName: "Dilnoza Karimova",
     bio: "",
-    school: "",
     gradeYear: "",
     region: "",
-    hometownRegion: "",
-    city: "",
+    districtId: "",
+    educationType: "",
+    institutionId: "",
     languages: [],
     phone: "",
     telegram: "",
@@ -131,24 +143,58 @@ describe("profileFormSchema", () => {
     expect(accepts({ telegram: "dilnoza.k" })).toBe(false);
   });
 
-  it("lets the hometown stay empty and rejects a region it does not know", () => {
-    const accepts = (hometownRegion: string) =>
-      profileFormSchema.safeParse({ ...valid, hometownRegion }).success;
+  it("accepts only a SOATO district code and a known education type", () => {
+    const accepts = (fields: Partial<typeof valid>) =>
+      profileFormSchema.safeParse({ ...valid, ...fields }).success;
 
-    expect(accepts("")).toBe(true);
-    expect(accepts("bukhara")).toBe(true);
-    expect(accepts("atlantis")).toBe(false);
+    expect(accepts({ districtId: "1726294" })).toBe(true);
+    expect(accepts({ districtId: "Chilonzor" })).toBe(false);
+    expect(accepts({ educationType: "gap_year" })).toBe(true);
+    expect(accepts({ educationType: "college" })).toBe(false);
+  });
+
+  it("requires region, district, education, institution and grade where the place is required", () => {
+    const issues = (fields: Partial<typeof valid>) => {
+      const result = requiredPlaceFormSchema.safeParse({ ...valid, ...fields });
+      return result.success ? [] : result.error.issues.map((issue) => issue.path[0]);
+    };
+
+    expect(issues({})).toEqual(["region", "districtId", "educationType"]);
+    expect(
+      issues({ region: "samarkand", districtId: "1718401", educationType: "school" }),
+    ).toEqual(["institutionId", "gradeYear"]);
+    expect(
+      issues({ region: "samarkand", districtId: "1718401", educationType: "gap_year" }),
+    ).toEqual([]);
+  });
+
+  it("drops the institution and the grade from a gap year", () => {
+    expect(
+      placeInputFromFormData(
+        form({
+          districtId: "1718401",
+          educationType: "gap_year",
+          institutionId: "school-1718401-14",
+          gradeYear: "11",
+        }),
+      ),
+    ).toEqual({
+      districtId: "1718401",
+      educationType: "gap_year",
+      institutionId: null,
+      gradeYear: "",
+    });
   });
 
   it("turns a stored profile into the form's default values", () => {
     const values = profileFormValues({
       fullName: "Dilnoza",
       bio: "",
-      school: "",
       gradeYear: "",
       region: null,
-      hometownRegion: "bukhara",
-      city: "",
+      districtId: null,
+      educationType: "university",
+      institutionId: "university-q651133",
       languages: ["uz", "ru"],
       phone: "",
       telegram: "dilnoza_k",
@@ -157,7 +203,9 @@ describe("profileFormSchema", () => {
       links: [],
     });
     expect(values.region).toBe("");
-    expect(values.hometownRegion).toBe("bukhara");
+    expect(values.districtId).toBe("");
+    expect(values.educationType).toBe("university");
+    expect(values.institutionId).toBe("university-q651133");
     expect(values.languages).toEqual(["uz", "ru"]);
     expect(values.telegram).toBe("dilnoza_k");
     expect(values.instagram).toBe("dilnoza.codes");

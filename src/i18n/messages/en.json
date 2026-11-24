@@ -291,7 +291,7 @@
         "lead": "The first thing an organiser reads."
       },
       "place": {
-        "title": "Where you study",
+        "title": "Where you live and study",
         "lead": "Organisers pick volunteers close to the event."
       },
       "contact": {
@@ -304,7 +304,7 @@
       "welcome": "Welcome",
       "username": "Username",
       "about": "About you",
-      "place": "Where you study",
+      "place": "Where you live and study",
       "contact": "Contact",
       "done": "Ready"
     },
@@ -808,7 +808,10 @@
         "telegram": "Telegram",
         "links": "Portfolio",
         "publicPage": "Public page",
-        "joined": "Joined"
+        "joined": "Joined",
+        "district": "District",
+        "education": "Studies",
+        "gapYear": "Gap year"
       },
       "publicHidden": "Hidden",
       "publicShow": "Show it in settings",
@@ -855,7 +858,8 @@
       "location": "Where you are",
       "contact": "Contact details",
       "links": "Public links",
-      "about": "About you"
+      "about": "About you",
+      "place": "Where you live and study"
     },
     "fields": {
       "fullName": "Full name",
@@ -891,8 +895,8 @@
       "fullName": "Full name",
       "bio": "Bio",
       "region": "Region",
-      "city": "City",
-      "school": "School",
+      "district": "District",
+      "education": "School or university",
       "gradeYear": "Year or grade",
       "languages": "Languages",
       "phone": "Phone",
@@ -922,7 +926,8 @@
       "education": "Where you study, so an organiser knows who is applying.",
       "location": "Organisers pick volunteers close to the event.",
       "contact": "A Telegram username is needed to apply. A phone number is optional. Below you choose whether either one appears on your profile.",
-      "links": "Social profiles and work you want anyone with your profile link to open."
+      "links": "Social profiles and work you want anyone with your profile link to open.",
+      "place": "Choose from the lists, so organisers can find volunteers near an event."
     },
     "edit": {
       "back": "Back to profile",
@@ -958,6 +963,52 @@
         "activity": "Activity",
         "bio": "Bio"
       }
+    },
+    "place": {
+      "region": "Region you live in",
+      "regionPlaceholder": "Choose a region",
+      "district": "District or city",
+      "districtPlaceholder": "Choose a district or city",
+      "districtSearch": "Search districts",
+      "districtEmpty": "No district matches that search.",
+      "districtNeedsRegion": "Choose a region first.",
+      "education": "What are you doing now?",
+      "educationTypes": {
+        "school": "School",
+        "university": "University",
+        "gap_year": "Gap year"
+      },
+      "school": "Your school",
+      "university": "Your university",
+      "schoolPlaceholder": "Choose your school",
+      "universityPlaceholder": "Choose your university",
+      "institutionSearch": "Search by name or number",
+      "schoolEmpty": "No school matches. Type its number to add it.",
+      "universityEmpty": "No university matches that search.",
+      "schoolNumberHint": "Not in the list? Type your school’s number.",
+      "schoolsLoading": "Loading schools…",
+      "schoolsFailed": "Couldn’t load the schools. Close the list and try again.",
+      "schoolNeedsDistrict": "Choose your district first.",
+      "schoolDistrict": "District of your school",
+      "otherDistrict": "My school is in another district",
+      "ownDistrict": "Use my district",
+      "gradeSchool": "Grade",
+      "gradeUniversity": "Year of study",
+      "gapYearNote": "On a gap year you don’t need a school or a grade.",
+      "previous": "You wrote before: “{text}”",
+      "required": "Choose one to continue.",
+      "gradeRequired": "Enter your grade or year.",
+      "attribution": "School and university lists: © OpenStreetMap contributors, Wikidata"
+    },
+    "placeCheck": {
+      "title": "Confirm where you live and study",
+      "lead": "We now use standard lists of districts, schools and universities. Choose yours once and we keep it, then your application continues.",
+      "saveApply": "Save and apply",
+      "saveSubmit": "Save and send",
+      "saving": "Saving…",
+      "cancel": "Not now",
+      "error": "Couldn’t save. Check the fields and try again.",
+      "close": "Close"
     }
   },
   "languages": {
