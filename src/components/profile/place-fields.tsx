@@ -39,6 +39,8 @@ export type PlaceValue = {
 
 export type PlaceFieldName = keyof PlaceValue;
 
+const DIRECTORY_ATTRIBUTION_URL = "https://www.openstreetmap.org/copyright";
+
 export const PLACE_FIELD_NAMES = [
   "region",
   "districtId",
@@ -76,6 +78,7 @@ export type PlaceLabels = {
   gapYearNote: string;
   gradeRequired: string;
   previous: string;
+  attribution: string;
 };
 
 type SchoolsState =
@@ -176,6 +179,7 @@ export function PlaceFields({
   previous,
   locale,
   labels,
+  unavailable,
 }: {
   idPrefix: string;
   value: PlaceValue;
@@ -188,6 +192,7 @@ export function PlaceFields({
   previous?: { city: string; school: string };
   locale: string;
   labels: PlaceLabels;
+  unavailable?: ReactNode;
 }) {
   const fieldId = (name: string) => `${idPrefix}-${name}`;
   const [picked, setPicked] = useState<{ id: string; label: string } | null>(
@@ -319,6 +324,17 @@ export function PlaceFields({
 
   const previousHint = (text: string | undefined) =>
     text?.trim() ? fill(labels.previous, { text: text.trim() }) : undefined;
+
+  if (unavailable) {
+    return (
+      <div className="rounded-lg border border-border">
+        {PLACE_FIELD_NAMES.map((name) => (
+          <input key={name} type="hidden" name={name} value={value[name]} />
+        ))}
+        {unavailable}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -492,6 +508,16 @@ export function PlaceFields({
                 </div>
               )
             ) : null}
+            <p className="text-xs leading-relaxed text-ink-muted">
+              <a
+                href={DIRECTORY_ATTRIBUTION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-4 hover:underline"
+              >
+                {labels.attribution}
+              </a>
+            </p>
           </div>
           <PlaceField
             id={fieldId("gradeYear")}

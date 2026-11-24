@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { api } from "@/lib/api/client.server";
+import { settle, unknownFailure, type Loaded } from "@/lib/api/load.server";
 import {
   districtListSchema,
   institutionListSchema,
@@ -47,14 +48,16 @@ export const getUniversities = cache(async function getUniversities(): Promise<
 
 export type PlaceDirectories = { districts: District[]; universities: Institution[] };
 
-export async function loadPlaceDirectories(): Promise<PlaceDirectories | null> {
-  try {
+export async function loadPlaceDirectories(): Promise<Loaded<PlaceDirectories>> {
+  const loaded = await settle(async () => {
     const [districts, universities] = await Promise.all([
       getDistricts(),
       getUniversities(),
     ]);
     return { districts, universities };
-  } catch {
-    return null;
+  });
+  if (loaded.status === "loaded" && loaded.data.districts.length === 0) {
+    return { status: "failed", failure: unknownFailure() };
   }
+  return loaded;
 }

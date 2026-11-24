@@ -143,6 +143,7 @@ export function ProfileForm({
   regions,
   districts,
   universities,
+  placeUnavailable,
   locale,
   labels,
   headed = true,
@@ -154,6 +155,7 @@ export function ProfileForm({
   regions: readonly RegionOption[];
   districts: readonly DistrictOption[];
   universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
   locale: string;
   labels: ProfileFormLabels;
   headed?: boolean;
@@ -273,6 +275,7 @@ export function ProfileForm({
               previous={{ city: values.city, school: values.school }}
               locale={locale}
               labels={labels.place}
+              unavailable={placeUnavailable}
             />
           </FormSection>
 

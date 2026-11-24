@@ -18,6 +18,7 @@ import { Link } from "@/i18n/navigation";
 import type { PlaceCheckData } from "@/components/profile/place-check-dialog";
 import { getApplicationByOpportunity } from "@/lib/api/applications.server";
 import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf } from "@/lib/api/load.server";
 import { getOpportunity } from "@/lib/api/opportunities.server";
 import { getProfile } from "@/lib/api/profile.server";
 import { listSaved, savedIds } from "@/lib/api/saved.server";
@@ -63,7 +64,7 @@ export default async function OpportunityPage({
   const completion = profileCompletion(profile ?? EMPTY_PROFILE);
   const directories =
     profile && onlyPlaceMissing(completion.missing)
-      ? await loadPlaceDirectories()
+      ? dataOf(await loadPlaceDirectories())
       : null;
 
   return (

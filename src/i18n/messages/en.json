@@ -997,7 +997,8 @@
       "gapYearNote": "On a gap year you don’t need a school or a grade.",
       "previous": "You wrote before: “{text}”",
       "required": "Choose one to continue.",
-      "gradeRequired": "Enter your grade or year."
+      "gradeRequired": "Enter your grade or year.",
+      "attribution": "School and university lists: © OpenStreetMap contributors, Wikidata"
     },
     "placeCheck": {
       "title": "Confirm where you live and study",

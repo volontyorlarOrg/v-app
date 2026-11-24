@@ -34,6 +34,7 @@ const TEXT_KEYS = [
   "gradeUniversity",
   "gapYearNote",
   "gradeRequired",
+  "attribution",
 ] as const satisfies readonly (keyof PlaceLabels)[];
 
 export function placeLabels(t: Translate): PlaceLabels {

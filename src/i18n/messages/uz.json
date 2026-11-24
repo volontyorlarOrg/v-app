@@ -997,7 +997,8 @@
       "gapYearNote": "Tanaffus yilida maktab yoki sinf kerak emas.",
       "previous": "Avval yozganingiz: “{text}”",
       "required": "Davom etish uchun bittasini tanlang.",
-      "gradeRequired": "Sinf yoki kursingizni yozing."
+      "gradeRequired": "Sinf yoki kursingizni yozing.",
+      "attribution": "Maktab va universitetlar roʻyxati: © OpenStreetMap ishtirokchilari, Wikidata"
     },
     "placeCheck": {
       "title": "Qayerda yashashingiz va oʻqishingizni tasdiqlang",

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import { LoadErrorRows, loadErrorLabels } from "@/components/app/load-error";
 import { PageHeader } from "@/components/app/page-header";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { AvatarEditor } from "@/components/profile/avatar-editor";
@@ -10,6 +11,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getMe } from "@/lib/api/account.server";
 import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf, type LoadFailure } from "@/lib/api/load.server";
 import type { District, Institution } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
@@ -68,8 +70,7 @@ export default async function ProfileEditPage({
     getMe(),
     loadPlaceDirectories(),
   ]);
-  const districts = directories?.districts ?? [];
-  const universities = directories?.universities ?? [];
+  const places = dataOf(directories);
 
   const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
@@ -85,8 +86,9 @@ export default async function ProfileEditPage({
       values={values}
       locale={locale as Locale}
       avatarUrl={me.avatarUrl}
-      districts={districts}
-      universities={universities}
+      districts={places?.districts ?? []}
+      universities={places?.universities ?? []}
+      placeFailure={directories.status === "failed" ? directories.failure : null}
     />
   );
 }
@@ -97,15 +99,18 @@ function ProfileEditor({
   avatarUrl,
   districts,
   universities,
+  placeFailure,
 }: {
   values: VolunteerProfile;
   locale: Locale;
   avatarUrl?: string;
   districts: District[];
   universities: Institution[];
+  placeFailure: LoadFailure | null;
 }) {
   const t = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
+  const common = useTranslations("common");
 
   return (
     <div className="flex flex-col gap-6">
@@ -169,6 +174,11 @@ function ProfileEditor({
         }))}
         districts={districts}
         universities={universities}
+        placeUnavailable={
+          placeFailure ? (
+            <LoadErrorRows failure={placeFailure} labels={loadErrorLabels(common)} />
+          ) : null
+        }
         locale={locale}
         headed={false}
         doneHref={navHref("profile")}

@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
+import { LoadErrorRows, loadErrorLabels } from "@/components/app/load-error";
 import {
   ONBOARDING_FIELD_KEYS,
   type OnboardingLabels,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/account/username";
 import { getMe } from "@/lib/api/account.server";
 import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf, type LoadFailure } from "@/lib/api/load.server";
 import type { District, Institution } from "@/lib/api/schemas";
 import { getProfile } from "@/lib/api/profile.server";
 import { requireSession } from "@/lib/api/session.server";
@@ -60,8 +62,7 @@ export default async function WelcomePage({
     readOnboardingState(),
     loadPlaceDirectories(),
   ]);
-  const districts = directories?.districts ?? [];
-  const universities = directories?.universities ?? [];
+  const places = dataOf(directories);
 
   const stored: VolunteerProfile = profile ?? {
     ...EMPTY_PROFILE,
@@ -83,8 +84,9 @@ export default async function WelcomePage({
       initialStep={welcomeStep(state, username.source)}
       username={username}
       addressPrefix={origin ? `${new URL(origin).host}/` : null}
-      districts={districts}
-      universities={universities}
+      districts={places?.districts ?? []}
+      universities={places?.universities ?? []}
+      placeFailure={directories.status === "failed" ? directories.failure : null}
     />
   );
 }
@@ -99,6 +101,7 @@ function Welcome({
   addressPrefix,
   districts,
   universities,
+  placeFailure,
 }: {
   locale: Locale;
   values: VolunteerProfile;
@@ -109,8 +112,10 @@ function Welcome({
   addressPrefix: string | null;
   districts: District[];
   universities: Institution[];
+  placeFailure: LoadFailure | null;
 }) {
   const t = useTranslations("onboarding");
+  const common = useTranslations("common");
   const profile = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
   const settings = useTranslations("settings");
@@ -200,6 +205,11 @@ function Welcome({
       languageOptions={languageDirectory.options(locale, values.languages)}
       districts={districts}
       universities={universities}
+      placeUnavailable={
+        placeFailure ? (
+          <LoadErrorRows failure={placeFailure} labels={loadErrorLabels(common)} />
+        ) : null
+      }
       locale={locale}
       username={username}
       addressPrefix={addressPrefix}

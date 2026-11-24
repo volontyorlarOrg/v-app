@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { AnswersForm, type AnswerField } from "@/components/applications/answers-form";
 import type { PlaceCheckData } from "@/components/profile/place-check-dialog";
 import { loadPlaceDirectories } from "@/lib/api/directories.server";
+import { dataOf } from "@/lib/api/load.server";
 import { REGIONS } from "@/lib/opportunities/types";
 import { EMPTY_PROFILE, profileCompletion } from "@/lib/profile/completion";
 import { onlyPlaceMissing } from "@/lib/profile/place";
@@ -64,7 +65,7 @@ export default async function ApplicationPage({
 
   const directories =
     profile && onlyPlaceMissing(profileCompletion(profile ?? EMPTY_PROFILE).missing)
-      ? await loadPlaceDirectories()
+      ? dataOf(await loadPlaceDirectories())
       : null;
 
   const preparing =

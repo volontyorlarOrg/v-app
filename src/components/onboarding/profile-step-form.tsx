@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
@@ -54,6 +54,7 @@ export function ProfileStepForm({
   regions,
   districts,
   universities,
+  placeUnavailable,
   locale,
   labels,
   onSaved,
@@ -66,6 +67,7 @@ export function ProfileStepForm({
   regions: readonly RegionOption[];
   districts: readonly DistrictOption[];
   universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
   locale: string;
   labels: OnboardingLabels;
   onSaved: (profile: VolunteerProfile) => void;
@@ -189,6 +191,7 @@ export function ProfileStepForm({
               previous={{ city: values.city, school: values.school }}
               locale={locale}
               labels={labels.place}
+              unavailable={placeUnavailable}
             />
             <StepField
               id={fieldId("languages")}
@@ -302,6 +305,7 @@ export function ProfileStepForm({
 
       <StepActions
         pending={pending}
+        blocked={step === "place" && Boolean(placeUnavailable)}
         labels={labels}
         onSkip={canSkip ? onSkip : undefined}
         onBack={onBack}

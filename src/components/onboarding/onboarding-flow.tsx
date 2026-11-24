@@ -58,6 +58,7 @@ export function OnboardingFlow({
   languageOptions,
   districts,
   universities,
+  placeUnavailable,
   locale,
   username,
   addressPrefix,
@@ -74,6 +75,7 @@ export function OnboardingFlow({
   languageOptions: readonly LanguageOption[];
   districts: readonly DistrictOption[];
   universities: readonly InstitutionOption[];
+  placeUnavailable?: ReactNode;
   locale: string;
   username: UsernameIdentity;
   addressPrefix: string | null;
@@ -218,6 +220,7 @@ export function OnboardingFlow({
                 regions={regions}
                 districts={districts}
                 universities={universities}
+                placeUnavailable={placeUnavailable}
                 locale={locale}
                 labels={labels}
                 onSaved={(profile) => {
