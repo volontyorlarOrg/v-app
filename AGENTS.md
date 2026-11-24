@@ -127,7 +127,10 @@ the month they joined, which are always shown, and the ones the volunteer chose
 to show (hometown, year, phone, Telegram, Instagram, LinkedIn) as plain ruled
 rows beside the public page address with its copy
 button, followed by **My activity**: the events they attended and their past
-events, each with its organisation, date, hours and XP.
+events, each with its organisation, date, hours and XP, and on their own
+profile everything that took XP away — an unexcused no-show with its penalty,
+an administrator's deduction with its reason, the milestone reset — from
+`deductions` on `GET /record/history`. Public profiles never list these.
 **The header, seven profile details and activity are always shown; the rest is the
 volunteer's choice.** The photo, name, username, level and figures cannot be
 hidden, and neither can the bio, region, city, school, languages, portfolio
@@ -164,7 +167,7 @@ each a link; then the blocks that appear only when they have something to say
 four most recent events that have ended. `/record` is **My activity**, the
 whole participation history, every outcome included. The level, its ladder and
 the figures are `GET /record/progress`, the backend's arithmetic shown.
-The profile's activity is the attended part of that same history. Nothing reads or writes
+The profile's activity is the attended part of that same history plus what took XP away. Nothing reads or writes
 `/me/preferences`; the strings under `settings.{preferences,notifications,
 privacy}` are unused and are kept only because that decision is
 reversible. `settings.appearance` is live: it labels the theme switch and the

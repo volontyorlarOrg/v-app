@@ -8,7 +8,7 @@ import {
 } from "@/components/profile/activity-section";
 import messages from "@/i18n/messages/en.json";
 import { formats } from "@/i18n/formats";
-import type { RewardHistoryEntry } from "@/lib/api/schemas";
+import type { RewardHistoryEntry, XpDeduction } from "@/lib/api/schemas";
 
 const attended: ProfileActivityEntry = {
   id: "a1",
@@ -53,6 +53,7 @@ function renderSection(
   entries: ProfileActivityEntry[],
   own = false,
   rewards: RewardHistoryEntry[] = [],
+  deductions: XpDeduction[] = [],
 ) {
   return render(
     <NextIntlClientProvider
@@ -61,7 +62,12 @@ function renderSection(
       formats={formats}
       timeZone="Asia/Tashkent"
     >
-      <ActivitySection entries={entries} own={own} rewards={rewards} />
+      <ActivitySection
+        entries={entries}
+        own={own}
+        rewards={rewards}
+        deductions={deductions}
+      />
     </NextIntlClientProvider>,
   );
 }
@@ -119,6 +125,54 @@ describe("ActivitySection", () => {
     expect(items[1]).toHaveTextContent("Winner · +50 XP");
     expect(items[2]).toHaveTextContent("History only");
     expect(items[2]).not.toHaveTextContent("XP");
+  });
+
+  it("shows what took XP away: a missed event, an administrator's reason and a reset, newest first", () => {
+    renderSection(
+      [
+        attended,
+        {
+          ...attended,
+          id: "missed",
+          title: "Open day",
+          organization: "Volontyorlar",
+          eventDate: "2026-11-21T06:30:00.000Z",
+          hours: null,
+          xpAwarded: -10,
+          missed: true,
+        },
+      ],
+      true,
+      [],
+      [
+        {
+          id: "taken",
+          kind: "adjustment",
+          xp: -80,
+          reason: "Broke the event rules",
+          createdAt: "2026-11-11T13:53:27.000Z",
+        },
+        {
+          id: "reset",
+          kind: "reset",
+          xp: -40,
+          reason: null,
+          createdAt: "2026-10-07T07:57:17.000Z",
+        },
+      ],
+    );
+
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(4);
+    expect(items[0]).toHaveTextContent("Open day");
+    expect(items[0]).toHaveTextContent("Unexcused no-show · −10 XP");
+    expect(items[1]).toHaveTextContent("XP taken away");
+    expect(items[1]).toHaveTextContent("Nov 11, 2026 · Broke the event rules");
+    expect(items[1]).toHaveTextContent("−80 XP");
+    expect(items[2]).toHaveTextContent("XP reset when rewards changed");
+    expect(items[2]).toHaveTextContent("−40 XP");
+    expect(items[3]).toHaveTextContent("City cleanup");
+    expect(items[3]).toHaveTextContent("3 h · +30 XP");
   });
 
   it("is absent on someone else's profile when there is nothing to show", () => {

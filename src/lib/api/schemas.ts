@@ -350,10 +350,21 @@ export const participationEntrySchema = z.object({
   imageUrl: optional(z.string()),
 });
 
+export const xpDeductionSchema = z.object({
+  id: z.string().min(1),
+  kind: z.string().min(1),
+  xp: z.number().int().negative(),
+  reason: z.string().nullable().default(null),
+  createdAt: isoDate,
+});
+
+export type XpDeduction = z.infer<typeof xpDeductionSchema>;
+
 export const historySchema = z.object({
   items: z.array(participationEntrySchema),
   total: z.number().int(),
   rewards: z.array(rewardHistoryEntrySchema).default([]),
+  deductions: z.array(xpDeductionSchema).default([]),
 });
 
 export const notificationSchema = z

@@ -4004,10 +4004,26 @@ export interface components {
             xpAwarded?: number;
             countsTowardProgress?: boolean;
         };
+        XpDeductionDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description adjustment: an administrator took XP away; reset: the 2026 milestone XP reset.
+             * @enum {string}
+             */
+            kind: "adjustment" | "reset";
+            xp: number;
+            /** @description Why an administrator took it away; null for a reset. */
+            reason: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
         ParticipationHistoryDto: {
             /** @description Claimed rewards, separate from event participation and total. */
             rewards: components["schemas"]["CheckpointRewardHistoryDto"][];
             items: components["schemas"]["ParticipationEntryDto"][];
+            /** @description XP taken away outside events, newest first. No-show penalties stay on their items. */
+            deductions: components["schemas"]["XpDeductionDto"][];
             total: number;
         };
         ResolveAttendanceDto: {

@@ -936,7 +936,9 @@
       "notCounted": "Только история",
       "empty": "Здесь появятся мероприятия, в которых вы участвовали.",
       "more": "Показать все: {count}",
-      "profileCompleted": "Профиль заполнен"
+      "profileCompleted": "Профиль заполнен",
+      "xpTakenAway": "XP отняты",
+      "xpReset": "Сброс XP при смене наград"
     },
     "visibility": {
       "hiddenNote": "Не показывается в профиле: {parts}. <link>Изменить</link>",

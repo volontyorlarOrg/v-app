@@ -1,6 +1,6 @@
 import { useFormatter, useTranslations } from "next-intl";
 
-import type { RewardHistoryEntry } from "@/lib/api/schemas";
+import type { RewardHistoryEntry, XpDeduction } from "@/lib/api/schemas";
 import {
   profileActivityTimeline,
   type ProfileActivityEntry,
@@ -9,6 +9,12 @@ import {
 export type { ProfileActivityEntry } from "@/lib/profile/activity";
 
 const LEAD = 6;
+
+function signedXp(value: number, format: ReturnType<typeof useFormatter>) {
+  return value > 0
+    ? `+${format.number(value)} XP`
+    : `−${format.number(Math.abs(value))} XP`;
+}
 
 function eventDay(value: string): Date {
   return new Date(value.length > 10 ? value : `${value}T00:00:00Z`);
@@ -21,11 +27,33 @@ function ActivityList({
 }) {
   const t = useTranslations("profile.activity");
   const record = useTranslations("record.history");
+  const outcome = useTranslations("record.participation.status");
   const format = useFormatter();
 
   return (
     <ul className="divide-y divide-border">
       {entries.map((entry) => {
+        if (entry.source === "deduction") {
+          return (
+            <li
+              key={`${entry.source}-${entry.id}`}
+              className="flex flex-wrap items-baseline gap-x-5 gap-y-1 py-3"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-ink">
+                  {entry.kind === "reset" ? t("xpReset") : t("xpTakenAway")}
+                </p>
+                <p className="text-sm [overflow-wrap:anywhere] text-ink-muted">
+                  <time dateTime={entry.createdAt}>
+                    {format.dateTime(eventDay(entry.createdAt), "dayYear")}
+                  </time>
+                  {entry.kind !== "reset" && entry.reason ? ` · ${entry.reason}` : null}
+                </p>
+              </div>
+              <p className="tabular text-sm text-ink">{signedXp(entry.xp, format)}</p>
+            </li>
+          );
+        }
         if (entry.source === "checkpoint") {
           return (
             <li
@@ -48,13 +76,12 @@ function ActivityList({
         }
         const credited = entry.source === "attendance" || entry.countsTowardProgress;
         const facts = [
+          entry.missed ? outcome("no_show") : null,
           entry.kind === "competition" && entry.placement
             ? record(`placements.${entry.placement}`)
             : null,
           entry.hours === null ? null : `${format.number(entry.hours)} ${t("hours")}`,
-          credited && entry.xpAwarded > 0
-            ? `+${format.number(entry.xpAwarded)} XP`
-            : null,
+          credited && entry.xpAwarded !== 0 ? signedXp(entry.xpAwarded, format) : null,
         ].filter((fact): fact is string => fact !== null);
 
         return (
@@ -87,14 +114,16 @@ function ActivityList({
 export function ActivitySection({
   entries,
   rewards = [],
+  deductions = [],
   own = false,
 }: {
   entries: readonly ProfileActivityEntry[];
   rewards?: readonly RewardHistoryEntry[];
+  deductions?: readonly XpDeduction[];
   own?: boolean;
 }) {
   const t = useTranslations("profile.activity");
-  const timeline = profileActivityTimeline(entries, rewards);
+  const timeline = profileActivityTimeline(entries, rewards, deductions);
 
   if (timeline.length === 0 && !own) return null;
 

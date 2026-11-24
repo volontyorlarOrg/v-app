@@ -300,6 +300,7 @@ function Profile({
             own
             entries={activityOf(history.data)}
             rewards={history.data.rewards}
+            deductions={history.data.deductions}
           />
         )
       }
@@ -349,7 +350,11 @@ function Profile({
 
 function activityOf(history: History): ProfileActivityEntry[] {
   return history.items
-    .filter((entry) => entry.outcome === "attended")
+    .filter(
+      (entry) =>
+        entry.outcome === "attended" ||
+        (entry.outcome === "no_show" && (entry.xpAwarded ?? 0) < 0),
+    )
     .map((entry) => ({
       id: entry.id,
       source: entry.source,
@@ -361,5 +366,6 @@ function activityOf(history: History): ProfileActivityEntry[] {
       placement: entry.placement ?? null,
       xpAwarded: entry.xpAwarded ?? 0,
       countsTowardProgress: entry.countsTowardProgress ?? true,
+      missed: entry.outcome === "no_show",
     }));
 }

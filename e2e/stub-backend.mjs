@@ -1775,6 +1775,15 @@ const server = createServer(async (request, response) => {
       items: state.history,
       total: state.history.length,
       rewards: rewardHistory(state),
+      deductions: [
+        {
+          id: "00000000-0000-4000-8000-0000000000d1",
+          kind: "adjustment",
+          xp: -20,
+          reason: "Left the event early",
+          createdAt: "2026-09-12T09:00:00.000Z",
+        },
+      ],
     });
   if (path === "/notifications" && method === "GET") {
     const items = currentNotifications(state);

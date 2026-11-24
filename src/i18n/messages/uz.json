@@ -936,7 +936,9 @@
       "notCounted": "Faqat tarix",
       "empty": "Qatnashgan tadbirlaringiz shu yerda koʻrinadi.",
       "more": "Barchasini koʻrsatish: {count}",
-      "profileCompleted": "Profil toʻldirildi"
+      "profileCompleted": "Profil toʻldirildi",
+      "xpTakenAway": "XP ayirildi",
+      "xpReset": "Mukofotlar oʻzgarganda XP bekor qilindi"
     },
     "visibility": {
       "hiddenNote": "Profilda koʻrsatilmaydi: {parts}. <link>Oʻzgartirish</link>",

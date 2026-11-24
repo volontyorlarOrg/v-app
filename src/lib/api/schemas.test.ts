@@ -247,6 +247,26 @@ describe("record and notification schemas", () => {
       }).success,
     ).toBe(false);
   });
+  it("reads XP deductions, defaults older responses to none and refuses a deduction that adds XP", () => {
+    const deduction = {
+      id: "taken",
+      kind: "adjustment",
+      xp: -80,
+      reason: "Broke the event rules",
+      createdAt: "2026-11-11T13:53:27.000Z",
+    };
+    expect(
+      historySchema.parse({ items: [], total: 0, deductions: [deduction] }).deductions,
+    ).toEqual([deduction]);
+    expect(historySchema.parse({ items: [], total: 0 }).deductions).toEqual([]);
+    expect(
+      historySchema.safeParse({
+        items: [],
+        total: 0,
+        deductions: [{ ...deduction, xp: 10 }],
+      }).success,
+    ).toBe(false);
+  });
   it("reads the record, the history and the saved list", () => {
     expect(
       recordSchema.parse({

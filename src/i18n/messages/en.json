@@ -936,7 +936,9 @@
       "notCounted": "History only",
       "empty": "Events you take part in will appear here.",
       "more": "Show all {count}",
-      "profileCompleted": "Profile completed"
+      "profileCompleted": "Profile completed",
+      "xpTakenAway": "XP taken away",
+      "xpReset": "XP reset when rewards changed"
     },
     "visibility": {
       "hiddenNote": "Not shown on your profile: {parts}. <link>Change</link>",

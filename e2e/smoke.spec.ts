@@ -1870,7 +1870,12 @@ test.describe("applications, record, profile and settings", () => {
   }) => {
     await gotoReady(page, "/profile");
     const activity = page.getByRole("region", { name: "My activity" });
-    await expect(activity.getByRole("listitem")).toHaveCount(4);
+    await expect(activity.getByRole("listitem")).toHaveCount(5);
+    const deduction = activity
+      .getByRole("listitem")
+      .filter({ hasText: "XP taken away" });
+    await expect(deduction).toContainText("Left the event early");
+    await expect(deduction).toContainText("−20 XP");
     await expect(activity.getByText("Winter clothing sorting day")).toBeVisible();
     await expect(activity.getByText("Youth Ideas Competition")).toBeVisible();
     await expect(activity.getByText("Neighborhood reading day")).toBeVisible();
