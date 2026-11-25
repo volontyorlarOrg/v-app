@@ -7,6 +7,7 @@ import {
   ONBOARDING_FIELD_KEYS,
   type OnboardingLabels,
 } from "@/components/onboarding/labels";
+import { ConsentForm } from "@/components/legal/legal-form";
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 import type { Locale } from "@/i18n/routing";
 import { ACCOUNT_ERROR_KEYS } from "@/lib/account/types";
@@ -35,7 +36,8 @@ import {
 } from "@/lib/profile/completion";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { placeLabels } from "@/lib/profile/place-labels";
-import { marketingOrigin } from "@/lib/seo/origin";
+import { getLegalState } from "@/lib/legal/state.server";
+import { marketingHref, marketingOrigin } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
 
@@ -55,12 +57,13 @@ export default async function WelcomePage({
   setRequestLocale(locale);
 
   const { next } = await searchParams;
-  const [session, profile, me, state, directories] = await Promise.all([
+  const [session, profile, me, state, directories, legal] = await Promise.all([
     requireSession(),
     getProfile(),
     getMe(),
     readOnboardingState(),
     loadPlaceDirectories(),
+    getLegalState(),
   ]);
   const places = dataOf(directories);
 
@@ -82,6 +85,7 @@ export default async function WelcomePage({
       profileSaved={profile !== null}
       next={safeReturnPath(typeof next === "string" ? next : null)}
       initialStep={welcomeStep(state, username.source)}
+      consentNeeded={!legal.accepted}
       username={username}
       addressPrefix={origin ? `${new URL(origin).host}/` : null}
       districts={places?.districts ?? []}
@@ -95,6 +99,7 @@ function Welcome({
   locale,
   values,
   profileSaved,
+  consentNeeded,
   next,
   initialStep,
   username,
@@ -106,6 +111,7 @@ function Welcome({
   locale: Locale;
   values: VolunteerProfile;
   profileSaved: boolean;
+  consentNeeded: boolean;
   next: string | null;
   initialStep: OnboardingStep;
   username: UsernameIdentity;
@@ -119,6 +125,10 @@ function Welcome({
   const profile = useTranslations("profile");
   const opportunities = useTranslations("opportunities");
   const settings = useTranslations("settings");
+  const legal = useTranslations("legal");
+  const auth = useTranslations("auth");
+  const privacyHref = marketingHref(locale, "privacy");
+  const termsHref = marketingHref(locale, "terms");
 
   const firstName = values.fullName.trim().split(/\s+/)[0] ?? "";
 
@@ -215,6 +225,46 @@ function Welcome({
       addressPrefix={addressPrefix}
       labels={labels}
       completionFields={completionFields}
+      consentNeeded={consentNeeded}
+      consentForm={
+        consentNeeded ? (
+          <ConsentForm
+            locale={locale}
+            next={next}
+            labels={{
+              accept:
+                privacyHref && termsHref
+                  ? auth.rich("signup.legal", {
+                      privacy: (chunks) => (
+                        <a
+                          href={privacyHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary-ink underline"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                      terms: (chunks) => (
+                        <a
+                          href={termsHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary-ink underline"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                    })
+                  : auth("signup.legalPlain"),
+              submit: legal("form.submit"),
+              pending: legal("form.pending"),
+              required: legal("form.required"),
+              error: legal("form.error"),
+            }}
+          />
+        ) : null
+      }
     />
   );
 }

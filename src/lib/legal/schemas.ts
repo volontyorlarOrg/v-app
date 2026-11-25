@@ -12,6 +12,7 @@ export const receiptSchema = z.object({ id: z.string(), status: z.string() });
 export const legalStateSchema = z.object({
   version: z.string(),
   accepted: z.boolean(),
+  pendingOnboarding: z.boolean().default(false),
   leaderboard: z.boolean(),
   publicProfile: z.boolean(),
 });

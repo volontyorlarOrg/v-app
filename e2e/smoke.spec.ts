@@ -10,15 +10,6 @@ const LOCALES = ["uz", "ru", "en"] as const;
 // Wait for React and the form hooks before filling or clicking client controls.
 async function gotoReady(page: Page, url: string) {
   const response = await page.goto(url);
-  if (url.includes("/signup") && new URL(page.url()).pathname === "/consent") {
-    await page.locator('input[name="accepted"]').check();
-    await page
-      .locator("form")
-      .filter({ has: page.locator('input[name="accepted"]') })
-      .getByRole("button")
-      .click();
-    await page.waitForURL("**/signup**");
-  }
   if (/\/(login|signup|welcome|settings|profile\/edit)(?:[/?#]|$)/.test(page.url())) {
     await page.locator("html[data-app-hydrated='true']").waitFor();
     await page.waitForFunction(() =>
@@ -179,6 +170,20 @@ async function createAccount(page: Page, email: string) {
   await expect(page).toHaveURL(/\/welcome$/);
 }
 
+async function finishPendingSetup(page: Page) {
+  await page.getByRole("button", { name: "Skip this step" }).click();
+  await page.getByLabel("Region you live in").selectOption("tashkent-city");
+  await page.getByRole("button", { name: "District or city" }).click();
+  await page.getByRole("combobox", { name: "Search districts" }).fill("chil");
+  await page.getByRole("option", { name: "Chilonzor District" }).click();
+  await page.getByText("Gap year", { exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip this step" }).click();
+  await page.getByRole("checkbox", { name: /I have read and agree/ }).check();
+  await page.getByRole("button", { name: "Agree and continue" }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+}
+
 test.describe("welcome flow", () => {
   test("a new volunteer's dashboard explains the first steps instead of empty panels", async ({
     page,
@@ -192,8 +197,7 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Skip for now" }).click();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await finishPendingSetup(page);
     const start = page.getByRole("region", {
       name: "Start with your first opportunity",
     });
@@ -292,11 +296,13 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
     ).toBeVisible();
-    await expect(
-      page.getByText("Your profile is complete.", { exact: false }),
-    ).toBeVisible();
-    await page.getByRole("link", { name: "Find your first opportunity" }).click();
-    await expect(page).toHaveURL(/\/opportunities$/);
+    const consent = page.getByRole("checkbox", { name: /I have read and agree/ });
+    await expect(consent).not.toBeChecked();
+    await page.getByRole("button", { name: "Agree and continue" }).click();
+    await expect(page).toHaveURL(/\/welcome$/);
+    await consent.check();
+    await page.getByRole("button", { name: "Agree and continue" }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
 
     await gotoReady(page, "/profile/edit");
     await expect(page.getByLabel("Region you live in")).toHaveValue("tashkent-city");
@@ -368,8 +374,9 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Skip for now" }).click();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
+    await gotoReady(page, "/dashboard");
+    await expect(page).toHaveURL(/\/welcome/);
   });
 
   test("a Telegram username is kept with one tap", async ({ page }) => {
@@ -735,8 +742,6 @@ test.describe("sign-in", () => {
   }) => {
     await gotoReady(page, "/login");
     await page.getByRole("link", { name: "Create an account" }).click();
-    await expect(page).toHaveURL(/\/consent$/);
-    await gotoReady(page, "/signup");
     await expect(page).toHaveURL(/\/signup$/);
     await expect(
       page.getByRole("link", { name: "Continue with Telegram" }),
@@ -2686,7 +2691,7 @@ test.describe("the leaderboard", () => {
 });
 
 test.describe("the leaderboard username", () => {
-  test("a volunteer without a profile is asked to create one before choosing what others see", async ({
+  test("an unfinished account cannot open visibility settings before consent", async ({
     page,
   }, info) => {
     await createAccount(page, `privacy-${info.project.name}@example.org`);
@@ -2695,16 +2700,9 @@ test.describe("the leaderboard username", () => {
       .getByLabel("Username", { exact: true })
       .fill(`private_${info.project.name.replaceAll("-", "_")}`);
     await page.getByRole("button", { name: "Continue", exact: true }).click();
-    await expect(
-      page.getByRole("heading", { level: 2, name: "About you" }),
-    ).toBeVisible();
     await gotoReady(page, "/settings");
-    const visibility = page.getByRole("region", { name: "What others see" });
-    await expect(visibility).toContainText("Create your profile first.");
-    await expect(visibility.getByRole("switch")).toHaveCount(0);
-    await expect(
-      visibility.getByRole("link", { name: "Complete profile" }),
-    ).toHaveAttribute("href", "/profile/edit");
+    await expect(page).toHaveURL(/\/welcome/);
+    await expect(page.getByRole("region", { name: "What others see" })).toHaveCount(0);
   });
   test("a new profile shows optional details and requires confirmation to show phone", async ({
     page,
@@ -2718,9 +2716,7 @@ test.describe("the leaderboard username", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "About you" }),
     ).toBeVisible();
-    await gotoReady(page, "/profile/edit");
-    await page.getByRole("button", { name: "Save profile" }).click();
-    await expect(page).toHaveURL(/\/profile$/);
+    await finishPendingSetup(page);
 
     await gotoReady(page, "/settings");
     const visibility = page.getByRole("region", { name: "What others see" });

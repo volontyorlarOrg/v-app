@@ -3547,6 +3547,7 @@ export interface components {
         LegalStateDto: {
             version: string;
             accepted: boolean;
+            pendingOnboarding: boolean;
             leaderboard: boolean;
             publicProfile: boolean;
         };

@@ -170,6 +170,45 @@
     --metal-mix-bottom: 10%;
   }
 
+  /* Menus contrast with the surrounding theme while keeping readable controls. */
+  .choice-dropdown {
+    --color-popover: #10233a;
+    --color-popover-foreground: #f1f6fb;
+    --color-foreground: #f1f6fb;
+    --color-ink: #f1f6fb;
+    --color-ink-muted: #b8c9db;
+    --color-muted-foreground: #b8c9db;
+    --color-border: #38516e;
+    --color-muted: #29445f;
+    --color-surface-soft: #29445f;
+    --color-surface-sunk: #29445f;
+    --color-primary-ink: #b6dfff;
+  }
+
+  :root[data-theme="dark"] .choice-dropdown {
+    --color-popover: #ffffff;
+    --color-popover-foreground: #0b2340;
+    --color-foreground: #0b2340;
+    --color-ink: #0b2340;
+    --color-ink-muted: #526479;
+    --color-muted-foreground: #526479;
+    --color-border: #c8d5e1;
+    --color-muted: #e7f1f9;
+    --color-surface-soft: #e7f1f9;
+    --color-surface-sunk: #e7f1f9;
+    --color-primary-ink: #005e92;
+  }
+
+  select[data-slot="native-select"] option {
+    background: #10233a;
+    color: #f1f6fb;
+  }
+
+  :root[data-theme="dark"] select[data-slot="native-select"] option {
+    background: #ffffff;
+    color: #0b2340;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;

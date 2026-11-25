@@ -8,69 +8,34 @@ async function signInExisting(page: Page, baseURL: string) {
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 
-test("sign-up starts with one consent box", async ({ page }) => {
-  await page.goto("/en/signup");
-  await expect(page).toHaveURL(/\/consent$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Before you start");
-  const required = page.locator('input[name="accepted"]');
-  await expect(
-    page.getByText(
-      /agree to the processing described and to my profile being visible to others/,
-    ),
-  ).toBeVisible();
-  await expect(required).not.toBeChecked();
-  await expect(page.getByLabel("What do you need?", { exact: true })).toHaveCount(0);
-  await expect(
-    page.locator('input[name="leaderboard"], input[name="publicProfile"]'),
-  ).toHaveCount(0);
-  await expect(page.locator('input[name="ageBand"], input[type="date"]')).toHaveCount(
-    0,
-  );
-
-  const submit = page.getByRole("button", { name: "Agree and continue" });
-  await submit.click();
-  await expect(page).toHaveURL(/\/consent$/);
-
-  await required.check();
-  await submit.click();
-  await expect(page).toHaveURL(/\/signup$/);
-  await expect(page.locator('input[name="fullName"]')).toBeVisible();
-  expect(
-    await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
-  ).toBe(true);
-});
-
-test("the consent step keeps the safe return path through sign-up", async ({
-  page,
-}) => {
-  const next = "/opportunities/book-drive";
-  await page.goto(`/en/signup?next=${encodeURIComponent(next)}`);
-  expect(new URL(page.url()).searchParams.get("next")).toBe(next);
-  await page.locator('input[name="accepted"]').check();
-  await page.getByRole("button", { name: "Agree and continue" }).click();
+test("sign-up begins profile setup without an early consent step", async ({ page }) => {
+  await page.goto("/en/signup?next=%2Fopportunities%2Fbook-drive");
   await expect(page).toHaveURL(/\/signup\?next=/);
-  expect(new URL(page.url()).searchParams.get("next")).toBe(next);
-  const provider = await page
-    .getByRole("link", { name: "Continue with Telegram" })
-    .getAttribute("href");
-  expect(new URL(provider!, page.url()).searchParams.get("next")).toBe(next);
+  await expect(page.locator('input[name="fullName"]')).toBeVisible();
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Continue with Telegram" }),
+  ).toBeVisible();
 });
 
-test("a guest can change the language on the consent page without losing the return path", async ({
-  page,
-}) => {
-  const next = "/opportunities/book-drive";
-  await page.goto(`/en/consent?next=${encodeURIComponent(next)}`);
-  for (const [locale, name] of [
-    ["ru", "Русский"],
-    ["uz", "O‘zbekcha"],
-    ["en", "English"],
+test("dropdowns contrast with the current theme", async ({ page }) => {
+  await page.goto("/en/signup");
+  for (const [theme, background, foreground] of [
+    ["light", "rgb(16, 35, 58)", "rgb(241, 246, 251)"],
+    ["dark", "rgb(255, 255, 255)", "rgb(11, 35, 64)"],
   ] as const) {
+    await page.evaluate(
+      (value) => (document.documentElement.dataset.theme = value),
+      theme,
+    );
     await page.getByRole("banner").locator('button[aria-haspopup="menu"]').click();
-    await page.getByRole("menuitem", { name: new RegExp(`^${name}`) }).click();
-    await expect(page.locator("html")).toHaveAttribute("lang", locale);
-    expect(new URL(page.url()).searchParams.get("next")).toBe(next);
-    await expect(page.locator('input[name="accepted"]')).not.toBeChecked();
+    const menu = page.locator('[data-slot="dropdown-menu-content"]');
+    await expect(menu).toHaveCSS("background-color", background);
+    await expect(menu.getByRole("menuitem", { name: /^Русский/ })).toHaveCSS(
+      "color",
+      foreground,
+    );
+    await page.keyboard.press("Escape");
   }
 });
 

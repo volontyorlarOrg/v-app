@@ -1,6 +1,4 @@
 import { useTranslations } from "next-intl";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -13,12 +11,9 @@ import {
   telegramStartHref,
 } from "@/components/auth/provider-buttons";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
 import { isGoogleConfigured } from "@/lib/auth/config";
 import { safeReturnPath } from "@/lib/auth/session";
 import { navHref } from "@/lib/routing/routes";
-import { ADMISSION_COOKIE } from "@/lib/legal/constants";
-import { marketingHref } from "@/lib/seo/origin";
 
 export const dynamic = "force-dynamic";
 
@@ -39,13 +34,9 @@ export default async function SignupPage({
 
   const { next } = await searchParams;
   const returnTo = safeReturnPath(typeof next === "string" ? next : null);
-  if (!(await cookies()).get(ADMISSION_COOKIE)?.value) {
-    redirect(returnTo ? `/consent?next=${encodeURIComponent(returnTo)}` : "/consent");
-  }
 
   return (
     <Signup
-      locale={locale as Locale}
       next={returnTo}
       telegramHref={telegramStartHref(locale, returnTo)}
       googleHref={isGoogleConfigured() ? googleStartHref(locale, returnTo) : null}
@@ -57,19 +48,15 @@ const legalLinkClass =
   "font-semibold text-primary-ink hover:underline underline-offset-4";
 
 function Signup({
-  locale,
   next,
   telegramHref,
   googleHref,
 }: {
-  locale: Locale;
   next: string | null;
   telegramHref: string;
   googleHref: string | null;
 }) {
   const t = useTranslations("auth");
-  const terms = marketingHref(locale, "terms");
-  const privacy = marketingHref(locale, "privacy");
   const loginHref = next
     ? `${navHref("login")}?next=${encodeURIComponent(next)}`
     : navHref("login");
@@ -88,23 +75,6 @@ function Signup({
         />
 
         <CredentialsSection mode="signup" next={next} />
-
-        <p className="mt-4 text-xs leading-5 text-ink-muted">
-          {terms && privacy
-            ? t.rich("signup.legal", {
-                terms: (chunks) => (
-                  <a href={terms} className={legalLinkClass}>
-                    {chunks}
-                  </a>
-                ),
-                privacy: (chunks) => (
-                  <a href={privacy} className={legalLinkClass}>
-                    {chunks}
-                  </a>
-                ),
-              })
-            : t("signup.legalPlain")}
-        </p>
       </AuthPanel>
 
       <p className="enter-rise mt-4 text-center text-sm text-ink-muted [--enter-delay:820ms]">

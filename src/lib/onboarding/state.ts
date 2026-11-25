@@ -38,7 +38,7 @@ export function serializeOnboardingState(state: OnboardingState): string {
 }
 
 export function resumeStep(state: OnboardingState | null): OnboardingStep {
-  if (!state || state.status === "done" || state.step === "done") return "welcome";
+  if (!state || state.status === "done") return "welcome";
   return state.step;
 }
 

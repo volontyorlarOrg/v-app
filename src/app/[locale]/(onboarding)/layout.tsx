@@ -8,7 +8,6 @@ import { BrandLockup } from "@/components/brand/logo";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
 import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
-import { ensureLegalConsent } from "@/lib/legal/state.server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +21,6 @@ export default async function OnboardingLayout({
   const [t, common] = await Promise.all([
     getTranslations({ locale, namespace: "nav" }),
     getTranslations({ locale, namespace: "common" }),
-    ensureLegalConsent(),
   ]);
 
   return (

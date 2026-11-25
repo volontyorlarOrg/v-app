@@ -17,6 +17,10 @@ import { isSecureCookieTransport } from "@/lib/auth/config";
 import { safeReturnPath } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 import { navHref } from "@/lib/routing/routes";
+import {
+  ONBOARDING_COOKIE_NAME,
+  onboardingCookieAttributes,
+} from "@/lib/onboarding/state";
 
 import {
   ADMISSION_COOKIE,
@@ -74,6 +78,14 @@ export async function giveConsentAction(
   }
 
   if (session) {
+    const store = await cookies();
+    if (store.get(ONBOARDING_COOKIE_NAME)?.value === "pending:done") {
+      store.set(
+        ONBOARDING_COOKIE_NAME,
+        "done",
+        onboardingCookieAttributes(isSecureCookieTransport()),
+      );
+    }
     revalidatePath("/", "layout");
     redirect(next ?? "/dashboard");
   }

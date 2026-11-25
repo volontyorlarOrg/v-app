@@ -64,6 +64,8 @@ export function OnboardingFlow({
   addressPrefix,
   labels,
   completionFields,
+  consentNeeded,
+  consentForm,
 }: {
   title: string;
   lead: string;
@@ -81,6 +83,8 @@ export function OnboardingFlow({
   addressPrefix: string | null;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
+  consentNeeded: boolean;
+  consentForm: ReactNode;
 }) {
   const [requested, setStep] = useState<OnboardingStep>(initialStep);
   const [direction, setDirection] = useState<StepDirection>("forward");
@@ -111,7 +115,9 @@ export function OnboardingFlow({
     setDirection(dir);
     setStep(to);
     writeOnboardingStateToClient(
-      to === "done" ? { status: "done" } : { status: "pending", step: to },
+      to === "done" && !consentNeeded
+        ? { status: "done" }
+        : { status: "pending", step: to },
     );
   }
 
@@ -131,7 +137,7 @@ export function OnboardingFlow({
   }));
 
   const skipLink =
-    usernameRequired || step === "place" ? null : (
+    consentNeeded || usernameRequired || step === "place" ? null : (
       <a
         href={exitHref}
         onClick={skipForNow}
@@ -234,7 +240,11 @@ export function OnboardingFlow({
             </>
           ) : null}
 
-          {step === "done" ? (
+          {step === "done" && consentNeeded ? (
+            <div className="mt-6">{consentForm}</div>
+          ) : null}
+
+          {step === "done" && !consentNeeded ? (
             <DoneBody
               labels={labels}
               complete={completion.complete}
