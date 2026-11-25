@@ -15,7 +15,7 @@ export function VerificationMarks({
     <span className="inline-flex items-center gap-1 align-middle">
       {verification?.verified ? (
         <span role="img" aria-label={t("verified")} title={t("verified")}>
-          <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout" />
+          <BadgeCheck aria-hidden="true" className="size-4 fill-action text-knockout [&>path:first-child]:stroke-none" />
         </span>
       ) : null}
       {badgeUrl ? (
