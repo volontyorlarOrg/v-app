@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { SignOutForm } from "@/components/auth/sign-out-form";
+import { ConsentAcceptText } from "@/components/legal/consent-accept-text";
 import { ConsentForm } from "@/components/legal/legal-form";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { onboardingPath } from "@/lib/onboarding/state";
 import { safeReturnPath } from "@/lib/auth/session";
 import { getSession } from "@/lib/auth/session.server";
 import { getLegalState } from "@/lib/legal/state.server";
@@ -39,6 +42,9 @@ export default async function ConsentPage({
     getSession(),
   ]);
   const state = session ? await getLegalState() : null;
+  if (state?.pendingOnboarding) redirect(onboardingPath(returnTo));
+  if (!session)
+    redirect(returnTo ? `/signup?next=${encodeURIComponent(returnTo)}` : "/signup");
 
   return (
     <>
@@ -66,7 +72,7 @@ export default async function ConsentPage({
               locale={locale}
               next={returnTo}
               labels={{
-                accept: t("form.accept"),
+                accept: <ConsentAcceptText locale={locale as Locale} />,
                 submit: t("form.submit"),
                 pending: t("form.pending"),
                 required: t("form.required"),

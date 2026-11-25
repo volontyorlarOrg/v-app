@@ -240,7 +240,7 @@ export function LanguagePicker({
           if (controlRef.current?.contains(event.target as Node))
             event.preventDefault();
         }}
-        className="w-(--radix-popover-trigger-width) overflow-hidden p-0"
+        className="choice-dropdown w-(--radix-popover-trigger-width) overflow-hidden p-0"
       >
         {full ? (
           <p className="border-b border-border px-4 py-2.5 text-xs leading-relaxed text-ink-muted">

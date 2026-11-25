@@ -3,10 +3,12 @@
 import { ArrowRight, BadgeCheck, CalendarCheck, CircleCheck, Send } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+import { ConsentForm, type ConsentFormLabels } from "@/components/legal/legal-form";
 import { SplitWords } from "@/components/motion/scene";
 import type { OnboardingLabels } from "@/components/onboarding/labels";
 import { PassStage } from "@/components/onboarding/pass-stage";
 import { ProfileStepForm } from "@/components/onboarding/profile-step-form";
+import { StepActions } from "@/components/onboarding/step-controls";
 import { StepRail, type RailItem } from "@/components/onboarding/step-rail";
 import { UsernameStepForm } from "@/components/onboarding/username-step-form";
 import { Button, buttonClass } from "@/components/ui/button";
@@ -64,6 +66,7 @@ export function OnboardingFlow({
   addressPrefix,
   labels,
   completionFields,
+  consent,
 }: {
   title: string;
   lead: string;
@@ -81,6 +84,7 @@ export function OnboardingFlow({
   addressPrefix: string | null;
   labels: OnboardingLabels;
   completionFields: Record<CompletionField, string>;
+  consent: ConsentFormLabels | null;
 }) {
   const [requested, setStep] = useState<OnboardingStep>(initialStep);
   const [direction, setDirection] = useState<StepDirection>("forward");
@@ -88,6 +92,7 @@ export function OnboardingFlow({
   const [saved, setSaved] = useState<VolunteerProfile>(
     profileSaved ? initialValues : EMPTY_PROFILE,
   );
+  const consentNeeded = consent !== null;
   const usernameRequired = username.source === "generated";
   const step = usernameRequired ? usernameGate(requested) : requested;
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -104,6 +109,12 @@ export function OnboardingFlow({
     headingRef.current?.focus();
   }, [step]);
 
+  useEffect(() => {
+    if (step === "done" && !consentNeeded) {
+      writeOnboardingStateToClient({ status: "done" });
+    }
+  }, [step, consentNeeded]);
+
   const exitHref = next ?? navHref("dashboard");
   const ctaHref = next ?? navHref("opportunities");
 
@@ -111,7 +122,9 @@ export function OnboardingFlow({
     setDirection(dir);
     setStep(to);
     writeOnboardingStateToClient(
-      to === "done" ? { status: "done" } : { status: "pending", step: to },
+      to === "done" && !consentNeeded
+        ? { status: "done" }
+        : { status: "pending", step: to },
     );
   }
 
@@ -131,7 +144,7 @@ export function OnboardingFlow({
   }));
 
   const skipLink =
-    usernameRequired || step === "place" ? null : (
+    consentNeeded || usernameRequired || step === "place" ? null : (
       <a
         href={exitHref}
         onClick={skipForNow}
@@ -184,7 +197,7 @@ export function OnboardingFlow({
             id="onboarding-step-title"
             ref={headingRef}
             tabIndex={-1}
-            className="text-2xl leading-[1.18] tracking-[-0.02em] text-balance sm:text-3xl"
+            className="text-2xl leading-[1.18] tracking-[-0.02em] text-balance outline-none sm:text-3xl"
           >
             {step === "welcome"
               ? labels.welcome.title
@@ -234,7 +247,37 @@ export function OnboardingFlow({
             </>
           ) : null}
 
-          {step === "done" ? (
+          {step === "done" && consent ? (
+            <>
+              <CompletionNote
+                labels={labels}
+                complete={completion.complete}
+                percent={completion.percent}
+                missing={completion.missing.map((field) => completionFields[field])}
+              />
+              <div className="mt-6 border-t border-border pt-5">
+                <ConsentForm
+                  locale={locale}
+                  next={next}
+                  labels={consent}
+                  actions={(pending) => (
+                    <StepActions
+                      pending={pending}
+                      labels={{
+                        continue: consent.submit,
+                        saving: consent.pending,
+                        skipStep: labels.skipStep,
+                        back: labels.back,
+                      }}
+                      onBack={() => go(LAST_FORM_STEP, "back")}
+                    />
+                  )}
+                />
+              </div>
+            </>
+          ) : null}
+
+          {step === "done" && !consent ? (
             <DoneBody
               labels={labels}
               complete={completion.complete}
@@ -276,6 +319,47 @@ function WelcomeBody({
   );
 }
 
+const LAST_FORM_STEP: OnboardingStep = FORM_STEPS.at(-1) ?? "welcome";
+
+function CompletionNote({
+  labels,
+  complete,
+  percent,
+  missing,
+  finishLink = false,
+}: {
+  labels: OnboardingLabels;
+  complete: boolean;
+  percent: number;
+  missing: readonly string[];
+  finishLink?: boolean;
+}) {
+  if (complete) {
+    return (
+      <p className="mt-3 flex items-start gap-2 font-semibold text-accent-ink">
+        <CircleCheck aria-hidden="true" className="mt-1 size-4 shrink-0" />
+        <span>{labels.done.complete}</span>
+      </p>
+    );
+  }
+  return (
+    <p className="mt-3 text-pretty text-ink">
+      {fill(labels.done.incomplete, { percent, fields: missing.join(", ") })}
+      {finishLink ? (
+        <>
+          {" "}
+          <Link
+            href={navHref("profileEdit")}
+            className="font-semibold text-primary-ink underline-offset-4 hover:underline"
+          >
+            {labels.done.finishOnProfile}
+          </Link>
+        </>
+      ) : null}
+    </p>
+  );
+}
+
 const NEXT_STEPS = [
   { key: "apply", Icon: Send, achievement: false },
   { key: "attend", Icon: CalendarCheck, achievement: false },
@@ -297,22 +381,13 @@ function DoneBody({
 }) {
   return (
     <>
-      {complete ? (
-        <p className="mt-3 flex items-start gap-2 font-semibold text-accent-ink">
-          <CircleCheck aria-hidden="true" className="mt-1 size-4 shrink-0" />
-          <span>{labels.done.complete}</span>
-        </p>
-      ) : (
-        <p className="mt-3 text-pretty text-ink">
-          {fill(labels.done.incomplete, { percent, fields: missing.join(", ") })}{" "}
-          <Link
-            href={navHref("profileEdit")}
-            className="font-semibold text-primary-ink underline-offset-4 hover:underline"
-          >
-            {labels.done.finishOnProfile}
-          </Link>
-        </p>
-      )}
+      <CompletionNote
+        labels={labels}
+        complete={complete}
+        percent={percent}
+        missing={missing}
+        finishLink
+      />
 
       <h3 className="mt-7 font-sans text-sm font-semibold text-ink">
         {labels.done.nextTitle}

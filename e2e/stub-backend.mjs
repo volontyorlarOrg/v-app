@@ -934,6 +934,12 @@ function newAccountState(email, fullName) {
     authMethods: { telegram: false, google: false, password: true },
   };
   state.mergeRequests = [];
+  state.legal = {
+    version: LEGAL_VERSION,
+    accepted: false,
+    leaderboard: false,
+    pendingOnboarding: true,
+  };
   state.profile = null;
   state.applications = [];
   state.saved = [];
@@ -1435,7 +1441,7 @@ const server = createServer(async (request, response) => {
     });
   }
   if (path === "/auth/password/signup" && method === "POST") {
-    if (!legalAdmissions.delete(body.admissionToken))
+    if (body.admissionToken && !legalAdmissions.delete(body.admissionToken))
       return send(response, 403, { code: "legalConsentRequired" });
     if (body.email === SEEDED_EMAIL)
       return send(response, 409, { code: "emailUnavailable" });
@@ -1528,6 +1534,7 @@ const server = createServer(async (request, response) => {
     if (body.version !== LEGAL_VERSION || body.accepted !== true)
       return send(response, 422, { code: "validationFailed" });
     state.legal.accepted = true;
+    state.legal.pendingOnboarding = false;
     state.legal.leaderboard = body.leaderboard === true;
     state.preferences.publicProfileEnabled = true;
     return send(response, 201, { id: state.user.id, status: "accepted" });
@@ -1559,7 +1566,16 @@ const server = createServer(async (request, response) => {
     }
     return send(response, 201, { id: item.id, status: item.status });
   }
-  if (!state.legal.accepted && !path.startsWith("/me/legal") && path !== "/auth/logout")
+  const pendingAllowed =
+    state.legal.pendingOnboarding &&
+    ((method === "GET" && ["/me", "/profile"].includes(path)) ||
+      (method === "PUT" && ["/me/username", "/profile"].includes(path)));
+  if (
+    !state.legal.accepted &&
+    !pendingAllowed &&
+    !path.startsWith("/me/legal") &&
+    path !== "/auth/logout"
+  )
     return send(response, 403, { code: "legalConsentRequired" });
   if (path === "/auth/logout" && method === "POST") {
     sessions.delete(token);

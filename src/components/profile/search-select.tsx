@@ -175,7 +175,7 @@ export function SearchSelect({
           searchRef.current?.focus();
         }}
         onCloseAutoFocus={(event) => event.preventDefault()}
-        className="w-(--radix-popover-trigger-width) min-w-64 overflow-hidden p-0"
+        className="choice-dropdown w-(--radix-popover-trigger-width) min-w-64 overflow-hidden p-0"
       >
         <div className="relative border-b border-border">
           <Search

@@ -43,7 +43,7 @@ describe("onboarding state cookie", () => {
   it("resumes where the volunteer left, and replays from the welcome otherwise", () => {
     expect(resumeStep(null)).toBe("welcome");
     expect(resumeStep({ status: "done" })).toBe("welcome");
-    expect(resumeStep({ status: "pending", step: "done" })).toBe("welcome");
+    expect(resumeStep({ status: "pending", step: "done" })).toBe("done");
     expect(resumeStep({ status: "pending", step: "contact" })).toBe("contact");
     expect(resumeStep({ status: "skipped", step: "place" })).toBe("place");
   });

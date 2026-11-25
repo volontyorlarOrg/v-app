@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, type ReactNode } from "react";
 
 import { ActionStatus } from "@/components/app/action-status";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { giveConsentAction, requestDataAction } from "@/lib/legal/actions";
 const idle: ActionResult = { status: "idle" };
 
 export type ConsentFormLabels = {
-  accept: string;
+  accept: ReactNode;
   submit: string;
   pending: string;
   required: string;
@@ -27,7 +27,7 @@ function Choice({
   required = false,
 }: {
   name: string;
-  label: string;
+  label: ReactNode;
   help?: string;
   required?: boolean;
 }) {
@@ -51,10 +51,12 @@ export function ConsentForm({
   locale,
   next,
   labels,
+  actions,
 }: {
   locale: string;
   next: string | null;
   labels: ConsentFormLabels;
+  actions?: (pending: boolean) => ReactNode;
 }) {
   const [state, action, pending] = useActionState(giveConsentAction, idle);
   return (
@@ -67,9 +69,13 @@ export function ConsentForm({
           {state.code === "consentRequired" ? labels.required : labels.error}
         </ActionStatus>
       ) : null}
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? labels.pending : labels.submit}
-      </Button>
+      {actions ? (
+        actions(pending)
+      ) : (
+        <Button type="submit" disabled={pending} className="w-full">
+          {pending ? labels.pending : labels.submit}
+        </Button>
+      )}
     </form>
   );
 }
