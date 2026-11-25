@@ -179,7 +179,7 @@ async function finishPendingSetup(page: Page) {
   await page.getByText("Gap year", { exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Skip this step" }).click();
-  await page.getByRole("checkbox", { name: /I have read and agree/ }).check();
+  await page.getByRole("checkbox", { name: /I have read the Privacy Policy/ }).check();
   await page.getByRole("button", { name: "Agree and continue" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 }
@@ -296,7 +296,17 @@ test.describe("welcome flow", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Your pass is ready." }),
     ).toBeVisible();
-    const consent = page.getByRole("checkbox", { name: /I have read and agree/ });
+    await expect(
+      page.getByText("Your profile is complete.", { exact: false }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Contact and public links" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    const consent = page.getByRole("checkbox", {
+      name: /my profile being visible to others/,
+    });
     await expect(consent).not.toBeChecked();
     await page.getByRole("button", { name: "Agree and continue" }).click();
     await expect(page).toHaveURL(/\/welcome$/);
@@ -377,6 +387,16 @@ test.describe("welcome flow", () => {
     await expect(page.getByRole("link", { name: "Skip for now" })).toHaveCount(0);
     await gotoReady(page, "/dashboard");
     await expect(page).toHaveURL(/\/welcome/);
+  });
+
+  test("a new account can sign out before agreeing to the terms", async ({
+    page,
+  }, info) => {
+    await createAccount(page, `leave-${info.project.name}@example.org`);
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await gotoReady(page, "/welcome");
+    await expect(page).toHaveURL(/\/login\?next=/);
   });
 
   test("a Telegram username is kept with one tap", async ({ page }) => {

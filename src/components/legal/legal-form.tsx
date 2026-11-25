@@ -51,10 +51,12 @@ export function ConsentForm({
   locale,
   next,
   labels,
+  actions,
 }: {
   locale: string;
   next: string | null;
   labels: ConsentFormLabels;
+  actions?: (pending: boolean) => ReactNode;
 }) {
   const [state, action, pending] = useActionState(giveConsentAction, idle);
   return (
@@ -67,9 +69,13 @@ export function ConsentForm({
           {state.code === "consentRequired" ? labels.required : labels.error}
         </ActionStatus>
       ) : null}
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? labels.pending : labels.submit}
-      </Button>
+      {actions ? (
+        actions(pending)
+      ) : (
+        <Button type="submit" disabled={pending} className="w-full">
+          {pending ? labels.pending : labels.submit}
+        </Button>
+      )}
     </form>
   );
 }

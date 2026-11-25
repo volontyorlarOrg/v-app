@@ -4,7 +4,9 @@ import { loadErrorLabels } from "@/components/app/load-error";
 import { LocaleSwitcher } from "@/components/app/locale-switcher";
 import { PanelErrorBoundary } from "@/components/app/panel-error-boundary";
 import { ThemeToggle } from "@/components/app/theme-toggle";
+import { SignOutForm } from "@/components/auth/sign-out-form";
 import { BrandLockup } from "@/components/brand/logo";
+import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ORGANIZATION_NAME } from "@/lib/content/org";
 import { HOME_ROUTE, navHref } from "@/lib/routing/routes";
@@ -18,10 +20,12 @@ export default async function OnboardingLayout({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [t, common] = await Promise.all([
+  const [t, common, settings] = await Promise.all([
     getTranslations({ locale, namespace: "nav" }),
     getTranslations({ locale, namespace: "common" }),
+    getTranslations({ locale, namespace: "settings" }),
   ]);
+  const signOut = settings("session.signOut");
 
   return (
     <>
@@ -42,6 +46,14 @@ export default async function OnboardingLayout({
         <div className="flex items-center gap-2">
           <LocaleSwitcher label={t("languageLabel")} />
           <ThemeToggle label={t("themeLabel")} />
+          <SignOutForm
+            label={signOut}
+            className={buttonClass({
+              variant: "danger-outline",
+              size: "sm",
+              className: "hidden h-11 px-4 sm:inline-flex",
+            })}
+          />
         </div>
       </header>
       <main id="main" className="container-page flex flex-1 flex-col py-6 lg:py-10">
@@ -49,6 +61,12 @@ export default async function OnboardingLayout({
           {children}
         </PanelErrorBoundary>
       </main>
+      <div className="container-page flex justify-center pb-8 sm:hidden">
+        <SignOutForm
+          label={signOut}
+          className={buttonClass({ variant: "danger-outline", size: "sm" })}
+        />
+      </div>
     </>
   );
 }

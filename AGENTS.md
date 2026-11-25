@@ -71,7 +71,11 @@ statistics, testimonials, awards, offices, addresses, or integrations.
   email sign-up, or Telegram and Google when the backend says `isNewUser`)
   lands on `/welcome`, the four-step welcome flow; its only state
   is a readable, app-only progress cookie, and every step saves through the
-  existing profile action;
+  existing profile action. Privacy consent is its last step: one checkbox
+  (`ConsentAcceptText`, the same sentence as `/consent`) after the four steps.
+  Until it is ticked the backend lets the account read and save only its own
+  profile and username, and every other page returns it to `/welcome`, so the
+  welcome layout carries its own red Sign out;
 - **the app needs `VOLONTYORLAR_API_URL` and `VOLONTYORLAR_SESSION_SECRET`.**
   Both are server-only. `src/proxy.ts` guards every `(volunteer)` route whether
   or not they are set; unset, no session can exist and the Telegram handoff

@@ -183,8 +183,6 @@
       "metaTitle": "Hisob yaratish",
       "title": "Hisobingizni yarating.",
       "lead": "Hisobingiz birinchi kirishda yaratiladi.",
-      "legal": "<privacy>Maxfiylik siyosati</privacy> va <terms>Foydalanish shartlari</terms>ni oʻqidim va ularga roziman.",
-      "legalPlain": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim va ularga roziman.",
       "haveAccount": "Hisobingiz bormi?",
       "logIn": "Kirish",
       "submit": "Hisob yaratish",
@@ -1334,10 +1332,10 @@
     "privacyPolicy": "Maxfiylik siyosati",
     "terms": "Foydalanish shartlari",
     "form": {
-      "accept": "Maxfiylik siyosati va Foydalanish shartlarini oʻqidim, ularda tavsiflangan qayta ishlashga va profilim boshqalarga koʻrinishiga roziman.",
+      "accept": "<privacy>Maxfiylik siyosati</privacy> va <terms>Foydalanish shartlari</terms>ni oʻqidim, ularda tavsiflangan qayta ishlashga va profilim boshqalarga koʻrinishiga roziman.",
       "submit": "Roziman, davom etish",
       "pending": "Saqlanmoqda…",
-      "required": "Davom etish uchun birinchi belgini qoʻying.",
+      "required": "Davom etish uchun belgini qoʻying.",
       "error": "Roziligingiz saqlanmadi. Internetni tekshirib, qayta urinib koʻring."
     },
     "accepted": "Amaldagi Maxfiylik siyosatiga rozilik bergansiz. Boshqalar koʻradigan maʼlumotlarni Profilni tahrirlashda tanlang.",

@@ -170,7 +170,6 @@
     --metal-mix-bottom: 10%;
   }
 
-  /* Menus contrast with the surrounding theme while keeping readable controls. */
   .choice-dropdown {
     --color-popover: #10233a;
     --color-popover-foreground: #f1f6fb;

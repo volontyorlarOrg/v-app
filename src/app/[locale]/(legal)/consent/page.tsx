@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthIntro } from "@/components/auth/auth-intro";
 import { AuthPanel } from "@/components/auth/auth-panel";
 import { SignOutForm } from "@/components/auth/sign-out-form";
+import { ConsentAcceptText } from "@/components/legal/consent-accept-text";
 import { ConsentForm } from "@/components/legal/legal-form";
 import { LegalLinks } from "@/components/legal/legal-links";
 import { Link } from "@/i18n/navigation";
@@ -71,7 +72,7 @@ export default async function ConsentPage({
               locale={locale}
               next={returnTo}
               labels={{
-                accept: t("form.accept"),
+                accept: <ConsentAcceptText locale={locale as Locale} />,
                 submit: t("form.submit"),
                 pending: t("form.pending"),
                 required: t("form.required"),

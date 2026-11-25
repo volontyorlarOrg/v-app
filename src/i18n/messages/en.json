@@ -183,8 +183,6 @@
       "metaTitle": "Create an account",
       "title": "Create your account.",
       "lead": "Your account is created the first time you sign in.",
-      "legal": "I have read and agree to the <privacy>Privacy Policy</privacy> and <terms>Terms of Use</terms>.",
-      "legalPlain": "I have read and agree to the Privacy Policy and Terms of Use.",
       "haveAccount": "Already have an account?",
       "logIn": "Log in",
       "submit": "Create account",
@@ -1334,10 +1332,10 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms of Use",
     "form": {
-      "accept": "I have read the Privacy Policy and Terms of Use, and agree to the processing described and to my profile being visible to others.",
+      "accept": "I have read the <privacy>Privacy Policy</privacy> and <terms>Terms of Use</terms>, and agree to the processing described and to my profile being visible to others.",
       "submit": "Agree and continue",
       "pending": "Saving…",
-      "required": "Tick the first box to continue.",
+      "required": "Tick the box to continue.",
       "error": "We could not save your consent. Check your connection and try again."
     },
     "accepted": "You accepted the current Privacy Policy. Choose what others see in Edit profile.",
