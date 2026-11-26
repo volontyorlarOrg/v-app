@@ -134,7 +134,11 @@ button, followed by **My activity**: the events they attended and their past
 events, each with its organisation, date, hours and XP, and on their own
 profile everything that took XP away — an unexcused no-show with its penalty,
 an administrator's deduction with its reason, the milestone reset — from
-`deductions` on `GET /record/history`. Public profiles never list these.
+`deductions` on `GET /record/history`. Public profiles list only an
+administrator's deductions, by amount and date and never the reason
+(`deductions` on the public contract); no-shows and the milestone reset stay on
+the volunteer's own profile. A public profile always shows its events, hours
+and XP figures, and the XP is the backend's net total, which can be below zero.
 **The header, seven profile details and activity are always shown; the rest is the
 volunteer's choice.** The photo, name, username, level and figures cannot be
 hidden, and neither can the bio, region, city, school, languages, portfolio

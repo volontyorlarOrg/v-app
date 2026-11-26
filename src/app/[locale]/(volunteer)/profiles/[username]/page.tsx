@@ -73,34 +73,31 @@ export default async function MemberProfilePage({
 
   const localeValue = locale as Locale;
   const number = (chunks: ReactNode) => <ProfileFigureNumber chunks={chunks} />;
-  const figures: ProfileFigure[] =
-    profile.stats.attendedEvents + profile.stats.confirmedHours + profile.xp > 0
-      ? [
-          {
-            id: "events",
-            content: t.rich("visitor.events", {
-              count: profile.stats.attendedEvents,
-              value: format.number(profile.stats.attendedEvents),
-              n: number,
-            }),
-          },
-          {
-            id: "hours",
-            content: t.rich("visitor.hours", {
-              count: profile.stats.confirmedHours,
-              value: format.number(profile.stats.confirmedHours),
-              n: number,
-            }),
-          },
-          {
-            id: "xp",
-            content: t.rich("visitor.xp", {
-              value: format.number(profile.xp),
-              n: number,
-            }),
-          },
-        ]
-      : [];
+  const figures: ProfileFigure[] = [
+    {
+      id: "events",
+      content: t.rich("visitor.events", {
+        count: profile.stats.attendedEvents,
+        value: format.number(profile.stats.attendedEvents),
+        n: number,
+      }),
+    },
+    {
+      id: "hours",
+      content: t.rich("visitor.hours", {
+        count: profile.stats.confirmedHours,
+        value: format.number(profile.stats.confirmedHours),
+        n: number,
+      }),
+    },
+    {
+      id: "xp",
+      content: t.rich("visitor.xp", {
+        value: format.number(profile.xp),
+        n: number,
+      }),
+    },
+  ];
   const text = (id: string, value: string): ProfileRow | null =>
     value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
   const portfolio = profileLinks(profile.links);
@@ -201,7 +198,13 @@ export default async function MemberProfilePage({
           socials={profileSocialLinks(profile)}
           figures={figures}
           rows={rows}
-          activity={<ActivitySection entries={activity} rewards={profile.rewards} />}
+          activity={
+            <ActivitySection
+              entries={activity}
+              rewards={profile.rewards}
+              deductions={profile.deductions}
+            />
+          }
           completion={null}
           labels={{
             figures: t("sheet.figures"),

@@ -201,6 +201,48 @@ describe("account schemas", () => {
     expect(parsed.phone).toBe("+998901234567");
     expect(parsed.instagram).toBe("dilnoza.codes");
     expect(parsed.links).toEqual(["https://portfolio.example/dilnoza"]);
+    expect(parsed.deductions).toEqual([]);
+  });
+
+  it("keeps a public XP total below zero and reads deductions without a reason", () => {
+    const base = {
+      displayName: "Dilnoza Karimova",
+      username: "dilnoza_k",
+      level: "newcomer",
+      stats: { attendedEvents: 0, confirmedHours: 0 },
+    };
+    const parsed = publicProfileSchema.parse({
+      ...base,
+      xp: -30,
+      deductions: [
+        {
+          id: "deduction-1",
+          xp: -20,
+          createdAt: "2026-11-20T08:15:00.000Z",
+          reason: "Private note",
+        },
+      ],
+    });
+    expect(parsed.xp).toBe(-30);
+    expect(parsed.deductions).toEqual([
+      {
+        id: "deduction-1",
+        kind: "adjustment",
+        xp: -20,
+        reason: null,
+        createdAt: "2026-11-20T08:15:00.000Z",
+      },
+    ]);
+    expect(() => publicProfileSchema.parse({ ...base, xp: 1.5 })).toThrow();
+    for (const xp of [0, 20]) {
+      expect(() =>
+        publicProfileSchema.parse({
+          ...base,
+          xp: 0,
+          deductions: [{ id: "d", xp, createdAt: "2026-11-20T08:15:00.000Z" }],
+        }),
+      ).toThrow();
+    }
   });
 
   it("reads /me and ignores the fields it does not use", () => {

@@ -299,6 +299,18 @@ export const rewardHistoryEntrySchema = z.object({
 
 export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
 
+export const publicDeductionSchema = z
+  .object({
+    id: z.string().min(1),
+    xp: z.number().int().negative(),
+    createdAt: isoDate,
+  })
+  .transform((deduction) => ({
+    ...deduction,
+    kind: "adjustment",
+    reason: null,
+  }));
+
 export const verificationSchema = z.object({
   verified: z.boolean(),
   badgeUrl: z.string().nullable().default(null),
@@ -326,7 +338,7 @@ export const publicProfileSchema = z.object({
   links: z.array(z.url()).default([]),
   joinedAt: isoDate.nullable().default(null),
   level: z.enum(LEVELS),
-  xp: z.number().int().nonnegative(),
+  xp: z.number().int(),
   stats: z.object({
     attendedEvents: z.number().int().nonnegative(),
     confirmedHours: z.number().nonnegative(),
@@ -346,6 +358,7 @@ export const publicProfileSchema = z.object({
     .default([]),
   activity: z.array(publicActivitySchema).optional(),
   rewards: z.array(rewardHistoryEntrySchema).default([]),
+  deductions: z.array(publicDeductionSchema).default([]),
 });
 
 export const recordSchema = z.object({
