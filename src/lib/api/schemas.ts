@@ -299,17 +299,28 @@ export const rewardHistoryEntrySchema = z.object({
 
 export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
 
-export const publicDeductionSchema = z
-  .object({
-    id: z.string().min(1),
-    xp: z.number().int().negative(),
-    createdAt: isoDate,
-  })
-  .transform((deduction) => ({
-    ...deduction,
-    kind: "adjustment",
-    reason: null,
-  }));
+const publicDeductionBase = {
+  id: z.string().min(1),
+  xp: z.number().int().negative(),
+  date: isoDate,
+};
+
+export const publicDeductionSchema = z.discriminatedUnion("kind", [
+  z.object({
+    ...publicDeductionBase,
+    kind: z.literal("no_show"),
+    opportunityTitle: z.string().min(1),
+    organization: z.string().nullable().default(null),
+  }),
+  z.object({
+    ...publicDeductionBase,
+    kind: z.literal("adjustment"),
+    reason: z.string().nullable().default(null),
+  }),
+  z.object({ ...publicDeductionBase, kind: z.literal("reset") }),
+]);
+
+export type PublicDeduction = z.infer<typeof publicDeductionSchema>;
 
 export const verificationSchema = z.object({
   verified: z.boolean(),

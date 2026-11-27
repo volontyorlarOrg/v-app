@@ -8,7 +8,12 @@ import {
 } from "@/components/profile/activity-section";
 import messages from "@/i18n/messages/en.json";
 import { formats } from "@/i18n/formats";
-import type { RewardHistoryEntry, XpDeduction } from "@/lib/api/schemas";
+import {
+  publicProfileSchema,
+  type RewardHistoryEntry,
+  type XpDeduction,
+} from "@/lib/api/schemas";
+import { publicDeductionActivity } from "@/lib/profile/activity";
 
 const attended: ProfileActivityEntry = {
   id: "a1",
@@ -173,6 +178,56 @@ describe("ActivitySection", () => {
     expect(items[2]).toHaveTextContent("−40 XP");
     expect(items[3]).toHaveTextContent("City cleanup");
     expect(items[3]).toHaveTextContent("3 h · +30 XP");
+  });
+
+  it("shows every XP loss from the public contract on someone else's profile", () => {
+    const profile = publicProfileSchema.parse({
+      displayName: "Place Check",
+      username: "place_check",
+      level: "newcomer",
+      xp: -80,
+      stats: { attendedEvents: 0, confirmedHours: 0 },
+      deductions: [
+        {
+          id: "deduction-1",
+          kind: "adjustment",
+          xp: -20,
+          reason: "Left the clean-up early",
+          date: "2026-11-20T08:15:00.000Z",
+          opportunityTitle: null,
+          organization: null,
+        },
+        {
+          id: "no-show-1",
+          kind: "no_show",
+          xp: -10,
+          reason: null,
+          date: "2026-10-20T09:00:00.000Z",
+          opportunityTitle: "Riverbank clean-up",
+          organization: "Volontyorlar",
+        },
+        {
+          id: "reset-1",
+          kind: "reset",
+          xp: -50,
+          reason: null,
+          date: "2026-10-08T12:00:00.000Z",
+          opportunityTitle: null,
+          organization: null,
+        },
+      ],
+    });
+    const lost = publicDeductionActivity(profile.deductions);
+    renderSection(lost.missed, false, [], lost.deductions);
+
+    const rows = within(screen.getByRole("region")).getAllByRole("listitem");
+    expect(rows.map((row) => row.textContent)).toEqual([
+      expect.stringMatching(/XP taken away.*Left the clean-up early.*−20 XP/),
+      expect.stringMatching(
+        /Riverbank clean-up.*Volontyorlar.*Unexcused no-show · −10 XP/,
+      ),
+      expect.stringMatching(/XP reset when rewards changed.*−50 XP/),
+    ]);
   });
 
   it("is absent on someone else's profile when there is nothing to show", () => {

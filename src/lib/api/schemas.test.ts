@@ -204,7 +204,7 @@ describe("account schemas", () => {
     expect(parsed.deductions).toEqual([]);
   });
 
-  it("keeps a public XP total below zero and reads deductions without a reason", () => {
+  it("keeps a public XP total below zero and reads every kind of XP loss", () => {
     const base = {
       displayName: "Dilnoza Karimova",
       username: "dilnoza_k",
@@ -217,9 +217,28 @@ describe("account schemas", () => {
       deductions: [
         {
           id: "deduction-1",
+          kind: "adjustment",
           xp: -20,
-          createdAt: "2026-11-20T08:15:00.000Z",
-          reason: "Private note",
+          reason: "Left early",
+          date: "2026-11-20T08:15:00.000Z",
+          opportunityTitle: null,
+          organization: null,
+        },
+        {
+          id: "no-show-1",
+          kind: "no_show",
+          xp: -10,
+          reason: null,
+          date: "2026-10-20T09:00:00.000Z",
+          opportunityTitle: "Riverbank clean-up",
+          organization: "Volontyorlar",
+        },
+        {
+          id: "reset-1",
+          kind: "reset",
+          xp: -50,
+          reason: "Milestone XP reset: launch-key",
+          date: "2026-10-08T12:00:00.000Z",
         },
       ],
     });
@@ -229,18 +248,29 @@ describe("account schemas", () => {
         id: "deduction-1",
         kind: "adjustment",
         xp: -20,
-        reason: null,
-        createdAt: "2026-11-20T08:15:00.000Z",
+        reason: "Left early",
+        date: "2026-11-20T08:15:00.000Z",
       },
+      {
+        id: "no-show-1",
+        kind: "no_show",
+        xp: -10,
+        date: "2026-10-20T09:00:00.000Z",
+        opportunityTitle: "Riverbank clean-up",
+        organization: "Volontyorlar",
+      },
+      { id: "reset-1", kind: "reset", xp: -50, date: "2026-10-08T12:00:00.000Z" },
     ]);
     expect(() => publicProfileSchema.parse({ ...base, xp: 1.5 })).toThrow();
-    for (const xp of [0, 20]) {
+    const loss = { id: "d", kind: "adjustment", date: "2026-11-20T08:15:00.000Z" };
+    for (const deduction of [
+      { ...loss, xp: 0 },
+      { ...loss, xp: 20 },
+      { ...loss, xp: -5, kind: "penalty" },
+      { ...loss, xp: -5, kind: "no_show" },
+    ]) {
       expect(() =>
-        publicProfileSchema.parse({
-          ...base,
-          xp: 0,
-          deductions: [{ id: "d", xp, createdAt: "2026-11-20T08:15:00.000Z" }],
-        }),
+        publicProfileSchema.parse({ ...base, xp: 0, deductions: [deduction] }),
       ).toThrow();
     }
   });

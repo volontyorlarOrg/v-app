@@ -22,6 +22,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { settle } from "@/lib/api/load.server";
 import { getPublicProfile } from "@/lib/api/public-profile.server";
+import { publicDeductionActivity } from "@/lib/profile/activity";
 import { initialsOf } from "@/lib/profile/initials";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { profileLinks } from "@/lib/profile/links";
@@ -103,14 +104,17 @@ export default async function MemberProfilePage({
   const portfolio = profileLinks(profile.links);
   const publicPage = publicProfileHref(profile.username);
   const joinedOn = profile.joinedAt ? new Date(profile.joinedAt) : null;
-  const activity: ProfileActivityEntry[] =
-    profile.activity ??
-    profile.pastEvents.map((event) => ({
-      ...event,
-      source: "manual" as const,
-      kind: "volunteering" as const,
-      placement: null,
-    }));
+  const lost = publicDeductionActivity(profile.deductions);
+  const activity: ProfileActivityEntry[] = [
+    ...(profile.activity ??
+      profile.pastEvents.map((event) => ({
+        ...event,
+        source: "manual" as const,
+        kind: "volunteering" as const,
+        placement: null,
+      }))),
+    ...lost.missed,
+  ];
   const rows = [
     profile.region
       ? {
@@ -202,7 +206,7 @@ export default async function MemberProfilePage({
             <ActivitySection
               entries={activity}
               rewards={profile.rewards}
-              deductions={profile.deductions}
+              deductions={lost.deductions}
             />
           }
           completion={null}
