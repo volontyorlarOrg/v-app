@@ -299,6 +299,29 @@ export const rewardHistoryEntrySchema = z.object({
 
 export type RewardHistoryEntry = z.infer<typeof rewardHistoryEntrySchema>;
 
+const publicDeductionBase = {
+  id: z.string().min(1),
+  xp: z.number().int().negative(),
+  date: isoDate,
+};
+
+export const publicDeductionSchema = z.discriminatedUnion("kind", [
+  z.object({
+    ...publicDeductionBase,
+    kind: z.literal("no_show"),
+    opportunityTitle: z.string().min(1),
+    organization: z.string().nullable().default(null),
+  }),
+  z.object({
+    ...publicDeductionBase,
+    kind: z.literal("adjustment"),
+    reason: z.string().nullable().default(null),
+  }),
+  z.object({ ...publicDeductionBase, kind: z.literal("reset") }),
+]);
+
+export type PublicDeduction = z.infer<typeof publicDeductionSchema>;
+
 export const verificationSchema = z.object({
   verified: z.boolean(),
   badgeUrl: z.string().nullable().default(null),
@@ -326,7 +349,7 @@ export const publicProfileSchema = z.object({
   links: z.array(z.url()).default([]),
   joinedAt: isoDate.nullable().default(null),
   level: z.enum(LEVELS),
-  xp: z.number().int().nonnegative(),
+  xp: z.number().int(),
   stats: z.object({
     attendedEvents: z.number().int().nonnegative(),
     confirmedHours: z.number().nonnegative(),
@@ -346,6 +369,7 @@ export const publicProfileSchema = z.object({
     .default([]),
   activity: z.array(publicActivitySchema).optional(),
   rewards: z.array(rewardHistoryEntrySchema).default([]),
+  deductions: z.array(publicDeductionSchema).default([]),
 });
 
 export const recordSchema = z.object({

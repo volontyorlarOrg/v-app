@@ -22,6 +22,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { settle } from "@/lib/api/load.server";
 import { getPublicProfile } from "@/lib/api/public-profile.server";
+import { publicDeductionActivity } from "@/lib/profile/activity";
 import { initialsOf } from "@/lib/profile/initials";
 import { languageDirectory } from "@/lib/profile/language-directory.server";
 import { profileLinks } from "@/lib/profile/links";
@@ -73,47 +74,47 @@ export default async function MemberProfilePage({
 
   const localeValue = locale as Locale;
   const number = (chunks: ReactNode) => <ProfileFigureNumber chunks={chunks} />;
-  const figures: ProfileFigure[] =
-    profile.stats.attendedEvents + profile.stats.confirmedHours + profile.xp > 0
-      ? [
-          {
-            id: "events",
-            content: t.rich("visitor.events", {
-              count: profile.stats.attendedEvents,
-              value: format.number(profile.stats.attendedEvents),
-              n: number,
-            }),
-          },
-          {
-            id: "hours",
-            content: t.rich("visitor.hours", {
-              count: profile.stats.confirmedHours,
-              value: format.number(profile.stats.confirmedHours),
-              n: number,
-            }),
-          },
-          {
-            id: "xp",
-            content: t.rich("visitor.xp", {
-              value: format.number(profile.xp),
-              n: number,
-            }),
-          },
-        ]
-      : [];
+  const figures: ProfileFigure[] = [
+    {
+      id: "events",
+      content: t.rich("visitor.events", {
+        count: profile.stats.attendedEvents,
+        value: format.number(profile.stats.attendedEvents),
+        n: number,
+      }),
+    },
+    {
+      id: "hours",
+      content: t.rich("visitor.hours", {
+        count: profile.stats.confirmedHours,
+        value: format.number(profile.stats.confirmedHours),
+        n: number,
+      }),
+    },
+    {
+      id: "xp",
+      content: t.rich("visitor.xp", {
+        value: format.number(profile.xp),
+        n: number,
+      }),
+    },
+  ];
   const text = (id: string, value: string): ProfileRow | null =>
     value.trim() ? { id, label: t(`sheet.rows.${id}`), value: value.trim() } : null;
   const portfolio = profileLinks(profile.links);
   const publicPage = publicProfileHref(profile.username);
   const joinedOn = profile.joinedAt ? new Date(profile.joinedAt) : null;
-  const activity: ProfileActivityEntry[] =
-    profile.activity ??
-    profile.pastEvents.map((event) => ({
-      ...event,
-      source: "manual" as const,
-      kind: "volunteering" as const,
-      placement: null,
-    }));
+  const lost = publicDeductionActivity(profile.deductions);
+  const activity: ProfileActivityEntry[] = [
+    ...(profile.activity ??
+      profile.pastEvents.map((event) => ({
+        ...event,
+        source: "manual" as const,
+        kind: "volunteering" as const,
+        placement: null,
+      }))),
+    ...lost.missed,
+  ];
   const rows = [
     profile.region
       ? {
@@ -201,7 +202,13 @@ export default async function MemberProfilePage({
           socials={profileSocialLinks(profile)}
           figures={figures}
           rows={rows}
-          activity={<ActivitySection entries={activity} rewards={profile.rewards} />}
+          activity={
+            <ActivitySection
+              entries={activity}
+              rewards={profile.rewards}
+              deductions={lost.deductions}
+            />
+          }
           completion={null}
           labels={{
             figures: t("sheet.figures"),

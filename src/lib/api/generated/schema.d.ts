@@ -5135,6 +5135,25 @@ export interface components {
             xpAwarded: number;
             countsTowardProgress: boolean;
         };
+        PublicDeductionDto: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * @description no_show: an unexcused no-show penalty from an event result; adjustment: XP an administrator took away; reset: the milestone XP reset when rewards changed.
+             * @enum {string}
+             */
+            kind: "no_show" | "adjustment" | "reset";
+            xp: number;
+            /** @description The administrator's reason for an adjustment; null for a no-show and a reset. */
+            reason: string | null;
+            /**
+             * Format: date-time
+             * @description When it happened: the event start for a no-show, the moment it was recorded otherwise.
+             */
+            date: string;
+            opportunityTitle: string | null;
+            organization: string | null;
+        };
         PublicProfileDto: {
             verification: components["schemas"]["VerificationDto"];
             /** @example Aziza Karimova */
@@ -5182,6 +5201,7 @@ export interface components {
             joinedAt?: string | null;
             /** @enum {string} */
             level: "newcomer" | "volunteer" | "supervisor" | "coordinator" | "leader";
+            /** @description Net experience points. Negative when penalties and deductions outweigh what was earned; the leaderboard still ranks from zero. */
             xp: number;
             stats: components["schemas"]["PublicProfileStatsDto"];
             pastEvents: components["schemas"]["PublicPastEventDto"][];
@@ -5189,6 +5209,8 @@ export interface components {
             activity: components["schemas"]["PublicActivityDto"][];
             /** @description Claimed rewards. */
             rewards: components["schemas"]["CheckpointRewardHistoryDto"][];
+            /** @description Every loss of experience points, newest first, at most 50: unexcused no-show penalties, administrator deductions with their reason, and the milestone reset. */
+            deductions: components["schemas"]["PublicDeductionDto"][];
         };
         CreateBlogPostDto: {
             /** @enum {string} */
