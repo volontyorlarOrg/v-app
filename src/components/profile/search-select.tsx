@@ -30,6 +30,7 @@ export function SearchSelect({
   labels,
   filter,
   extra,
+  last,
   footer,
   status,
   disabled = false,
@@ -45,6 +46,7 @@ export function SearchSelect({
   labels: SearchSelectLabels;
   filter: (option: SearchSelectOption, query: string) => boolean;
   extra?: (query: string) => SearchSelectOption | null;
+  last?: SearchSelectOption | null;
   footer?: string;
   status?: string;
   disabled?: boolean;
@@ -58,13 +60,18 @@ export function SearchSelect({
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const matches = useMemo(() => {
-    const found = options.filter((option) => filter(option, query));
+    const found = options.filter(
+      (option) => option.id !== last?.id && filter(option, query),
+    );
     const added = extra?.(query);
     return added && !found.some((option) => option.id === added.id)
       ? [added, ...found]
       : found;
-  }, [options, filter, extra, query]);
-  const visible = matches.slice(0, VISIBLE_LIMIT);
+  }, [options, filter, extra, last, query]);
+  const visible = useMemo(() => {
+    const shown = matches.slice(0, VISIBLE_LIMIT);
+    return last ? [...shown, last] : shown;
+  }, [matches, last]);
   const positions = useMemo(
     () => new Map(visible.map((option, index) => [option.id, index])),
     [visible],
@@ -246,7 +253,7 @@ export function SearchSelect({
             </li>
           ))}
         </ul>
-        {!status && visible.length === 0 ? (
+        {!status && matches.length === 0 ? (
           <p
             role="status"
             className="px-4 pt-1 pb-4 text-center text-sm text-ink-muted"

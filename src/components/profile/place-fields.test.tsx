@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PlaceFields, type PlaceLabels } from "./place-fields";
 
@@ -33,12 +34,12 @@ const value = {
   gradeYear: "2",
 };
 
-function setup(unavailable?: React.ReactNode) {
+function setup(unavailable?: React.ReactNode, place = value) {
   return render(
     <form aria-label="place">
       <PlaceFields
         idPrefix="p"
-        value={value}
+        value={place}
         onChange={() => {}}
         errors={{}}
         regions={[{ value: "tashkent-city", label: "Tashkent city" }]}
@@ -53,7 +54,52 @@ function setup(unavailable?: React.ReactNode) {
   );
 }
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("PlaceFields", () => {
+  it("ends the school list with the district's other school", async () => {
+    const school = {
+      id: "school-1726294-5",
+      type: "school",
+      region: "tashkent-city",
+      districtId: "1726294",
+      name: { uz: "5-son maktab", ru: "Школа № 5", en: "School No. 5" },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ items: [school] })),
+    );
+    setup(undefined, {
+      ...value,
+      educationType: "school",
+      institutionId: "",
+      gradeYear: "",
+    });
+
+    await userEvent.click(document.getElementById("p-institutionId")!);
+    const listbox = await screen.findByRole("listbox");
+    await within(listbox).findByText("School No. 5");
+
+    expect(
+      within(listbox)
+        .getAllByRole("option")
+        .map((option) => option.textContent),
+    ).toEqual(["School No. 5", "Other school"]);
+
+    await userEvent.type(
+      screen.getByRole("combobox", { name: "institutionSearch" }),
+      "nothing like it",
+    );
+    expect(
+      within(screen.getByRole("listbox"))
+        .getAllByRole("option")
+        .map((option) => option.textContent),
+    ).toEqual(["Other school"]);
+    expect(screen.getByText("schoolEmpty")).toBeInTheDocument();
+  });
+
   it("credits the directory sources beside the institution", () => {
     setup();
 

@@ -20,6 +20,7 @@ import {
   matchesOption,
   needsInstitution,
   numberedSchoolOption,
+  otherSchoolOption,
   schoolNumberQuery,
   sortByLocalName,
   type DistrictOption,
@@ -287,12 +288,20 @@ export function PlaceFields({
     [scopeDistrict, locale],
   );
 
+  const otherSchool = useMemo<SearchSelectOption | null>(() => {
+    if (education !== "school" || !scopeDistrict || schools.status !== "ready")
+      return null;
+    const option = otherSchoolOption(scopeDistrict);
+    return { id: option.id, label: localName(option.name, locale) };
+  }, [education, scopeDistrict, schools.status, locale]);
+
   const selectedInstitution =
     picked && picked.id === value.institutionId
       ? picked.label
       : value.institutionId
         ? (institutionOptions.find((option) => option.id === value.institutionId)
-            ?.label ?? null)
+            ?.label ??
+          (otherSchool?.id === value.institutionId ? otherSchool.label : null))
         : null;
 
   const chooseRegion = (region: string) => {
@@ -449,6 +458,7 @@ export function PlaceFields({
                 }}
                 filter={filterOption}
                 extra={education === "school" ? numberedSchool : undefined}
+                last={otherSchool}
                 footer={education === "school" ? labels.schoolNumberHint : undefined}
                 status={schoolStatus}
                 invalid={Boolean(errors.institutionId)}

@@ -88,6 +88,20 @@ export function numberedSchoolOption(
   };
 }
 
+export function otherSchoolOption(district: DistrictOption): InstitutionOption {
+  return {
+    id: `school-${district.id}-other`,
+    type: "school",
+    region: district.region,
+    districtId: district.id,
+    name: {
+      uz: "Boshqa maktab",
+      ru: "Другая школа",
+      en: "Other school",
+    },
+  };
+}
+
 const APOSTROPHES = /['‘’`ʻʼ´]/g;
 
 export function searchKey(value: string): string {
