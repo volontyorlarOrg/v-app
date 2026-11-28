@@ -42,18 +42,17 @@ reads the local `v-backend` and its separate development database. Run
 - The two sign-in surfaces: log in and create an account, each with Telegram,
   Google, and an email and password form. Google renders disabled with a note
   until its client id is set.
-- A product panel: a navy sidebar on desktop carrying the lockup, the
-  notification bell, the three sections and the identity card, with no top
-  bar; a slim header and a four-tab bar on a phone.
-- The dashboard: greeting and level, three figures, the next commitment,
-  recent applications, and one progress panel for record and profile readiness.
+- A product panel: a sidebar on desktop carrying the lockup, the four
+  sections (Dashboard, Opportunities, Leaderboard, Tasks) and the identity
+  card, with profile and settings at its foot; a slim header and a tab bar on a
+  phone.
+- The dashboard: greeting and the hours-based level, the next commitment,
+  recent applications, and progress toward the next level.
 - Live-data product screens: opportunities with URL-backed filters and detail
   pages, applications with status groups and a timeline per application, a
   saved Opportunities view, the record with a participation history, a profile
   editor, and settings for appearance and linked sign-in methods.
 
-## Where to read next
+## Working guide
 
-| You want                 | Go to                    |
-| ------------------------ | ------------------------ |
-| How to work in this repo | [`AGENTS.md`](AGENTS.md) |
+The working guide for this repository (`AGENTS.md`) is kept in each developer's local checkout and is not part of the repository.

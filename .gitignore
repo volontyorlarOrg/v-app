@@ -49,3 +49,8 @@ next-env.d.ts
 /playwright/.cache/
 
 /.impeccable/review/
+
+# agent guides and docs stay in local checkouts
+AGENTS.md
+CLAUDE.md
+docs/
